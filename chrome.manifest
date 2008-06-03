@@ -1,0 +1,7 @@
+content melampus jar:chrome/melampus.jar!/content/
+content melampus jar:chrome/melampus.jar!/content/ contentaccessible=yes
+locale	melampus	en-US		jar:chrome/melampus.jar!/locale/en-US/
+skin	melampus	classic/1.0	jar:chrome/melampus.jar!/skin/
+
+overlay	chrome://browser/content/browser.xul	chrome://melampus/content/melampus-overlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://melampus/skin/melampus.css

@@ -1,0 +1,175 @@
+/*
+ * CSS for Latin verb conjugation table
+ */
+body, th, td {
+    font-family: "Trebuchet MS", "Arial Unicode MS", sans-serif;
+    font-size: 90%;
+}
+
+.title {
+    font-weight: bold;
+    text-align: center;
+    font-size: 110%;
+}
+
+#links a {
+    padding-right: 1em;
+}
+
+#expand-table-link {
+    display: none;
+}
+
+#reorder {
+    display: none;
+}
+
+.reorder-links {
+    display: none;
+}
+
+table#mp-infl-table {
+	border-collapse: collapse;
+	border: 2px solid;
+	/*width: auto;*/
+	table-layout: fixed;
+}
+
+#mp-infl-table caption {
+    font-weight: bold;
+    text-align: left;
+}
+
+#mp-infl-table tr {
+	border: 1px solid gray;
+	padding: 2px;
+}
+
+
+#expand-table {
+    display: none;
+}
+
+th {
+    display: none;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    padding: 2px;
+}
+td {
+    display: none;
+}
+
+th.always-visible {
+  display:table-cell;
+}
+
+tr#headerrow1 th:first-child {
+    visibility: hidden; 
+
+}
+
+
+tr.data-row th {
+   display:table-cell;
+   font-weight: normal;
+   font-style: italic;
+   border-left: 1px solid black;
+   border-right: none;
+}
+
+tr.group1row td {
+    border-left: none;
+    border-right: none;    
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+}
+
+
+tr.group1row th {
+    border-left: 1px solid black;
+    border-right: none;
+    text-align: left;
+}
+
+
+.ending {
+    padding-left: 2px;
+    display: inline;
+    white-space: nowrap;
+}
+
+a.footnote:after {
+    content: " ";
+
+}
+
+.footnote {
+    vertical-align: super;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.footnote-text {
+    display: none;
+}
+
+.footnote-visible {
+    display: inline;
+    position: absolute;
+    color: black;
+    padding: 2px;
+    font-weight: normal;
+    border: 1px solid #BBC !important;
+    background-color: #F0F7FF;
+    white-space: normal;
+}
+
+
+td.highlight-ending {
+   
+}
+
+span.highlight-ending {
+    background-color: yellow;
+    font-weight: bold;
+    font-size: 1.25em;
+}
+
+.highlight-hover {
+   background-color: #c7b589;
+   
+}
+
+td {
+    border-left: 1px solid gray; 
+    border-right: 1px solid gray;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    padding: 2px;
+    white-space: nowrap;
+    vertical-align: bottom;
+    
+} 
+
+.notfirst {
+    padding-left: 0px;
+
+}
+.notfirst:before {
+    content: ", ";
+
+}
+
+.loading {
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background: transparent url(loading.gif) no-repeat;
+    cursor: progress;
+    white-space: nowrap;
+}

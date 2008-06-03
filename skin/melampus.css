@@ -1,0 +1,143 @@
+/*
+ * Copyright 2008 Cantus Foundation
+ * http://alpheios.net
+ *
+ * Icons from http://tango.freedesktop.org
+ * 
+ * This file is part of Melampus.
+ * 
+ * Melampus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Melampus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+#mp-window {
+	width: auto;
+	height: auto;
+	background: transparent;
+	color: #000000;
+	border: none !important;
+	border-spacing: 0px;
+	margin: 0px;
+	padding: 0px;
+	letter-spacing: normal;
+	text-align: left;
+	text-decoration: none;
+	text-indent: 0px;
+	text-transform: none;
+	white-space: normal;
+	word-spacing: normal;
+	font: normal 14px sans-serif;
+	visibility: visible;
+	position: absolute; 
+	z-index: 7777;
+	border: 1px solid #BBC !important;
+	padding: 4px;
+	background: #F0F7FF;
+	top: 5px;
+	left: 5px;
+	min-width: 100px;
+}
+
+/* XML Markup */
+#mp-text {
+    font-size: 1em;
+    font-style: normal;
+}
+
+.mp-entry span {
+    padding-right: .5em;
+}
+
+.mp-hdwd,.mp-phrase {
+    font-weight: bold;
+}
+
+.mp-mean {
+    font-style: italic;
+    margin-left: 1em;
+}
+
+.mp-entry,.mp-unknown,.mp-error {
+    margin-bottom: 1em;
+}
+
+.mp-attr {
+    font-weight: normal;
+    color: #000000;
+	background: #F0F7FF;
+}
+
+.mp-case,.mp-mood,.mp-decl,.mp-conj,.mp-pofs {
+	color:blue;
+	background: #F0F7FF;
+	cursor: pointer;
+}
+
+/* attributes inside part-of-speech should not have pointer cursor */
+.mp-attr {
+    cursor: default;
+}
+
+.mp-pofs:after {
+    content: ";";
+}
+
+.mp-term {
+    margin-left: 1em;
+}
+
+.mp-infl {
+    margin-left: 2em;
+}
+
+#mp-close {
+    text-align: right;
+    color: blue;
+    background: #F0F7FF;
+    font-size: 85%;
+    cursor: pointer;
+}
+
+#mp-secondary-loading {
+    display: inline;
+    color: gray;
+    border: 2px outset black;
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background: white url(loading.gif) no-repeat;
+    cursor: progress;
+    white-space: nowrap;
+    position: absolute;
+}
+
+#mp-text-loading {
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background: transparent url(loading.gif) no-repeat;
+    cursor: progress;
+    white-space: nowrap;
+}
+
+.loading {
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background: transparent url(loading.gif) no-repeat;
+    cursor: progress;
+    white-space: nowrap;
+}

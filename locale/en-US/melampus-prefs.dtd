@@ -1,0 +1,18 @@
+<!ENTITY melampus.prefs.preferences "Melampus Preferences">
+<!ENTITY melampus.prefs.mouse "Mouse Settings">
+<!ENTITY melampus.prefs.system "System Settings">
+<!ENTITY melampus.prefs.general "General">
+<!ENTITY melampus.prefs.debug "Enable Console Debugging">
+<!ENTITY melampus.prefs.includecontext "Extract Surrounding Context From Word">
+<!ENTITY melampus.prefs.popuptrigger "Event triggers for popup:">
+<!ENTITY melampus.prefs.popuptrigger.default "Default:">
+<!ENTITY melampus.prefs.popuptrigger.mousemove "mousemove">
+<!ENTITY melampus.prefs.popuptrigger.dblclick "dblclick">
+<!ENTITY melampus.prefs.windows "Window Preferences">
+<!ENTITY melampus.prefs.grammar.window.loc "Grammar Window Location">
+<!ENTITY melampus.prefs.shift.window.loc "Shift Key Window Location">
+<!ENTITY melampus.prefs.top.left "Top Left">
+<!ENTITY melampus.prefs.top.right "Top Right">
+<!ENTITY melampus.prefs.bottom.left "Bottom Left">
+<!ENTITY melampus.prefs.bottom.right "Bottom Right">
+<!ENTITY melampus.prefs.default.language "Preferred Language">

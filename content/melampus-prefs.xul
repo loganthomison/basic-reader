@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://melampus/skin/prefs/melampus-prefs.css/" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://melampus/locale/melampus-prefs.dtd">
+<prefwindow id="melampus-prefs" title="&melampus.prefs.preferences;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        buttons="accept,cancel">
+<prefpane id="melampus-prefs-system" 
+          label="&melampus.prefs.system;" 
+          image="chrome://melampus/skin/prefs/emblem-system.png">
+    <preferences>
+        <preference id="pref-debug" name="extensions.melampus.debug" type="bool"/>
+        <preference id="pref-default-language" 
+                    name="extensions.melampus.default_language" 
+                    type="string"/>
+    </preferences>
+    <hbox flex="1" align="center">
+    <vbox flex="1">
+        <groupbox>
+            <caption label="&melampus.prefs.general;"/>
+            <checkbox id="debug" label="&melampus.prefs.debug;" preference="pref-debug"/>
+            <label value="&melampus.prefs.default.language;" control="default-language"/>
+            <textbox id="default-language" 
+                     preference="pref-default-language"/>
+        </groupbox>
+    </vbox>
+    </hbox>
+</prefpane>
+<prefpane id="melampus-prefs-mouse" 
+          label="&melampus.prefs.mouse;" 
+          image="chrome://melampus/skin/prefs/input-mouse.png">
+    <preferences>
+        <preference id="pref-trigger" name="extensions.melampus.popuptrigger" type="string"/>
+    </preferences>
+        <label value="&melampus.prefs.popuptrigger;" />
+        <hbox id="melampus-mouse-hbox" flex="1" align="center">
+        <groupbox id="melampus-mouse-group" flex="1">    
+            <radiogroup preference="pref-trigger">
+                <caption label="&melampus.prefs.popuptrigger.default;" />
+                <radio label="&melampus.prefs.popuptrigger.mousemove;" value="mousemove"/>    
+                <radio label="&melampus.prefs.popuptrigger.dblclick;" value="dblclick"/>
+            </radiogroup>
+        </groupbox>
+        </hbox>
+</prefpane>
+<prefpane id="melampus-prefs-windows"
+          label="&melampus.prefs.windows;"
+          image="chrome://melampus/skin/prefs/preferences-system-windows.png">
+    <preferences>
+        <preference id="pref-grammar-window-loc" 
+                    name="extensions.melampus.grammar.window.loc" 
+                    type="string"/>
+        <preference id="pref-shift-window-loc" 
+                    name="extensions.melampus.shift.window.loc" 
+                    type="string"/>
+    </preferences>
+    <hbox flex="1" align="center">
+        <vbox flex="1">
+            <label value="&melampus.prefs.shift.window.loc;"
+                   control="shift-window-loc"/>
+            <menulist id="shift-window-loc" 
+                      preference="pref-shift-window-loc">
+                <menupopup>
+                    <menuitem label="&melampus.prefs.top.left;" 
+                              value="topleft"/>
+                    <menuitem label="&melampus.prefs.top.right;" 
+                              value="topright"/>
+                    <menuitem label="&melampus.prefs.bottom.left;" 
+                              value="bottomleft"/>
+                    <menuitem label="&melampus.prefs.bottom.right;" 
+                              value="bottomright"/>
+                </menupopup>
+            </menulist>
+            <label value="&melampus.prefs.grammar.window.loc;"
+                   control="grammar-window-loc"/>
+            <menulist id="grammar-window-loc" 
+                      preference="pref-grammar-window-loc">
+                <menupopup>
+                    <menuitem label="&melampus.prefs.top.left;" 
+                              value="topleft"/>
+                    <menuitem label="&melampus.prefs.top.right;" 
+                              value="topright"/>
+                    <menuitem label="&melampus.prefs.bottom.left;" 
+                              value="bottomleft"/>
+                    <menuitem label="&melampus.prefs.bottom.right;" 
+                              value="bottomright"/>
+                </menupopup>
+            </menulist>
+        </vbox>
+    </hbox>
+</prefpane>
+</prefwindow>
