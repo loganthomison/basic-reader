@@ -1,0 +1,18 @@
+<!ENTITY alpheios.prefs.preferences "Alpheios Preferences">
+<!ENTITY alpheios.prefs.mouse "Mouse Settings">
+<!ENTITY alpheios.prefs.system "System Settings">
+<!ENTITY alpheios.prefs.general "General">
+<!ENTITY alpheios.prefs.debug "Enable Console Debugging">
+<!ENTITY alpheios.prefs.includecontext "Extract Surrounding Context From Word">
+<!ENTITY alpheios.prefs.popuptrigger "Event triggers for popup:">
+<!ENTITY alpheios.prefs.popuptrigger.default "Default:">
+<!ENTITY alpheios.prefs.popuptrigger.mousemove "mousemove">
+<!ENTITY alpheios.prefs.popuptrigger.dblclick "dblclick">
+<!ENTITY alpheios.prefs.windows "Window Preferences">
+<!ENTITY alpheios.prefs.grammar.window.loc "Grammar Window Location">
+<!ENTITY alpheios.prefs.shift.window.loc "Shift Key Window Location">
+<!ENTITY alpheios.prefs.top.left "Top Left">
+<!ENTITY alpheios.prefs.top.right "Top Right">
+<!ENTITY alpheios.prefs.bottom.left "Bottom Left">
+<!ENTITY alpheios.prefs.bottom.right "Bottom Right">
+<!ENTITY alpheios.prefs.default.language "Preferred Language">

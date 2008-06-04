@@ -1,0 +1,11 @@
+<!ENTITY alpheios.inline.enable.cm "Toggle Alpheios On">
+<!ENTITY alpheios.inline.disable.cm "Toggle Alpheios Off">
+<!ENTITY alpheios.inline.cm.key "m">
+<!ENTITY alpheios.inline.enable.tm "Toggle Alpheios On">
+<!ENTITY alpheios.inline.disable.tm "Toggle Alpheios Off">
+<!ENTITY alpheios.inline.tm.key "m">
+<!ENTITY alpheios.decl.table.title "Declension Table">
+<!ENTITY alpheios.infl.window.title "Inflections">
+<!ENTITY alpheios.lang.menu "Alpheios Language">
+<!ENTITY alpheios.lang.none "(none supported)">
+
