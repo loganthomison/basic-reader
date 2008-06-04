@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE window SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+
+<overlay id="alpheios" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <stringbundleset id="stringbundleset">
+        <stringbundle id="alpheios-strings" 
+                      src="chrome://alpheios/locale/alpheios.properties"/>
+    </stringbundleset>
+
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+	<script type="application/x-javascript" src="chrome://alpheios/content/alpheios-main.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-popup.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-lang-tool.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-languages.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-src-select.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.1.min.js" />
+        
+	<commandset id="mainCommandSet">
+		<command id="alpheios-toggle-cmd" oncommand="Alph.main.alph_inlineToggle();"/>
+        <command id="alpheios-lang-cmd" 
+                 oncommand="Alph.main.select_language(event.target.value);"/>
+	</commandset>
+
+	<popup id="contentAreaContextMenu">
+		<menuseparator id="alpheios-separator-cm" 
+                       hidden="false" />
+		<menuitem id="alpheios-toggle-cm" 
+                  label="&alpheios.inline.enable.cm;" 
+                  accesskey="&alpheios.inline.cm.key;"  
+                  key="alpheios-toggle-key" 
+                  command="alpheios-toggle-cmd" 
+                  hidden="false" 
+                  insertafter="alpheios-separator-cm"/>
+        <menu id="alpheios-lang-menu-cm" 
+              label="&alpheios.lang.menu;"
+              insertafter="alpheios-toggle-cm"
+              command="alpheios-lang-cmd">
+            <menupopup id="alpheios-lang-popup-cm">
+                <menuitem id="alpheios-cm-lang-none"
+                          label="&alpheios.lang.none;"
+                          hidden="true"
+                          type="checkbox"
+                          value=""/>
+            </menupopup>   
+        </menu>
+	</popup>
+	
+	<menupopup id="menu_ToolsPopup">
+        <menuseparator id="alpheios-separator-tm" 
+                       hidden="false"/>
+        <menuitem id="alpheios-toggle-tm" 
+                  label="&alpheios.inline.enable.tm;" 
+                  accesskey="&alpheios.inline.tm.key;" 
+                  key="alpheios-toggle-key" 
+                  command="alpheios-toggle-cmd"  
+                  hidden="false" 
+                  insertafter="alpheios-separator-tm" />
+        <menu id="alpheios-lang-menu-tm" 
+              label="&alpheios.lang.menu;"
+              insertafter="alpheios-toggle-tm"
+              command="alpheios-lang-cmd">
+            <menupopup id="alpheios-lang-popup-tm">
+                <menuitem id="alpheios-tm-lang-none"
+                          label="&alpheios.lang.none;"
+                          value=""
+                          type="checkbox"
+                          hidden="true"/>
+            </menupopup>   
+        </menu>
+    </menupopup>
+</overlay>

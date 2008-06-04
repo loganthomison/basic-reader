@@ -1,19 +1,19 @@
 /**
- * @fileoverview This file defines the MP.LanguageTool class prototype.
+ * @fileoverview This file defines the Alph.LanguageTool class prototype.
  *
  * @version $Id$
  *
  * Copyright 2008 Cantus Foundation
  * http://alpheios.net
  * 
- * This file is part of Melampus.
+ * This file is part of Alpheios.
  * 
- * Melampus is free software: you can redistribute it and/or modify
+ * Alpheios is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * Melampus is distributed in the hope that it will be useful,
+ * Alpheios is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,7 +24,7 @@
 
 
 /**
- * @class  MP.LanguageTool is the base class for language-specific
+ * @class  Alph.LanguageTool is the base class for language-specific
  * functionality.
  * 
  * @constructor 
@@ -32,13 +32,13 @@
  * @param {Properties} a_properties additional properties to set as private members of 
  *                                  the object (accessor methods will be dynamically created)
  */
-MP.LanguageTool = function(a_language,a_properties) 
+Alph.LanguageTool = function(a_language,a_properties) 
 {
     this.source_language = a_language;
 
  
     // TODO need to figure out which properties should be immutable.
-    // Use of the function calls to MP.util.getPref allows the properties
+    // Use of the function calls to Alph.util.getPref allows the properties
     // to change if the user modifies the preferences, but there may be
     // some properties for which we can't allow changes without reinstanting
     // the object.
@@ -46,26 +46,26 @@ MP.LanguageTool = function(a_language,a_properties)
     {
         context_forward: function()
             { 
-                return MP.util.getPref("context_forward",a_language) 
+                return Alph.util.getPref("context_forward",a_language) 
                     || 0;
             },
         context_back: function()
             { 
-                return MP.util.getPref("context_back",a_language) 
+                return Alph.util.getPref("context_back",a_language) 
                     || 0;
             },
-        chromepkg: function(){ return MP.util.getPref("chromepkg",a_language) || "melampus"},
+        chromepkg: function(){ return Alph.util.getPref("chromepkg",a_language) || "alpheios"},
         popuptrigger: function() 
             { 
                 // individual language may override the popuptrigger,
                 // but they don't have to
-                return MP.util.getPrefOrDefault("popuptrigger",a_language); 
+                return Alph.util.getPrefOrDefault("popuptrigger",a_language); 
             },
-        usemhttpd : function(){ return MP.util.getPref("usemhttpd",a_language) },
+        usemhttpd : function(){ return Alph.util.getPref("usemhttpd",a_language) },
         grammarlinks: function() 
             { 
                 var grammarlinklist = {};
-                var links = MP.util.getPref("grammar.hotlinks",a_language);
+                var links = Alph.util.getPref("grammar.hotlinks",a_language);
                 if (typeof links != "undefined")
                 {
                     links = links.split(/,/);
@@ -88,24 +88,24 @@ MP.LanguageTool = function(a_language,a_properties)
     this.set_context_handler();
     this.set_shift_handler();
     
-    var startup_methods = MP.util.getPref("methods.startup",a_language);
+    var startup_methods = Alph.util.getPref("methods.startup",a_language);
     if (typeof startup_methods != "undefined")
     {
         startup_methods = startup_methods.split(/,/);
         for (var i=0; i<startup_methods.length; i++)
         {
             var method_name = startup_methods[i];
-            // is the method in the MP.LanguageTool object?
+            // is the method in the Alph.LanguageTool object?
             if (typeof this[method_name] == 'function')
             {
-                MP.util.log("Calling " + method_name + " for " + a_language);
+                Alph.util.log("Calling " + method_name + " for " + a_language);
                 this[method_name]();
                 // TODO should we throw an error if the startup method returns false?
             }
             // TODO - do we want to support eval of javascript code present as a string in the config? 
             else
             {
-                MP.util.log("Startup method " + method_name + "for " + a_language + " not defined");
+                Alph.util.log("Startup method " + method_name + "for " + a_language + " not defined");
             }
         }
     }
@@ -119,7 +119,7 @@ MP.LanguageTool = function(a_language,a_properties)
  * @private
  * @type String 
  */
-MP.LanguageTool.prototype.source_language = '';
+Alph.LanguageTool.prototype.source_language = '';
 
 /**
  * Creates accessor methods on the instance for the 
@@ -131,7 +131,7 @@ MP.LanguageTool.prototype.source_language = '';
  *                      by the get accessor, otherwise,the value will 
  *                      be returned as-is 
  */
-MP.LanguageTool.prototype.set_accessors = function(a_properties) 
+Alph.LanguageTool.prototype.set_accessors = function(a_properties) 
 {
         var myobj = this;
         for ( var prop in a_properties ) 
@@ -167,27 +167,27 @@ MP.LanguageTool.prototype.set_accessors = function(a_properties)
  * @see #findSelection 
  * @private
  */
-MP.LanguageTool.prototype.set_find_selection = function()
+Alph.LanguageTool.prototype.set_find_selection = function()
 {
     // get the base unit
     // default to 'word' if not defined
     var base_unit = 
-        MP.util.getPref('base_unit',
+        Alph.util.getPref('base_unit',
                          this.source_language) || 'word';
     if (base_unit == 'word')
     {
         this.findSelection = function(a_ro, a_rangstr)
             {
-                var mptarget = this.doSpaceSeparatedWordSelection(a_ro, a_rangstr);
-                return this.handleConversion(mptarget);
+                var alphtarget = this.doSpaceSeparatedWordSelection(a_ro, a_rangstr);
+                return this.handleConversion(alphtarget);
             }
     }
     else if (base_unit == 'character')
     {
         this.findSelection = function(a_ro, a_rangstr)
             {
-                var mptarget = this.doCharacterBasedWordSelection(a_ro, a_rangstr);           
-                return this.handleConversion(mptarget);
+                var alphtarget = this.doCharacterBasedWordSelection(a_ro, a_rangstr);           
+                return this.handleConversion(alphtarget);
             }
     }
     else
@@ -201,9 +201,9 @@ MP.LanguageTool.prototype.set_find_selection = function()
  * which encompass the range offset (to be fed to a lexicon tool).
  * @param {int} a_ro the range offset
  * @param {String} a_rngstr the string of characters containing the range offset
- * @return {MP.SourceSelection} {@link MP.SourceSelection} object
+ * @return {Alph.SourceSelection} {@link Alph.SourceSelection} object
  */
-MP.LanguageTool.prototype.findSelection = function(a_ro, a_rngstr)
+Alph.LanguageTool.prototype.findSelection = function(a_ro, a_rngstr)
 {
     alert("No selection method defined");
     return {};
@@ -215,21 +215,21 @@ MP.LanguageTool.prototype.findSelection = function(a_ro, a_rngstr)
  * @see #lexiconLookup 
  * @private
  */
-MP.LanguageTool.prototype.set_lexicon_lookup = function()
+Alph.LanguageTool.prototype.set_lexicon_lookup = function()
 {
     var lexicon_method = 
-        MP.util.getPref("methods.lexicon",this.source_language);
+        Alph.util.getPref("methods.lexicon",this.source_language);
     if (lexicon_method == 'webservice')
     {
-        this.lexiconLookup = function(a_mptarget,a_onsuccess,a_onerror)
+        this.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
         {
-            MP.util.log("Query word: " + a_mptarget.getWord());
+            Alph.util.log("Query word: " + a_alphtarget.getWord());
 
             var url = 
-                MP.util.getPref("url.lexicon",this.source_language) +
-                MP.util.getPref("url.lexicon.request",this.source_language);
+                Alph.util.getPref("url.lexicon",this.source_language) +
+                Alph.util.getPref("url.lexicon.request",this.source_language);
                 url = url.replace(/\<WORD\>/,
-                                  encodeURIComponent(a_mptarget.getWord()));
+                                  encodeURIComponent(a_alphtarget.getWord()));
                 // TODO add support for the context in the lexicon url
         
             // send asynchronous request to the lexicon service
@@ -237,7 +237,7 @@ MP.LanguageTool.prototype.set_lexicon_lookup = function()
                 {
                     type: "GET",
                     url: url,
-                    timeout: MP.util.getPref("url.lexicon.timeout",this.source_language),
+                    timeout: Alph.util.getPref("url.lexicon.timeout",this.source_language),
                     dataType: 'html', //TODO - get from prefs
                     error: function(req,textStatus,errorThrown)
                     {
@@ -256,24 +256,24 @@ MP.LanguageTool.prototype.set_lexicon_lookup = function()
     }
     else
     {
-        MP.util.log("methods.lexicon invalid or undefined: " + lexicon_method);
+        Alph.util.log("methods.lexicon invalid or undefined: " + lexicon_method);
     }
 }
 
 /**
  * Looks up the target selection in the lexicon tool
- * @param {MP.SourceSelection} a_mptarget the target selection object (as returned by findSelection)
+ * @param {Alph.SourceSelection} a_alphtarget the target selection object (as returned by findSelection)
  * @param {function} a_onsuccess callback upon successful lookup. 
  *                               Takes the lexicon output as an argument.
  * @param {function} a_onerror callback upon successful lookup.  
  *                             Takes an error message as argument.
  */
-MP.LanguageTool.prototype.lexiconLookup = function(a_mptarget,a_onsuccess,a_onerror)
+Alph.LanguageTool.prototype.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
 {
     var err_msg = 
         document
-        .getElementById("melampus-strings")
-        .getFormattedString("mp-error-nolexicon",[this.source_language]);
+        .getElementById("alpheios-strings")
+        .getFormattedString("alph-error-nolexicon",[this.source_language]);
 
     a_onerror(err_msg);
 };
@@ -284,17 +284,17 @@ MP.LanguageTool.prototype.lexiconLookup = function(a_mptarget,a_onsuccess,a_oner
  * @see #contextHandler 
  * @private
  */
-MP.LanguageTool.prototype.set_context_handler = function()
+Alph.LanguageTool.prototype.set_context_handler = function()
 {
     var context_handler = 
-        MP.util.getPref("context_handler",this.source_language);
+        Alph.util.getPref("context_handler",this.source_language);
     if (typeof this[context_handler] == 'function')
     {
         this.contextHandler = this[context_handler];
     }
     else
     {
-        MP.util.log("No context_handler defined for " + this.source_language);    
+        Alph.util.log("No context_handler defined for " + this.source_language);    
     }
     
 }
@@ -305,7 +305,7 @@ MP.LanguageTool.prototype.set_context_handler = function()
  * TODO - does this really need to be the whole document 
  *        or just the popup? 
  */
-MP.LanguageTool.prototype.contextHandler = function(a_doc) 
+Alph.LanguageTool.prototype.contextHandler = function(a_doc) 
 {
     // default is to do nothing 
     return;
@@ -317,17 +317,17 @@ MP.LanguageTool.prototype.contextHandler = function(a_doc)
  * @see #shiftHandler 
  * @private
  */
-MP.LanguageTool.prototype.set_shift_handler = function()
+Alph.LanguageTool.prototype.set_shift_handler = function()
 {
     var shift_handler = 
-        MP.util.getPref("shift_handler",this.source_language);
+        Alph.util.getPref("shift_handler",this.source_language);
     if (typeof this[shift_handler] == 'function')
     {
         this.shiftHandler = this[shift_handler];
     }
     else
     {
-        MP.util.log("No shift_handler defined for " + this.source_language);    
+        Alph.util.log("No shift_handler defined for " + this.source_language);    
     }
 }
 /**
@@ -335,7 +335,7 @@ MP.LanguageTool.prototype.set_shift_handler = function()
  * TODO - this should really be a generic keypress handler
  * @param {Event} a_event the keypress event
  */
-MP.LanguageTool.prototype.shiftHandler = function(a_event)
+Alph.LanguageTool.prototype.shiftHandler = function(a_event)
 {
     // default is to do nothing
     return;
@@ -349,24 +349,24 @@ MP.LanguageTool.prototype.shiftHandler = function(a_event)
  * @see #findSelection 
  * @private
  */
-MP.LanguageTool.prototype.doSpaceSeparatedWordSelection = 
+Alph.LanguageTool.prototype.doSpaceSeparatedWordSelection = 
 function(a_ro, a_rngstr)
 {
 
-    var result = new MP.SourceSelection();
+    var result = new Alph.SourceSelection();
     
     // clean string:
     //   convert punctuation to spaces
     a_rngstr = a_rngstr.replace(/[.,;:!?'\"(){}\[\]\/\\\xA0\n\r]/g, " ");
     
-    MP.util.log("In doSpaceSeparatedWordSelection for " + a_rngstr);
+    Alph.util.log("In doSpaceSeparatedWordSelection for " + a_rngstr);
 
     // If the user selected whitespace in the margins of a range
     // close the popup and return.
     if (this.selectionInMargin(a_ro, a_rngstr))
     {
         // return and hide popup for mouseover whitespace
-        MP.xlate.hidePopup();
+        Alph.xlate.hidePopup();
         return result; 
     }
     
@@ -454,10 +454,10 @@ function(a_ro, a_rngstr)
  * @see #findSelection 
  * @private
  */
-MP.LanguageTool.prototype.doCharacterBasedWordSelection = 
+Alph.LanguageTool.prototype.doCharacterBasedWordSelection = 
 function(a_ro, a_rngstr)
 {
-    var result = new MP.SourceSelection();
+    var result = new Alph.SourceSelection();
     
     // clean string:
     //   convert punctuation to spaces
@@ -468,7 +468,7 @@ function(a_ro, a_rngstr)
     if (this.selectionInMargin(a_ro, a_rngstr))
     {
         // return and hide popup for mouseover whitespace
-        MP.xlate.hidePopup();
+        Alph.xlate.hidePopup();
         return result; 
     }
 
@@ -543,34 +543,34 @@ function(a_ro, a_rngstr)
  * Generic method to apply any necessary conversion
  * to the source text selection.
  * Delegates to a language-specific 
- * conversion method in the MP.convert namespace.
+ * conversion method in the Alph.convert namespace.
  * @private
- * @param {MP.SourceSelection} a_mptarget the object returned by {@link #findSelection}
+ * @param {Alph.SourceSelection} a_alphtarget the object returned by {@link #findSelection}
  */
-MP.LanguageTool.prototype.handleConversion = function(a_mptarget)
+Alph.LanguageTool.prototype.handleConversion = function(a_alphtarget)
 {
     var convert_method =
-        MP.util.getPref("methods.convert",this.source_language);
+        Alph.util.getPref("methods.convert",this.source_language);
         
     if (convert_method != null 
-        && typeof MP.convert[convert_method] == 'function'
-        && a_mptarget.getWord())
+        && typeof Alph.convert[convert_method] == 'function'
+        && a_alphtarget.getWord())
     {
-        a_mptarget.convertWord( function(a_word) { return MP.convert[convert_method](a_word); } );
+        a_alphtarget.convertWord( function(a_word) { return Alph.convert[convert_method](a_word); } );
     }
     
-    return a_mptarget;
+    return a_alphtarget;
 };
 
-MP.LanguageTool.prototype.convertString = function(a_str)
+Alph.LanguageTool.prototype.convertString = function(a_str)
 {
   var convert_method =
-        MP.util.getPref("methods.convert",this.source_language);
+        Alph.util.getPref("methods.convert",this.source_language);
         
     if (convert_method != null 
-        && typeof MP.convert[convert_method] == 'function')
+        && typeof Alph.convert[convert_method] == 'function')
     {
-        a_str = MP.convert[convert_method](a_str);
+        a_str = Alph.convert[convert_method](a_str);
     }
     return a_str;
 }
@@ -579,16 +579,16 @@ MP.LanguageTool.prototype.convertString = function(a_str)
 /**
  * Handler which can be used as the contextHander.  
  * It uses language-specific configuration to identify 
- * the elements from the mp-text popup which should produce links
+ * the elements from the alph-text popup which should produce links
  * to the language-specific grammar.
  * @see #contextHandler 
  */
-MP.LanguageTool.prototype.grammarContext = function(a_doc)
+Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 {
     var myobj=this;
-    var grammarurl = MP.util.getPref("url.grammar",this.source_language) || "";
+    var grammarurl = Alph.util.getPref("url.grammar",this.source_language) || "";
     var links = this.getgrammarlinks();
-    $("#mp-text",a_doc).bind(
+    $("#alph-text",a_doc).bind(
         "click", 
         function(a_e)
         {
@@ -623,12 +623,12 @@ MP.LanguageTool.prototype.grammarContext = function(a_doc)
                     
                 var grammar_loading_msg = 
                     document
-                    .getElementById("melampus-strings")
-                    .getString("mp-loading-grammar");
+                    .getElementById("alpheios-strings")
+                    .getString("alph-loading-grammar");
     
                 var features =
                     {
-                        screen: MP.util.getPref("grammar.window.loc")
+                        screen: Alph.util.getPref("grammar.window.loc")
                     };
                             
                 // TODO - list of parameters to pass should come from
@@ -636,15 +636,15 @@ MP.LanguageTool.prototype.grammarContext = function(a_doc)
                 var params = 
                     {
                         target_href: target,
-                        callback: MP.xlate.hideLoadingMessage
+                        callback: Alph.xlate.hideLoadingMessage
                     }
                 // open or replace the grammar window           
-                MP.xlate.openSecondaryWindow(
-                    "mp-grammar-window",
+                Alph.xlate.openSecondaryWindow(
+                    "alph-grammar-window",
                     targetURL,
                     features,
                     params,
-                    MP.xlate.showLoadingMessage,
+                    Alph.xlate.showLoadingMessage,
                     [range.startContainer,grammar_loading_msg]
                 );
             }            
@@ -656,18 +656,18 @@ MP.LanguageTool.prototype.grammarContext = function(a_doc)
 /**
  * 
  */
-MP.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_otherparams)
+Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_otherparams)
 {
 
-    if(! MP.xlate.popupVisible()) 
+    if(! Alph.xlate.popupVisible()) 
     {
         return;    
     }
     //TODO a_showpofs and a_otherparams should be merged
     var params = a_otherparams || {};
     params.showpofs = a_showpofs;
-    params.word = MP.main.getCurrentBrowser().melampus.word;
-    var popup = $("#mp-text", content.document);
+    params.word = Alph.main.getCurrentBrowser().alpheios.word;
+    var popup = $("#alph-text", content.document);
     params = this.getInflectionTable(popup,params)
     if (! params)
     {
@@ -675,7 +675,7 @@ MP.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_oth
     }
     if (typeof params.showpofs != 'undefined')
     {
-        MP.util.log("Handling inflections for " + params.showpofs);
+        Alph.util.log("Handling inflections for " + params.showpofs);
         
         // send the word endings to the declension table
         // if the window isn't already open, open it
@@ -684,17 +684,17 @@ MP.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_oth
         {
             width:"300",
             height:"620",
-            screen: MP.util.getPref("shift.window.loc"),
+            screen: Alph.util.getPref("shift.window.loc"),
             menubar: "yes",
             toolbar: "yes"
         }
-        MP.xlate.openSecondaryWindow(
-                        "mp-infl-table",
-                        "chrome://melampus/content/melampus-infl.xul",
+        Alph.xlate.openSecondaryWindow(
+                        "alph-infl-table",
+                        "chrome://alpheios/content/alpheios-infl.xul",
                         features,
                         params);
-            MP.util.log("Inflections window should have focus with " 
-                + MP.main.getCurrentBrowser().melampus.word);
+            Alph.util.log("Inflections window should have focus with " 
+                + Alph.main.getCurrentBrowser().alpheios.word);
     }
 }
 
@@ -705,10 +705,10 @@ MP.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_oth
  * @param {String} a_showcase the requested case to display in the popup
  *                  (if not defined the first case displayed will be used) 
  */
-MP.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
+Alph.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
 {
     
-    if(! MP.xlate.popupVisible()) 
+    if(! Alph.xlate.popupVisible()) 
     {
         return;    
     }
@@ -716,7 +716,7 @@ MP.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
     var params = { suffixes: { noun: [],
                                adjective: []
                              },
-                   word: MP.main.getCurrentBrowser().melampus.word,
+                   word: Alph.main.getCurrentBrowser().alpheios.word,
                    showcase: a_showcase
                  };
     var supported_cases = 
@@ -725,21 +725,21 @@ MP.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
           adjective: 'adjective'
         };
 
-    var popup = $("#mp-text", content.document);
+    var popup = $("#alph-text", content.document);
 
-    // The word will have one more more mp-infl-set elements
-    // Each mp-infl-set element should have a mp-suffix element
-    // and one or more mp-case elements.  Iterate through the mp-infl-sets
-    // retrieving the mp-suffix elements which are applicable to
+    // The word will have one more more alph-infl-set elements
+    // Each alph-infl-set element should have a alph-suffix element
+    // and one or more alph-case elements.  Iterate through the alph-infl-sets
+    // retrieving the alph-suffix elements which are applicable to
     // each supported case
-    $(".mp-infl-set",popup).each(
+    $(".alph-infl-set",popup).each(
         function(i)
         {
             for (var supported_case in supported_cases)
             {
                 var map_case = supported_cases[supported_case];
                 var has_case = 
-                    $(".mp-case[context$='" + map_case + "']",
+                    $(".alph-case[context$='" + map_case + "']",
                     this);
                 if ( has_case.length > 0 )
                 {
@@ -751,7 +751,7 @@ MP.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
                         params.showcase = map_case;
                     }
                     params.suffixes[map_case].push(
-                        $(".mp-suff",this).get());
+                        $(".alph-suff",this).get());
 
                 }                
             }
@@ -767,15 +767,15 @@ MP.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
         {
             width:"300",
             height:"620",
-            screen: MP.util.getPref("shift.window.loc")
+            screen: Alph.util.getPref("shift.window.loc")
         }
-        MP.xlate.openSecondaryWindow(
-                    "mp-decl-table",
-                    "chrome://melampus/content/melampus-decl.xul",
+        Alph.xlate.openSecondaryWindow(
+                    "alph-decl-table",
+                    "chrome://alpheios/content/alpheios-decl.xul",
                     features,
                     params);
-        MP.util.log("Declension table should have focus with " 
-            + MP.main.getCurrentBrowser().melampus.word);
+        Alph.util.log("Declension table should have focus with " 
+            + Alph.main.getCurrentBrowser().alpheios.word);
     }
 };
 
@@ -788,7 +788,7 @@ MP.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
  * @return true if in the margin, false if not
  * @type Boolean
  */
-MP.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
+Alph.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
 {
     // Sometimes mouseover a margin seems to set the range offset
     // greater than the string length, so check that condition,
@@ -808,7 +808,7 @@ MP.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
  * content document, to apply to the display of the popup
  * @param {Document} a_doc the window content document
  */
-MP.LanguageTool.prototype.addStyleSheet = function(a_doc)
+Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
 {
     var chromepkg = this.getchromepkg();
     var css = document.createElementNS(
@@ -826,7 +826,7 @@ MP.LanguageTool.prototype.addStyleSheet = function(a_doc)
  *  from the window content document.
  *  @param {Document} a_doc the window content document
  */
-MP.LanguageTool.prototype.removeStyleSheet = function(a_doc)
+Alph.LanguageTool.prototype.removeStyleSheet = function(a_doc)
 {
     var css_id = this.getchromepkg() + "-css";
     $("#"+css_id,a_doc).remove();
@@ -837,7 +837,7 @@ MP.LanguageTool.prototype.removeStyleSheet = function(a_doc)
  * changes to the transformed lexicon output
  * @param {Node} a_node the HTML DOM node containing the lexicon output 
  */
-MP.LanguageTool.prototype.postTransform = function(a_node)
+Alph.LanguageTool.prototype.postTransform = function(a_node)
 {
     // no default behavior
 };
@@ -850,7 +850,7 @@ MP.LanguageTool.prototype.postTransform = function(a_node)
  * @param {String} a_params optional requested parameters 
  * @return the parameters object for the inflection window
  */
-MP.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
+Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
 {
     // no default behavior
     return;

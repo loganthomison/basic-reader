@@ -1,5 +1,5 @@
 /**
- * @fileoverview This file contains the MP.xlate class with generic 
+ * @fileoverview This file contains the Alph.xlate class with generic 
  * Mouseover translation functions
  * 
  * @version $Id$
@@ -16,14 +16,14 @@
  * Based on rikaiXUL 0.4 by Todd Rudick
  * http://rikaixul.mozdev.org/
  * 
- * This file is part of Melampus.
+ * This file is part of Alpheios.
  * 
- * Melampus is free software: you can redistribute it and/or modify
+ * Alpheios is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * Melampus is distributed in the hope that it will be useful,
+ * Alpheios is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -32,17 +32,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// make sure the MP namespace is defined
-if (typeof MP == "undefined") {
-    MP = {};
+// make sure the Alph namespace is defined
+if (typeof Alph == "undefined") {
+    Alph = {};
 }
 
 
 /**
- * MP.xlate contains the generic popup functionality
+ * Alph.xlate contains the generic popup functionality
  * @singleton
  */
-MP.xlate = {
+Alph.xlate = {
     
     /**
      * An XSLT Processor for the lexicon xml output
@@ -52,7 +52,7 @@ MP.xlate = {
     xsltProcessor: null,
 
     /**
-     * Transforms xml text adhering to the melampus schema to html
+     * Transforms xml text adhering to the alpheios schema to html
      * TODO transform stylesheet may need to be language specific
      * @private
      * @param {String} a_text the text to be transformed
@@ -69,7 +69,7 @@ MP.xlate = {
              */
             this.xsltProcessor = new XSLTProcessor();
             var p = new XMLHttpRequest();
-            p.open("GET", "chrome://melampus/skin/melampus.xsl", false);
+            p.open("GET", "chrome://alpheios/skin/alpheios.xsl", false);
             p.send(null);
             var xslRef = p.responseXML;
             this.xsltProcessor.importStylesheet(xslRef)
@@ -83,7 +83,7 @@ MP.xlate = {
         }
         catch (e)
         {
-            MP.util.log(e);
+            Alph.util.log(e);
         }
         return wordHTML;
     },
@@ -121,9 +121,9 @@ MP.xlate = {
          * However, this does not seem to work the same for the dbleclick event
          * so this should be limited to use of the mousemove trigger.  
          */
-        if ( MP.main.getXlateTrigger() == 'mousemove' &&
+        if ( Alph.main.getXlateTrigger() == 'mousemove' &&
              (a_e.explicitOriginalTarget.nodeType != 3) && !("form" in a_e.target)) {
-            return MP.xlate.hidePopup();
+            return Alph.xlate.hidePopup();
         }
 
         /* The rangeParent is going to be a #text node.
@@ -152,7 +152,7 @@ MP.xlate = {
             if (testchar == 32 || testchar == 9 || testchar == 10)
             {
                 ++ro;
-                MP.util.log("Advancing range offset past whitespace.");
+                Alph.util.log("Advancing range offset past whitespace.");
             }
             else
             {
@@ -163,32 +163,32 @@ MP.xlate = {
         // if we advanced past the end of the string without finding anything 
         // then it was empty space so just close the popup and return 
         if (ro >= rngstr.length) {
-            return MP.xlate.hidePopup();
+            return Alph.xlate.hidePopup();
         }
-        var mptarget = MP.main.getLanguageTool().findSelection(ro,rngstr);
+        var alphtarget = Alph.main.getLanguageTool().findSelection(ro,rngstr);
 
         // if we couldn't identify the target word, return without doing anything
-        if (! mptarget.getWord())
+        if (! alphtarget.getWord())
         {
             return
         }
                     
         // nothing to do if same word as last AND the popup is shown
         // (hidePopup removes the last word from the state variable), 
-        var mp_state = MP.main.getCurrentBrowser().melampus;
-        if (mptarget.equals(mp_state.lastSelection))
+        var alph_state = Alph.main.getCurrentBrowser().alpheios;
+        if (alphtarget.equals(alph_state.lastSelection))
         {
             return;
         }
 
-        mp_state.lastWord = mptarget.getWord();
-        mp_state.lastSelection = mptarget;
+        alph_state.lastWord = alphtarget.getWord();
+        alph_state.lastSelection = alphtarget;
 
         // Add the range back to the document highlighted as the selected range
         var doc = rp.ownerDocument;
         var r = doc.createRange();
-        r.setStart(rp, mptarget.getWordStart());
-        r.setEnd(rp, mptarget.getWordEnd());
+        r.setStart(rp, alphtarget.getWordStart());
+        r.setEnd(rp, alphtarget.getWordEnd());
         var sel = doc.defaultView.getSelection();
         sel.removeAllRanges();
         sel.addRange(r);
@@ -196,16 +196,16 @@ MP.xlate = {
         // add the range parent object to the target
         // so that the user's selection can be highlighted
         // again differently after translation, if necessary
-        mptarget.setRangeParent(rp);
+        alphtarget.setRangeParent(rp);
         
         // show output
-        this.showPopup(a_e.target, a_e.screenX, a_e.screenY, mptarget);
+        this.showPopup(a_e.target, a_e.screenX, a_e.screenY, alphtarget);
     },
 
 
     /**
      * Displays an error in the popup. Supplied as a callback argument
-     * to the {@link MP.LanguageTool#lexiconLookup} method. 
+     * to the {@link Alph.LanguageTool#lexiconLookup} method. 
      * @param {String} a_msg the error message
      * @param a_topdoc The Document or Node which holds the popup
      */
@@ -213,27 +213,27 @@ MP.xlate = {
     {
         var err_msg =
             document
-                .getElementById("melampus-strings")
+                .getElementById("alpheios-strings")
                 .getFormattedString(
-                    "mp-loading-error",
+                    "alph-loading-error",
                     [a_msg ]);
-        MP.util.log("Query Response (Error): " + err_msg);
-        if (MP.main.useLocalDaemon() && 
-            typeof MP.main.getCurrentBrowser()
-                          .melampus.daemonPid == "undefined")
+        Alph.util.log("Query Response (Error): " + err_msg);
+        if (Alph.main.useLocalDaemon() && 
+            typeof Alph.main.getCurrentBrowser()
+                          .alpheios.daemonPid == "undefined")
         {
             err_msg = err_msg + '<br/>' +  
-                document.getElementById("melampus-strings")
-                        .getString("mp-error-mhttpd-notstarted");
+                document.getElementById("alpheios-strings")
+                        .getString("alph-error-mhttpd-notstarted");
         }
 
-        $("#mp-text-loading",a_topdoc).remove();
+        $("#alph-text-loading",a_topdoc).remove();
         
         // replace any earlier error
-        $("#mp-loading-error",a_topdoc).remove();
+        $("#alph-loading-error",a_topdoc).remove();
 
-        $("#mp-text",a_topdoc).append(
-            '<div id="mp-loading-error">' +
+        $("#alph-text",a_topdoc).append(
+            '<div id="alph-loading-error">' +
             err_msg +
             '</div>'
         );
@@ -242,41 +242,41 @@ MP.xlate = {
     /**
      * Shows the results of the lexicon lookup in the popup.
      * Supplied as a callback argument to the 
-     * {@link MP.LanguageTool#lexiconLookup} method.
+     * {@link Alph.LanguageTool#lexiconLookup} method.
      * @param {String} a_xml the xml string containing the lexicon response
-     * @param {Object} a_mptarget the details on the target of the event which triggered the popup
-     *                 (as returned by {@link MP.LanguageTool#findSelection})
+     * @param {Object} a_alphtarget the details on the target of the event which triggered the popup
+     *                 (as returned by {@link Alph.LanguageTool#findSelection})
      * @param a_topdoc the Document or Node which contains the popup  
      */
-    showTranslation: function(a_xml,a_mptarget,a_topdoc) {
-        MP.util.log("Query response:" + a_xml);
-        var wordHTML = MP.xlate.transform(a_xml);
+    showTranslation: function(a_xml,a_alphtarget,a_topdoc) {
+        Alph.util.log("Query response:" + a_xml);
+        var wordHTML = Alph.xlate.transform(a_xml);
         // don't display an empty popup
         if (   (wordHTML == '')
-            || (   ($(".mp-entry",wordHTML).size() == 0)
-                && ($(".mp-unknown",wordHTML).size() == 0)
-                && ($(".mp-error",wordHTML).size() == 0)))
+            || (   ($(".alph-entry",wordHTML).size() == 0)
+                && ($(".alph-unknown",wordHTML).size() == 0)
+                && ($(".alph-error",wordHTML).size() == 0)))
         {
-            MP.util.log("No valid entries to display.");
-            return MP.xlate.hidePopup();
+            Alph.util.log("No valid entries to display.");
+            return Alph.xlate.hidePopup();
 
         }
         
-        $("#mp-text",a_topdoc).remove();
-        var mptext_node = 
-            window.content.document.importNode(wordHTML.getElementById("mp-text"),true);
-        MP.main.getLanguageTool().postTransform(mptext_node);
-        $("#mp-window",a_topdoc).append(mptext_node);
+        $("#alph-text",a_topdoc).remove();
+        var alphtext_node = 
+            window.content.document.importNode(wordHTML.getElementById("alph-text"),true);
+        Alph.main.getLanguageTool().postTransform(alphtext_node);
+        $("#alph-window",a_topdoc).append(alphtext_node);
 
         // add language-specific click handler, if any
-        MP.main.getLanguageTool().contextHandler(a_topdoc);
+        Alph.main.getLanguageTool().contextHandler(a_topdoc);
         
         // re-highlight the translated range in the source document
-        var rp = a_mptarget.getRangeParent()
+        var rp = a_alphtarget.getRangeParent()
         var doc = rp.ownerDocument;
         var r = doc.createRange();
-        r.setStart(rp, a_mptarget.getWordStart());
-        r.setEnd(rp, a_mptarget.getWordEnd());
+        r.setStart(rp, a_alphtarget.getWordStart());
+        r.setEnd(rp, a_alphtarget.getWordEnd());
         var sel = doc.defaultView.getSelection();
         sel.removeAllRanges();
         sel.addRange(r);
@@ -293,43 +293,43 @@ MP.xlate = {
      * @param {int} a_x the X-coordinate of the trigger event
      * @param {int} a_y the Y-coordinate of the trigger event
      * @param {Object} the details on the target of the event which triggered the popup
-     *                 @see MP.LanguageTool#findSelection
+     *                 @see Alph.LanguageTool#findSelection
      */
-    showPopup: function(a_elem, a_x, a_y, a_mptarget)
+    showPopup: function(a_elem, a_x, a_y, a_alphtarget)
     {
         const topdoc = a_elem.ownerDocument;
-        var mp_state = MP.main.getCurrentBrowser().melampus;
+        var alph_state = Alph.main.getCurrentBrowser().alpheios;
         var popup;
-        // check the melampus state object for the prior element 
-        if (mp_state.lastElem)
+        // check the alpheios state object for the prior element 
+        if (alph_state.lastElem)
         {
-            popup = $("#mp-window",mp_state.lastElem.ownerDocument).get(0);
+            popup = $("#alph-window",alph_state.lastElem.ownerDocument).get(0);
         }
         // if the popup window exists, and it's in a different document than
         // the current one, remove it from the prior document
-        if (popup && (topdoc != mp_state.lastElem.ownerDocument))
+        if (popup && (topdoc != alph_state.lastElem.ownerDocument))
         {
-            this.removePopup(MP.main.getCurrentBrowser());
+            this.removePopup(Alph.main.getCurrentBrowser());
             popup = null;
         }
                         
         // popup element not found or removed, so create a new one
         if (!popup)
         {
-            // add the base melampus stylesheet
+            // add the base alpheios stylesheet
             var css = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                              "link");
             css.setAttribute("rel", "stylesheet");
             css.setAttribute("type", "text/css");
-            css.setAttribute("href", "chrome://melampus/skin/melampus.css");
-            css.setAttribute("id", "melampus-css");
+            css.setAttribute("href", "chrome://alpheios/skin/alpheios.css");
+            css.setAttribute("id", "alpheios-css");
             $("head",topdoc).append(css);
 
             // add any language-specific stylesheet
-            MP.main.getLanguageTool().addStyleSheet(topdoc);
+            Alph.main.getLanguageTool().addStyleSheet(topdoc);
             
             popup = topdoc.createElementNS("http://www.w3.org/1999/xhtml", "div");
-            popup.setAttribute("id", "mp-window");
+            popup.setAttribute("id", "alph-window");
 
             /* cancel the mousemove and dblclick events over the popup */
             popup.addEventListener("mousemove", this.cancelMouseMove, false);
@@ -337,24 +337,24 @@ MP.xlate = {
             
             $("body",topdoc).append(popup);
         
-            // add the element to the melampus state object in the browser,
+            // add the element to the alpheios state object in the browser,
             // so that it can be accessed to remove the popup later
-            mp_state.lastElem = a_elem;
+            alph_state.lastElem = a_elem;
             
             // add a close link if the popup is activated by a double-click
             // instead of mouseover
-            if (MP.main.getXlateTrigger() == 'dblclick')
+            if (Alph.main.getXlateTrigger() == 'dblclick')
             {
                 var close_link =
                    topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                         "div");
-                close_link.setAttribute("id","mp-close");
+                close_link.setAttribute("id","alph-close");
                 close_link.innerHTML = "[x]";
                 popup.appendChild(close_link);
-                $("#mp-close",topdoc).bind("click",
+                $("#alph-close",topdoc).bind("click",
                     function()
                     {
-                        MP.xlate.hidePopup()
+                        Alph.xlate.hidePopup()
                     }
                 );
             }
@@ -381,7 +381,7 @@ MP.xlate = {
             }
             catch(e)
             {
-                MP.util.log("Error getting frame coords: " + e);
+                Alph.util.log("Error getting frame coords: " + e);
             }
         }
 
@@ -393,11 +393,11 @@ MP.xlate = {
 
         var xlate_loading =
             document
-                .getElementById("melampus-strings")
-                .getFormattedString("mp-loading-translation",[a_mptarget.getWord()]);
-        $("#mp-text",popup).remove();
-        $("#mp-window",topdoc).append(
-            '<div id="mp-text"><div id="mp-text-loading">' +
+                .getElementById("alpheios-strings")
+                .getFormattedString("alph-loading-translation",[a_alphtarget.getWord()]);
+        $("#alph-text",popup).remove();
+        $("#alph-window",topdoc).append(
+            '<div id="alph-text"><div id="alph-text-loading">' +
             xlate_loading +
             '</div></div>'
         );
@@ -552,45 +552,45 @@ MP.xlate = {
         popup.style.top = a_y + "px";
         popup.style.display = "";
 
-        // add the original word to the browser's melampus object so that the
+        // add the original word to the browser's alpheios object so that the
         // other functions can access it
-        mp_state.word = a_mptarget.getWord();
+        alph_state.word = a_alphtarget.getWord();
 
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
         // the popup with the results on success,
         // and a call back to translationError to populate
         // the popup with an error message on failure
-        MP.main.getLanguageTool().lexiconLookup(
-            a_mptarget,
+        Alph.main.getLanguageTool().lexiconLookup(
+            a_alphtarget,
             function(data)
             {
-                MP.xlate.showTranslation(data,a_mptarget,topdoc);
+                Alph.xlate.showTranslation(data,a_alphtarget,topdoc);
             },
             function(a_msg)
             {   
-                MP.xlate.translationError(a_msg,topdoc);
+                Alph.xlate.translationError(a_msg,topdoc);
             }
         );
     },
 
     /**
-     * Hides the popup and removes the melampus stylesheets from the 
+     * Hides the popup and removes the alpheios stylesheets from the 
      * browser content document.
      */
     hidePopup: function()
     {
         var topdoc = this.getLastDoc();
-        $("#mp-window",topdoc).css("display","none");
-        $("#mp-text",topdoc).remove();
+        $("#alph-window",topdoc).css("display","none");
+        $("#alph-text",topdoc).remove();
         topdoc.defaultView.getSelection().removeAllRanges();
         
         // remove the last word from the state
-        var mp_state = MP.main.getCurrentBrowser().melampus;
-        if (mp_state)
+        var alph_state = Alph.main.getCurrentBrowser().alpheios;
+        if (alph_state)
         { 
-            mp_state.lastWord = null;
-            mp_state.lastSelection = null;
+            alph_state.lastWord = null;
+            alph_state.lastSelection = null;
         
         }
         
@@ -624,16 +624,16 @@ MP.xlate = {
      */
     closeSecondaryWindows: function(a_bro)
     {
-        var mp_state = a_bro.melampus;
+        var alph_state = a_bro.alpheios;
         // return if the extension isn't enabled for this browser
-        if (!mp_state)
+        if (!alph_state)
         {
             return;
         }
-        var windows = mp_state.windows;
+        var windows = alph_state.windows;
         for (var win in windows)
         {
-            MP.util.log("Checking status of window " + win);
+            Alph.util.log("Checking status of window " + win);
             if (windows[win] != null && ! windows[win].closed)
             {
                 windows[win].close();
@@ -644,7 +644,7 @@ MP.xlate = {
 
     /**
      * Opens or replaces a popup window and adds a reference to it to the
-     * melampus state variable on the current browser.
+     * alpheios state variable on the current browser.
      *  @param {String} a_name the name of the new window
      *  @param {String} a_url the url to load in the window
      *  @param {Properties} a_feature optional feature properties for the window
@@ -675,8 +675,8 @@ MP.xlate = {
         // just proceed as if opening a new window
 
         var a_window =
-            MP.main.getCurrentBrowser().
-                melampus.windows[a_name];
+            Alph.main.getCurrentBrowser().
+                alpheios.windows[a_name];
                 
         // if the window exists already, is open, has the same location
         // and an update_args_callback property has been added to 
@@ -688,7 +688,7 @@ MP.xlate = {
             a_window.arguments && 
             a_window.arguments[0].update_args_callback != null)
         {
-            MP.util.log("Calling update_args_callback for window " + a_name);
+            Alph.util.log("Calling update_args_callback for window " + a_name);
             a_window.arguments[0].update_args_callback(a_window_args);
         }
         // if the window doesn't exist, or is closed, or has arguments
@@ -697,7 +697,7 @@ MP.xlate = {
         else if (a_window == null || a_window.closed || a_window_args)
         {
 
-            MP.util.log("Opening new window named: " + a_name);
+            Alph.util.log("Opening new window named: " + a_name);
             // add a loading message to notify the user we're loading
             // the grammar - really this should come from a
             // stringbundle if we're going to keep it
@@ -752,7 +752,7 @@ MP.xlate = {
                     if ( bottom_y < 0 ){
                         bottom_y = window.screenY;
                     }
-                    MP.util.log("Screen: " + a_features[prop]);
+                    Alph.util.log("Screen: " + a_features[prop]);
                     switch(a_features[prop])
                     {
                         case "topright":
@@ -793,7 +793,7 @@ MP.xlate = {
                     prop + "=" + features[prop]);
             }
 
-            MP.util.log("Features: " + feature_list.join(","));
+            Alph.util.log("Features: " + feature_list.join(","));
             a_window = window.openDialog(
                 a_url,
                 a_name,
@@ -833,7 +833,7 @@ MP.xlate = {
                 a_window.location.hash != ''
                 )
             {
-                MP.util.log("Replacing location hash with " + target_hash);
+                Alph.util.log("Replacing location hash with " + target_hash);
                 a_window.location.hash = target_hash;
             }
             // otherwise, just replace the location and allow the window
@@ -842,7 +842,7 @@ MP.xlate = {
             // shouldn't be necessary
             else
             {
-                MP.util.log("Replacing location with " + a_url);
+                Alph.util.log("Replacing location with " + a_url);
                 a_window.location = a_url;
                 
             }
@@ -850,9 +850,9 @@ MP.xlate = {
         }
         // now focus the window
         a_window.focus();
-        MP.util.log("Secondary window should have focus at "+ a_url);
-        MP.main.getCurrentBrowser().
-            melampus.windows[a_name] = a_window;
+        Alph.util.log("Secondary window should have focus at "+ a_url);
+        Alph.main.getCurrentBrowser().
+            alpheios.windows[a_name] = a_window;
     },
 
     /**
@@ -865,12 +865,12 @@ MP.xlate = {
         try {
             // we can't use the event target, because the event is 
             // in the 2ndary window not the one showing the message
-            var topdoc = MP.xlate.getLastDoc();
-            $("#mp-secondary-loading",topdoc).remove();
+            var topdoc = Alph.xlate.getLastDoc();
+            $("#alph-secondary-loading",topdoc).remove();
         }
         catch(e)
         {
-            MP.util.log("Error hiding loading message: " + e);
+            Alph.util.log("Error hiding loading message: " + e);
         }
     },
 
@@ -882,44 +882,44 @@ MP.xlate = {
      */
     showLoadingMessage: function(args)
     {
-        if ($("#mp-secondary-loading",args[0]).length == 0 )
+        if ($("#alph-secondary-loading",args[0]).length == 0 )
         {
             $(args[0]).append(
-                '<div id="mp-secondary-loading">' + args[1] + '</div>');
+                '<div id="alph-secondary-loading">' + args[1] + '</div>');
         }
     },
     
     
     /**
-     * Remove the mp-window element and related css from the
+     * Remove the alph-window element and related css from the
      * browser content document
      * @param a_bro the browser 
      */
      removePopup: function(a_bro)
      {
         var last_doc = this.getLastDoc();
-        // remove the main melampus stylesheet
-        $("#melampus-css",last_doc).remove();
+        // remove the main alpheios stylesheet
+        $("#alpheios-css",last_doc).remove();
         // remove the language specific stylesheet
-        var lang_tool = MP.main.getLanguageTool();
+        var lang_tool = Alph.main.getLanguageTool();
         if (lang_tool)
         {   
             lang_tool.removeStyleSheet(last_doc);
         }
-        // remove the melampus window element
-        $("#mp-window",last_doc).remove();
+        // remove the alpheios window element
+        $("#alph-window",last_doc).remove();
      },
      
      /**
       * Determines if the popup is currently being displayed, 
-      * based upon the lastElem object in the melampus state variable
+      * based upon the lastElem object in the alpheios state variable
       * @return true if it was found and visible, otherwise false
       * @type Boolean
       */
      popupVisible: function()
      {
         var topdoc = this.getLastDoc();
-        return $("#mp-window",topdoc).is(':visible');
+        return $("#alph-window",topdoc).is(':visible');
      },
      
      /**
@@ -930,15 +930,15 @@ MP.xlate = {
      getLastDoc: function()
      {
         var lastdoc;
-        var bro = MP.main.getCurrentBrowser();
-        if (bro.melampus && bro.melampus.lastElem )
+        var bro = Alph.main.getCurrentBrowser();
+        if (bro.alpheios && bro.alpheios.lastElem )
         {
-            lastdoc = bro.melampus.lastElem.ownerDocument;
+            lastdoc = bro.alpheios.lastElem.ownerDocument;
         } 
         if (typeof lastdoc == "undefined" || lastdoc == null)
         {
             // default to the window content document which is the majority case
-            lastdoc = MP.main.getCurrentBrowser().contentDocument;
+            lastdoc = Alph.main.getCurrentBrowser().contentDocument;
         }
         return lastdoc;
      }

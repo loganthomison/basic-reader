@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/prefs/alpheios-prefs.css/" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<prefwindow id="alpheios-prefs" title="&alpheios.prefs.preferences;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        buttons="accept,cancel">
+<prefpane id="alpheios-prefs-system" 
+          label="&alpheios.prefs.system;" 
+          image="chrome://alpheios/skin/prefs/emblem-system.png">
+    <preferences>
+        <preference id="pref-debug" name="extensions.alpheios.debug" type="bool"/>
+        <preference id="pref-default-language" 
+                    name="extensions.alpheios.default_language" 
+                    type="string"/>
+    </preferences>
+    <hbox flex="1" align="center">
+    <vbox flex="1">
+        <groupbox>
+            <caption label="&alpheios.prefs.general;"/>
+            <checkbox id="debug" label="&alpheios.prefs.debug;" preference="pref-debug"/>
+            <label value="&alpheios.prefs.default.language;" control="default-language"/>
+            <textbox id="default-language" 
+                     preference="pref-default-language"/>
+        </groupbox>
+    </vbox>
+    </hbox>
+</prefpane>
+<prefpane id="alpheios-prefs-mouse" 
+          label="&alpheios.prefs.mouse;" 
+          image="chrome://alpheios/skin/prefs/input-mouse.png">
+    <preferences>
+        <preference id="pref-trigger" name="extensions.alpheios.popuptrigger" type="string"/>
+    </preferences>
+        <label value="&alpheios.prefs.popuptrigger;" />
+        <hbox id="alpheios-mouse-hbox" flex="1" align="center">
+        <groupbox id="alpheios-mouse-group" flex="1">    
+            <radiogroup preference="pref-trigger">
+                <caption label="&alpheios.prefs.popuptrigger.default;" />
+                <radio label="&alpheios.prefs.popuptrigger.mousemove;" value="mousemove"/>    
+                <radio label="&alpheios.prefs.popuptrigger.dblclick;" value="dblclick"/>
+            </radiogroup>
+        </groupbox>
+        </hbox>
+</prefpane>
+<prefpane id="alpheios-prefs-windows"
+          label="&alpheios.prefs.windows;"
+          image="chrome://alpheios/skin/prefs/preferences-system-windows.png">
+    <preferences>
+        <preference id="pref-grammar-window-loc" 
+                    name="extensions.alpheios.grammar.window.loc" 
+                    type="string"/>
+        <preference id="pref-shift-window-loc" 
+                    name="extensions.alpheios.shift.window.loc" 
+                    type="string"/>
+    </preferences>
+    <hbox flex="1" align="center">
+        <vbox flex="1">
+            <label value="&alpheios.prefs.shift.window.loc;"
+                   control="shift-window-loc"/>
+            <menulist id="shift-window-loc" 
+                      preference="pref-shift-window-loc">
+                <menupopup>
+                    <menuitem label="&alpheios.prefs.top.left;" 
+                              value="topleft"/>
+                    <menuitem label="&alpheios.prefs.top.right;" 
+                              value="topright"/>
+                    <menuitem label="&alpheios.prefs.bottom.left;" 
+                              value="bottomleft"/>
+                    <menuitem label="&alpheios.prefs.bottom.right;" 
+                              value="bottomright"/>
+                </menupopup>
+            </menulist>
+            <label value="&alpheios.prefs.grammar.window.loc;"
+                   control="grammar-window-loc"/>
+            <menulist id="grammar-window-loc" 
+                      preference="pref-grammar-window-loc">
+                <menupopup>
+                    <menuitem label="&alpheios.prefs.top.left;" 
+                              value="topleft"/>
+                    <menuitem label="&alpheios.prefs.top.right;" 
+                              value="topright"/>
+                    <menuitem label="&alpheios.prefs.bottom.left;" 
+                              value="bottomleft"/>
+                    <menuitem label="&alpheios.prefs.bottom.right;" 
+                              value="bottomright"/>
+                </menupopup>
+            </menulist>
+        </vbox>
+    </hbox>
+</prefpane>
+</prefwindow>
