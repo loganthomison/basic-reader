@@ -1,7 +1,7 @@
-content melampus chrome/content/
-content melampus chrome/content/ contentaccessible=yes
-locale	melampus	en-US		chrome/locale/en-US/
-skin	melampus	classic/1.0	chrome/skin/
+content alpheios chrome/content/
+content alpheios chrome/content/ contentaccessible=yes
+locale	alpheios	en-US		chrome/locale/en-US/
+skin	alpheios	classic/1.0	chrome/skin/
 
-overlay	chrome://browser/content/browser.xul	chrome://melampus/content/melampus-overlay.xul
-style	chrome://global/content/customizeToolbar.xul	chrome://melampus/skin/melampus.css
+overlay	chrome://browser/content/browser.xul	chrome://alpheios/content/alpheios-overlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://alpheios/skin/alpheios.css

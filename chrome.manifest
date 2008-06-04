@@ -1,7 +1,7 @@
-content melampus jar:chrome/melampus.jar!/content/
-content melampus jar:chrome/melampus.jar!/content/ contentaccessible=yes
-locale	melampus	en-US		jar:chrome/melampus.jar!/locale/en-US/
-skin	melampus	classic/1.0	jar:chrome/melampus.jar!/skin/
+content alpheios jar:chrome/alpheios.jar!/content/
+content alpheios jar:chrome/alpheios.jar!/content/ contentaccessible=yes
+locale	alpheios	en-US		jar:chrome/alpheios.jar!/locale/en-US/
+skin	alpheios	classic/1.0	jar:chrome/alpheios.jar!/skin/
 
-overlay	chrome://browser/content/browser.xul	chrome://melampus/content/melampus-overlay.xul
-style	chrome://global/content/customizeToolbar.xul	chrome://melampus/skin/melampus.css
+overlay	chrome://browser/content/browser.xul	chrome://alpheios/content/alpheios-overlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://alpheios/skin/alpheios.css

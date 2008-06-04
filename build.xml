@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 
-<project name="melampus" default="package" basedir=".">
-	<dirname property="melampus.basedir" file="${ant.file.melampus}"/>
-	<property name="src.dir" value="${melampus.basedir}" />
-	<property name="dist.dir" value="${melampus.basedir}/dist" />
-	<property name="docs.dir" value="${melampus.basedir}/docs/api" />
+<project name="alpheios" default="package" basedir=".">
+	<dirname property="alpheios.basedir" file="${ant.file.alpheios}"/>
+	<property name="src.dir" value="${alpheios.basedir}" />
+	<property name="dist.dir" value="${alpheios.basedir}/dist" />
+	<property name="docs.dir" value="${alpheios.basedir}/docs/api" />
 	<property name="perl.path" value="C:/perl/bin/perl.exe" />
 	<property name="jsdoc.path" value="C:/JSDoc-1.10.2/jsdoc.pl" />
-	<property name="app.name" value="melampus" />
+	<property name="app.name" value="alpheios" />
 	<property name="ff.test.dir" value="/test" />
 	<property name="ext.test.dir" 
 	          value="${ff.test.dir}/extensions/${app.name}" />
 	<property name="deploy.dir"
-              value="/Program Files/Apache Group/Apache2/htdocs/melampus_devbuilds" />
+              value="/Program Files/Apache Group/Apache2/htdocs/alpheios_devbuilds" />
 	<property name="docs.deploy.dir"
 	          value="/test/docs/${app.name}"/>
 	<property name="release.id" value="0.2" />
@@ -90,7 +90,7 @@
 		                  
 		<svn>
 			<commit message="post-build-auto-increment">
-			<fileset dir="${melampus.basedir}">
+			<fileset dir="${alpheios.basedir}">
 					<include name="install.rdf"/>
 					<include name="version.properties"/>
 					<include name="dist/${package}"/>
@@ -130,14 +130,14 @@
 
 	<!-- get the extra external files from SVN -->
 	<target name="get-extras">
-		<property file="${melampus.basedir}/extras.properties"/>
+		<property file="${alpheios.basedir}/extras.properties"/>
 		<for list="${extras}" param="type">
 		  <sequential>
 		  	<svn>
 		  		<export 
 		         srcUrl="${@{type}.repository}"
 		  	     revision="${@{type}.revision}"
-		  	     destPath="${melampus.basedir}/${@{type}.target_dir}"/>
+		  	     destPath="${alpheios.basedir}/${@{type}.target_dir}"/>
 		    </svn>
 		  </sequential>
 		</for>
@@ -146,7 +146,7 @@
 	<!-- increment the official build id -->
     <target name="inc-build-id" depends="update-version">
         
-        <property file="${melampus.basedir}/version.properties"/>
+        <property file="${alpheios.basedir}/version.properties"/>
         <echo>SVN Revision: ${svn.revision}</echo>
         <echo>BuildId: ${buildNum}</echo>
         <echo>BuildDate: ${buildDate}</echo>
@@ -161,10 +161,10 @@
         </replaceregexp>       
         <svn>
 	        <commit message="pre-build-auto-increment" 
-	                file="${melampus.basedir}/install.rdf"/>
+	                file="${alpheios.basedir}/install.rdf"/>
 	    </svn>
         <svn>
-    	    <status path="${melampus.basedir}/install.rdf" 
+    	    <status path="${alpheios.basedir}/install.rdf" 
     	  	       revisionProperty="svn.revision" />
     	</svn>
     	<echo>Updating version properties to New SVN Revision: ${svn.revision}</echo>
@@ -180,7 +180,7 @@
     -->	
 	<target name="update-version">
 		<svn>
-		   <status path="${melampus.basedir}/install.rdf" revisionProperty="svn.revision" />
+		   <status path="${alpheios.basedir}/install.rdf" revisionProperty="svn.revision" />
 		</svn>
 		<echo>Updating version.properties with SVN Revision: ${svn.revision}</echo>
 		        
@@ -224,8 +224,8 @@
 		<property file="extras.properties"/>
         <for list="${extras}" param="type">
           <sequential>
-          	<echo message="cleaning ${melampus.basedir}/${@{type}.target_dir}"/>
-            <delete dir="${melampus.basedir}/${@{type}.target_dir}" failonerror="true" />
+          	<echo message="cleaning ${alpheios.basedir}/${@{type}.target_dir}"/>
+            <delete dir="${alpheios.basedir}/${@{type}.target_dir}" failonerror="true" />
           </sequential>
         </for>
 	</target>
@@ -246,7 +246,7 @@
 	<target name="prepare.docs">
 		<mkdir dir="${docs.dir}" />
 		<exec dir="${src.dir}" executable="${perl.path}">
-			<arg line="${jsdoc.path} -p -d ${docs.dir} -project-name Melampus --no-lexical-privates content"/>
+			<arg line="${jsdoc.path} -p -d ${docs.dir} -project-name Alpheios --no-lexical-privates content"/>
 		</exec>
 	</target>
 	

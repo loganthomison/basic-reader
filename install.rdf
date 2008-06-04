@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!-- $Revision$-->
-<!-- $BuildId: 674+$-->
+<!-- $BuildId: 673+$-->
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 		xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
 	<Description about="urn:mozilla:install-manifest">
-		<em:name>melampus</em:name>
-		<em:version>0.2.676.20080604</em:version>
+		<em:name>alpheios</em:name>
+		<em:version>0.2.667.20080603</em:version>
 		<em:description></em:description>
 		<em:creator>Cantus Foundation</em:creator>
 		<em:id>{4816253c-3208-49d8-9557-0745a5508299}</em:id>
@@ -27,7 +27,7 @@
         
 		<em:iconURL></em:iconURL>
 		<em:homepageURL>http://alpheios.net</em:homepageURL>
-		<em:optionsURL>chrome://melampus/content/melampus-prefs.xul</em:optionsURL>
+		<em:optionsURL>chrome://alpheios/content/alpheios-prefs.xul</em:optionsURL>
 		<em:updateURL>http://alpheios.net/xpi-updates/update.rdf</em:updateURL>
 		<em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDOd5Mjthp4ZkEF0g6sF6fHbUb92PJTSSPxjjdsuDOXG9dUTVwIDjW183lTZawP7+4E8PmUeqVl5GCjKRCAhAXmSV+X/IYgSuiTOTjuXUJ/ylA9EGSo2dHVeGJ834XIKe5NK7NL08EFxst58vCASTViuMv5GpeIYtPvbj7PyXJ82QIDAQAB</em:updateKey>
 	</Description>
