@@ -1,0 +1,334 @@
+.alph-xml *{
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: none;
+    display: inline;
+}
+.alph-xml entry {
+    display: block;
+}
+.alph-xml phrase {
+   display: block;
+}
+.alph-xml dict {
+   display: block;
+}
+.alph-xml infl {
+   display: block;
+}
+.alph-xml mean {
+   display: block;
+}
+.alph-xml note {
+   display: block;
+}
+.alph-xml age:before {
+    content: "<age>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml age:after {
+    content: "</age> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml area:before {
+    content: "<area>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml area:after {
+    content: "</area> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml case:before {
+    content: "<case>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml case:after {
+    content: "</case> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml comp:before {
+    content: "<comp>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml comp:after {
+    content: "</comp> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml conj:before {
+    content: "<conj>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml conj:after {
+    content: "</conj> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml decl:before {
+    content: "<decl>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml decl:after {
+    content: "</decl> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml dict:before {
+    content: "<dict>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml dict:after {
+    content: "</dict> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml entry:before {
+    content: "<entry>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml entry:after {
+    content: "</entry> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml freq:before {
+    content: "<freq>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml freq:after {
+    content: "</freq> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml gend:before {
+    content: "<gend>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml gend:after {
+    content: "</gend> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml geo:before {
+    content: "<geo>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml geo:after {
+    content: "</geo> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml hdwd:before {
+    content: "<hdwd>"; 
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml hdwd:after {
+    content: "</hdwd> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml infl:before {
+    content: "<infl>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml infl:after {
+    content: "</infl> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml kind:before {
+    content: "<kind>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml kind:after {
+    content: "</kind> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml mean:before {
+    content: "<mean>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml mean:after {
+    content: "</mean> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml mood:before {
+    content: "<mood>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml mood:after {
+    content: "</mood> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml note:before {
+    content: "<note>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml note:after {
+    content: "</note> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml num:before {
+    content: "<num>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml num:after {
+    content: "</num> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml pers:before {
+    content: "<pers>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml pers:after {
+    content: "</pers> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml pofs:before {
+    content: "<pofs>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml pofs:after {
+    content: "</pofs> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml phrase:before {
+    content: "<phrase>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml phrase:after {
+    content: "</phrase> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml sort:before {
+    content: "<sort>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml sort:after {
+    content: "</sort> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml src:before {
+    content: "<src>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml src:after {
+    content: "</src> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml stem:before {
+    content: "<stem>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml stem:after {
+    content: "</stem> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml suff:before {
+    content: "<suff> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml suff:after {
+    content: "</suff> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml tense:before {
+    content: "<tense> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml tense:after {
+    content: "</tense> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml term:before {
+    content: "<term>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml term:after {
+    content: "</term> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml var:before {
+    content: "<var> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml var:after {
+    content: "</var> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml voice:before {
+    content: "<voice>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml voice:after {
+    content: "</voice >";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml word:before {
+    content: "<word>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml word:after {
+    content: "</word> ";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml xmpl:before {
+    content: "<xmpl>";
+    color: blue;
+    font-size: 80%;
+}
+.alph-xml xmpl:after {
+    content: "</xmpl> ";
+    color: blue;
+    font-size: 80%;
+}

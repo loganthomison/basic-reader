@@ -10,10 +10,10 @@
     <xsl:template match="/">
         <html>
             <head>
-                <link rel="stylesheet" type="text/css" href="melampus.css"/>
+                <link rel="stylesheet" type="text/css" href="alpheios.css"/>
             </head>
             <body>
-                <div id="mp-text">
+                <div id="alph-text">
                     <xsl:apply-templates select="//word|//error|//unknown"/>
                 </div>
             </body>
@@ -21,7 +21,7 @@
     </xsl:template>
 
     <xsl:template match="word">
-        <div class="mp-word">
+        <div class="alph-word">
             <!-- sort entries by decreasing frequency of occurrence -->
             <!-- and then by part of speech -->
             <!-- arbitrarily choosing the first in the rare case where multiple dict elements exist -->
@@ -29,7 +29,7 @@
                 <xsl:sort select="dict[1]/freq/@order" data-type="number" order="descending"/>
                 <xsl:sort select="dict[1]/pofs/@order" data-type="number" order="descending"/>
 
-                <div class="mp-entry">
+                <div class="alph-entry">
 
                     <!-- process dictionary info and meanings -->
                     <xsl:for-each select="dict|mean">
@@ -69,25 +69,25 @@
     <!-- end match word -->
 
     <xsl:template match="unknown">
-        <div class="mp-unknown">
+        <div class="alph-unknown">
             <xsl:text>Unknown: </xsl:text>
-            <span class="mp-hdwd">
+            <span class="alph-hdwd">
                 <xsl:value-of select="."/>
             </span>
         </div>
     </xsl:template>
 
     <xsl:template match="error">
-        <div class="mp-error">
+        <div class="alph-error">
             <xsl:text>Error: </xsl:text>
-            <span class="mp-hdwd">
+            <span class="alph-hdwd">
                 <xsl:value-of select="."/>
             </span>
         </div>
     </xsl:template>
 
     <xsl:template match="dict">
-        <div class="mp-dict">
+        <div class="alph-dict">
             <!-- define order in which elements should appear -->
             <xsl:call-template name="item-plus-text">
                 <xsl:with-param name="item" select="hdwd"/>
@@ -130,7 +130,7 @@
     </xsl:template>
 
     <xsl:template match="mean">
-        <div class="mp-mean">
+        <div class="alph-mean">
             <xsl:value-of select="."/>
         </div>
     </xsl:template>
@@ -140,20 +140,20 @@
         <xsl:param name="pofs"/>
 
         <xsl:if test="$attr|$pofs">
-            <span class="mp-pofs" context="{translate($pofs,' ','_')}">
+            <span class="alph-pofs" context="{translate($pofs,' ','_')}">
                 <xsl:choose>
                     <!-- say "verb taking <x>" rather than "taking <x> verb" -->
                     <xsl:when test="starts-with($attr,'taking ')">
                         <xsl:value-of select="$pofs"/>
                         <xsl:text> </xsl:text>
-                        <span class="mp-attr">
+                        <span class="alph-attr">
                             <xsl:value-of select="$attr"/>
                         </span>
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- all other attributes come before part of speech-->
                         <xsl:if test="$attr">
-                            <span class="mp-attr">
+                            <span class="alph-attr">
                                 <xsl:value-of select="$attr"/>
                             </span>
                         </xsl:if>
@@ -172,7 +172,7 @@
             <xsl:choose>
                 <!-- if context supplied, add it to span -->
                 <xsl:when test="$span-context">
-                    <span class="mp-{$span-name}" context="{translate($span-context,' ','_')}">
+                    <span class="alph-{$span-name}" context="{translate($span-context,' ','_')}">
                         <xsl:text>(</xsl:text>
                         <xsl:for-each select="$items">
                             <xsl:if test="position() != 1">, </xsl:if>
@@ -183,7 +183,7 @@
                 </xsl:when>
                 <!-- if no context supplied -->
                 <xsl:otherwise>
-                    <span class="mp-{$span-name}">
+                    <span class="alph-{$span-name}">
                         <xsl:text>(</xsl:text>
                         <xsl:for-each select="$items">
                             <xsl:if test="position() != 1">, </xsl:if>
@@ -211,7 +211,7 @@
                     ($pofs != 'preposition') and
                     ($pofs != 'interjection') and
                     ($pofs != 'particle')))">
-            <div class="mp-infl-set">
+            <div class="alph-infl-set">
                 <xsl:apply-templates select="$inflections[1]/term"/>
                 <xsl:if test="$inflections[1]/pofs != $inflections[1]/../dict[1]/pofs">
                     <xsl:call-template name="parenthesize">
@@ -227,7 +227,7 @@
                     <xsl:when test="$inflections/case">
                         <!-- process singular case list -->
                         <xsl:if test="count($inflections[num = 'singular']/case)">
-                            <div class="mp-infl">
+                            <div class="alph-infl">
                                 <xsl:text>Singular: </xsl:text>
                                 <xsl:for-each select="$inflections[num = 'singular']/case">
                                     <xsl:sort select="./@order" data-type="number"
@@ -239,7 +239,7 @@
 
                         <!-- process plural case list -->
                         <xsl:if test="count($inflections[num = 'plural']/case)">
-                            <div class="mp-infl">
+                            <div class="alph-infl">
                                 <xsl:text>Plural: </xsl:text>
                                 <xsl:for-each select="$inflections[num = 'plural']/case">
                                     <xsl:sort select="./@order" data-type="number"
@@ -251,7 +251,7 @@
 
                         <!-- process other case list -->
                         <xsl:if test="count($inflections[count(current()/num)=0]/case)">
-                            <div class="mp-infl">
+                            <div class="alph-infl">
                                 <xsl:text>Case: </xsl:text>
                                 <xsl:for-each select="$inflections[count(current()/num)=0]/case">
                                     <xsl:sort select="./@order" data-type="number"
@@ -266,7 +266,7 @@
                     <!-- verb inflection -->
                     <xsl:when test="$inflections/tense">
                         <xsl:for-each select="$inflections[tense]">
-                            <div class="mp-infl">
+                            <div class="alph-infl">
                                 <xsl:call-template name="item-plus-text-plus-context">
                                     <xsl:with-param name="item" select="pers"/>
                                     <xsl:with-param name="suffix" select="' person'"/>
@@ -288,7 +288,7 @@
 
                     <!-- adverb inflection -->
                     <xsl:when test="$inflections[1]/pofs = 'adverb'">
-                        <div class="mp-infl">
+                        <div class="alph-infl">
                             <xsl:apply-templates select="comp"/>
                         </div>
                     </xsl:when>
@@ -299,12 +299,12 @@
     </xsl:template>
 
     <xsl:template match="term">
-        <span class="mp-term">
+        <span class="alph-term">
             <xsl:value-of select="stem"/>
             <xsl:if test="suff">
                 <xsl:text>&#8226;</xsl:text>
             </xsl:if>
-            <span class="mp-suff">
+            <span class="alph-suff">
                 <xsl:value-of select="suff"/>
             </span>
         </span>
@@ -312,7 +312,7 @@
 
     <!--  Templates to handle simple text elements -->
     <xsl:template match="*">
-        <span class="mp-{name(.)}">
+        <span class="alph-{name(.)}">
             <xsl:value-of select="."/>
         </span>
     </xsl:template>
@@ -327,7 +327,7 @@
             <xsl:text>-</xsl:text>
             <xsl:value-of select="../pofs"/>
         </xsl:variable>
-        <span class="mp-case" context="{translate($context,' ','_')}">
+        <span class="alph-case" context="{translate($context,' ','_')}">
             <xsl:value-of select="."/>
             <xsl:if
                 test="(../pofs='pronoun' or
@@ -367,7 +367,7 @@
         <xsl:param name="prefix" select="''"/>
         <xsl:param name="suffix" select="''"/>
         <xsl:for-each select="$item">
-            <span class="mp-{name(.)}" context="{translate(.,' ','_')}">
+            <span class="alph-{name(.)}" context="{translate(.,' ','_')}">
                 <xsl:value-of select="$prefix"/>
                 <xsl:value-of select="."/>
                 <xsl:value-of select="$suffix"/>
@@ -380,7 +380,7 @@
         <xsl:param name="prefix" select="''"/>
         <xsl:param name="suffix" select="''"/>
         <xsl:for-each select="$item">
-            <span class="mp-{name(.)}">
+            <span class="alph-{name(.)}">
                 <xsl:value-of select="$prefix"/>
                 <xsl:value-of select="."/>
                 <xsl:value-of select="$suffix"/>
