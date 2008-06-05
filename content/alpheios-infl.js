@@ -365,8 +365,34 @@ Alph.infl = {
                 $("#links",topdoc).append(link);
             }
         }
+        
+        // add other links TODO  this should be different class?
+        if (a_link_target.links)
+        {
+            for (i=0; i<a_link_target.links.length; i++)
+            {
+                var linkname = a_link_target.links[i];
+                
+                var link =
+                   topdoc.createElementNS("http://www.w3.org/1999/xhtml",
+                                        "a");
+                    link.setAttribute("href","#" + linkname);
+                    link.setAttribute("class","alph-infl-link");
+                    link.setAttribute("alph-infl-link",linkname);
+                    link.innerHTML =  
+                        document
+                            .getElementById("alph-infl-strings")
+                            .getFormattedString(
+                                "alph-infl-link", 
+                                [linkname]);
+
+                $("#links",topdoc).append(link);
+            }
+        }
+
         $(".alph-infl-link",topdoc).click(
             function(e) {
+                $(".loading",topdoc).show();
                 var showpofs = $(this).attr("alph-infl-link");
                 window.opener.Alph.main.getLanguageTool().handleInflections(e,showpofs);
             }
