@@ -7,7 +7,7 @@
 	<property name="docs.dir" value="${alpheios.basedir}/docs/api" />
 	<property name="perl.path" value="C:/perl/bin/perl.exe" />
 	<property name="jsdoc.path" value="C:/JSDoc-1.10.2/jsdoc.pl" />
-	<property name="app.name" value="alpheios" />
+	<property name="app.name" value="alpheios-basic" />
 	<property name="ff.test.dir" value="/test" />
 	<property name="ext.test.dir" 
 	          value="${ff.test.dir}/extensions/${app.name}" />
@@ -15,7 +15,7 @@
               value="/Program Files/Apache Group/Apache2/htdocs/alpheios_devbuilds" />
 	<property name="docs.deploy.dir"
 	          value="/test/docs/${app.name}"/>
-	<property name="release.id" value="0.2" />
+	<property name="release.id" value="0.3" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
 	<property name="package" value="${app.name}-${release.id}.xpi"/>
 	<property name="extras" value="mhttpd"/>
