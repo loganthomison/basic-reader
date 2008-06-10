@@ -45,6 +45,11 @@ if (typeof Alph == "undefined")
 Alph.main =
 {
     
+    /** 
+     * flag for main menu update status
+     */
+    mm_languages_updated: false,
+    
     /**
      * flag for the status of the ctrl key
      * @private
@@ -481,7 +486,7 @@ Alph.main =
             tmenu_text =
                 $("#alpheios-strings").get(0)
                     .getString("alph-inline-enable-tm");
-        
+            
             // TODO - we ought to preserve the user's last
             //        language selection rather than resetting  
             menu_lang = this.defaultLanguage;
@@ -494,23 +499,30 @@ Alph.main =
             tmenu_text =
                 $("#alpheios-strings").get(0)
                     .getString("alph-inline-disable-tm");
+
             menu_lang = this.getCurrentBrowser().alpheios.current_language;
         }
         $("#alpheios-toggle-cm").attr("label",cmenu_text);
         $("#alpheios-toggle-tm").attr("label",tmenu_text);
+        $("#alpheios-toggle-mm").attr("label",tmenu_text);
         
         // uncheck the previously checked language
         $("#alpheios-lang-popup-tm menuitem[checked='true']")
             .attr("checked","false");
         $("#alpheios-lang-popup-cm menuitem[checked='true']")
             .attr("checked","false");
+        $("#alpheios-lang-popup-mm menuitem[checked='true']")
+            .attr("checked","false");
         // check the current language
         $("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']")
             .attr("checked","true");
         $("#alpheios-lang-popup-cm menuitem[value='"+menu_lang+"']")
             .attr("checked","true");
-             
-
+        $("#alpheios-lang-popup-mm menuitem[value='"+menu_lang+"']")
+            .attr("checked","true");
+            
+        //update the state of the commands for the panel
+        this.update_tools_menu();
     },
 
     /**
@@ -867,8 +879,157 @@ Alph.main =
         {
            a_bro.removeEventListener(trigger,this.doXlateText,false);
         }
-    }
+    },
         
+    /**
+     * Update the Languages menu items
+     */
+    update_main_menu_languages: function()
+    {
+        // just return if we've already done this once
+        if (this.mm_languages_updated)
+        {
+            return;
+        }
+        var main_menu = $("#alpheios-lang-popup-mm").get(0);
+        // iterate through the toolbar menu items
+        // adding them to the main menu
+        
+        $("#alpheios-lang-popup-tm menuitem").each(
+            function(i)
+            {
+                var lang = this.value;
+                Alph.util.log("Adding menuitem for: " + lang);
+                $(this).clone(true).appendTo(main_menu);
+            }
+        );
+        this.mm_languages_updated = true; 
+    },
+    
+    /**
+     * Lookup a user-provided word
+     * @param {Event} a_event the event that triggered th elookup
+     */
+    do_tb_lookup: function(a_event)
+    {
+        if (a_event.keyCode != 13)
+        {
+            return;
+        }
+        var word = ($("#alpheios-lookup-text").get(0)).value;
+        
+        if (word.length == 0)
+        {
+            return;
+        }
+        
+        // make sure Alpheios is enabled
+        var bro = this.getCurrentBrowser();
+        if (! bro.alpheios)
+        {
+            this.inlineEnable(bro);
+            this.onTabSelect();
+        }
+     
+        var target= new Alph.SourceSelection();
+        target.setWord(word);
+        target.setWordStart(0);
+        target.setWordEnd(word.length -1);
+        target.setContext(word);
+        target.setContextPos(0);
+        
+        var topdoc = $("#alph-morph-body").get(0).contentDocument;
+        this.getLanguageTool().lexiconLookup(
+            target,
+            function(data)
+            {
+                $("#alph-window",topdoc).css("display","block");
+                Alph.xlate.showTranslation(data,target,topdoc);
+            },
+            function(a_msg)
+            {   
+                Alph.xlate.translationError(a_msg,topdoc);
+            }
+        );
+    },
+    
+    /**
+     * Toggle the state of a panel
+     * @param {Event} a_event the event that triggered the action
+     * @param {String} a_panel_id the name of the target panel
+     */
+    toggle_panel: function(a_event,a_panel_id)
+    {
+        if (a_event.explicitOriginalTarget.hasAttribute("checked")== true)
+        {
+            $("#"+a_panel_id).attr("collapsed",false);
+            $("#"+a_panel_id+"-splitter").attr("collapsed",false);
+             // enable Alpheios if it isn't already so that the panel is useful
+            var bro = this.getCurrentBrowser();
+            if (! bro.alpheios)
+            {
+                this.inlineEnable(bro);
+                this.onTabSelect();
+            }
+            // update the status of any commands used  by the panel
+            this.update_tools_menu();
+        }
+        else
+        {
+            $("#"+a_panel_id).attr("collapsed",true);
+            $("#"+a_panel_id+"-splitter").attr("collapsed",true);
+           
+        }
+    },
+    
+    /**
+     * Update the tools menu for the current language
+     */
+    update_tools_menu: function()
+    {
+        var lang_tool = Alph.main.getLanguageTool();
+        var bro = this.getCurrentBrowser();
+        $("command.alpheios-language-specific-cmd").each(
+            function()
+            {
+                var cmd_id = $(this).attr("id");
+                // disable the tools if Alpheios isn't enabled
+                if (! bro.alpheios)
+                {
+                    $("#"+cmd_id).attr("disabled",true);
+                }
+                else
+                {
+                    if (lang_tool.getCmd(cmd_id))
+                    {
+                        $("#"+cmd_id).attr("disabled",false);
+                    }
+                    else
+                    {
+                        $("#"+cmd_id).attr("disabled",true);
+                    }
+                }
+            }
+        );             
+    },
+    
+    /**
+     * Execute a tools menu command - delegate to the current
+     * language tool. 
+     * @param {Event} a_event the command event
+     */
+    execute_tools_command: function(a_event)
+    {
+        
+        var lang_tool = Alph.main.getLanguageTool();
+        var cmd_id = a_event.target.getAttribute("id");
+        Alph.util.log("Executing " + cmd_id);
+        if (lang_tool && lang_tool.getCmd(cmd_id))
+        {
+            lang_tool[(lang_tool.getCmd(cmd_id))]();
+        }
+        
+    }
 };
 
 Alph.main.init();

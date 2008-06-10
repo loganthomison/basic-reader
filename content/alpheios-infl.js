@@ -87,18 +87,12 @@ Alph.infl = {
         var link_target = window.arguments[0];
 
         
-        var primary_pofs = 'verb'; //TODO - from prefs?
         var pofs_set = [];
         for (var pofs in link_target.suffixes)
         {
-            if (link_target.suffixes[pofs].length > 0)
+            if (link_target.suffixes[pofs].length > 0 || pofs == link_target.showpofs)
             {
                 pofs_set.push(pofs);
-                if (pofs  == primary_pofs && 
-                    typeof link_target.showpofs == "undefined")
-                {
-                        link_target.showpofs = pofs;
-                }
                 
             }
         }
@@ -123,7 +117,7 @@ Alph.infl = {
         });
         link_target.suffix_list = suffix_list.join(',');
 
-                // if we don't have the primary case, just use the first one we found
+        // if we don't have the primary case, just use the first one we found
         if (typeof link_target.showpofs == 'undefined')
         {
             link_target.showpofs = pofs_set[0]
@@ -195,21 +189,20 @@ Alph.infl = {
         // show the links to the other possible orders
         if (a_link_target.order)
         {
+            $("#sortorder",topdoc).val(a_link_target.order);
             $("#reorder",topdoc).css("display","block");
-            $(".reorder-link",topdoc).each(
-                function()
-                {
-                    if ($(this).attr("id") != a_link_target.order)
-                    {
-                        $(this).css("display","inline");
-                    }
-                    else
-                    {
-                        $(this).css("display","none");
-                    }
-                }
-            );
         }
+        
+        // add handler for the reorder links
+        $("#sortorder",topdoc).change(
+            function(e)
+            {
+                $(".loading",topdoc).show();
+                var showorder = $(":selected", this).val();
+                window.opener.Alph.main.getLanguageTool().handleInflections(e,'verb', { order: showorder } );
+            }
+        );
+        
         //show the word we're working with
         $("caption",a_tbl).html(a_link_target.word + " (" + suffix_list + ")");
 
@@ -340,73 +333,97 @@ Alph.infl = {
         window.opener.Alph.util.log("Display time: " + (end-start));
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted
-
         
         // add links for the other relevant inflections
-        for (var i=0; i<a_pofs_set.length; i++)
-        {
-            if (a_pofs_set[i] != a_link_target.showpofs)
+        if (a_pofs_set.length > 1) {
+            for (var i=0; i<a_pofs_set.length; i++)
             {
-                var linkname = a_pofs_set[i].replace("_",':');
-                
+                // if a part of speech is broken down further,
+                // format will be <primary pofs>_<secondary info>
+                // e.g. verb_suppine, etc.
+                var parts = a_pofs_set[i].split(/_/);
+                var linktype;
+                var linkname;
+                if (parts.length >1)
+                { 
+                    linktype = parts[0];
+                    linkname = parts[0] + '(' + parts[1] + ')';
+                }
+                else {
+                    linktype = a_pofs_set[i];
+                    linkname = a_pofs_set[i];
+                }
+    
                 var link =
                    topdoc.createElementNS("http://www.w3.org/1999/xhtml",
-                                        "a");
-                    link.setAttribute("href","#" + a_pofs_set[i]);
-                    link.setAttribute("class","alph-infl-link");
-                    link.setAttribute("alph-infl-link",a_pofs_set[i]);
+                                        "option");
+                    link.setAttribute("value",a_pofs_set[i]);
                     link.innerHTML =  
                         document
                             .getElementById("alph-infl-strings")
                             .getFormattedString(
-                                "alph-infl-link", 
+                                "alph-infl-link-"+linktype, 
                                 [linkname]);
-
-                $("#links",topdoc).append(link);
+                if (a_pofs_set[i] == a_link_target.showpofs)
+                {
+                    link.setAttribute("selected",true);
+                }
+    
+                $("#infl-links-select",topdoc).append(link);
             }
         }
         
-        // add other links TODO  this should be different class?
+        
+        // TODO - dedupe? See congestaque
         if (a_link_target.links)
         {
             for (i=0; i<a_link_target.links.length; i++)
             {
-                var linkname = a_link_target.links[i];
+                var parts = a_link_target.links[i].split(/_/);
+                var linktype;
+                var linkname;
+                if (parts.length >1)
+                { 
+                    linktype = parts[0];
+                    linkname = parts[0] + '(' + parts[1] + ')';
+                }
+                else {
+                    linktype = a_link_target.links[i];
+                    linkname = a_link_target.links[i];
+                }
                 
                 var link =
                    topdoc.createElementNS("http://www.w3.org/1999/xhtml",
-                                        "a");
-                    link.setAttribute("href","#" + linkname);
-                    link.setAttribute("class","alph-infl-link");
-                    link.setAttribute("alph-infl-link",linkname);
+                                        "option");
+                    link.setAttribute("value",a_link_target.links[i]);
                     link.innerHTML =  
                         document
                             .getElementById("alph-infl-strings")
                             .getFormattedString(
-                                "alph-infl-link", 
+                                "alph-infl-link-"+linktype, 
                                 [linkname]);
 
-                $("#links",topdoc).append(link);
+                $("#infl-links-select",topdoc).append(link);
             }
         }
 
-        $(".alph-infl-link",topdoc).click(
+        if ($("select#infl-links-select option",topdoc).length > 1)
+        {
+            var label = document
+                .getElementById("alph-infl-strings")
+                .getString("alph-infl-links-label"); 
+            $("#infl-links-label",topdoc).text(label);
+            $("#infl-links",topdoc).css("display","block");
+        }
+        $("#infl-links-select",topdoc).change(
             function(e) {
                 $(".loading",topdoc).show();
-                var showpofs = $(this).attr("alph-infl-link");
-                window.opener.Alph.main.getLanguageTool().handleInflections(e,showpofs);
+                var showpofs = $(":selected",this).val();
+                window.opener.Alph.util.log("Switching to " + showpofs);
+                window.opener.Alph.main.getLanguageTool().handleInflections(e,showpofs,null,a_link_target.source_node);
             }
         );
-        
-        $(".reorder-link",topdoc).click(
-            function(e)
-            {
-                var showorder = $(this).attr("id");
-                $(".loading",topdoc).show();
-                window.opener.Alph.main.getLanguageTool().handleInflections(e,'verb', { order: showorder } );
-            }
-        );
-        
+                
         $(".footnote",a_tbl).click(
             function(e)
             {
@@ -445,7 +462,9 @@ Alph.infl = {
             50;
                     
         // add a little room to the right of the table 
-        var x = $("#alph-infl-table",topdoc).get(0).offsetWidth + 50;
+            
+
+        var x = $("#alph-infl-table",topdoc).get(0).offsetWidth + 75;
                     
         if (x > window.screen.availWidth) {
             x = window.screen.availWidth - 20; // don't take up the entire screen

@@ -654,20 +654,29 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 
 
 /**
- * 
+ * Handler which can be used to show context-specific inflection tables
+ * @param {Event} a_event the target event
+ * @param {String} a_showpofs the requested inflection type
+ * @param {Object} a_otherparams option object to supply default parameters
+ * @param {Node} a_node the node which contains the context
  */
-Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_otherparams)
+Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_otherparams,a_node)
 {
 
-    if(! Alph.xlate.popupVisible()) 
-    {
-        return;    
-    }
+    //if(! Alph.xlate.popupVisible()) 
+    //{
+    //    return;    
+    //}
     //TODO a_showpofs and a_otherparams should be merged
     var params = a_otherparams || {};
     params.showpofs = a_showpofs;
     params.word = Alph.main.getCurrentBrowser().alpheios.word;
-    var popup = $("#alph-text", content.document);
+    var topdoc = a_node || content.document;
+    var popup = $("#alph-text", topdoc);
+    if (popup.length == 0)
+    {
+        return;
+    }
     params = this.getInflectionTable(popup,params)
     if (! params)
     {
@@ -675,6 +684,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_o
     }
     if (typeof params.showpofs != 'undefined')
     {
+        params.source_node = topdoc;
         Alph.util.log("Handling inflections for " + params.showpofs);
         
         // send the word endings to the declension table
@@ -696,6 +706,18 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_o
             Alph.util.log("Inflections window should have focus with " 
                 + Alph.main.getCurrentBrowser().alpheios.word);
     }
+}
+
+/**
+ * Handler which can be used to show context-specific inflection tables
+ * for the morpohology panel
+ * @param {Event} a_event the target event
+ * @param {Node} a_node the node which contains the context
+ */
+Alph.LanguageTool.prototype.handleInflectionsForMorphWindow = function(a_event,a_showpofs, a_otherparams,a_node)
+{
+    var morph_doc = $("#alph-morph-body").get(0).contentDocument;
+    this.handleInflections(a_event,a_showpofs, a_otherparams,morph_doc);
 }
 
 /**
@@ -855,3 +877,14 @@ Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
     // no default behavior
     return;
 };
+
+/**
+ * Method which returns the requested command
+ * @param {String} a_cmd the name of the command
+ * @return {String} the name of the function associated with the command
+ *                  or undefined. 
+ */
+Alph.LanguageTool.prototype.getCmd = function(a_cmd)
+{
+    return Alph.util.getPrefOrDefault("cmds."+a_cmd,this.source_language);
+}

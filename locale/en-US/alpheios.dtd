@@ -8,4 +8,16 @@
 <!ENTITY alpheios.infl.window.title "Inflections">
 <!ENTITY alpheios.lang.menu "Alpheios Language">
 <!ENTITY alpheios.lang.none "(none supported)">
-
+<!ENTITY alpheios-tools-label "View">
+<!ENTITY alpheios-tools-tooltip "Alpheios Tools">
+<!ENTITY alpheios-tools-morph-label "Morphology Panel">
+<!ENTITY alpheios-tools-morph-tooltip "Show/Hide Morphology Panel">
+<!ENTITY alpheios-tools-inflect-label "Inflection Tables">
+<!ENTITY alpheios-tools-inflect-tooltip "View Inflection Table">
+<!ENTITY alpheios-tools-grammar-label "Grammar">
+<!ENTITY alpheios-tools-grammar-tooltip "View Grammar">
+<!ENTITY alpheios-morph-toolbar-label "Alpheios Morphology Lookup">
+<!ENTITY alpheios-morph-lookup-tooltip "Enter a word or words.">
+<!ENTITY alpheios-toolbar-grippy-tooltip "Alpheios Toolbar">
+<!ENTITY alpheios-toolbar-name "Alpheios Toolbar">
+<!ENTITY alpheios.lang.menu.tooltip "Choose Alpheios Language">

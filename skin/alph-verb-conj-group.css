@@ -12,7 +12,7 @@ body, th, td {
     font-size: 110%;
 }
 
-#links a {
+#links a, #infl-links a {
     padding-right: 1em;
 }
 
@@ -20,12 +20,27 @@ body, th, td {
     display: none;
 }
 
-#reorder {
-    display: none;
+#infl-links {
+    display: none; 
+    padding: 2px;
 }
 
-.reorder-links {
+#infl-links-label {
+    font-style: italic;
+}
+
+#reorder {
     display: none;
+    padding: 2px;
+}
+
+#reorder-label {
+    font-style: italic;
+}
+
+select#sortorder option, select#infl-links-select option{
+    /* TODO want this to be smaller but having trouble with selected */
+    /* font-size: 90% */
 }
 
 table#alph-infl-table {
@@ -58,19 +73,37 @@ th {
     border-bottom: 1px solid gray;
     padding: 2px;
 }
-td {
-    display: none;
-}
 
 th.always-visible {
   display:table-cell;
 }
 
+
 tr#headerrow1 th:first-child {
     visibility: hidden; 
-
 }
 
+
+tr#headerrow1-irreg th {
+    border-top: 2px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    
+}
+
+tr.group1row th {
+    white-space: nowrap;
+}
+
+tr.group1row th.emptyheader {
+    border-left: none;
+    border-right: none;
+}
+
+tr#headerrow1-irreg th:first-child {
+    visibility: hidden; 
+}
 
 tr.data-row th {
    display:table-cell;
@@ -92,6 +125,16 @@ tr.group1row th {
     border-left: 1px solid black;
     border-right: none;
     text-align: left;
+}
+
+tr.data-row td.emptycell {
+    border-left: none;
+    border-right: none;
+    color: red;
+}
+
+td {
+    display: none;
 }
 
 
@@ -173,3 +216,4 @@ td {
     cursor: progress;
     white-space: nowrap;
 }
+

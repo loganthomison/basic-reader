@@ -23,9 +23,7 @@
 #alph-window {
 	width: auto;
 	height: auto;
-	background: transparent;
 	color: #000000;
-	border: none !important;
 	border-spacing: 0px;
 	margin: 0px;
 	padding: 0px;
@@ -140,4 +138,20 @@
     background: transparent url(loading.gif) no-repeat;
     cursor: progress;
     white-space: nowrap;
+}
+
+#alph-morph-box-splitter {
+    border-top: 1px solid #BBB9BA;
+    border-bottom: none;
+    background: #f3f3f3 !important;
+    min-height: 3px;
+    max-height: 3px;
+}
+
+#alph-morph-box {
+    height: 100px;
+}
+
+#alph-lookup-label {
+    vertical-align: bottom;
 }

@@ -258,7 +258,7 @@ Alph.xlate = {
                 && ($(".alph-error",wordHTML).size() == 0)))
         {
             Alph.util.log("No valid entries to display.");
-            return Alph.xlate.hidePopup();
+            return Alph.xlate.hidePopup(a_topdoc);
 
         }
         
@@ -273,14 +273,17 @@ Alph.xlate = {
         
         // re-highlight the translated range in the source document
         var rp = a_alphtarget.getRangeParent()
-        var doc = rp.ownerDocument;
-        var r = doc.createRange();
-        r.setStart(rp, a_alphtarget.getWordStart());
-        r.setEnd(rp, a_alphtarget.getWordEnd());
-        var sel = doc.defaultView.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(r);
-        
+        if (rp)
+        {
+            var doc = rp.ownerDocument;
+            var r = doc.createRange();
+            r.setStart(rp, a_alphtarget.getWordStart());
+            r.setEnd(rp, a_alphtarget.getWordEnd());
+            var sel = doc.defaultView.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(r);
+        }
+            
         // TODO - we probably should reposition the popup now that we 
         // know it's final size
     },
@@ -577,10 +580,11 @@ Alph.xlate = {
     /**
      * Hides the popup and removes the alpheios stylesheets from the 
      * browser content document.
+     * @param {Node} a_node - the node which contains the popup
      */
-    hidePopup: function()
+    hidePopup: function(a_node)
     {
-        var topdoc = this.getLastDoc();
+        var topdoc = a_node || this.getLastDoc();
         $("#alph-window",topdoc).css("display","none");
         $("#alph-text",topdoc).remove();
         topdoc.defaultView.getSelection().removeAllRanges();
@@ -867,6 +871,10 @@ Alph.xlate = {
             // in the 2ndary window not the one showing the message
             var topdoc = Alph.xlate.getLastDoc();
             $("#alph-secondary-loading",topdoc).remove();
+            
+            // also check the morphology window
+            var morph_window = $("#alph-morph-body").get(0).contentDocument;
+            $("#alph-secondary-loading",morph_window).remove();
         }
         catch(e)
         {

@@ -1,0 +1,30 @@
+body {
+    background: white;
+}
+
+#alph-window {
+    border: none !important;
+    padding: 4px;
+    background: white;
+}
+
+.alph-attr,.alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs, .alph-close {
+    background: white;
+}
+
+
+#alph-morph-splitter {
+    border-top: 1px solid #BBB9BA;
+    border-bottom: none;
+    background: #f3f3f3 !important;
+    min-height: 3px;
+    max-height: 3px;
+}
+
+#alph-morph-box {
+    height: 100px;
+}
+
+#alph-lookup-label {
+    vertical-align: bottom;
+}

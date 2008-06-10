@@ -22,6 +22,23 @@
 		<command id="alpheios-toggle-cmd" oncommand="Alph.main.alph_inlineToggle();"/>
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value);"/>
+        <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
+        <command id="alpheios-morph-toggle-cmd" oncommand="Alph.main.toggle_panel(event,'alph-morph-box');"/>
+        <command 
+            class="alpheios-language-specific-cmd"
+            id="alpheios-inflect-cmd" 
+            oncommand="Alph.main.execute_tools_command(event);" 
+            disabled="true"/>
+        <command
+            class="alpheios-language-specific-cmd"
+            id="alpheios-grammar-cmd" 
+            oncommand="Alph.main.execute_tools_command(event);" 
+            disabled="true"/>
+        <command
+            class="alpheios-language-specific-cmd"
+            id="alpheios-morph-inflect-cmd" 
+            oncommand="Alph.main.execute_tools_command(event);" 
+            disabled="true"/>
 	</commandset>
 
 	<popup id="contentAreaContextMenu">
@@ -71,4 +88,101 @@
             </menupopup>   
         </menu>
     </menupopup>
+    
+    <toolbox id="navigator-toolbox">
+        <toolbar id="alpheios-toolbar" 
+                 accesskey="" 
+                 class="chromeclass-toolbar" 
+                 collapsed="false" 
+                 context="toolbar-context-menu" 
+                 customizable="true" 
+                 grippytooltiptext="&alpheios-toolbar-grippy-tooltip;" 
+                 hidden="false" 
+                 iconsize="small" 
+                 inherits="collapsed,hidden" 
+                 mode="text" 
+                 persist="collapsed,hidden" 
+                 toolbarname="&alpheios-toolbar-name;"
+                 defaultset="alpheios-toggle-mm,alpheios-lang-button,alpheios-tools-button"/>
+    </toolbox>
+
+    <toolbarpalette id="BrowserToolbarPalette">
+        <toolbarbutton 
+            id="alpheios-toggle-mm" 
+            class="toolbarbutton-class"
+            label="&alpheios.inline.enable.tm;"
+            command="alpheios-toggle-cmd"/>
+        <toolbarbutton
+            id="alpheios-lang-button"
+            class="toolbarbutton-class"
+            label="&alpheios.lang.menu;"
+            insertafter="alpheios-toggle-mm"
+            command="alpheios-lang-cmd"
+            tooltiptext="&alpheios.lang.menu.tooltip;"
+            type="menu">
+            <menupopup 
+                id="alpheios-lang-popup-mm" 
+                onpopupshowing="Alph.main.update_main_menu_languages()"/>
+        </toolbarbutton>
+        <toolbarbutton
+            id="alpheios-tools-button"
+            class="toolbarbutton-class"
+            label="&alpheios-tools-label;"
+            command="alpheios-tools-cmd"
+            tooltiptext="&alpheios-tools-tooltip;"
+            type="menu">
+            <menupopup
+                id="alpheios-tools-popup"
+                onpopupshowing="Alph.main.update_tools_menu();">
+                <menuitem
+                    id="alpheios-morph-button"
+                    type="checkbox"
+                    label="&alpheios-tools-morph-label;"
+                    command="alpheios-morph-toggle-cmd"
+                    tooltiptext="&alpheios-tools-morph-tooltip;"
+                    class="menuitem-iconic" />
+                <menuitem
+                    id="alpheios-inflection-button"
+                    label="&alpheios-tools-inflect-label;"
+                    command="alpheios-inflect-cmd"
+                    tooltiptext="&alpheios-tools-inflect-tooltip;"
+                    class="menuitem-iconic" />
+                <menuitem
+                    id="alpheios-grammar-button"
+                    label="&alpheios-tools-grammar-label;"
+                    command="alpheios-grammar-cmd"
+                    tooltiptext="&alpheios-tools-grammar-tooltip;"
+                    class="menuitem-iconic" />
+            </menupopup>
+        </toolbarbutton>
+    </toolbarpalette>
+    
+    <vbox id="appcontent">
+        <splitter id="alph-morph-box-splitter" collapsed="true"/>
+        <vbox persist="height" id="alph-morph-box" collapsed="true">
+            <toolbox id="alph-morph-toolbox">
+                <toolbar id="alph-morph-toolbar">
+                    <toolbaritem id="alpheios-lookup-text-tbitem">
+                        <label id="alph-lookup-label" 
+                               control="alpheios-lookup-text" 
+                               value="&alpheios-morph-toolbar-label;" 
+                               align="baseline"/>
+                        <textbox id="alpheios-lookup-text"
+                            command="alpheios-lookup-cmd"
+                            onkeypress="Alph.main.do_tb_lookup(event)"
+                            align="baseline"
+                            tooltiptext="&alpheios-morph-lookup-tooltip;"/>
+                    </toolbaritem>
+                    <toolbarbutton 
+                        id="alpheios-morph-inflection" 
+                        class="toolbarbutton-class"
+                        label="&alpheios-tools-inflect-label;" 
+                        tooltiptext="&alpheios-tools-inflect-label;"
+                        type="button"
+                        command="alpheios-morph-inflect-cmd"/>
+                    </toolbar>
+              </toolbox>
+            <iframe id="alph-morph-body" src="chrome://alpheios/content/alph-morph.html" flex="10"/>
+        </vbox>  
+    </vbox>
 </overlay>

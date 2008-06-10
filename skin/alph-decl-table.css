@@ -20,6 +20,16 @@ body, th, td {
     display: none;
 }
 
+#infl-links {
+    display: none; 
+    padding: 2px;
+}
+
+#infl-links-label {
+    font-style: italic;
+}
+
+
 table#alph-infl-table {
 	border-collapse: separate;
 	border: 2px solid;
