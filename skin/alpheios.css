@@ -52,6 +52,16 @@
     font-style: normal;
 }
 
+.alph-word {
+    border-top: 1px dotted black;
+    padding-top: 10px;
+}
+
+.alph-word-first {
+    border-top: none;
+    padding-top: 0px;
+}
+
 .alph-entry span {
     padding-right: .5em;
 }
@@ -150,8 +160,4 @@
 
 #alph-morph-box {
     height: 100px;
-}
-
-#alph-lookup-label {
-    vertical-align: bottom;
 }

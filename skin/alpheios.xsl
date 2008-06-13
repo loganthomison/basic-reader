@@ -211,7 +211,10 @@
                     ($pofs != 'preposition') and
                     ($pofs != 'interjection') and
                     ($pofs != 'particle')))">
-            <div class="alph-infl-set">
+            <!-- add the term as the value of the context attribute for the
+                 inflection set -->
+            <xsl:variable name="term" select="$inflections[1]/term"/>
+            <div class="alph-infl-set" context="{$term}">
                 <xsl:apply-templates select="$inflections[1]/term"/>
                 <xsl:if test="$inflections[1]/pofs != $inflections[1]/../dict[1]/pofs">
                     <xsl:call-template name="parenthesize">

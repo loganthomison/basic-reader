@@ -203,8 +203,15 @@ Alph.infl = {
             }
         );
         
-        //show the word we're working with
-        $("caption",a_tbl).html(a_link_target.word + " (" + suffix_list + ")");
+        //show the words for this inflection type
+        var wordlist = "";
+        for (var word in a_link_target.words[showpofs])
+        {
+            wordlist = wordlist + word + ", ";
+        }
+        wordlist = wordlist.replace(/\,\s$/,'');
+        
+        $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
 
         // replace the table header text
         var str = document.getElementById("alph-infl-strings");
@@ -525,6 +532,5 @@ Alph.infl = {
         // return true to allow event propogation if needed
         return true;
     }
-    
     
 };

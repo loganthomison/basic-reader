@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE window SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+<?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 
 <overlay id="alpheios" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
@@ -23,7 +24,7 @@
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value);"/>
         <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
-        <command id="alpheios-morph-toggle-cmd" oncommand="Alph.main.toggle_panel(event,'alph-morph-box');"/>
+        <command id="alpheios-morph-toggle-cmd" oncommand="Alph.main.toggle_panel(event,'alph-morph-box','alpheios-morph-button');"/>
         <command 
             class="alpheios-language-specific-cmd"
             id="alpheios-inflect-cmd" 
@@ -159,30 +160,6 @@
     
     <vbox id="appcontent">
         <splitter id="alph-morph-box-splitter" collapsed="true"/>
-        <vbox persist="height" id="alph-morph-box" collapsed="true">
-            <toolbox id="alph-morph-toolbox">
-                <toolbar id="alph-morph-toolbar">
-                    <toolbaritem id="alpheios-lookup-text-tbitem">
-                        <label id="alph-lookup-label" 
-                               control="alpheios-lookup-text" 
-                               value="&alpheios-morph-toolbar-label;" 
-                               align="baseline"/>
-                        <textbox id="alpheios-lookup-text"
-                            command="alpheios-lookup-cmd"
-                            onkeypress="Alph.main.do_tb_lookup(event)"
-                            align="baseline"
-                            tooltiptext="&alpheios-morph-lookup-tooltip;"/>
-                    </toolbaritem>
-                    <toolbarbutton 
-                        id="alpheios-morph-inflection" 
-                        class="toolbarbutton-class"
-                        label="&alpheios-tools-inflect-label;" 
-                        tooltiptext="&alpheios-tools-inflect-label;"
-                        type="button"
-                        command="alpheios-morph-inflect-cmd"/>
-                    </toolbar>
-              </toolbox>
-            <iframe id="alph-morph-body" src="chrome://alpheios/content/alph-morph.html" flex="10"/>
-        </vbox>  
+        <vbox persist="height" id="alph-morph-box" collapsed="true"/>
     </vbox>
 </overlay>

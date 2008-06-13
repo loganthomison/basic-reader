@@ -957,13 +957,18 @@ Alph.main =
      * Toggle the state of a panel
      * @param {Event} a_event the event that triggered the action
      * @param {String} a_panel_id the name of the target panel
+     * @param {String} a_menu_id the name of the menu item for the target panel 
      */
-    toggle_panel: function(a_event,a_panel_id)
+    toggle_panel: function(a_event,a_panel_id,a_menu_id)
     {
-        if (a_event.explicitOriginalTarget.hasAttribute("checked")== true)
+        var panel = $("#"+a_panel_id);
+        if ($(panel).attr("collapsed") == 'true')
         {
-            $("#"+a_panel_id).attr("collapsed",false);
+            $(panel).attr("collapsed",false);
+            
+            // open the splitter too
             $("#"+a_panel_id+"-splitter").attr("collapsed",false);
+            
              // enable Alpheios if it isn't already so that the panel is useful
             var bro = this.getCurrentBrowser();
             if (! bro.alpheios)
@@ -971,14 +976,22 @@ Alph.main =
                 this.inlineEnable(bro);
                 this.onTabSelect();
             }
+            
+            // update the menu item for the panel
+            $("#"+a_menu_id).attr('checked',true);
+            
             // update the status of any commands used  by the panel
             this.update_tools_menu();
         }
         else
         {
-            $("#"+a_panel_id).attr("collapsed",true);
+            $(panel).attr("collapsed",true);
+            // collapse the splitter too
             $("#"+a_panel_id+"-splitter").attr("collapsed",true);
-           
+            
+            // update the menu item for the panel
+            $("#"+a_menu_id).attr('checked',false);
+            
         }
     },
     

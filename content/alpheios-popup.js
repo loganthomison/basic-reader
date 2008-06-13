@@ -262,6 +262,9 @@ Alph.xlate = {
 
         }
         
+        // add a class to the first word in the response 
+        $("div.alph-word:first",wordHTML).addClass("alph-word-first");
+        
         $("#alph-text",a_topdoc).remove();
         var alphtext_node = 
             window.content.document.importNode(wordHTML.getElementById("alph-text"),true);
