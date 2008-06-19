@@ -233,7 +233,7 @@ Alph.LanguageTool.prototype.set_lexicon_lookup = function()
                 // TODO add support for the context in the lexicon url
         
             // send asynchronous request to the lexicon service
-            $.ajax(
+            Alph.$.ajax(
                 {
                     type: "GET",
                     url: url,
@@ -588,7 +588,7 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
     var myobj=this;
     var grammarurl = Alph.util.getPref("url.grammar",this.source_language) || "";
     var links = this.getgrammarlinks();
-    $("#alph-text",a_doc).bind(
+    Alph.$("#alph-text",a_doc).bind(
         "click", 
         function(a_e)
         {
@@ -672,7 +672,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_o
     params.showpofs = a_showpofs;
     params.word = Alph.main.getCurrentBrowser().alpheios.word;
     var topdoc = a_node || content.document;
-    var popup = $("#alph-text", topdoc);
+    var popup = Alph.$("#alph-text", topdoc);
     if (popup.length == 0)
     {
         return;
@@ -716,7 +716,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_o
  */
 Alph.LanguageTool.prototype.handleInflectionsForMorphWindow = function(a_event,a_showpofs, a_otherparams,a_node)
 {
-    var morph_doc = $("#alph-morph-body").get(0).contentDocument;
+    var morph_doc = Alph.$("#alph-morph-body").get(0).contentDocument;
     this.handleInflections(a_event,a_showpofs, a_otherparams,morph_doc);
 }
 
@@ -747,21 +747,21 @@ Alph.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
           adjective: 'adjective'
         };
 
-    var popup = $("#alph-text", content.document);
+    var popup = Alph.$("#alph-text", content.document);
 
     // The word will have one more more alph-infl-set elements
     // Each alph-infl-set element should have a alph-suffix element
     // and one or more alph-case elements.  Iterate through the alph-infl-sets
     // retrieving the alph-suffix elements which are applicable to
     // each supported case
-    $(".alph-infl-set",popup).each(
+    Alph.$(".alph-infl-set",popup).each(
         function(i)
         {
             for (var supported_case in supported_cases)
             {
                 var map_case = supported_cases[supported_case];
                 var has_case = 
-                    $(".alph-case[context$='" + map_case + "']",
+                    Alph.$(".alph-case[context$='" + map_case + "']",
                     this);
                 if ( has_case.length > 0 )
                 {
@@ -773,7 +773,7 @@ Alph.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
                         params.showcase = map_case;
                     }
                     params.suffixes[map_case].push(
-                        $(".alph-suff",this).get());
+                        Alph.$(".alph-suff",this).get());
 
                 }                
             }
@@ -839,7 +839,7 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
     css.setAttribute("type", "text/css");
     css.setAttribute("href", "chrome://" + chromepkg + "/skin/" + chromepkg + ".css");
     css.setAttribute("id", chromepkg + "-css");
-    $("head",a_doc).append(css);
+    Alph.$("head",a_doc).append(css);
   
 };
 
@@ -851,7 +851,7 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
 Alph.LanguageTool.prototype.removeStyleSheet = function(a_doc)
 {
     var css_id = this.getchromepkg() + "-css";
-    $("#"+css_id,a_doc).remove();
+    Alph.$("#"+css_id,a_doc).remove();
 };
 
 /**

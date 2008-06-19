@@ -27,6 +27,17 @@
 // Make sure the Alph namespace is defined
 if (typeof Alph == "undefined") {
     Alph = {};
+    // load the jQuery library in the scope of the Alph object
+    // and call jQuery.noConflict(extreme) to revert control of the
+    // $ and jQuery to whichever library first implemented it (to
+    // avoid stepping on the toes of any other extensions).
+    // See http://docs.jquery.com/Core/jQuery.noConflict#extreme
+    // Note, we may run into problems if we want to use any jQuery plugins,
+    // in which case it might be sufficient to skip the extreme flag
+    Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+          .getService(Components.interfaces.mozIJSSubScriptLoader)
+          .loadSubScript("chrome://alpheios/content/jquery-1.2.1.min.js", Alph);
+    Alph.$ = jQuery.noConflict(true);
 }
 
 /**

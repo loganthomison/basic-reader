@@ -32,13 +32,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-// initialize the Alph namespace
-if (typeof Alph == "undefined")
-{
-    Alph = {};
-}
-
+          
 /**
  * @singleton
  */
@@ -338,7 +332,7 @@ Alph.main =
      */
     getLocalDaemonPid: function(a_onsuccess,a_onerror)
     {
-        $.ajax(
+        Alph.$.ajax(
             {
                 type: "GET",
                 async: true,
@@ -373,7 +367,7 @@ Alph.main =
         detach_url = detach_url + "?_r=" + rand_num;
         Alph.util.log("detach daemon at " + detach_url);
         
-        $.ajax(
+        Alph.$.ajax(
             {
                 type: "GET",   
                 async: true, 
@@ -481,10 +475,10 @@ Alph.main =
         if (typeof this.getCurrentBrowser().alpheios == "undefined")
         {
             cmenu_text =
-                $("#alpheios-strings").get(0)
+                Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-enable-cm");
             tmenu_text =
-                $("#alpheios-strings").get(0)
+                Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-enable-tm");
             
             // TODO - we ought to preserve the user's last
@@ -494,31 +488,31 @@ Alph.main =
         else
         {
             cmenu_text =
-                $("#alpheios-strings").get(0)
+                Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-disable-cm");
             tmenu_text =
-                $("#alpheios-strings").get(0)
+                Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-disable-tm");
 
             menu_lang = this.getCurrentBrowser().alpheios.current_language;
         }
-        $("#alpheios-toggle-cm").attr("label",cmenu_text);
-        $("#alpheios-toggle-tm").attr("label",tmenu_text);
-        $("#alpheios-toggle-mm").attr("label",tmenu_text);
+        Alph.$("#alpheios-toggle-cm").attr("label",cmenu_text);
+        Alph.$("#alpheios-toggle-tm").attr("label",tmenu_text);
+        Alph.$("#alpheios-toggle-mm").attr("label",tmenu_text);
         
         // uncheck the previously checked language
-        $("#alpheios-lang-popup-tm menuitem[checked='true']")
+        Alph.$("#alpheios-lang-popup-tm menuitem[checked='true']")
             .attr("checked","false");
-        $("#alpheios-lang-popup-cm menuitem[checked='true']")
+        Alph.$("#alpheios-lang-popup-cm menuitem[checked='true']")
             .attr("checked","false");
-        $("#alpheios-lang-popup-mm menuitem[checked='true']")
+        Alph.$("#alpheios-lang-popup-mm menuitem[checked='true']")
             .attr("checked","false");
         // check the current language
-        $("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']")
+        Alph.$("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']")
             .attr("checked","true");
-        $("#alpheios-lang-popup-cm menuitem[value='"+menu_lang+"']")
+        Alph.$("#alpheios-lang-popup-cm menuitem[value='"+menu_lang+"']")
             .attr("checked","true");
-        $("#alpheios-lang-popup-mm menuitem[value='"+menu_lang+"']")
+        Alph.$("#alpheios-lang-popup-mm menuitem[value='"+menu_lang+"']")
             .attr("checked","true");
             
         //update the state of the commands for the panel
@@ -547,7 +541,7 @@ Alph.main =
         var rand_num = Math.floor(Math.random()* 100000000)
         attach_url = attach_url + "?_r=" + rand_num;
         
-        $.ajax(
+        Alph.$.ajax(
             {
                 type: "GET",
                 async: true,
@@ -603,7 +597,7 @@ Alph.main =
 
         if (daemon == null)
         {
-            alert($("#alpheios-strings").get(0)
+            alert(Alph.$("#alpheios-strings").get(0)
                 .getString("alph-error-mhttpd-notfound"));
             return;
                     
@@ -713,10 +707,10 @@ Alph.main =
 
         var language_count = 0;
         // discover supported languages
-        $("#alpheios-lang-popup-tm menuitem").each(
+        Alph.$("#alpheios-lang-popup-tm menuitem").each(
             function(i)
             {
-                //var lang = $(this).attr("value");
+                //var lang = Alph.$(this).attr("value");
                 var lang = this.value;
                 Alph.util.log("Language menuitem: " + lang);
                 if (lang != null && lang != '' )
@@ -738,7 +732,7 @@ Alph.main =
                 else
                 {
                     Alph.util.log("Language value undefined for " + this.label);
-                    $(this).attr("hidden","true");
+                    Alph.$(this).attr("hidden","true");
                 }
             }
          );
@@ -747,8 +741,8 @@ Alph.main =
          // in the menu and return false to disable the extension
          if (language_count==0)
          {
-            $("#alpheios-tm-lang-none").attr("hidden","false");
-            $("#alpheios-cm-lang-none").attr("hidden","false"); 
+            Alph.$("#alpheios-tm-lang-none").attr("hidden","false");
+            Alph.$("#alpheios-cm-lang-none").attr("hidden","false"); 
          }
          else
          { 
@@ -765,7 +759,7 @@ Alph.main =
             {
                              
              Alph.main.defaultLanguage = 
-                $("#alpheios-lang-popup-tm menuitem:visible").get(0).value;
+                Alph.$("#alpheios-lang-popup-tm menuitem:visible").get(0).value;
             }
             // successfully setup the Alph.Languages object, so return true 
             languages_set = true;
@@ -891,16 +885,16 @@ Alph.main =
         {
             return;
         }
-        var main_menu = $("#alpheios-lang-popup-mm").get(0);
+        var main_menu = Alph.$("#alpheios-lang-popup-mm").get(0);
         // iterate through the toolbar menu items
         // adding them to the main menu
         
-        $("#alpheios-lang-popup-tm menuitem").each(
+        Alph.$("#alpheios-lang-popup-tm menuitem").each(
             function(i)
             {
                 var lang = this.value;
                 Alph.util.log("Adding menuitem for: " + lang);
-                $(this).clone(true).appendTo(main_menu);
+                Alph.$(this).clone(true).appendTo(main_menu);
             }
         );
         this.mm_languages_updated = true; 
@@ -916,7 +910,7 @@ Alph.main =
         {
             return;
         }
-        var word = ($("#alpheios-lookup-text").get(0)).value;
+        var word = (Alph.$("#alpheios-lookup-text").get(0)).value;
         
         if (word.length == 0)
         {
@@ -938,12 +932,12 @@ Alph.main =
         target.setContext(word);
         target.setContextPos(0);
         
-        var topdoc = $("#alph-morph-body").get(0).contentDocument;
+        var topdoc = Alph.$("#alph-morph-body").get(0).contentDocument;
         this.getLanguageTool().lexiconLookup(
             target,
             function(data)
             {
-                $("#alph-window",topdoc).css("display","block");
+                Alph.$("#alph-window",topdoc).css("display","block");
                 Alph.xlate.showTranslation(data,target,topdoc);
             },
             function(a_msg)
@@ -961,13 +955,13 @@ Alph.main =
      */
     toggle_panel: function(a_event,a_panel_id,a_menu_id)
     {
-        var panel = $("#"+a_panel_id);
-        if ($(panel).attr("collapsed") == 'true')
+        var panel = Alph.$("#"+a_panel_id);
+        if (Alph.$(panel).attr("collapsed") == 'true')
         {
-            $(panel).attr("collapsed",false);
+            Alph.$(panel).attr("collapsed",false);
             
             // open the splitter too
-            $("#"+a_panel_id+"-splitter").attr("collapsed",false);
+            Alph.$("#"+a_panel_id+"-splitter").attr("collapsed",false);
             
              // enable Alpheios if it isn't already so that the panel is useful
             var bro = this.getCurrentBrowser();
@@ -978,19 +972,19 @@ Alph.main =
             }
             
             // update the menu item for the panel
-            $("#"+a_menu_id).attr('checked',true);
+            Alph.$("#"+a_menu_id).attr('checked',true);
             
             // update the status of any commands used  by the panel
             this.update_tools_menu();
         }
         else
         {
-            $(panel).attr("collapsed",true);
+            Alph.$(panel).attr("collapsed",true);
             // collapse the splitter too
-            $("#"+a_panel_id+"-splitter").attr("collapsed",true);
+            Alph.$("#"+a_panel_id+"-splitter").attr("collapsed",true);
             
             // update the menu item for the panel
-            $("#"+a_menu_id).attr('checked',false);
+            Alph.$("#"+a_menu_id).attr('checked',false);
             
         }
     },
@@ -1002,24 +996,24 @@ Alph.main =
     {
         var lang_tool = Alph.main.getLanguageTool();
         var bro = this.getCurrentBrowser();
-        $("command.alpheios-language-specific-cmd").each(
+        Alph.$("command.alpheios-language-specific-cmd").each(
             function()
             {
-                var cmd_id = $(this).attr("id");
+                var cmd_id = Alph.$(this).attr("id");
                 // disable the tools if Alpheios isn't enabled
                 if (! bro.alpheios)
                 {
-                    $("#"+cmd_id).attr("disabled",true);
+                    Alph.$("#"+cmd_id).attr("disabled",true);
                 }
                 else
                 {
                     if (lang_tool.getCmd(cmd_id))
                     {
-                        $("#"+cmd_id).attr("disabled",false);
+                        Alph.$("#"+cmd_id).attr("disabled",false);
                     }
                     else
                     {
-                        $("#"+cmd_id).attr("disabled",true);
+                        Alph.$("#"+cmd_id).attr("disabled",true);
                     }
                 }
             }
