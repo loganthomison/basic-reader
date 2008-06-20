@@ -12,7 +12,7 @@ body {
     background: white;
 }
 
-/** hide meanings in morph view **/
-.alph-mean {
+/** hide some things in dictionary view **/
+.alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error  {
     display: none;
 }

@@ -870,9 +870,13 @@ Alph.xlate = {
             var topdoc = Alph.xlate.getLastDoc();
             Alph.$("#alph-secondary-loading",topdoc).remove();
             
-            // also check the morphology window
-            var morph_window = Alph.$("#alph-morph-body").get(0).contentDocument;
-            Alph.$("#alph-secondary-loading",morph_window).remove();
+            // also check the morphology and dictionary windows
+            Alph.$(".alph-lexicon-output").each( 
+                function() {
+                    var doc = Alph.$(this).get(0).contentDocument;
+                    Alph.$("#alph-secondary-loading",doc).remove();
+                }
+            );
         }
         catch(e)
         {

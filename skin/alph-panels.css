@@ -1,0 +1,20 @@
+#alph-morph-panel {
+    height: 100px;
+}
+
+#alph-morph-box-splitter {
+    border: 1px solid #BBB9BA;
+    background: #f3f3f3 !important;
+    min-width: 2px;
+    max-width: 2px;
+}
+
+#alph-morph-body {
+    height: 100%;
+    width: 50%;
+}
+
+#alph-dict-body {
+    height: 100%;
+    width: 50%;
+}

@@ -23,7 +23,7 @@
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value);"/>
         <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
-        <command id="alpheios-morph-toggle-cmd" oncommand="Alph.main.toggle_panel(event,'alph-morph-box','alpheios-morph-button');"/>
+        
         <command 
             class="alpheios-language-specific-cmd"
             id="alpheios-inflect-cmd" 
@@ -135,13 +135,6 @@
                 id="alpheios-tools-popup"
                 onpopupshowing="Alph.main.update_tools_menu();">
                 <menuitem
-                    id="alpheios-morph-button"
-                    type="checkbox"
-                    label="&alpheios-tools-morph-label;"
-                    command="alpheios-morph-toggle-cmd"
-                    tooltiptext="&alpheios-tools-morph-tooltip;"
-                    class="menuitem-iconic" />
-                <menuitem
                     id="alpheios-inflection-button"
                     label="&alpheios-tools-inflect-label;"
                     command="alpheios-inflect-cmd"
@@ -158,7 +151,7 @@
     </toolbarpalette>
     
     <vbox id="appcontent">
-        <splitter id="alph-morph-box-splitter" collapsed="true"/>
-        <vbox persist="height" id="alph-morph-box" collapsed="true"/>
+        <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-splitter"/>
+        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel"/>
     </vbox>
 </overlay>

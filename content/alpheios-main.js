@@ -932,17 +932,28 @@ Alph.main =
         target.setContext(word);
         target.setContextPos(0);
         
-        var topdoc = Alph.$("#alph-morph-body").get(0).contentDocument;
         this.getLanguageTool().lexiconLookup(
             target,
             function(data)
             {
-                Alph.$("#alph-window",topdoc).css("display","block");
-                Alph.xlate.showTranslation(data,target,topdoc);
+                Alph.$(".alph-lexicon-output").each(
+                    function() 
+                    {
+                        var doc = Alph.$(this).get(0).contentDocument
+                        Alph.$("#alph-window",doc).css("display","block");
+                        Alph.xlate.showTranslation(data,target,doc);
+                    }
+                );
             },
             function(a_msg)
             {   
-                Alph.xlate.translationError(a_msg,topdoc);
+                Alph.$(".alph-lexicon-output").each(
+                    function() 
+                    {
+                        var doc = Alph.$(this).get(0).contentDocument
+                        Alph.xlate.translationError(a_msg,doc);
+                    }
+                );                
             }
         );
     },
@@ -956,6 +967,7 @@ Alph.main =
     toggle_panel: function(a_event,a_panel_id,a_menu_id)
     {
         var panel = Alph.$("#"+a_panel_id);
+                
         if (Alph.$(panel).attr("collapsed") == 'true')
         {
             Alph.$(panel).attr("collapsed",false);
@@ -976,6 +988,7 @@ Alph.main =
             
             // update the status of any commands used  by the panel
             this.update_tools_menu();
+   
         }
         else
         {

@@ -1,38 +1,66 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://alpheios/skin/alph-toolbar.css" type="text/css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alph-panels.css" type="text/css"?>
 
 <!DOCTYPE window SYSTEM "chrome://alpheios/locale/alpheios.dtd">
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <vbox persist="height" id="alph-morph-box" collapsed="true">
-            <toolbox id="alph-morph-toolbox">
-                <toolbar id="alph-morph-toolbar">
-                    <toolbaritem id="alpheios-lookup-text-tbitem">
-                        <label id="alph-lookup-label" 
-                               control="alpheios-lookup-text" 
-                               value="&alpheios-morph-toolbar-label;" 
-                               align="baseline"/>
-                        <textbox id="alpheios-lookup-text"
-                            command="alpheios-lookup-cmd"
-                            onkeypress="Alph.main.do_tb_lookup(event)"
-                            align="baseline"
-                            tooltiptext="&alpheios-morph-lookup-tooltip;"/>
-                    </toolbaritem>
-                    <toolbarbutton 
-                        id="alpheios-morph-inflection" 
-                        class="toolbarbutton-class"
-                        label="&alpheios-tools-inflect-label;" 
-                        tooltiptext="&alpheios-tools-inflect-label;"
-                        type="button"
-                        command="alpheios-morph-inflect-cmd"/>
-                    <toolbarspring/>
-                    <toolbarbutton 
-                        id="alph-morph-close" 
-                        class="alph-close-button"
-                        tooltiptext="&alpheios.panel.close;" 
-                        command="alpheios-morph-toggle-cmd"/>
-                    </toolbar>
-              </toolbox>
-            <iframe id="alph-morph-body" src="chrome://alpheios/content/alph-morph.html" flex="10"/>
+    <commandset id="mainCommandSet">
+        <command id="alpheios-morph-toggle-cmd" 
+             oncommand="Alph.main.toggle_panel(event,'alph-bottom-panel','alpheios-morph-button');"/>
+    </commandset>
+             
+    <!-- overlay the tools menu -->
+    <menupopup id="alpheios-tools-popup">
+        <menuitem
+            id="alpheios-morph-button"
+            type="checkbox"
+            label="&alpheios-tools-morph-label;"
+            command="alpheios-morph-toggle-cmd"
+            tooltiptext="&alpheios-tools-morph-tooltip;"
+            class="menuitem-iconic" />
+    </menupopup>
+    
+    <vbox id="alph-bottom-panel">
+        <toolbox id="alph-morph-toolbox">
+            <toolbar id="alph-morph-toolbar">
+                <toolbaritem id="alpheios-lookup-text-tbitem">
+                    <label id="alph-lookup-label" 
+                           control="alpheios-lookup-text" 
+                           value="&alpheios-morph-toolbar-label;" 
+                           align="baseline"/>
+                    <textbox id="alpheios-lookup-text"
+                        command="alpheios-lookup-cmd"
+                        onkeypress="Alph.main.do_tb_lookup(event)"
+                        align="baseline"
+                        tooltiptext="&alpheios-morph-lookup-tooltip;"/>
+                </toolbaritem>
+                <toolbarbutton 
+                    id="alpheios-morph-inflection" 
+                    class="toolbarbutton-class"
+                    label="&alpheios-tools-inflect-label;" 
+                    tooltiptext="&alpheios-tools-inflect-label;"
+                    type="button"
+                    command="alpheios-morph-inflect-cmd"/>
+                <toolbarspring/>
+                <toolbarbutton 
+                    id="alph-morph-close" 
+                    class="alph-close-button"
+                    tooltiptext="&alpheios.panel.close;" 
+                    command="alpheios-morph-toggle-cmd"/>
+                </toolbar>
+        </toolbox>
+        <hbox id="alph-morph-panel" flex="10">
+            <iframe 
+                id="alph-morph-body" 
+                src="chrome://alpheios/content/alph-morph.html" 
+                flex="10" 
+                class="alph-lexicon-output"/>
+            <splitter id="alph-morph-box-splitter" collapsed="false"/>
+            <iframe id="alph-dict-body" 
+                    src="chrome://alpheios/content/alph-dict.html" 
+                    flex="10"
+                    class="alph-lexicon-output"/>
+        </hbox>
     </vbox>  
 </overlay>
