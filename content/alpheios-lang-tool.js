@@ -587,7 +587,6 @@ Alph.LanguageTool.prototype.convertString = function(a_str)
 Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 {
     var myobj=this;
-    var grammarurl = Alph.util.getPref("url.grammar",this.source_language) || "";
     var links = this.getgrammarlinks();
     Alph.$("#alph-text",a_doc).bind(
         "click", 
@@ -619,38 +618,53 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
                 {
                     target += "-" + rngContext.split(/-/)[0];
                 }
-                var targetURL = grammarurl;
-                targetURL = targetURL.replace(/\<ITEM\>/, target);
-                    
-                var grammar_loading_msg = 
-                    document
-                    .getElementById("alpheios-strings")
-                    .getString("alph-loading-grammar");
     
-                var features =
-                    {
-                        screen: Alph.util.getPref("grammar.window.loc")
-                    };
-                            
-                // TODO - list of parameters to pass should come from
-                // preferences
-                var params = 
-                    {
-                        target_href: target,
-                        callback: Alph.xlate.hideLoadingMessage
-                    }
-                // open or replace the grammar window           
-                Alph.xlate.openSecondaryWindow(
-                    "alph-grammar-window",
-                    targetURL,
-                    features,
-                    params,
-                    Alph.xlate.showLoadingMessage,
-                    [range.startContainer,grammar_loading_msg]
-                );
+                myobj.openGrammar(a_e,range.startContainer,target);
             }            
          }
      );
+};
+
+/**
+ * Open the Grammar defined for the language.
+ * @param {Event} a_event the event which triggered the request
+ * @param {Node} a_node the DOM node to show a loading message next to (optional)
+ * @param {String} a_target a string to be added to the Grammar url (replacing the <ITEM> placeholder (optional)
+ * @param {Object} a_params parameters object to pass to the Grammar window (optional)  
+ */
+Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_params)
+{   
+    var targetURL = Alph.util.getPref("url.grammar",this.source_language) || "";
+    targetURL = targetURL.replace(/\<ITEM\>/, a_target || "");
+    
+    var grammar_loading_msg = 
+        document
+        .getElementById("alpheios-strings")
+        .getString("alph-loading-grammar");
+    
+    var features =
+    {
+        screen: Alph.util.getPref("grammar.window.loc")
+    };
+                            
+    // TODO - list of parameters to pass should come from
+    // preferences
+    var params = Alph.$.extend( 
+        {
+            target_href: a_target,
+            callback: Alph.xlate.hideLoadingMessage
+        },
+        a_params || {}
+    );
+    // open or replace the grammar window           
+    Alph.xlate.openSecondaryWindow(
+        "alph-grammar-window",
+        targetURL,
+        features,
+        params,
+        Alph.xlate.showLoadingMessage,
+            [a_node||{},grammar_loading_msg]
+    );        
 };
 
 
