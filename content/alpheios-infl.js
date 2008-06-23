@@ -199,7 +199,14 @@ Alph.infl = {
             {
                 $(".loading",topdoc).show();
                 var showorder = $(":selected", this).val();
-                window.opener.Alph.main.getLanguageTool().handleInflections(e,'verb', { order: showorder } );
+                window.opener.Alph.main.getLanguageTool().
+                    handleInflections(
+                        e,
+                        a_link_target.source_node,
+                        {showpofs: 'verb',
+                        order: showorder 
+                        }
+                    );
             }
         );
         
@@ -425,9 +432,10 @@ Alph.infl = {
         $("#infl-links-select",topdoc).change(
             function(e) {
                 $(".loading",topdoc).show();
-                var showpofs = $(":selected",this).val();
-                window.opener.Alph.util.log("Switching to " + showpofs);
-                window.opener.Alph.main.getLanguageTool().handleInflections(e,showpofs,null,a_link_target.source_node);
+                var newpofs = $(":selected",this).val();
+                window.opener.Alph.util.log("Switching to " + newpofs);
+                window.opener.Alph.main.getLanguageTool().
+                    handleInflections(e,a_link_target.source_node,{showpofs: newpofs});
             }
         );
                 
@@ -525,8 +533,8 @@ Alph.infl = {
     onKeyDown: function(a_e) {
         if (a_e.keyCode == 16) {
             if (window.opener.Alph.xlate.popupVisible()) {
-                
-                window.opener.Alph.main.getLanguageTool().handleInflections(a_e);
+                var popup = $("#alph-text", window.opener.content.document).clone();    
+                window.opener.Alph.main.getLanguageTool().handleInflections(a_e,popup);
             }
         }
         // return true to allow event propogation if needed

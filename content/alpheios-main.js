@@ -439,7 +439,10 @@ Alph.main =
         // only effective while the mouseover popup is visible
         if (a_event.keyCode == 16)
         {
-            Alph.main.getLanguageTool().shiftHandler(a_event);
+            // make a copy of the current popup element and use that in case the user
+            // moves the mouse before the target handler finishes initializing
+            var popup = Alph.$("#alph-text", content.document).clone();    
+            Alph.main.getLanguageTool().shiftHandler(a_event,popup);
         }
         else if (a_event.keyCode == 17) {
             Alph.main.ctrlDown = true;

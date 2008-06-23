@@ -334,8 +334,9 @@ Alph.LanguageTool.prototype.set_shift_handler = function()
  * Method which can be used to add a handler for the shift key
  * TODO - this should really be a generic keypress handler
  * @param {Event} a_event the keypress event
+ * @param {Node} a_node the target node
  */
-Alph.LanguageTool.prototype.shiftHandler = function(a_event)
+Alph.LanguageTool.prototype.shiftHandler = function(a_event,a_node)
 {
     // default is to do nothing
     return;
@@ -656,35 +657,26 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 /**
  * Handler which can be used to show context-specific inflection tables
  * @param {Event} a_event the target event
- * @param {String} a_showpofs the requested inflection type
  * @param {Object} a_otherparams option object to supply default parameters
  * @param {Node} a_node the node which contains the context
  */
-Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_otherparams,a_node)
+Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherparams)
 {
 
-    //if(! Alph.xlate.popupVisible()) 
-    //{
-    //    return;    
-    //}
-    //TODO a_showpofs and a_otherparams should be merged
     var params = a_otherparams || {};
-    params.showpofs = a_showpofs;
-    params.word = Alph.main.getCurrentBrowser().alpheios.word;
-    var topdoc = a_node || content.document;
-    var popup = Alph.$("#alph-text", topdoc);
-    if (popup.length == 0)
+    
+    if (Alph.$(a_node).length == 0)
     {
         return;
     }
-    params = this.getInflectionTable(popup,params)
+    params = this.getInflectionTable(a_node,params)
     if (! params)
     {
         return;
     }
     if (typeof params.showpofs != 'undefined')
     {
-        params.source_node = topdoc;
+        params.source_node = a_node;
         Alph.util.log("Handling inflections for " + params.showpofs);
         
         // send the word endings to the declension table
@@ -714,10 +706,11 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_showpofs, a_o
  * @param {Event} a_event the target event
  * @param {Node} a_node the node which contains the context
  */
-Alph.LanguageTool.prototype.handleInflectionsForMorphWindow = function(a_event,a_showpofs, a_otherparams,a_node)
+Alph.LanguageTool.prototype.handleInflectionsForMorphWindow = function(a_event,a_node)
 {
     var morph_doc = Alph.$("#alph-morph-body").get(0).contentDocument;
-    this.handleInflections(a_event,a_showpofs, a_otherparams,morph_doc);
+    var morph_text = Alph.$("#alph-text",morph_doc);
+    this.handleInflections(a_event,morph_text);
 }
 
 /**

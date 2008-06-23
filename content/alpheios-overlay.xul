@@ -34,11 +34,6 @@
             id="alpheios-grammar-cmd" 
             oncommand="Alph.main.execute_tools_command(event);" 
             disabled="true"/>
-        <command
-            class="alpheios-language-specific-cmd"
-            id="alpheios-morph-inflect-cmd" 
-            oncommand="Alph.main.execute_tools_command(event);" 
-            disabled="true"/>
 	</commandset>
 
 	<popup id="contentAreaContextMenu">

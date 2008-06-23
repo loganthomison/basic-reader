@@ -8,6 +8,11 @@
     <commandset id="mainCommandSet">
         <command id="alpheios-morph-toggle-cmd" 
              oncommand="Alph.main.toggle_panel(event,'alph-bottom-panel','alpheios-morph-button');"/>
+        <command
+            class="alpheios-language-specific-cmd"
+            id="alpheios-morph-inflect-cmd" 
+            oncommand="Alph.main.execute_tools_command(event);" 
+            disabled="true"/>
     </commandset>
              
     <!-- overlay the tools menu -->
