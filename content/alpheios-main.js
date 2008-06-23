@@ -475,6 +475,7 @@ Alph.main =
         var cmenu_text = '';
         var tmenu_text = '';
         var menu_lang = '';
+        var status_text = '';
         if (typeof this.getCurrentBrowser().alpheios == "undefined")
         {
             cmenu_text =
@@ -484,9 +485,13 @@ Alph.main =
                 Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-enable-tm");
             
+            status_text = 
+                Alph.$("#alpheios-strings").get(0)
+                    .getString("alph-tools-status-disabled");
             // TODO - we ought to preserve the user's last
             //        language selection rather than resetting  
             menu_lang = this.defaultLanguage;
+            
         }
         else
         {
@@ -496,12 +501,16 @@ Alph.main =
             tmenu_text =
                 Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-disable-tm");
-
             menu_lang = this.getCurrentBrowser().alpheios.current_language;
+            status_text = 
+                "[" +
+                Alph.$("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']").attr("label")
+                + "]";
         }
         Alph.$("#alpheios-toggle-cm").attr("label",cmenu_text);
         Alph.$("#alpheios-toggle-tm").attr("label",tmenu_text);
         Alph.$("#alpheios-toggle-mm").attr("label",tmenu_text);
+        Alph.$("#alpheios-toolbar-status-text").attr("value",status_text);
         
         // uncheck the previously checked language
         Alph.$("#alpheios-lang-popup-tm menuitem[checked='true']")
@@ -1049,7 +1058,7 @@ Alph.main =
         Alph.util.log("Executing " + cmd_id);
         if (lang_tool && lang_tool.getCmd(cmd_id))
         {
-            lang_tool[(lang_tool.getCmd(cmd_id))]();
+            lang_tool[(lang_tool.getCmd(cmd_id))](a_event);
         }
         
     }

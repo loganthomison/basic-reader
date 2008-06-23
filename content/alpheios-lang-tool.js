@@ -665,6 +665,12 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
 
     var params = a_otherparams || {};
     
+    // if we weren't explicitly handled a node to work with, try to find the popup
+    // in the default content document
+    if (! a_node)
+    {
+        a_node = Alph.$("#alph-text", content.document).clone();
+    }
     if (Alph.$(a_node).length == 0)
     {
         return;

@@ -23,7 +23,6 @@
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value);"/>
         <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
-        
         <command 
             class="alpheios-language-specific-cmd"
             id="alpheios-inflect-cmd" 
@@ -34,6 +33,11 @@
             id="alpheios-grammar-cmd" 
             oncommand="Alph.main.execute_tools_command(event);" 
             disabled="true"/>
+        <command id="alpheios-options-cmd" 
+            oncommand="window.openDialog('chrome://alpheios/content/alpheios-prefs.xul', 
+                      'alpheios-options-dialog', 'chrome,titlebar,toolbar,centerscreen,modal')"/>;
+        <command id="alpheios-feedback-cmd"
+            oncommand="window.open('http://groups.google.com/group/alpheios-reading-tools','alpheios-feedback')"/>
 	</commandset>
 
 	<popup id="contentAreaContextMenu">
@@ -98,22 +102,40 @@
                  mode="text" 
                  persist="collapsed,hidden" 
                  toolbarname="&alpheios-toolbar-name;"
-                 defaultset="alpheios-toggle-mm,alpheios-lang-button,alpheios-tools-button"/>
+                 defaultset="alpheios-mainmenu-button,alpheios-lang-button,alpheios-tools-button,alpheios-toolbar-spring,alpheios-toolbar-status"/>
     </toolbox>
 
     <toolbarpalette id="BrowserToolbarPalette">
-        <toolbarbutton 
-            id="alpheios-toggle-mm" 
+        <toolbarbutton
+            id="alpheios-mainmenu-button"
             class="toolbarbutton-class"
-            label="&alpheios.inline.enable.tm;"
-            command="alpheios-toggle-cmd"/>
+            label="&alpheios.menu;"
+            type="menu">
+            <menupopup
+                id="alpheios-main-menu">
+                <menuitem
+                    id="alpheios-toggle-mm" 
+                    label="&alpheios.inline.enable.tm;"
+                    command="alpheios-toggle-cmd"/>
+                <menuitem
+                    id="alpheios-options-mm"
+                    label="&alpheios.menu.options;"
+                    tooltiptext="&alpheios.menu.options.tooltip;"
+                    command="alpheios-options-cmd"/>
+                <menuitem
+                    id="alpheios-feedback-mm"
+                    label="&alpheios.menu.feedback;"
+                    tooltiptext="&alpheios.menu.feedback.tooltip;"
+                    command="alpheios-feedback-cmd"/>
+            </menupopup>
+        </toolbarbutton>               
         <toolbarbutton
             id="alpheios-lang-button"
             class="toolbarbutton-class"
-            label="&alpheios.lang.menu;"
+            label="&alpheios.menu.lang;"
             insertafter="alpheios-toggle-mm"
             command="alpheios-lang-cmd"
-            tooltiptext="&alpheios.lang.menu.tooltip;"
+            tooltiptext="&alpheios.menu.lang.tooltip;"
             type="menu">
             <menupopup 
                 id="alpheios-lang-popup-mm" 
@@ -143,6 +165,11 @@
                     class="menuitem-iconic" />
             </menupopup>
         </toolbarbutton>
+        <toolbarspring id="alpheios-toolbar-spring"/>
+        <toolbaritem id="alpheios-toolbar-status">
+            <label id="alpheios-toolbar-status-text"
+                   value="&alpheios-tools-status-disabled;"/>
+        </toolbaritem>
     </toolbarpalette>
     
     <vbox id="appcontent">

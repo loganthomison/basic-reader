@@ -8,6 +8,14 @@
 <!ENTITY alpheios.infl.window.title "Inflections">
 <!ENTITY alpheios.lang.menu "Alpheios Language">
 <!ENTITY alpheios.lang.none "(none supported)">
+<!ENTITY alpheios.menu "Alpheios">
+<!ENTITY alpheios.menu.options "Options">
+<!ENTITY alpheios.menu.options.tooltip "Configure Alpheios Preferences">
+<!ENTITY alpheios.menu.feedback "Feedback">
+<!ENTITY alpheios.menu.feedback.tooltip "Provide Feedback on Alpheios">
+<!ENTITY alpheios.menu.lang "Language">
+<!ENTITY alpheios.menu.lang.tooltip "Select Language for Alpheios">
+<!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-tools-label "View">
 <!ENTITY alpheios-tools-tooltip "Alpheios Tools">
 <!ENTITY alpheios-tools-morph-label "Morphology Panel">
@@ -20,5 +28,4 @@
 <!ENTITY alpheios-morph-lookup-tooltip "Enter a word or words.">
 <!ENTITY alpheios-toolbar-grippy-tooltip "Alpheios Toolbar">
 <!ENTITY alpheios-toolbar-name "Alpheios Toolbar">
-<!ENTITY alpheios.lang.menu.tooltip "Choose Alpheios Language">
 <!ENTITY alpheios.panel.close "Close">
