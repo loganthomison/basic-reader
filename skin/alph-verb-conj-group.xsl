@@ -27,7 +27,7 @@
     <!-- default order is Tense, Number, Person -->
     <xsl:param name="group1" select="'tense'"/>
     <xsl:param name="group2" select="'num'"/>
-    <xsl:param name="group3" select="'person'"/>
+    <xsl:param name="group3" select="'pers'"/>
     
     <!-- column groupings -->
     <!-- default order is Voice, Conjugation, Mood -->
@@ -45,7 +45,7 @@
         <xsl:choose>
             <xsl:when test="$fragment">
                 <xsl:call-template name="verbtable">
-                    <xsl:with-param name="endings" select="//verb-ending-set"/>
+                    <xsl:with-param name="endings" select="//infl-ending-set"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -55,7 +55,7 @@
                     </head>
                     <body>
                         <xsl:call-template name="verbtable">
-                            <xsl:with-param name="endings" select="//verb-ending-set"/>
+                            <xsl:with-param name="endings" select="//infl-ending-set"/>
                         </xsl:call-template>                     
                     </body>
                 </html>                
@@ -93,7 +93,7 @@
             <xsl:for-each select="$firstgroup">
                 <!-- lookup sort order for this attribute from order-table in the conjugation data -->
                 <xsl:sort 
-                    select="/conjdata/order-table/order-item[@attname=$group1 
+                    select="/infl-data/order-table/order-item[@attname=$group1 
                         and text()=current()]/@order" 
                     data-type="number"/>
                  <!-- if this is the first instance of this attribute value proceed to 
@@ -107,7 +107,7 @@
                             <xsl:value-of select="$lastgroup1"/>
                             <xsl:call-template name="add-footnote">
                                 <xsl:with-param name="item"
-                                    select="/conjdata/order-table/order-item[@attname=$group1 
+                                    select="/infl-data/order-table/order-item[@attname=$group1 
                                     and text()=$lastgroup1]" />
                             </xsl:call-template>                            
                         </th>
@@ -126,7 +126,7 @@
                             and .=$lastgroup1]/../@*[local-name(.)=$group2]"/>
                     <!-- iterate through the items in the second group -->
                     <xsl:for-each select="$secondgroup">
-                        <xsl:sort select="/conjdata/order-table/order-item[@attname=$group2 
+                        <xsl:sort select="/infl-data/order-table/order-item[@attname=$group2 
                             and text()=current()]/@order" data-type="number"/>
                         <!-- if this the first instance of this attribute value proceed
                              to 3rd level grouping -->
@@ -143,7 +143,7 @@
                                 and . = $lastgroup2]/../@*[local-name(.)=$group3]"/>
                             <!-- iterate through the items in the third group -->
                             <xsl:for-each select="$thirdgroup">
-                                <xsl:sort select="/conjdata/order-table/order-item[@attname=$group3 and text()=current()]/@order" 
+                                <xsl:sort select="/infl-data/order-table/order-item[@attname=$group3 and text()=current()]/@order" 
                                     data-type="number"/>
                                 <!-- start a new row to hold the data if this is the first instance of 
                                      this attribute value -->
@@ -159,7 +159,7 @@
                                                    <xsl:value-of select="$lastgroup2"/>
                                                     <xsl:call-template name="add-footnote">
                                                         <xsl:with-param name="item" 
-                                                            select="/conjdata/order-table/order-item[@attname=$group2 
+                                                            select="/infl-data/order-table/order-item[@attname=$group2 
                                                             and text()=$lastgroup2]"/>
                                                     </xsl:call-template>
                                                 </th>
@@ -199,15 +199,15 @@
         <xsl:param name="groupheader"/>
         <xsl:for-each select="$data">
             <xsl:sort 
-                select="/conjdata/order-table/order-item[@attname=$group4 
+                select="/infl-data/order-table/order-item[@attname=$group4 
                     and text()=current()/@*[local-name(.)=$group4]]/@order" 
                 data-type="number"/>
             <xsl:sort 
-                select="/conjdata/order-table/order-item[@attname=$group5 
+                select="/infl-data/order-table/order-item[@attname=$group5 
                     and text()=current()/@*[local-name(.)=$group5]]/@order" 
                 data-type="number"/>
             <xsl:sort 
-                select="/conjdata/order-table/order-item[@attname=$group6 
+                select="/infl-data/order-table/order-item[@attname=$group6 
                     and text()=current()/@*[local-name(.)=$group6]]/@order" 
                 data-type="number"/>
             <xsl:if test="position()=1">
@@ -216,12 +216,12 @@
                 <th class="rowgroupheader header-text">
                     <xsl:value-of select="$groupheader"/>
                     <xsl:call-template name="add-footnote">
-                        <xsl:with-param name="item" select="/conjdata/order-table/order-item[@attname=$groupheader]"/>
+                        <xsl:with-param name="item" select="/infl-data/order-table/order-item[@attname=$groupheader]"/>
                     </xsl:call-template>
                 </th>
             </xsl:if>
             <td>
-                <xsl:variable name="verb-endings" select="verb-ending"/>
+                <xsl:variable name="verb-endings" select="infl-ending"/>
                 <xsl:for-each select="$verb-endings">
                     <xsl:variable name="entries" select="count($selected_endings/div[@class='alph-entry'])"/>                    
                     <xsl:variable name="selected" 
@@ -235,7 +235,7 @@
                               and (span[@class='alph-tense']/text() = current()/../@tense)
                               and (span[@class='alph-voice']/text() = current()/../@voice)
                               and (span[@class='alph-mood']/@context = current()/../@mood)
-                              and (span[@class='alph-pers']/@context = current()/../@person)
+                              and (span[@class='alph-pers']/@context = current()/../@pers)
                               and (span[@class='alph-num']/@context = current()/../@num)
                               ])
                             ]"/>    
@@ -335,7 +335,7 @@
     <xsl:template name="stem-data" match="order-item[@attname='conj']">        
         <br/>
         <xsl:variable name="thisconj" select="text()"/>
-        <xsl:value-of select="/conjdata/stem-table/verb-stem[@conj=$thisconj]"/>
+        <xsl:value-of select="/infl-data/stem-table/stem[@conj=$thisconj]"/>
         <xsl:call-template name="add-footnote">
             <xsl:with-param name="item" select="."/>
         </xsl:call-template>                
