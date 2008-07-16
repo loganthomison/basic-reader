@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 
-<!DOCTYPE window SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
+<?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
+
 
 <overlay id="alpheios" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
@@ -17,6 +20,16 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-languages.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-src-select.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
+
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="alpheios-inflect"
+                     class="alpheios-language-notifier"
+                     disabled="true"/>
+        <broadcaster id="alpheios-grammar"
+                     class="alpheios-language-notifier"
+                     disabled="true"/>
+    </broadcasterset>
         
 	<commandset id="mainCommandSet">
 		<command id="alpheios-toggle-cmd" oncommand="Alph.main.alph_inlineToggle();"/>
@@ -24,15 +37,13 @@
                  oncommand="Alph.main.select_language(event.target.value);"/>
         <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
         <command 
-            class="alpheios-language-specific-cmd"
             id="alpheios-inflect-cmd" 
-            oncommand="Alph.main.execute_tools_command(event);" 
-            disabled="true"/>
+            oncommand="Alph.main.execute_lang_command(event);" 
+            observes="alpheios-inflect"/>
         <command
-            class="alpheios-language-specific-cmd"
             id="alpheios-grammar-cmd" 
-            oncommand="Alph.main.execute_tools_command(event);" 
-            disabled="true"/>
+            oncommand="Alph.main.execute_lang_command(event);" 
+            observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
             oncommand="window.openDialog('chrome://alpheios/content/alpheios-prefs.xul', 
                       'alpheios-options-dialog', 'chrome,titlebar,toolbar,centerscreen,modal')"/>;
@@ -176,4 +187,9 @@
         <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-splitter"/>
         <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel"/>
     </vbox>
+    
+    <tabbrowser id="content">
+        <splitter id="alph-right-panel-splitter" collapsed="true" class="alph-panel-splitter"/>
+        <vbox id="alph-right-panel" persist="width" collapsed="true" class="alph-panel"/>
+    </tabbrowser>
 </overlay>

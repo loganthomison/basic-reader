@@ -892,6 +892,18 @@ Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
 };
 
 /**
+ * Method which checks the availability of a specific feature
+ * @param {String} a_id the id of the feature
+ * @return {Boolean} true if enabled, otherwise false 
+ */
+Alph.LanguageTool.prototype.getFeature = function(a_id)
+{
+    var enabled = Alph.util.getPrefOrDefault("features."+a_id,this.source_language); 
+    Alph.util.log("Feature " + a_id + " for " + this.source_language + " is " + enabled);
+    return enabled;
+}
+
+/**
  * Method which returns the requested command
  * @param {String} a_cmd the name of the command
  * @return {String} the name of the function associated with the command

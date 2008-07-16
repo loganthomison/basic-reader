@@ -6,7 +6,7 @@ toolbarbutton.alph-close-button:hover {
     list-style-image: url("chrome://alpheios/skin/closeHover.png");
 }
 
-toolbarbutton.alph-close-button:hover:active {
+toolbarbutton.alph-close-button:active {
     list-style-image: url("chrome://alpheios/skin/closeActive.png");
 }
 

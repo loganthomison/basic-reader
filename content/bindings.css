@@ -1,0 +1,5 @@
+alpheiosPanel {
+    -moz-binding: url("chrome://alpheios/content/bindings.xml#alpheiosPanel");
+    -moz-box-orient: vertical;
+}
+

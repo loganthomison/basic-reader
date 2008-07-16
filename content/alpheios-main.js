@@ -70,6 +70,13 @@ Alph.main =
     defaultLanguage: '',
     
     /**
+     * holds the Alph.panel objects (keyed by panel id)
+     * @private
+     * @type Object 
+     */
+    panels: { },
+    
+    /**
      * Initialize function for the class. Adds the onLoad event listener to the window
      * and calls the {@link Alph.util#init} method
      */
@@ -91,6 +98,9 @@ Alph.main =
     {
         
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
+        document
+            .getElementById("appcontent")
+            .addEventListener("DOMContentLoaded", Alph.main.reset_state, false);
         
         var mks = document.getElementById("mainKeyset");
 
@@ -123,7 +133,7 @@ Alph.main =
         gBrowser.mTabContainer
                 .addEventListener("select", Alph.main.onTabSelect, false);
         gBrowser.mTabContainer
-                .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);
+                .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);        
     },
 
     /**
@@ -152,6 +162,7 @@ Alph.main =
             .removeEventListener("select", this.onTabSelect, false);
         gBrowser.mTabContainer
             .removeEventListener("TabClose", this.onTabClose, false);
+        //gBrowser.removeEventListener("load", Alph.main.onPageLoad, false);
         Alph.util.shutdown();    
     },
 
@@ -161,6 +172,7 @@ Alph.main =
     onTabSelect: function()
     {
         Alph.main.toggleMenuText();
+        Alph.main.reset_state();
     },
 
     /**
@@ -215,7 +227,9 @@ Alph.main =
 
         a_bro.addEventListener("keydown", this.onKeyDown, true);
         a_bro.addEventListener("keyup", this.onKeyUp, true);
-        a_bro.alpheios = { windows: {}, };
+        a_bro.alpheios = { windows: {}, 
+                           panels: {} 
+                         };
         if (! this.set_languages())
         {
             var err_msg = 
@@ -265,6 +279,25 @@ Alph.main =
         delete a_bro.alpheios;
         // TODO - clear Alph.Languages?
         
+                // Update the panels
+        Alph.$("alpheiosPanel").each(
+            function()
+            {
+                var panel_id = Alph.$(this).attr("id");
+                try 
+                {
+                    var panel_obj = Alph.main.panels[panel_id];
+                    panel_obj.reset_state(a_bro)    
+                } 
+                catch (e)
+                {   
+                    Alph.util.log("Unable to reset state for panel " + panel_id + ":" + e);
+                }
+            }
+        );
+
+        
+        
     },
 
     /**
@@ -285,6 +318,10 @@ Alph.main =
             // detach daemon
             this.detachLocalDaemon();
         }
+        
+        // Remove all panel references in this
+        // browser element
+        delete a_bro.alpheios.panels;
     },
 
     /**
@@ -973,84 +1010,66 @@ Alph.main =
     /**
      * Toggle the state of a panel
      * @param {Event} a_event the event that triggered the action
-     * @param {String} a_panel_id the name of the target panel
-     * @param {String} a_menu_id the name of the menu item for the target panel 
+     * @param {String} a_panel_id the name of the target panel 
      */
-    toggle_panel: function(a_event,a_panel_id,a_menu_id)
+    toggle_panel: function(a_event,a_panel_id)
     {
-        var panel = Alph.$("#"+a_panel_id);
-                
-        if (Alph.$(panel).attr("collapsed") == 'true')
+        var panel = this.panels[a_panel_id];
+        if (typeof panel != "undefined")
         {
-            Alph.$(panel).attr("collapsed",false);
-            
-            // open the splitter too
-            Alph.$("#"+a_panel_id+"-splitter").attr("collapsed",false);
-            
-             // enable Alpheios if it isn't already so that the panel is useful
-            var bro = this.getCurrentBrowser();
-            if (! bro.alpheios)
-            {
-                this.inlineEnable(bro);
-                this.onTabSelect();
-            }
-            
-            // update the menu item for the panel
-            Alph.$("#"+a_menu_id).attr('checked',true);
-            
-            // update the status of any commands used  by the panel
-            this.update_tools_menu();
-   
-        }
-        else
-        {
-            Alph.$(panel).attr("collapsed",true);
-            // collapse the splitter too
-            Alph.$("#"+a_panel_id+"-splitter").attr("collapsed",true);
-            
-            // update the menu item for the panel
-            Alph.$("#"+a_menu_id).attr('checked',false);
-            
+            panel.toggle();
         }
     },
     
     /**
-     * Update the tools menu for the current language
+     * Update the tools (View) menu for the current browser and language
+     * (call by the popupshowing handler for the menu)
      */
     update_tools_menu: function()
     {
         var lang_tool = Alph.main.getLanguageTool();
         var bro = this.getCurrentBrowser();
-        Alph.$("command.alpheios-language-specific-cmd").each(
+        
+        // check the language-specific notifiers
+        Alph.$("broadcaster.alpheios-language-notifier").each(
             function()
             {
-                var cmd_id = Alph.$(this).attr("id");
-                // disable the tools if Alpheios isn't enabled
-                if (! bro.alpheios)
+                var id = Alph.$(this).attr("id");
+                var disabled = true;
+                // enable only if Alpheios is enabled
+                // and the language supports the feature
+                if (bro.alpheios && lang_tool.getFeature(id) )
                 {
-                    Alph.$("#"+cmd_id).attr("disabled",true);
+                    disabled = false;
+                }
+                Alph.$(this).attr("disabled",disabled);
+            }
+        );        
+        
+        // check the extension-status specific notifiers
+        Alph.$("broadcaster.alpheios-enabled-notifier").each(
+            function()
+            {
+                // enable if Alpheios is enabled
+                if (bro.alpheios)
+                {
+                    Alph.$(this).attr("disabled",false);
                 }
                 else
                 {
-                    if (lang_tool.getCmd(cmd_id))
-                    {
-                        Alph.$("#"+cmd_id).attr("disabled",false);
-                    }
-                    else
-                    {
-                        Alph.$("#"+cmd_id).attr("disabled",true);
-                    }
+                    Alph.$(this).attr("disabled",true);
                 }
             }
-        );             
+        );          
     },
     
     /**
-     * Execute a tools menu command - delegate to the current
+     * Execute a language-specific command - delegate to the current
      * language tool. 
-     * @param {Event} a_event the command event
+     * @param {Event} a_event the command event (as invoked by the oncommand
+     *                attribute of a &lt;command&gt; XUL tag
      */
-    execute_tools_command: function(a_event)
+    execute_lang_command: function(a_event)
     {
         
         var lang_tool = Alph.main.getLanguageTool();
@@ -1059,6 +1078,80 @@ Alph.main =
         if (lang_tool && lang_tool.getCmd(cmd_id))
         {
             lang_tool[(lang_tool.getCmd(cmd_id))](a_event);
+        }
+        
+    },
+    
+    /**
+     * Resets the state element for the current browser.
+     */
+    reset_state: function()
+    {
+        var bro = Alph.main.getCurrentBrowser();
+
+        // Temporary hack to enable pedagogical-reader specific functionality
+        // for the prototype. Eventually this will be handled completely differently.
+        // We will probably want to enable functionality sets for specific
+        // sites (defined by the user or by us). May want to consider nsIPermissions 
+        // manager to handle site-specfic permissions.
+        var ped_site = 
+            bro.currentURI.spec
+            .match(Alph.util.getPref("ped-prototype-match"));
+        
+        // notify the pedagogical reader observers
+        Alph.$("broadcaster.alph-pedagogical-notifier").each(
+            function()
+            {
+                if (ped_site == null)
+                {
+                    Alph.$(this).attr("disabled",true)
+                }
+                else
+                {
+                    Alph.$(this).attr("disabled",false);
+                }
+            }
+            
+        );
+        
+        // Update the panels
+        Alph.$("alpheiosPanel").each(
+            function()
+            {
+                var panel_id = Alph.$(this).attr("id");
+                try 
+                {
+                    var panel_obj = Alph.main.panels[panel_id];
+                    panel_obj.reset_state(bro)    
+                } 
+                catch (e)
+                {   
+                    Alph.util.log("Unable to reset state for panel " + panel_id + ":" + e);
+                }
+            }
+        );
+        
+    },
+    
+    /**
+     * Initialization method called by the constructor for the alpheiosPanel binding. 
+     * Aggregates Alph.Panel objects for each panel element in the Alph.main.panels
+     * object.
+     * @param {alpheiosPanel} a_panel the DOM object bound to the alpheiosPanel tag.
+     */
+    panelBound: function(a_panel)
+    {
+        var panel_id = Alph.$(a_panel).attr("id");
+        var panel_class = Alph.$(a_panel).attr("paneltype");
+        try 
+        {
+            var panel_obj = new Alph[panel_class](a_panel);
+            this.panels[panel_id] = panel_obj;    
+        } 
+        catch(exception)
+        {
+            Alph.util.log("Error instantiating " +
+                panel_id + " with " + panel_class + ":" + exception);
         }
         
     }

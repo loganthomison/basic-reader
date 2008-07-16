@@ -8,4 +8,10 @@ pref("extensions.alpheios.grammar.window.loc",
         "bottomright");
 pref("extensions.alpheios.shift.window.loc",
         "topleft");
+pref("extensions.alpheios.features.alpheios-inflect",false);
+pref("extensions.alpheios.features.alpheios-grammar",false);
+pref("extensions.alpheios.cmds.alpheios-inflect-cmd","handleInflections");
+pref("extensions.alpheios.cmds.alpheios-morph-inflect-cmd","handleInflectionsForMorphWindow");
+pref("extensions.alpheios.cmds.alpheios-grammar-cmd","openGrammar");
+pref("extensions.alpheios.ped-prototype-match","http:\/\/perseus.harrysdell.com:8020\/hopper\/alpheios\/text-alph.jsp");
  

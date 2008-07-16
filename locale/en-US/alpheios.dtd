@@ -24,8 +24,12 @@
 <!ENTITY alpheios-tools-inflect-tooltip "View Inflection Table">
 <!ENTITY alpheios-tools-grammar-label "Grammar">
 <!ENTITY alpheios-tools-grammar-tooltip "View Grammar">
-<!ENTITY alpheios-morph-toolbar-label "Alpheios Morphology Lookup">
+<!ENTITY alpheios-morph-toolbar-label "Alpheios: Morphology">
 <!ENTITY alpheios-morph-lookup-tooltip "Enter a word or words.">
 <!ENTITY alpheios-toolbar-grippy-tooltip "Alpheios Toolbar">
 <!ENTITY alpheios-toolbar-name "Alpheios Toolbar">
 <!ENTITY alpheios.panel.close "Close">
+<!ENTITY alpheios.panel.options "Options">
+<!ENTITY alpheios-tools-trans-label "Translation Panel">
+<!ENTITY alpheios-tools-trans-tooltip "Show/Hide Translation Panel">
+<!ENTITY alpheios.panel.trans.label "Alpheios: Translation">

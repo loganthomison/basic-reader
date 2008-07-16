@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE window [
+<!ENTITY % alpheiosDTD SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+%alpheiosDTD;
+]>
+
+<bindings xmlns="http://www.mozilla.org/xbl"
+    xmlns:xbl="http://www.mozilla.org/xbl"
+    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    
+    <binding id="alpheiosPanel" extends="xul:vbox">
+        <content>
+            <xul:toolbox anonid="panelToolbox">
+                <xul:toolbar anonid="panelToolbar">
+                    <children includes="toolbaritem|toolbarbutton|toolbarspring"/>
+                    <xul:toolbarspring/>
+                    <xul:toolbarbutton 
+                        anonid="panelOptionsButton"
+                        type="menu" 
+                        class="alph-options-button" 
+                        label="&alpheios.panel.options;">
+                        <xul:menupopup anonid="panelOptionsPopup"/>
+                    </xul:toolbarbutton>
+                    <xul:toolbarbutton 
+                        anonid="panelCloseButton" 
+                        class="alph-close-button"
+                        tooltiptext="&alpheios.panel.close;"/>
+                </xul:toolbar>
+            </xul:toolbox>
+            <xul:box anonid="browserBox" flex="1" xbl:inherits="orient=panelorient">
+                <children includes="browser|splitter"/>
+            </xul:box>
+            <children/>
+        </content>
+        <implementation>
+            <constructor><![CDATA[
+            this.optionsPopup = 
+                document.getAnonymousElementByAttribute(this, "anonid", "panelOptionsPopup");
+            this.browserBox = 
+                document.getAnonymousElementByAttribute(this, "anonid", "browserBox");
+            this.panel_id = this.getAttribute("id");
+            this.closeButton =
+                document.getAnonymousElementByAttribute(this, "anonid", "panelCloseButton");
+            this.closeButton.setAttribute("oncommand",
+                "Alph.main.toggle_panel(event,'" + this.panel_id + "')");
+            Alph.main.panelBound(this);
+        ]]></constructor>
+        </implementation>
+    </binding>
+    
+</bindings>
