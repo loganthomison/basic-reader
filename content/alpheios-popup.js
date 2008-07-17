@@ -559,7 +559,9 @@ Alph.xlate = {
 
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
-        // the popup with the results on success,
+        // the popup and any other lexicon 
+        // output browsers (i.e. in the morph panel)
+        // with the results on success,
         // and a call back to translationError to populate
         // the popup with an error message on failure
         Alph.main.getLanguageTool().lexiconLookup(
@@ -567,10 +569,27 @@ Alph.xlate = {
             function(data)
             {
                 Alph.xlate.showTranslation(data,a_alphtarget,topdoc);
+                Alph.$(".alph-lexicon-output").each(
+                    function() 
+                    {
+                        var doc = Alph.$(this).get(0).contentDocument
+                        Alph.$("#alph-window",doc).css("display","block");
+                        Alph.xlate.showTranslation(data,a_alphtarget,doc);
+                    }
+                );
+
             },
             function(a_msg)
             {   
                 Alph.xlate.translationError(a_msg,topdoc);
+                Alph.$(".alph-lexicon-output").each(
+                    function() 
+                    {
+                        var doc = Alph.$(this).get(0).contentDocument
+                        Alph.$("#alph-window",doc).css("display","block");
+                        Alph.xlate.translationError(a_msg,doc);
+                    }
+                );
             }
         );
     },
@@ -918,6 +937,15 @@ Alph.xlate = {
         }
         // remove the alpheios window element
         Alph.$("#alph-window",last_doc).remove();
+        
+        // also clear the morphology and dictionary panels
+        Alph.$(".alph-lexicon-output").each( 
+            function() {
+                var doc = Alph.$(this).get(0).contentDocument;
+                Alph.$("#alph-window",doc).html("");
+            }
+        );
+
      },
      
      /**

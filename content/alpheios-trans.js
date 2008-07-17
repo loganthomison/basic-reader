@@ -68,7 +68,6 @@ Alph.Translation.prototype.reset_to_default = function(a_bro)
  * @return the new panel status
  * @type int
  */
-
 Alph.Translation.prototype.show = function()
 {
     var panel_obj = this;
