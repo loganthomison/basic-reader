@@ -44,15 +44,14 @@
             notifier="alph-morph-status"
             paneltype="Morph"
             panelorient="horizontal">
+            <toolbaritem id="alpheios-morph-panel-label">
+                <label id="alph-morph-label" 
+                       value="&alpheios-morph-toolbar-label;"/>
+            </toolbaritem>
             <toolbaritem id="alpheios-lookup-text-tbitem">
-                <label id="alph-lookup-label" 
-                       control="alpheios-lookup-text" 
-                       value="&alpheios-morph-toolbar-label;" 
-                       align="baseline"/>
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"
                     onkeypress="Alph.main.do_tb_lookup(event)"
-                    align="baseline"
                     tooltiptext="&alpheios-morph-lookup-tooltip;"/>
             </toolbaritem>
             <toolbarbutton 

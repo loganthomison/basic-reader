@@ -46,8 +46,7 @@
             panelorient="vertical">
             <toolbaritem id="alpheios-trans-tb-label">
                 <label id="alpheios-trans-label" 
-                       value="&alpheios.panel.trans.label;" 
-                       align="baseline"/>
+                       value="&alpheios.panel.trans.label;"/>
             </toolbaritem>
             <browser 
                     flex="1"

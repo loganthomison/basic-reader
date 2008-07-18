@@ -1,3 +1,7 @@
+#alph-right-panel {
+    width: 200px;
+}
+
 #alph-morph-panel {
     height: 100px;
 }
@@ -17,4 +21,21 @@
 #alph-dict-body {
     height: 100%;
     width: 50%;
+}
+
+.alph-panel-splitter {
+    background: #f3f3f3 !important;
+    border-left: 1px solid #BBB9BA;
+    border-right: 1px solid #BBB9BA;
+    min-width: 4px;
+    max-width: 4px;
+}
+
+.alph-panel-splitter[orient="vertical"] {
+    border: none;
+    border-top: 1px solid #BBB9BA;
+    min-height: 4px;
+    max-height: 4px;
+    min-width: 0;
+    max-width: none;
 }

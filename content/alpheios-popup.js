@@ -574,6 +574,7 @@ Alph.xlate = {
                     {
                         var doc = Alph.$(this).get(0).contentDocument
                         Alph.$("#alph-window",doc).css("display","block");
+                        Alph.main.getLanguageTool().addStyleSheet(doc);
                         Alph.xlate.showTranslation(data,a_alphtarget,doc);
                     }
                 );
@@ -943,6 +944,10 @@ Alph.xlate = {
             function() {
                 var doc = Alph.$(this).get(0).contentDocument;
                 Alph.$("#alph-window",doc).html("");
+                if (lang_tool)
+                {
+                    lang_tool.removeStyleSheet(doc);
+                }
             }
         );
 

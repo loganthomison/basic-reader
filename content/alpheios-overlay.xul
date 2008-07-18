@@ -113,6 +113,7 @@
                  mode="text" 
                  persist="collapsed,hidden" 
                  toolbarname="&alpheios-toolbar-name;"
+                 align="center"
                  defaultset="alpheios-mainmenu-button,alpheios-lang-button,alpheios-tools-button,alpheios-toolbar-spring,alpheios-toolbar-status"/>
     </toolbox>
 

@@ -846,14 +846,18 @@ Alph.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
 Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
 {
     var chromepkg = this.getchromepkg();
-    var css = document.createElementNS(
-        "http://www.w3.org/1999/xhtml","link");
-    css.setAttribute("rel", "stylesheet");
-    css.setAttribute("type", "text/css");
-    css.setAttribute("href", "chrome://" + chromepkg + "/skin/" + chromepkg + ".css");
-    css.setAttribute("id", chromepkg + "-css");
-    Alph.$("head",a_doc).append(css);
-  
+    var chromecss = "chrome://" + chromepkg + "/skin/" + chromepkg + ".css"
+    // only add the stylesheet if it's not already there
+    if (Alph.$("link[href='"+ chromecss + "']",a_doc).length == 0)
+    {
+        var css = document.createElementNS(
+            "http://www.w3.org/1999/xhtml","link");
+        css.setAttribute("rel", "stylesheet");
+        css.setAttribute("type", "text/css");
+        css.setAttribute("href", chromecss);
+        css.setAttribute("id", chromepkg + "-css");
+        Alph.$("head",a_doc).append(css);
+    }
 };
 
 /**

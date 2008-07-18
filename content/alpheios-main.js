@@ -843,12 +843,14 @@ Alph.main =
             // remove the popoup and stylesheets 
             // from the prior language, if any
             Alph.xlate.removePopup(bro);
- 
+            
             bro.alpheios.current_language = a_lang;
             
+            var lang_tool = this.getLanguageTool();
+            
             // update the popup trigger if necessary
-            this.setXlateTrigger(bro,this.getLanguageTool().getpopuptrigger());
-
+            this.setXlateTrigger(bro,lang_tool.getpopuptrigger());
+             
             // call onTabSelect to update the menu to show
             // which language is current
             this.onTabSelect();
@@ -1097,6 +1099,21 @@ Alph.main =
         var ped_site = 
             bro.currentURI.spec
             .match(Alph.util.getPref("ped-prototype-match"));
+
+        if (ped_site != null) 
+        { 
+            var lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
+            // if alpheios is enabled set to the right language for the prototype
+            if (bro.alpheios && 
+                bro.alpheios.current_language != lang &&
+                typeof Alph.Languages[lang] != "undefined")
+            {
+                Alph.util.log("Auto-switching alpheios to " + lang);
+                Alph.main.select_language(lang);
+                // select_language calls onTabSelect which will re-call reset_state
+                return;  
+            }
+        }
         
         // notify the pedagogical reader observers
         Alph.$("broadcaster.alph-pedagogical-notifier").each(

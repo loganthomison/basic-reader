@@ -12,13 +12,13 @@
     <binding id="alpheiosPanel" extends="xul:vbox">
         <content>
             <xul:toolbox anonid="panelToolbox">
-                <xul:toolbar anonid="panelToolbar">
+                <xul:toolbar anonid="panelToolbar" align="center">
                     <children includes="toolbaritem|toolbarbutton|toolbarspring"/>
                     <xul:toolbarspring/>
                     <xul:toolbarbutton 
                         anonid="panelOptionsButton"
                         type="menu" 
-                        class="alph-options-button" 
+                        class="toolbarbutton-class" 
                         label="&alpheios.panel.options;">
                         <xul:menupopup anonid="panelOptionsPopup"/>
                     </xul:toolbarbutton>
