@@ -716,7 +716,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
                         features,
                         params);
             Alph.util.log("Inflections window should have focus with " 
-                + Alph.main.getCurrentBrowser().alpheios.word);
+                + Alph.main.get_state_obj().get_var("word"));
     }
 }
 
@@ -751,7 +751,7 @@ Alph.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
     var params = { suffixes: { noun: [],
                                adjective: []
                              },
-                   word: Alph.main.getCurrentBrowser().alpheios.word,
+                   word: Alph.main.get_state_obj().get_var("word"),
                    showcase: a_showcase
                  };
     var supported_cases = 
@@ -810,7 +810,7 @@ Alph.LanguageTool.prototype.showDeclensionTable = function(a_event,a_showcase)
                     features,
                     params);
         Alph.util.log("Declension table should have focus with " 
-            + Alph.main.getCurrentBrowser().alpheios.word);
+            + Alph.main.get_state_obj().get_var("word"));
     }
 };
 

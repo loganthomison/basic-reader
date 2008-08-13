@@ -43,27 +43,6 @@ Alph.Translation.prototype = new Alph.Panel();
 
 /**
  * Translation panel specific implementation of 
- * {@link Alph.Panel#reset_to_default}
- * @param {Browser} a_bro the current browser
- * @return the new panel status
- * @type int
- */
-Alph.Translation.prototype.reset_to_default = function(a_bro)
-{
-    var notifier = Alph.$("#" + this.notifier);
-    if (Alph.$("#" + this.notifier).attr("disabled") == "false" )
-    {
-        return this.show();
-    }
-    else
-    {
-        // flag the panel as being auto-hidden vs. user-hidden
-        return this.hide(true);
-    }
-};
-
-/**
- * Translation panel specific implementation of 
  * {@link Alph.Panel#show}
  * @return the new panel status
  * @type int
@@ -74,11 +53,21 @@ Alph.Translation.prototype.show = function()
     var bro = Alph.main.getCurrentBrowser();
     //TODO - eventually should be able to pick the translation url
     // up from the user's preferences for the basic reader
+    
+    
     var trans_url = Alph.$("#alph-trans-url",bro.contentDocument);
-    if (trans_url.length >0)
+    var tab_box = Alph.$("tabbox",this.panel_elem).get(0);    
+    if (trans_url.length == 0)
+    {
+        // if we don't have a pedagogical translation, just set the external translation tab
+        // as the selected tab
+        Alph.$("#alph-trans-tab-external",tab_box).click();
+    }
+    else
     {
         Alph.util.log("loading translation from " + Alph.$(trans_url).attr("url"));
-        var browser_box = this.panel_elem;
+    
+        var browser_box = Alph.$("#alph-trans-panel-primary",tab_box); 
         var trans_doc = 
             Alph.$("browser",browser_box).get(0).contentDocument;
         Alph.$.ajax(
@@ -94,13 +83,34 @@ Alph.Translation.prototype.show = function()
                 success: function(data, textStatus) 
                 {
                     Alph.$("body",trans_doc).html(data);
+                    // TODO - need to take state into account
+                    // (i.e. if user chose a different tab)
+                    Alph.$("#alph-trans-tab-primary",tab_box).click();
                 } 
             }   
         );
-        return Alph.Panel.STATUS_SHOW;
+        
    }
-   else
-   {
-        return Alph.Panel.STATUS_AUTOHIDE;
-   }
+   return Alph.Panel.STATUS_SHOW;
+};
+
+
+/**
+ * Static helper method to load a url from a the url location bar into
+ * the sibling browser.
+ * @param {Event} a_event the Event which initiated the load
+ * @param {Node} a_urlbar the DOM Node containing the location bar
+ */
+Alph.Translation.loadUrl = function(a_event,a_urlbar) {  
+    if (!a_urlbar.value)
+    {
+        return;
+    }
+    // TODO - look at all the extra processing for browser page loading in browser.js 
+    // and determine what, if any, of that should be supported here (e.g. auto-append of suffix,
+    // auto-search for non-urls, etc)
+    var browser = Alph.$(a_urlbar).siblings("browser").get(0);
+    browser.loadURI(a_urlbar.value);
+    
+    
 };

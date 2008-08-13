@@ -169,15 +169,16 @@ Alph.xlate = {
         }
                     
         // nothing to do if same word as last AND the popup is shown
-        // (hidePopup removes the last word from the state variable), 
-        var alph_state = Alph.main.getCurrentBrowser().alpheios;
-        if (alphtarget.equals(alph_state.lastSelection))
+        // (hidePopup removes the last word from the state variable),
+        var alph_state = Alph.main.get_state_obj();
+        var lastSelection = alph_state.get_var("lastSelection");
+        if (alphtarget.equals(lastSelection))
         {
             return;
         }
 
-        alph_state.lastWord = alphtarget.getWord();
-        alph_state.lastSelection = alphtarget;
+        alph_state.set_var("lastWord",alphtarget.getWord());
+        alph_state.set_var("lastSelection", alphtarget);
 
         // Add the range back to the document highlighted as the selected range
         var doc = rp.ownerDocument;
@@ -213,14 +214,14 @@ Alph.xlate = {
                     "alph-loading-error",
                     [a_msg ]);
         Alph.util.log("Query Response (Error): " + err_msg);
-        if (Alph.main.useLocalDaemon() && 
-            typeof Alph.main.getCurrentBrowser()
-                          .alpheios.daemonPid == "undefined")
-        {
-            err_msg = err_msg + '<br/>' +  
-                document.getElementById("alpheios-strings")
-                        .getString("alph-error-mhttpd-notstarted");
-        }
+        //if (Alph.main.useLocalDaemon() && 
+        //    typeof Alph.main.getCurrentBrowser()
+        //                  .alpheios.daemonPid == "undefined")
+        //{
+        //    err_msg = err_msg + '<br/>' +  
+        //        document.getElementById("alpheios-strings")
+        //                .getString("alph-error-mhttpd-notstarted");
+        //}
 
         Alph.$("#alph-text-loading",a_topdoc).remove();
         
@@ -232,6 +233,7 @@ Alph.xlate = {
             err_msg +
             '</div>'
         );
+        Alph.main.broadcast_ui_event();
     },
 
     /**
@@ -281,7 +283,8 @@ Alph.xlate = {
             sel.removeAllRanges();
             sel.addRange(r);
         }
-            
+
+        Alph.main.broadcast_ui_event();
         // TODO - we probably should reposition the popup now that we 
         // know it's final size
     },
@@ -299,16 +302,16 @@ Alph.xlate = {
     showPopup: function(a_elem, a_x, a_y, a_alphtarget)
     {
         const topdoc = a_elem.ownerDocument;
-        var alph_state = Alph.main.getCurrentBrowser().alpheios;
+        var alph_state = Alph.main.get_state_obj();
         var popup;
         // check the alpheios state object for the prior element 
-        if (alph_state.lastElem)
+        if (alph_state.get_var("lastElem"))
         {
-            popup = Alph.$("#alph-window",alph_state.lastElem.ownerDocument).get(0);
+            popup = Alph.$("#alph-window",alph_state.get_var("lastElem").ownerDocument).get(0);
         }
         // if the popup window exists, and it's in a different document than
         // the current one, remove it from the prior document
-        if (popup && (topdoc != alph_state.lastElem.ownerDocument))
+        if (popup && (topdoc != alph_state.get_var("lastElem").ownerDocument))
         {
             this.removePopup(Alph.main.getCurrentBrowser());
             popup = null;
@@ -340,7 +343,7 @@ Alph.xlate = {
         
             // add the element to the alpheios state object in the browser,
             // so that it can be accessed to remove the popup later
-            alph_state.lastElem = a_elem;
+            alph_state.set_var("lastElem",a_elem);
             
             // add a close link if the popup is activated by a double-click
             // instead of mouseover
@@ -555,7 +558,7 @@ Alph.xlate = {
 
         // add the original word to the browser's alpheios object so that the
         // other functions can access it
-        alph_state.word = a_alphtarget.getWord();
+        alph_state.set_var("word",a_alphtarget.getWord());
 
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
@@ -608,14 +611,14 @@ Alph.xlate = {
         topdoc.defaultView.getSelection().removeAllRanges();
         
         // remove the last word from the state
-        var alph_state = Alph.main.getCurrentBrowser().alpheios;
-        if (alph_state)
+        var alph_state = Alph.main.get_state_obj();
+        if (alph_state.get_var("enabled"))
         { 
-            alph_state.lastWord = null;
-            alph_state.lastSelection = null;
+            alph_state.set_var("lastWord", null);
+            alph_state.set_var("lastSelection",null);
         
         }
-        
+        Alph.main.broadcast_ui_event();
         // keep the last element in the state, so that we can find
         // the popup (and stylesheets) again
     },
@@ -646,13 +649,12 @@ Alph.xlate = {
      */
     closeSecondaryWindows: function(a_bro)
     {
-        var alph_state = a_bro.alpheios;
         // return if the extension isn't enabled for this browser
-        if (!alph_state)
+        if (! Alph.main.is_enabled(a_bro))
         {
             return;
         }
-        var windows = alph_state.windows;
+        var windows = Alph.main.get_state_obj(a_bro).get_var("windows");
         for (var win in windows)
         {
             Alph.util.log("Checking status of window " + win);
@@ -973,10 +975,10 @@ Alph.xlate = {
      getLastDoc: function()
      {
         var lastdoc;
-        var bro = Alph.main.getCurrentBrowser();
-        if (bro.alpheios && bro.alpheios.lastElem )
+        var lastElem = Alph.main.get_state_obj().get_var("lastElem");
+        if ( lastElem != null )
         {
-            lastdoc = bro.alpheios.lastElem.ownerDocument;
+            lastdoc = lastElem.ownerDocument;
         } 
         if (typeof lastdoc == "undefined" || lastdoc == null)
         {

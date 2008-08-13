@@ -29,7 +29,7 @@
                 </xul:toolbar>
             </xul:toolbox>
             <xul:box anonid="browserBox" flex="1" xbl:inherits="orient=panelorient">
-                <children includes="browser|splitter"/>
+                <children includes="browser|splitter|tabbox"/>
             </xul:box>
             <children/>
         </content>

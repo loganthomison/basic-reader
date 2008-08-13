@@ -32,8 +32,6 @@
  */
 Alph.Panel = function(a_panel)
 {
-    // TODO - figure out why call to init is failing
-    //this.init();
     this.panel_elem = a_panel;
     this.panel_id = Alph.$(a_panel).attr("id");
     this.parent_box = Alph.$(this.panel_elem).parent("vbox")[0];
@@ -71,7 +69,7 @@ Alph.Panel.STATUS_AUTOHIDE = 3;
  */
 Alph.Panel.prototype.init = function()
 {
-    
+    // override in panel specific implementations
 };
 
 /**
@@ -100,49 +98,44 @@ Alph.Panel.prototype.reset_to_default = function()
  */
 Alph.Panel.prototype.reset_state = function(a_bro)
 {
-    
-    var state_obj = a_bro.alpheios;
-    
-    // if the alpheios state object hasn't been initialized for the 
-    // current browser yet, hide the panels
-    // TODO - eventually we may want to open panels separately from enabling the
-    // extension?
-     
-    var state = false;
-    // get the default state for the current browser if:
-    // 1. alpheios isn't enabled, or 
-    // 2. panel hasn't been toggled yet, or
-    // 3. panel was previously auto-hidden,
 
-    if (
-         typeof state_obj == "undefined" ||
-         typeof state_obj.panels[this.panel_id] == "undefined" ||
-         state_obj.panels[this.panel_id] == Alph.Panel.STATUS_AUTOHIDE)
+    var panel_state = this.get_browser_state(a_bro);
+
+    // update the panel contents for the current browser
+    this.reset_contents(panel_state);
+         
+    var status;
+    // get the default state for the current browser if:
+    // 1. panel hasn't been toggled yet, or
+    // 2. panel was previously auto-hidden,
+
+    if ( typeof panel_state.status == "undefined" ||
+         panel_state.status == Alph.Panel.STATUS_AUTOHIDE)
     {
-        state = this.reset_to_default(a_bro);
+        status = this.reset_to_default(a_bro);
     }
     // otherwise if it's enabled, show
-    else if (state_obj.panels[this.panel_id] == Alph.Panel.STATUS_SHOW)
+    else if (panel_state.status == Alph.Panel.STATUS_SHOW)
     {
-        state = this.show();
+        status = this.show();
     }
     // or hide
     else
     {
-        state = this.hide();
+        status = this.hide();
     }
-    this.update(state);
+    this.update_status(status);
 };
 
 /**
  * Updates the interface to a new panel status and 
- * stores the new panel state.
+ * stores the new status to the panel state object
  * @private
  * @param {int} a_status the new panel status (should be one of 
  *              Alph.Panel.STATUS_SHOW, Alph.Panel.STATUS_HIDE 
  *              Alph.Panel.STATUS_AUTOHIDE)
  */
-Alph.Panel.prototype.update = function(a_status)
+Alph.Panel.prototype.update_status = function(a_status)
 {
  
     var parent_splitter = this.parent_box.previousSibling;
@@ -164,13 +157,8 @@ Alph.Panel.prototype.update = function(a_status)
     // update the browser state object to reflect the current
     // panel status
     var bro = Alph.main.getCurrentBrowser();
-    // TODO eventually enabled/disabled should be a property
-    // of the state object itself so that we can store state info
-    // even when the extension isn't enabled.
-    if (bro.alpheios)
-    {
-        bro.alpheios.panels[this.panel_id] = a_status;    
-    }
+    var panel_state = this.get_browser_state(bro);
+    panel_state.status = a_status;
 };
 
 /**
@@ -226,20 +214,60 @@ Alph.Panel.prototype.toggle = function()
   var status = Alph.$(this.parent_box).attr("collapsed");
   if (status == "true")
   {
-    this.update(this.show());
+    this.update_status(this.show());
   }
   else
   { 
-    this.update(this.hide());
+    this.update_status(this.hide());
   }
     
 };
 
 /**
- * Method which can be used as a deconstructor code for the panel.
+ * Method which can be used as a deconstructor for the panel.
  */
 Alph.Panel.prototype.cleanup = function()
 {
     // TODO - remove all references to this panel in any
     // of the tab browsers
+};
+
+/**
+ * Method which can be used to reset the contents for the panel
+ * when the panel state changes 
+ * @param {Object} a_panel_state the current panel state object
+ */
+Alph.Panel.prototype.reset_contents = function(a_panel_state)
+{
+    // default does nothing  - override in panel-specific implementations
+};
+
+/**
+ * Method which can be registered to observe changes to the overall UI
+ * in the specific panel.
+ * TODO - ultimately this should be redone using an Observer service -
+ * may make sense to wait until we can use a JS module for this (with FF3)
+ * @param {Browser} a_bro the current browser
+ */
+Alph.Panel.prototype.observe_ui_event = function(a_bro)
+{
+    // default does nothing - override in panel-specific implementations
+};
+
+/**
+ * Get the panel state for the current browser object
+ * @param {Browser} a_bro the current browser
+ * @return the panel state object
+ * @type Object
+ */
+Alph.Panel.prototype.get_browser_state = function(a_bro)
+{
+  var panel_state = Alph.main.get_state_obj(a_bro).get_var("panels");
+  if (typeof panel_state[this.panel_id] == "undefined")
+  {
+    panel_state[this.panel_id] = {};
+    // initialize the panel state
+    this.init(panel_state[this.panel_id]);
+  }
+  return panel_state[this.panel_id];
 };

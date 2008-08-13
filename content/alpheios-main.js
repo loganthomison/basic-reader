@@ -100,7 +100,7 @@ Alph.main =
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
         document
             .getElementById("appcontent")
-            .addEventListener("DOMContentLoaded", Alph.main.reset_state, false);
+            .addEventListener("DOMContentLoaded", function(e) { Alph.main.reset_state(e) }, false);
         
         var mks = document.getElementById("mainKeyset");
 
@@ -202,7 +202,7 @@ Alph.main =
         // Thunderbird has no tabs, so we need to use the window instead of
         // the current browser container
         var bro = this.getCurrentBrowser();
-        if (bro.alpheios)
+        if (this.is_enabled(bro))
         {
                 this.inlineDisable(bro);
         }
@@ -224,19 +224,17 @@ Alph.main =
     inlineEnable: function(a_bro,a_lang)
     {        
         this.mouseButtons = 0;
-
+        
         a_bro.addEventListener("keydown", this.onKeyDown, true);
         a_bro.addEventListener("keyup", this.onKeyUp, true);
-        a_bro.alpheios = { windows: {}, 
-                           panels: {} 
-                         };
+        this.get_state_obj(a_bro).set_var("enabled",true);
         if (! this.set_languages())
         {
             var err_msg = 
                 document.getElementById("alpheios-strings")
                         .getString("alph-error-nolanguages");
-            alert(err_msg)
-            this.inlineDisable(a_bro)
+            alert(err_msg);
+            this.inlineDisable(a_bro);
             return;
         }
         if (a_lang == null)
@@ -254,7 +252,8 @@ Alph.main =
             this.getLocalDaemonPid(
                 this.on_mhttpd_start,
                 this.start_mhttpd);   
-        }                    
+        }
+        
     },
 
     /**
@@ -264,7 +263,7 @@ Alph.main =
     inlineDisable: function(a_bro)
     {
         // just return without doing anything if we're already disabled
-        if (! a_bro.alpheios)
+        if ( ! this.is_enabled(a_bro))
         {
             return;
         }
@@ -276,10 +275,9 @@ Alph.main =
 
         this.cleanup(a_bro);
         
-        delete a_bro.alpheios;
-        // TODO - clear Alph.Languages?
+        this.get_state_obj(a_bro).set_disabled();
         
-                // Update the panels
+        // Update the panels
         Alph.$("alpheiosPanel").each(
             function()
             {
@@ -319,9 +317,6 @@ Alph.main =
             this.detachLocalDaemon();
         }
         
-        // Remove all panel references in this
-        // browser element
-        delete a_bro.alpheios.panels;
     },
 
     /**
@@ -513,7 +508,7 @@ Alph.main =
         var tmenu_text = '';
         var menu_lang = '';
         var status_text = '';
-        if (typeof this.getCurrentBrowser().alpheios == "undefined")
+        if (! this.is_enabled(this.getCurrentBrowser()))
         {
             cmenu_text =
                 Alph.$("#alpheios-strings").get(0)
@@ -538,7 +533,7 @@ Alph.main =
             tmenu_text =
                 Alph.$("#alpheios-strings").get(0)
                     .getString("alph-inline-disable-tm");
-            menu_lang = this.getCurrentBrowser().alpheios.current_language;
+            menu_lang = this.get_state_obj().get_var("current_language");
             status_text = 
                 "[" +
                 Alph.$("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']").attr("label")
@@ -829,7 +824,7 @@ Alph.main =
     select_language: function(a_lang) {
         // enable alpheios if it isn't already
         var bro = this.getCurrentBrowser();
-        if (! bro.alpheios)
+        if ( ! this.is_enabled(bro))
         {   
             return this.inlineEnable(bro,a_lang);
         }
@@ -844,7 +839,7 @@ Alph.main =
             // from the prior language, if any
             Alph.xlate.removePopup(bro);
             
-            bro.alpheios.current_language = a_lang;
+            this.get_state_obj(bro).set_var("current_language",a_lang);
             
             var lang_tool = this.getLanguageTool();
             
@@ -870,9 +865,9 @@ Alph.main =
     {
         var bro = this.getCurrentBrowser();
         var lang_tool;
-        if (bro.alpheios)
+        if (this.is_enabled(bro))
         {
-            lang_tool = Alph.Languages[bro.alpheios.current_language];
+            lang_tool = Alph.Languages[this.get_state_obj(bro).get_var("current_language")];
         }
         return lang_tool;
     },
@@ -890,7 +885,7 @@ Alph.main =
         this.removeXlateTrigger(a_bro);
         
         a_bro.addEventListener(a_trigger, this.doXlateText, false);
-        a_bro.alpheios.xlate_trigger = a_trigger;
+        this.get_state_obj(a_bro).set_var("xlate_trigger",a_trigger);
 
     },
     
@@ -906,10 +901,7 @@ Alph.main =
         {
             a_bro = this.getCurrentBrowser();
         }
-        if (a_bro.alpheios)
-        {
-            return a_bro.alpheios.xlate_trigger;
-        }
+        return this.get_state_obj(a_bro).get_var("xlate_trigger");
     },
     
     /**
@@ -970,7 +962,7 @@ Alph.main =
         
         // make sure Alpheios is enabled
         var bro = this.getCurrentBrowser();
-        if (! bro.alpheios)
+        if (! this.is_enabled(bro))
         {
             this.inlineEnable(bro);
             this.onTabSelect();
@@ -1040,7 +1032,7 @@ Alph.main =
                 var disabled = true;
                 // enable only if Alpheios is enabled
                 // and the language supports the feature
-                if (bro.alpheios && lang_tool.getFeature(id) )
+                if (Alph.main.is_enabled(bro) && lang_tool.getFeature(id) )
                 {
                     disabled = false;
                 }
@@ -1053,7 +1045,7 @@ Alph.main =
             function()
             {
                 // enable if Alpheios is enabled
-                if (bro.alpheios)
+                if (Alph.main.is_enabled(bro))
                 {
                     Alph.$(this).attr("disabled",false);
                 }
@@ -1084,10 +1076,36 @@ Alph.main =
         
     },
     
+    /** 
+     * Broadcast a UI event to the panels
+     * TODO replace this with the Observes JS Module when FF3 is min supported
+     */
+    broadcast_ui_event: function()
+    {
+        var bro = this.getCurrentBrowser();
+        // Update the panels
+        Alph.$("alpheiosPanel").each(
+            function()
+            {
+                var panel_id = Alph.$(this).attr("id");
+                try 
+                {
+                    var panel_obj = Alph.main.panels[panel_id];
+                    panel_obj.observe_ui_event(bro);    
+                } 
+                catch (e)
+                {   
+                    Alph.util.log("Error observing ui event for panel " + panel_id + ":" + e);
+                }
+            }
+        );
+        
+    },
+    
     /**
      * Resets the state element for the current browser.
      */
-    reset_state: function()
+    reset_state: function(a_event)
     {
         var bro = Alph.main.getCurrentBrowser();
 
@@ -1104,8 +1122,8 @@ Alph.main =
         { 
             var lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
             // if alpheios is enabled set to the right language for the prototype
-            if (bro.alpheios && 
-                bro.alpheios.current_language != lang &&
+            if (this.is_enabled(bro) && 
+                this.get_state_obj(bro).get_var("current_language") != lang &&
                 typeof Alph.Languages[lang] != "undefined")
             {
                 Alph.util.log("Auto-switching alpheios to " + lang);
@@ -1171,6 +1189,67 @@ Alph.main =
                 panel_id + " with " + panel_class + ":" + exception);
         }
         
+    },
+    
+    /**
+     * Get the Alpheios state object for the selected browser
+     * @param {Browser} a_bro the browser object
+     * @return {Alph.State} the Alpheios State object
+     */
+    get_state_obj: function(a_bro)
+    {
+        // if a browser hasn't been supplied, just get the current one
+        if (typeof a_bro == "undefined")
+        {
+            a_bro = this.getCurrentBrowser();
+        }
+        if (typeof a_bro.alpheios == "undefined")
+        {
+            a_bro.alpheios = new Alph.State();
+        };
+        return a_bro.alpheios;
+    },
+        
+    /**
+     * Shortcut method to see if the Alpheios extension has
+     * been enabled for the selected browser
+     * @param {Browser} a_bro the browser object
+     * @returns true if enabled false if not
+     * @type Boolean
+     */
+    is_enabled: function(a_bro)
+    {
+        return this.get_state_obj(a_bro).get_var("enabled");
+    },
+    
+    /**
+     * Shortcut method to see if the Alpheios extension status
+     * for the selected browser was last toggled by an overt User action 
+     * (Not yet in use)
+     * @param {Browser} a_bro the Browser object
+     * @return true if user initiated otherwise false
+     * @type boolean 
+     */
+    enabled_by_user: function(a_bro)
+    {
+        return 
+            this.is_enabled(a_bro) &&
+            this.get_state_obj(a_bro).get_var("toggled_by") == Alph.State.USER_ACTION;
+    },
+
+    /**
+     * Shortcut method to see if the Alpheios extension status
+     * for the selected browser was last toggled automatically 
+     * (Not yet in use)
+     * @param {Browser} a_bro the Browser object
+     * @return true if user initiated otherwise false
+     * @type boolean 
+     */
+    enabled_by_system: function(a_bro)
+    {
+        return 
+            this.is_enabled(a_bro) &&
+            this.get_state_obj(a_bro).get_var("toggled_by") == Alph.State.SYS_ACTION;
     }
 };
 

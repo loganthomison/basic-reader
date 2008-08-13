@@ -123,8 +123,8 @@ Alph.util = {
             var num = gBrowser.browsers.length;
             for (var i = 0; i < num; i++) {
                 var bro = gBrowser.getBrowserAtIndex(i);
-                if (bro.alpheios && 
-                    a_name.indexOf(bro.alpheios.current_language) == 0)
+                if (Alph.main.is_enabled(bro) && 
+                    a_name.indexOf(Alph.main.get_state_obj(bro).get_var("current_language")) == 0)
                 {
                     Alph.main.setXlateTrigger(bro,a_value);
                 }

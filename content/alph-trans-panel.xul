@@ -11,9 +11,12 @@
     
     <broadcasterset id="mainBroadcasterSet">
         <broadcaster id="alph-trans-status"
-                     class="alph-pedagogical-notifier"
                      disabled="true"
-                     checked="false"/>
+                     checked="false"
+                     class="alpheios-enabled-notifier" />
+        <broadcaster id="alph-pedagogical-status"
+                     class="alph-pedagogical-notifier"
+                     disabled="true"/>
     </broadcasterset>
 
     <!-- overlay the main command set -->
@@ -48,10 +51,51 @@
                 <label id="alpheios-trans-label" 
                        value="&alpheios.panel.trans.label;"/>
             </toolbaritem>
-            <browser 
-                    flex="1"
-                    type="content" 
-                    src="chrome://alpheios/content/html/alph-panel.html"/>
+            <tabbox flex="1">
+                <tabs>
+                    <tab id="alph-trans-tab-primary"
+                         label="&alpheios.panel.trans.tab.ped.primary;"
+                         observes="alph-pedagogical-status"/>
+                    <tab id="alph-trans-tab-external" 
+                         label="&alpheios.panel.trans.tab.external;" 
+                         selected="true"/>
+
+                </tabs>
+                <tabpanels flex="1">
+                    <tabpanel flex="1" id="alph-trans-panel-primary">
+                        <browser
+                            flex="1"
+                            type="content" 
+                            src="chrome://alpheios/content/html/alph-panel.html"/>            
+                    </tabpanel>
+                    <tabpanel flex="1" orient="vertical" id="alph-trans-panel-external">
+                         <textbox id="alph-trans-ext-urlbar" 
+                            type="autocomplete"
+                            autocompletesearch="history"
+                            autocompletepopup="alph-trans-ext-auto-popup"
+                            completeselectedindex="true"
+                            tabscrolling="true"
+                            showcommentcolumn="true"
+                            showimagecolumn="false"
+                            enablehistory="true"
+                            maxrows="6"
+                            newlines="stripsurroundingwhitespace"
+                            oninput=""
+                            ontextentered="Alph.Translation.loadUrl(param,this)"
+                            ontextreverted=""
+                            pageproxystate="invalid"
+                            onsearchbegin=""
+                            onsearchcomplete=""
+                            onfocus=""
+                            onblur=""/>
+                            <browser
+                                flex="1"
+                                type="content" 
+                                src="about:blank"/>
+                    </tabpanel>
+                    
+                </tabpanels>
+            </tabbox>
         </alpheiosPanel>
     </vbox>
 </overlay>
