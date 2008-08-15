@@ -30,12 +30,20 @@
         <broadcaster id="alpheios-grammar"
                      class="alpheios-language-notifier"
                      disabled="true"/>
+        <broadcaster id="alpheios-pedagogical-status"
+                     class="alpheios-pedagogical-notifier"
+                     disabled="true"/>
+        <broadcaster id="alpheios-basic-status"
+                     class="alpheios-basic-notifier"
+                     disabled="false"/>
     </broadcasterset>
         
 	<commandset id="mainCommandSet">
-		<command id="alpheios-toggle-cmd" oncommand="Alph.main.alph_inlineToggle();"/>
+		<command id="alpheios-toggle-cmd" 
+                 oncommand="Alph.main.alph_inlineToggle();"
+                 observes="alpheios-basic-status" />
         <command id="alpheios-lang-cmd" 
-                 oncommand="Alph.main.select_language(event.target.value);"/>
+                 oncommand="Alph.main.select_language(event.target.value,true);"/>
         <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
         <command 
             id="alpheios-inflect-cmd" 

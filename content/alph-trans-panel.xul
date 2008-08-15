@@ -14,9 +14,6 @@
                      disabled="true"
                      checked="false"
                      class="alpheios-enabled-notifier" />
-        <broadcaster id="alph-pedagogical-status"
-                     class="alph-pedagogical-notifier"
-                     disabled="true"/>
     </broadcasterset>
 
     <!-- overlay the main command set -->
@@ -55,7 +52,7 @@
                 <tabs>
                     <tab id="alph-trans-tab-primary"
                          label="&alpheios.panel.trans.tab.ped.primary;"
-                         observes="alph-pedagogical-status"/>
+                         observes="alpheios-pedagogical-status"/>
                     <tab id="alph-trans-tab-external" 
                          label="&alpheios.panel.trans.tab.external;" 
                          selected="true"/>

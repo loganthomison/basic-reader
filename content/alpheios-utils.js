@@ -114,7 +114,7 @@ Alph.util = {
         {
             a_name = a_lang + '.' + a_name;
         }
-        if (a_name.search(/popuptrigger$/ != -1))
+        if (a_name.search(/popuptrigger$/) != -1)
         {
             // iterate through the open browsers
             // updating to the trigger if alpheios 
@@ -218,13 +218,43 @@ Alph.util = {
         }
         
         var type = this.ALPH_PREFS.getPrefType(a_name);
-        //TODO - handle missing prefs
+        
+        // if we don't know the type, try to determine it
+        if ( type == 0 )
+        {
+            switch(typeof a_value)
+            {
+                case 'string': 
+                {
+                    type = Components.interfaces.nsIPrefBranch.PREF_STRING;
+                    break;
+                }
+                case 'number':
+                {
+                    type = Components.interfaces.nsIPrefBranch.PREF_INT;
+                    break;
+                }
+                case 'boolean':
+                {
+                    type = Components.interfaces.nsIPrefBranch.PREF_BOOL;
+                    break;
+                }
+                default:
+                {
+                    // leave it as invalid if we can't determine it
+                }
+            }
+        }
+        
         if (type == Components.interfaces.nsIPrefBranch.PREF_STRING)
             this.ALPH_PREFS.setCharPref(a_name, a_value);
         else if (type == Components.interfaces.nsIPrefBranch.PREF_INT)
             this.ALPH_PREFS.setIntPref(a_name, a_value);
         else if (type == Components.interfaces.nsIPrefBranch.PREF_BOOL)
             this.ALPH_PREFS.setBoolPref(a_name, a_value);
+        else
+            this.log("Invalid preference type for " + a_name)
+            // fall through behavior is to not set the pref if we don't know what type it is
     },
     
     /**

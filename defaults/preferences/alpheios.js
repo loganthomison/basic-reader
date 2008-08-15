@@ -14,4 +14,7 @@ pref("extensions.alpheios.cmds.alpheios-inflect-cmd","handleInflections");
 pref("extensions.alpheios.cmds.alpheios-morph-inflect-cmd","handleInflectionsForMorphWindow");
 pref("extensions.alpheios.cmds.alpheios-grammar-cmd","openGrammar");
 pref("extensions.alpheios.ped-prototype-match","http:\/\/perseus.harrysdell.com:8020\/hopper\/alpheios\/text-alph.jsp");
- 
+pref("extensions.alpheios.panels.alph-morph-panel.pedagogical",1);
+pref("extensions.alpheios.panels.alph-morph-panel.basic",2);
+pref("extensions.alpheios.panels.alph-trans-panel.pedagogical",1);
+pref("extensions.alpheios.panels.alph-trans-panel.basic",2);

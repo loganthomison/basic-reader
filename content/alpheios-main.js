@@ -75,6 +75,11 @@ Alph.main =
      * @type Object 
      */
     panels: { },
+
+    /**
+     * flag to indicate if the languages were successfully set
+     */
+    has_languages: false,
     
     /**
      * Initialize function for the class. Adds the onLoad event listener to the window
@@ -98,10 +103,9 @@ Alph.main =
     {
         
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
-        document
-            .getElementById("appcontent")
-            .addEventListener("DOMContentLoaded", function(e) { Alph.main.reset_state(e) }, false);
-        
+        gBrowser
+            .addEventListener("DOMContentLoaded", function(event) { Alph.main.reset_state(event) }, false);
+      
         var mks = document.getElementById("mainKeyset");
 
         // note: setting keys seem to only work during startup
@@ -133,7 +137,9 @@ Alph.main =
         gBrowser.mTabContainer
                 .addEventListener("select", Alph.main.onTabSelect, false);
         gBrowser.mTabContainer
-                .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);        
+                .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);
+                
+        Alph.main.has_languages = Alph.main.set_languages();
     },
 
     /**
@@ -162,7 +168,8 @@ Alph.main =
             .removeEventListener("select", this.onTabSelect, false);
         gBrowser.mTabContainer
             .removeEventListener("TabClose", this.onTabClose, false);
-        //gBrowser.removeEventListener("load", Alph.main.onPageLoad, false);
+        // gBrowser.removeEventListener("load", Alph.main.onPageLoad, false);
+        
         Alph.util.shutdown();    
     },
 
@@ -195,40 +202,65 @@ Alph.main =
     },
 
     /**
-     * Toggle the enabled/disabled status of the extension.
+     * Toggle the enabled/disabled status of the extension. Use for user-initiated actions.
+     * @param {Browser} a_bro the Browser object (optional - current browser used if not supplied)
+     * @param {String} a_lang the language to use (optional - default language used if not supplied)
      */
-    alph_inlineToggle: function()
+    alph_inlineToggle: function(a_bro,a_lang)
     {
         // Thunderbird has no tabs, so we need to use the window instead of
         // the current browser container
-        var bro = this.getCurrentBrowser();
-        if (this.is_enabled(bro))
+        if (typeof a_bro == "undefined")
         {
-                this.inlineDisable(bro);
+            a_bro = this.getCurrentBrowser();
+        }
+        if (this.is_enabled(a_bro))
+        {
+                this.inlineDisable(a_bro);
         }
         else 
         {
-            this.inlineEnable(bro);
+            this._enable(a_bro,a_lang);
         }
-
+        this.get_state_obj(a_bro).set_var("toggled_by",Alph.State.USER_ACTION);
+        this.onTabSelect();
+        
+    },
+    
+    /**
+     * Automatically enables the extension for a browser window
+     * @param {Browser} a_bro the Browser window
+     * @param {String} a_lang the language to use
+     */
+    autoToggle: function(a_bro,a_lang)
+    {
+        if (this.is_enabled(a_bro))
+        {
+            this.inlineDisable(a_bro);
+        }
+        else {
+            this._enable(a_bro,a_lang);
+        }
+        this.get_state_obj().set_var("toggled_by",Alph.State.SYS_ACTION);
         this.onTabSelect();
     },
 
     /**
-     * Enables the extension for a browser window
+     * Enables the extension for a browser window. 
+     * @private  
      * @param a_bro the current browser 
      * @param {String} a_lang the language to set as current 
      *                 (optional, if not specified a default
      *                  will be used)
      */
-    inlineEnable: function(a_bro,a_lang)
+    _enable: function(a_bro,a_lang)
     {        
         this.mouseButtons = 0;
         
         a_bro.addEventListener("keydown", this.onKeyDown, true);
         a_bro.addEventListener("keyup", this.onKeyUp, true);
         this.get_state_obj(a_bro).set_var("enabled",true);
-        if (! this.set_languages())
+        if (! this.has_languages)
         {
             var err_msg = 
                 document.getElementById("alpheios-strings")
@@ -242,7 +274,10 @@ Alph.main =
             // TODO - pick up language from source text
             a_lang = this.defaultLanguage;
         }
-        this.select_language(a_lang);
+        
+        // flag select language not to call onTabSelect
+        // because it will be called later by the calling toggle method
+        this.select_language(a_lang,false);
         
         this.setXlateTrigger(a_bro,this.getLanguageTool().getpopuptrigger());
         
@@ -276,26 +311,7 @@ Alph.main =
         this.cleanup(a_bro);
         
         this.get_state_obj(a_bro).set_disabled();
-        
-        // Update the panels
-        Alph.$("alpheiosPanel").each(
-            function()
-            {
-                var panel_id = Alph.$(this).attr("id");
-                try 
-                {
-                    var panel_obj = Alph.main.panels[panel_id];
-                    panel_obj.reset_state(a_bro)    
-                } 
-                catch (e)
-                {   
-                    Alph.util.log("Unable to reset state for panel " + panel_id + ":" + e);
-                }
-            }
-        );
-
-        
-        
+                
     },
 
     /**
@@ -814,19 +830,22 @@ Alph.main =
     /**
      * Set the current language in use by the browser window.
      * If the extension isn't already enabled, redirects to 
-     * {@link Alph.main#inlineEnable} to enable it for the selected
+     * {@link Alph.main#alph_inlineToggle} to enable it for the selected
      * language.
      * @private
      * @param {String} a_lang the selected language
+     * @param {boolean} a_direct flag to indicate whether the method is being
+     *                  called directly via a menu action or from the 
+     *                  {@link Alph.main#_enable} method
      * TODO eventually language should be automatically determined
      * from the language of the source text if possible
      */
-    select_language: function(a_lang) {
+    select_language: function(a_lang,a_direct) {
         // enable alpheios if it isn't already
         var bro = this.getCurrentBrowser();
         if ( ! this.is_enabled(bro))
         {   
-            return this.inlineEnable(bro,a_lang);
+            return this.alph_inlineToggle(bro,a_lang);
         }
         if (typeof Alph.Languages[a_lang] == "undefined")
         {
@@ -846,9 +865,13 @@ Alph.main =
             // update the popup trigger if necessary
             this.setXlateTrigger(bro,lang_tool.getpopuptrigger());
              
-            // call onTabSelect to update the menu to show
-            // which language is current
-            this.onTabSelect();
+            // if called directly, call onTabSelect to update the 
+            // menu to show which language is current; if not this
+            // should be handled by the calling method.
+            if (a_direct)
+            {
+                this.onTabSelect();
+            }
             
         
         }
@@ -964,8 +987,7 @@ Alph.main =
         var bro = this.getCurrentBrowser();
         if (! this.is_enabled(bro))
         {
-            this.inlineEnable(bro);
-            this.onTabSelect();
+            return;
         }
      
         var target= new Alph.SourceSelection();
@@ -1107,6 +1129,13 @@ Alph.main =
      */
     reset_state: function(a_event)
     {
+        if (typeof a_event != "undefined")
+        {
+            // stop the propagation of the event so that it doesn't
+            // get called more than once for the browser
+            a_event.stopPropagation();    
+        }
+        
         var bro = Alph.main.getCurrentBrowser();
 
         // Temporary hack to enable pedagogical-reader specific functionality
@@ -1120,21 +1149,37 @@ Alph.main =
 
         if (ped_site != null) 
         { 
-            var lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
-            // if alpheios is enabled set to the right language for the prototype
-            if (this.is_enabled(bro) && 
-                this.get_state_obj(bro).get_var("current_language") != lang &&
-                typeof Alph.Languages[lang] != "undefined")
+            var ped_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
+            var cur_lang = this.get_state_obj(bro).get_var("current_language");
+            
+            // if we support this language automatically setup the extension for it
+            if (typeof Alph.Languages[ped_lang] != "undefined")
             {
-                Alph.util.log("Auto-switching alpheios to " + lang);
-                Alph.main.select_language(lang);
-                // select_language calls onTabSelect which will re-call reset_state
-                return;  
+                // if Alpheios is not enabled, auto-enable it
+                if (! this.is_enabled(bro))
+                {
+                    Alph.util.log("Auto-enabling alpheios for " + ped_lang);
+                    return this.autoToggle(bro,ped_lang);
+                }
+                else if (this.is_enabled(bro) && cur_lang != ped_lang)
+                {
+                    Alph.util.log("Auto-switching alpheios to " + ped_lang);
+                    Alph.main.select_language(ped_lang,true);
+                    // select_language calls onTabSelect which will re-call reset_state
+                    return;  
+                }
+                        // if alpheios is enabled set to the right language for the prototype
             }
+        }
+        // if we're not on a pedagogical site but were and system automatically enabled 
+        // the extension, then disable it again
+        else if (this.is_enabled(bro) && ! this.toggled_by_user(bro))
+        {
+            return this.autoToggle(bro);
         }
         
         // notify the pedagogical reader observers
-        Alph.$("broadcaster.alph-pedagogical-notifier").each(
+        Alph.$("broadcaster.alpheios-pedagogical-notifier").each(
             function()
             {
                 if (ped_site == null)
@@ -1144,6 +1189,22 @@ Alph.main =
                 else
                 {
                     Alph.$(this).attr("disabled",false);
+                }
+            }
+            
+        );
+        
+        // notify the basic reader observers
+        Alph.$("broadcaster.alpheios-basic-notifier").each(
+            function()
+            {
+                if (ped_site == null)
+                {
+                    Alph.$(this).attr("disabled",false)
+                }
+                else
+                {
+                    Alph.$(this).attr("disabled",true);
                 }
             }
             
@@ -1230,26 +1291,12 @@ Alph.main =
      * @return true if user initiated otherwise false
      * @type boolean 
      */
-    enabled_by_user: function(a_bro)
+    toggled_by_user: function(a_bro)
     {
-        return 
-            this.is_enabled(a_bro) &&
+        var by_user = 
             this.get_state_obj(a_bro).get_var("toggled_by") == Alph.State.USER_ACTION;
-    },
-
-    /**
-     * Shortcut method to see if the Alpheios extension status
-     * for the selected browser was last toggled automatically 
-     * (Not yet in use)
-     * @param {Browser} a_bro the Browser object
-     * @return true if user initiated otherwise false
-     * @type boolean 
-     */
-    enabled_by_system: function(a_bro)
-    {
-        return 
-            this.is_enabled(a_bro) &&
-            this.get_state_obj(a_bro).get_var("toggled_by") == Alph.State.SYS_ACTION;
+        return by_user;
+         
     }
 };
 

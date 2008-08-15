@@ -82,8 +82,20 @@ Alph.Panel.prototype.init = function()
  */
 Alph.Panel.prototype.reset_to_default = function()
 {
-    // default status for all panels is hidden
-    return this.hide();
+    // if a preference is stored, use it
+    var status_pref = this.get_status_pref_setting();
+    var status = Alph.util.getPrefOrDefault(status_pref,
+        Alph.main.get_state_obj().get_var("current_language"));
+        
+    if (typeof status != "undefined" && status == Alph.Panel.STATUS_SHOW)
+    {
+        return this.show();
+    }
+    else 
+    {
+        // default status for all panels is hidden
+        return this.hide();
+    }
 }
 
 /**
@@ -105,24 +117,14 @@ Alph.Panel.prototype.reset_state = function(a_bro)
     this.reset_contents(panel_state);
          
     var status;
-    // get the default state for the current browser if:
-    // 1. panel hasn't been toggled yet, or
-    // 2. panel was previously auto-hidden,
-
-    if ( typeof panel_state.status == "undefined" ||
-         panel_state.status == Alph.Panel.STATUS_AUTOHIDE)
+    // just auto hide everything if alpheios is disabled
+    if ( ! Alph.main.is_enabled(a_bro))
     {
-        status = this.reset_to_default(a_bro);
+        status = this.hide(true);
     }
-    // otherwise if it's enabled, show
-    else if (panel_state.status == Alph.Panel.STATUS_SHOW)
-    {
-        status = this.show();
-    }
-    // or hide
     else
     {
-        status = this.hide();
+        status = this.reset_to_default(a_bro);
     }
     this.update_status(status);
 };
@@ -159,6 +161,21 @@ Alph.Panel.prototype.update_status = function(a_status)
     var bro = Alph.main.getCurrentBrowser();
     var panel_state = this.get_browser_state(bro);
     panel_state.status = a_status;
+    
+    // if we're responding to a user request, store the new
+    // status as the default status for the panel
+    if (a_status != Alph.Panel.STATUS_AUTOHIDE)
+    {
+        // only store language-specific status for now 
+        // TODO support user override of global preferences ?
+        // TODO support per url preferences ?
+        var lang = Alph.main.get_state_obj(bro).get_var("current_language");
+        if (lang != "")
+        {
+            Alph.util.setPref(this.get_status_pref_setting(),a_status,lang)
+        }
+    }
+    
 };
 
 /**
@@ -270,4 +287,23 @@ Alph.Panel.prototype.get_browser_state = function(a_bro)
     this.init(panel_state[this.panel_id]);
   }
   return panel_state[this.panel_id];
+};
+
+/**
+ * Get the name of the preferences setting for the panel status
+ */
+Alph.Panel.prototype.get_status_pref_setting = function()
+{
+    var status_pref = "panels." + this.panel_id + ".";
+    // Pedagogical Site preferences are separate from Basic preferences
+    // TODO - eventually we may want to support per-url preferences for all sites
+    if (Alph.$("#alpheios-pedagogical-status").attr("disabled") == "true")
+    {   
+        status_pref = status_pref + "basic";
+    }
+    else
+    {
+        status_pref = status_pref + "pedagogical";
+    }
+    return status_pref; 
 };

@@ -34,6 +34,10 @@
 Alph.Translation = function(a_panel)
 {
     Alph.Panel.call(this,a_panel);
+    // override the main DOMContentLoaded listener for the browser
+    Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).
+            addEventListener("DOMContentLoaded", function(e) { e.stopPropagation();} , true);
+
 };
     
 /**
@@ -94,6 +98,32 @@ Alph.Translation.prototype.show = function()
    return Alph.Panel.STATUS_SHOW;
 };
 
+/**
+ * Translation panel specific implementation of 
+ * {@link Alph.Panel#reset_contents}
+ * Loads the external url per the state of the current browser
+ * @param {Object} a_panel_state the current panel state
+ */
+Alph.Translation.prototype.reset_contents = function(a_panel_state)
+{
+    var url = a_panel_state.external_url;
+    var current_url = 
+            Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).currentURI.spec;
+    if (typeof url == "undefined")
+    {
+        if (current_url != "about:blank")
+        {   
+            // no need to reload the blank page
+            url = "about:blank";
+            Alph.$("#alph-trans-ext-urlbar",this.panel_elem).get(0).value = "";
+        } 
+    }
+    if (typeof url != "undefined" && (url != current_url))
+    {
+        Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).loadURI(url);
+    }
+    
+};
 
 /**
  * Static helper method to load a url from a the url location bar into
@@ -112,5 +142,18 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
     var browser = Alph.$(a_urlbar).siblings("browser").get(0);
     browser.loadURI(a_urlbar.value);
     
+    // update the panel state with the new url
+   
+    try 
+    {
+        // the panel should already be intialized by the time the user tries to load
+        // a url but if not, just quiety log the error
+        var panel_state = (Alph.main.get_state_obj().get_var("panels"))["alph-trans-panel"];
+        panel_state.external_url = a_urlbar.value;
+    }
+    catch(e)
+    {
+        Alph.util.log("Unable to update trans panel state with external url: " + e);
+    }
     
 };
