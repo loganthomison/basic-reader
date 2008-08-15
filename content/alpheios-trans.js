@@ -111,16 +111,18 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
             Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).currentURI.spec;
     if (typeof url == "undefined")
     {
-        if (current_url != "about:blank")
+        if (current_url != "about:blank" && current_url != "")
         {   
             // no need to reload the blank page
             url = "about:blank";
-            Alph.$("#alph-trans-ext-urlbar",this.panel_elem).get(0).value = "";
         } 
     }
+    Alph.util.log("Am I even here?");
     if (typeof url != "undefined" && (url != current_url))
     {
-        Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).loadURI(url);
+        var url_bar = Alph.$("#alph-trans-ext-urlbar",this.panel_elem).get(0); 
+        url_bar.value = url;
+        Alph.Translation.loadUrl(null,url_bar);
     }
     
 };
@@ -156,4 +158,9 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
         Alph.util.log("Unable to update trans panel state with external url: " + e);
     }
     
+    // clear the value from the url bar if it's set to "about:blank"
+    if (a_urlbar.value == "about:blank")
+    {
+        a_urlbar.value ="";
+    }
 };

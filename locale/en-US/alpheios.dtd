@@ -35,3 +35,4 @@
 <!ENTITY alpheios.panel.trans.label "Alpheios: Translation">
 <!ENTITY alpheios.panel.trans.tab.external "Internet">
 <!ENTITY alpheios.panel.trans.tab.ped.primary "Alpheios Pedagogical">
+<!ENTITY alpheios.panel.trans.tab.external.url "Enter URL of Translation">
