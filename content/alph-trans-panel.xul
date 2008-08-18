@@ -24,6 +24,11 @@
             observes="alph-trans-status"/>
     </commandset>    
     
+    <popupset id="mainPopupSet">
+        <!--ff2: popup type="autocomplete" id="alph-trans-ext-auto-popup"/ -->
+        <!--ff3: panel type="autocomplete" id="alph-trans-ext-auto-popup" noautofocus="true" hidden="true"/ -->
+    </popupset>
+    
     <!-- overlay the tools menu -->
     <menupopup id="alpheios-tools-popup">
         <menuitem

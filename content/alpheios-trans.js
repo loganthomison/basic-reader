@@ -117,7 +117,6 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
             url = "about:blank";
         } 
     }
-    Alph.util.log("Am I even here?");
     if (typeof url != "undefined" && (url != current_url))
     {
         var url_bar = Alph.$("#alph-trans-ext-urlbar",this.panel_elem).get(0); 
