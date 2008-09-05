@@ -952,6 +952,7 @@ Alph.xlate = {
                 }
             }
         );
+        Alph.main.broadcast_ui_event();
 
      },
      

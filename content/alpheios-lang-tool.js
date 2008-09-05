@@ -905,7 +905,7 @@ Alph.LanguageTool.prototype.getFeature = function(a_id)
     var enabled = Alph.util.getPrefOrDefault("features."+a_id,this.source_language); 
     Alph.util.log("Feature " + a_id + " for " + this.source_language + " is " + enabled);
     return enabled;
-}
+};
 
 /**
  * Method which returns the requested command
@@ -916,4 +916,16 @@ Alph.LanguageTool.prototype.getFeature = function(a_id)
 Alph.LanguageTool.prototype.getCmd = function(a_cmd)
 {
     return Alph.util.getPrefOrDefault("cmds."+a_cmd,this.source_language);
-}
+};
+
+/**
+ * Method returns a language-specific file from the index_files directory
+ * of the language chrome. 
+ * Temporary until we figure out how we really want to handle this
+ * @param {String} a_docid The id (name) of the file to retrieve 
+ */
+Alph.LanguageTool.prototype.getIndexFile = function(a_docid)
+{
+    var chromepkg = this.getchromepkg();
+    return "chrome://" + chromepkg + "/content/index_files/" + a_docid;
+};
