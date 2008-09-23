@@ -1,0 +1,26 @@
+/*
+ * CSS for Noun Inflection tables
+ */
+td.regular {
+    border-left: 1px solid gray; 
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-right: none;
+    padding: 2px;
+    white-space: nowrap;
+    vertical-align: bottom;
+    
+} 
+td.irregular{
+    border-left: 1px dashed gray; 
+    border-right: 1px solid gray;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    padding: 2px;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+td.noirreg {
+   border-right: 1px solid gray;
+}

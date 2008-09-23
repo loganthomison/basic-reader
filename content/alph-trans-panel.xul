@@ -26,7 +26,12 @@
     
     <popupset id="mainPopupSet">
         <!--ff2: popup type="autocomplete" id="alph-trans-ext-auto-popup"/ -->
-        <!--ff3: panel type="autocomplete" id="alph-trans-ext-auto-popup" noautofocus="true" hidden="true"/ -->
+        <!--popup type="autocomplete" id="alph-trans-ext-auto-popup"/-->
+        <panel 
+            type="autocomplete-richlistbox" 
+            id="alph-trans-ext-auto-popup" 
+            noautofocus="true"/>
+
     </popupset>
     
     <!-- overlay the tools menu -->
@@ -76,12 +81,12 @@
                             tooltiptext="&alpheios.panel.trans.tab.external.url;"
                             autocompletesearch="history"
                             autocompletepopup="alph-trans-ext-auto-popup"
-                            completeselectedindex="false"
-                            disableautocomplete="true"
+                            minResultsForPopup="1"
+                            completeselectedindex="true"
                             tabscrolling="true"
                             showcommentcolumn="true"
-                            showimagecolumn="false"
-                            enablehistory="false"
+                            showimagecolumn="true"
+                            enablehistory="true"
                             maxrows="6"
                             newlines="stripsurroundingwhitespace"
                             oninput=""

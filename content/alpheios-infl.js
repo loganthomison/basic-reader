@@ -182,8 +182,7 @@ Alph.infl = {
         
         var topdoc = window.content.document || window.document;
         var showpofs = a_link_target.showpofs;
-        this.init_table(a_tbl);
-       
+        this.init_table(a_tbl);        
         var suffix_list = 'Inflection endings: ' + a_link_target.suffix_list;
 
         // show the links to the other possible orders
@@ -246,11 +245,12 @@ Alph.infl = {
         window.opener.Alph.util.log("Translation time: " + (end-start));
 
         // for each ending in the table, highlight it if there's a matching suffix
-        // in the link source
+        // in the link source but only if we haven't been asked not to look for matches
         start = end;
 
         if ( a_link_target.suffixes[showpofs] != null 
-             && a_link_target.suffixes[showpofs].length > 0 ) {
+             && a_link_target.suffixes[showpofs].length > 0 
+             && ! a_link_target.suppress_match) {
             var col_parents = [];
             var pre_selected = $("span.selected",a_tbl);
             if (pre_selected.length > 0)
@@ -448,6 +448,77 @@ Alph.infl = {
                     $(text).toggleClass("footnote-visible");
                     return false;
                 }
+            }
+        );
+        
+        // collapse cells with more than 3 endings
+        // TODO - this may only be temporary - experimenting with different approaches
+        $("td",a_tbl).each(
+            function()
+            {
+                var endings = $("span.ending", this);
+                // collapse lists of endings > 3 unless the cell has a highlighted ending,
+                // in which case just display them all
+                if ($(endings).length > 3 && ! $(this).hasClass("highlight-ending") )
+                {
+                    
+                    $(endings).slice(3).each(
+                        function() {
+                            $(this).addClass("ending-collapsed");
+                            $(this).nextAll(".footnote").addClass("ending-collapsed");
+                            $(this).nextAll(".footnote-delimiter").addClass("ending-collapsed");
+                        }  
+                    );
+                                                
+                    // add a toggle item and handler
+                    
+                    var expand = str.getString("alph-infl-expand");
+                    var collapse = str.getString("alph-infl-collapse");
+                    var expand_tip = str.getString("alph-infl-expand-tooltip");
+                    var collapse_tip = str.getString("alph-infl-collapse-tooltip");
+                    
+                    $(this).append("<a class='endings-toggle' title='" 
+                        + expand_tip + "'>" + expand + "</a>");
+                    $(".endings-toggle",this)
+                    .click(
+                        function(e)
+                        {
+                            var toggle = $(this).html();
+                            if (toggle.indexOf(expand) != -1)
+                            {
+                                $(this).html(collapse)
+                                $(this).attr("title",collapse_tip);
+                            }
+                            else 
+                            {
+                                $(this).html(expand);
+                                $(this).attr("title",expand_tip);
+                            }
+                            $(this).siblings(".ending-collapsed").toggleClass("ending-expanded");
+                            return false;
+                        }
+                    );
+                }
+            }
+        );
+        
+        // add a click handler to the reference links
+        $(".alph-reflink",a_tbl).click(
+            function(e) 
+            {
+                var link_target = $(this).attr("href").split(/:/);
+                // only handle grammar links for now
+                // TODO this code will change once we have the real linking architecture
+                if (link_target[0] == 'grammar')
+                {
+                    window.opener.Alph.main.getLanguageTool().openGrammar(null,null,link_target[2]);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+                
             }
         );
     },
