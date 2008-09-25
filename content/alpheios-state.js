@@ -37,7 +37,7 @@ Alph.State = function()
         toggled_by: [Alph.State.SYS_ACTION,true],
         windows: [{}, true],
         panels: [{}, true],
-        xlate_trigger: ['mousemove',true],
+        xlate_trigger: [null,true],
         current_language: ["",true],
         lastElem: [null,false],
         lastSelection: [null,false],

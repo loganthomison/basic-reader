@@ -279,8 +279,6 @@ Alph.main =
         // because it will be called later by the calling toggle method
         this.select_language(a_lang,false);
         
-        this.setXlateTrigger(a_bro,this.getLanguageTool().getpopuptrigger());
-        
         // if local service
         if (this.useLocalDaemon())
         {
@@ -511,6 +509,7 @@ Alph.main =
         {
             Alph.main.ctrlDown = false;
         }
+        return true;
     },
 
     /**
@@ -935,9 +934,10 @@ Alph.main =
     removeXlateTrigger: function(a_bro)
     {
         var trigger = this.getXlateTrigger(a_bro);
-        if (typeof trigger != "undefined")
+        
+        if (trigger != null && typeof trigger != "undefined")
         {
-           a_bro.removeEventListener(trigger,this.doXlateText,false);
+            a_bro.removeEventListener(trigger,this.doXlateText,false);
         }
     },
         
@@ -1133,6 +1133,7 @@ Alph.main =
         {
             // stop the propagation of the event so that it doesn't
             // get called more than once for the browser
+            // TODO - this isn't right .... shouldn't stop the prop of the dom content loaded event
             a_event.stopPropagation();    
         }
         
@@ -1147,7 +1148,7 @@ Alph.main =
             bro.currentURI.spec
             .match(Alph.util.getPref("ped-prototype-match"));
 
-        if (ped_site != null) 
+        if (ped_site != null)
         { 
             var ped_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
             var cur_lang = this.get_state_obj(bro).get_var("current_language");
@@ -1159,7 +1160,8 @@ Alph.main =
                 if (! this.is_enabled(bro))
                 {
                     Alph.util.log("Auto-enabling alpheios for " + ped_lang);
-                    return this.autoToggle(bro,ped_lang);
+                    this.autoToggle(bro,ped_lang);
+                    return;
                 }
                 else if (this.is_enabled(bro) && cur_lang != ped_lang)
                 {
@@ -1175,7 +1177,8 @@ Alph.main =
         // the extension, then disable it again
         else if (this.is_enabled(bro) && ! this.toggled_by_user(bro))
         {
-            return this.autoToggle(bro);
+            this.autoToggle(bro);
+            return;
         }
         
         // notify the pedagogical reader observers
@@ -1218,7 +1221,7 @@ Alph.main =
                 try 
                 {
                     var panel_obj = Alph.main.panels[panel_id];
-                    panel_obj.reset_state(bro)    
+                    panel_obj.reset_state(bro);    
                 } 
                 catch (e)
                 {   

@@ -284,6 +284,10 @@ Alph.xlate = {
             sel.addRange(r);
         }
 
+        // focus on the popup window so that we make sure our event handlers
+        // are going to be invoked (i.e. if a textbox elsewhere is focused, the keydown
+        // event listener might be hijacked) See Bug 149.
+        Alph.$("#alph-window-anchor",a_topdoc).focus();
         Alph.main.broadcast_ui_event();
         // TODO - we probably should reposition the popup now that we 
         // know it's final size
@@ -362,7 +366,12 @@ Alph.xlate = {
                     }
                 );
             }
-
+            
+            var anchor = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
+                                                 "a");
+            anchor.setAttribute("name","alph-window-anchor");
+            anchor.setAttribute("id","alph-window-anchor");
+            popup.appendChild(anchor);
         }
 
         popup.style.width = "auto";
