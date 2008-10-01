@@ -22,6 +22,13 @@
 
     <xsl:template match="word">
         <div class="alph-word">
+            <!-- set context to word form if present -->
+            <xsl:if test="form">
+              <xsl:attribute name="context">
+                <xsl:value-of select="form"/>
+              </xsl:attribute>
+            </xsl:if>
+          
             <!-- sort entries by decreasing frequency of occurrence -->
             <!-- and then by part of speech -->
             <!-- arbitrarily choosing the first in the rare case where multiple dict elements exist -->
