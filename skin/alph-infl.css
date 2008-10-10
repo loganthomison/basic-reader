@@ -113,6 +113,10 @@ tr.data-row th {
    border-right: none;
 }
 
+tr.data-row th.rowgroupheader {
+    border-right: 1px solid gray;
+}
+
 tr.group1row td {
     border-left: none;
     border-right: none;    
@@ -224,7 +228,7 @@ td {
     display: none;
 }
 
-.ending-expanded {
+.ending-collapsed.ending-expanded {
     display: inline;
 }
 

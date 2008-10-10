@@ -217,6 +217,7 @@ Alph.infl = {
         }
         wordlist = wordlist.replace(/\,\s$/,'');
         
+        // TODO -- should fix the XSLT to populate this instead
         $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
 
         // replace the table header text
@@ -326,8 +327,8 @@ Alph.infl = {
             }
 
             // if we couldn't find any of the suffixes in the table
-            // just expand the whole thing
-            if (sib_cols.length == 0)
+            // or we should expand anyway, expand the whole thing
+            if (sib_cols.length == 0 || a_link_target.always_expand)
             {
                 Alph.infl.expand_table(a_tbl,topdoc);
             }
@@ -450,58 +451,7 @@ Alph.infl = {
                 }
             }
         );
-        
-        // collapse cells with more than 3 endings
-        // TODO - this may only be temporary - experimenting with different approaches
-        $("td",a_tbl).each(
-            function()
-            {
-                var endings = $("span.ending", this);
-                // collapse lists of endings > 3 unless the cell has a highlighted ending,
-                // in which case just display them all
-                if ($(endings).length > 3 && ! $(this).hasClass("highlight-ending") )
-                {
-                    
-                    $(endings).slice(3).each(
-                        function() {
-                            $(this).addClass("ending-collapsed");
-                            $(this).nextAll(".footnote").addClass("ending-collapsed");
-                            $(this).nextAll(".footnote-delimiter").addClass("ending-collapsed");
-                        }  
-                    );
-                                                
-                    // add a toggle item and handler
-                    
-                    var expand = str.getString("alph-infl-expand");
-                    var collapse = str.getString("alph-infl-collapse");
-                    var expand_tip = str.getString("alph-infl-expand-tooltip");
-                    var collapse_tip = str.getString("alph-infl-collapse-tooltip");
-                    
-                    $(this).append("<a class='endings-toggle' title='" 
-                        + expand_tip + "'>" + expand + "</a>");
-                    $(".endings-toggle",this)
-                    .click(
-                        function(e)
-                        {
-                            var toggle = $(this).html();
-                            if (toggle.indexOf(expand) != -1)
-                            {
-                                $(this).html(collapse)
-                                $(this).attr("title",collapse_tip);
-                            }
-                            else 
-                            {
-                                $(this).html(expand);
-                                $(this).attr("title",expand_tip);
-                            }
-                            $(this).siblings(".ending-collapsed").toggleClass("ending-expanded");
-                            return false;
-                        }
-                    );
-                }
-            }
-        );
-        
+
         // add a click handler to the reference links
         $(".alph-reflink",a_tbl).click(
             function(e) 
@@ -521,6 +471,112 @@ Alph.infl = {
                 
             }
         );
+        // add a toggle to show the stem classes
+        var show_stem = str.getString("alph-infl-show-stem"); 
+        var hide_stem = str.getString("alph-infl-hide-stem");
+        $("div.stem-classes",a_tbl).wrapAll('<div class="stem-classes-toggle/>');        
+        $("div.stem-classes-toggle",a_tbl).prepend('<a href="#stem-classes">' + show_stem + '</a>').click(
+            function() {
+                $("div.stem-classes",this).toggleClass("show-stem");
+                if ($("a",this).html().indexOf(show_stem) == -1)
+                {
+                    $("a"),this.html(show_stem);
+                }
+                else
+                {
+                    $("a"),this.html(hide_stem);
+                }
+            }
+        );
+        // add a toggle item and handler     
+        var expand = str.getString("alph-infl-expand");
+        var collapse = str.getString("alph-infl-collapse");
+        var expand_tip = str.getString("alph-infl-expand-tooltip");
+        var collapse_tip = str.getString("alph-infl-collapse-tooltip");
+                
+        var collapse_index = {};
+        var collapsed = window.opener.Alph.main.getLanguageTool().handleInflectionDisplay(a_tbl,str);
+        if (typeof collapsed != "undefined")
+        {
+            for (var i=0; i<collapsed.length; i++)
+            {
+                var index = $(collapsed[i]).get(0).realIndex;
+                if (typeof collapse_index[index] == "undefined")
+                {
+                    window.opener.Alph.util.log("Collapse index " + index);
+                    $("tr#headerrow2 th[realIndex='" + index + "']",a_tbl)
+                        .append("<a class='endings-toggle' title='" 
+                            + expand_tip + "'>" + expand + "</a>");
+                    collapse_index[index] = 1;    
+                }
+                
+            }
+        }
+        $(".endings-toggle",a_tbl).click(
+            function(e)
+            {
+                var toggle = $(this).html();
+                if (toggle.indexOf(expand) != -1)
+                {
+                    $(this).html(collapse)
+                    $(this).attr("title",collapse_tip);
+                }
+                else 
+                {
+                    $(this).html(expand);
+                    $(this).attr("title",expand_tip);
+                }
+                var index = $(this).parent("th").get(0).realIndex;
+                var cell_span = $(this).parent("th").attr("colspan");
+                if (cell_span == null || cell_span == '') 
+                {
+                    cell_span = 1;
+                }
+                for (var i=0; i<cell_span; i++) {
+                    $("td[realIndex='" + (index + i) + "'] .ending.ending-collapsed",a_tbl).each(
+                        function()
+                        {
+                            $(this).toggleClass("ending-expanded");
+                            var ending_index = $(this).attr("ending-index");
+                            $(this).nextAll("[ending-index='" + ending_index +"']").toggleClass("ending-expanded");
+                        }
+                    );
+                                        
+                }
+                Alph.infl.resize_window(topdoc);
+                return false;
+            }
+        );
+
+        var start = (new Date()).getTime();
+        var data_rows = $("tr.data-row",a_tbl).length;
+        var empty_cols = [];
+        // iterate through the columns, hiding any which are completely empty
+        $("col",a_tbl).each (
+          function() {
+            var index = $(this).attr("realIndex");
+            var num_empty = $("td[realIndex='" + index + "'] span.emptycell",a_tbl).length;
+            if (num_empty == data_rows) 
+            {
+                window.opener.Alph.util.log(num_empty + " cells in col " + index);
+                empty_cols.push(index);    
+            }
+  
+          }
+        );
+        
+        empty_cols.forEach( 
+            function(a_o, a_i)
+            {
+                window.opener.Alph.util.log("Hiding column " + a_o);
+                $("td[realIndex='" + a_o + "']",a_tbl).addClass("emptycol")
+                $("th[realIndex='" + a_o + "']",a_tbl).addClass("emptycol");
+            }
+        );
+        
+        var end = (new Date()).getTime();
+        window.opener.Alph.util.log("Hiding time: " + (end-start));
+
     },
     
     /**
@@ -611,5 +667,4 @@ Alph.infl = {
         // return true to allow event propogation if needed
         return true;
     }
-    
 };

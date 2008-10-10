@@ -929,3 +929,8 @@ Alph.LanguageTool.prototype.getIndexFile = function(a_docid)
     var chromepkg = this.getchromepkg();
     return "chrome://" + chromepkg + "/content/index_files/" + a_docid;
 };
+
+Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
+{
+  // default does nothing   
+};

@@ -24,3 +24,47 @@ td.irregular{
 td.noirreg {
    border-right: 1px solid gray;
 }
+
+td.emptycol {
+    visibility: hidden; 
+    max-width: 0px;
+    border-right: 0;
+    border-left: 0;
+    
+}
+
+#headerrow2 .emptycol {
+    visibility: hidden;
+    max-width: 0px;
+    border-right: 0;
+    border-left: 0;
+}
+
+.stem-classes {
+    display: none;
+}
+
+.stem-class {
+    font-weight: normal;
+    font-size: 90%;
+}
+
+.stem-class.highlight-ending {
+    background-color: yellow;
+}
+
+.show-stem {
+    display: inline;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100px;
+    overflow: scroll;
+    color: black;
+    padding: 2px;
+    font-weight: normal;
+    border: 1px solid #BBC !important;
+    background-color: #F0F7FF;
+    white-space: normal;
+}
+
