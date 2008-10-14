@@ -480,11 +480,11 @@ Alph.infl = {
                 $("div.stem-classes",this).toggleClass("show-stem");
                 if ($("a",this).html().indexOf(show_stem) == -1)
                 {
-                    $("a"),this.html(show_stem);
+                    $("a",this).html(show_stem);
                 }
                 else
                 {
-                    $("a"),this.html(hide_stem);
+                    $("a",this).html(hide_stem);
                 }
             }
         );
@@ -503,7 +503,6 @@ Alph.infl = {
                 var index = $(collapsed[i]).get(0).realIndex;
                 if (typeof collapse_index[index] == "undefined")
                 {
-                    window.opener.Alph.util.log("Collapse index " + index);
                     $("tr#headerrow2 th[realIndex='" + index + "']",a_tbl)
                         .append("<a class='endings-toggle' title='" 
                             + expand_tip + "'>" + expand + "</a>");
@@ -558,7 +557,6 @@ Alph.infl = {
             var num_empty = $("td[realIndex='" + index + "'] span.emptycell",a_tbl).length;
             if (num_empty == data_rows) 
             {
-                window.opener.Alph.util.log(num_empty + " cells in col " + index);
                 empty_cols.push(index);    
             }
   
@@ -568,7 +566,6 @@ Alph.infl = {
         empty_cols.forEach( 
             function(a_o, a_i)
             {
-                window.opener.Alph.util.log("Hiding column " + a_o);
                 $("td[realIndex='" + a_o + "']",a_tbl).addClass("emptycol")
                 $("th[realIndex='" + a_o + "']",a_tbl).addClass("emptycol");
             }
