@@ -617,7 +617,14 @@ Alph.xlate = {
         var topdoc = a_node || this.getLastDoc();
         Alph.$("#alph-window",topdoc).css("display","none");
         Alph.$("#alph-text",topdoc).remove();
-        topdoc.defaultView.getSelection().removeAllRanges();
+        try {
+            topdoc.defaultView.getSelection().removeAllRanges();
+        } catch(a_e)
+        {
+            //TODO sometimes we get a null defaultView. Need to figure
+            // out why and fix, rather than just logging it.
+            Alph.util.log("no default view");
+        }
         
         // remove the last word from the state
         var alph_state = Alph.main.get_state_obj();

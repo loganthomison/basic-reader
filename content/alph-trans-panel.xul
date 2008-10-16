@@ -14,6 +14,9 @@
                      disabled="true"
                      checked="false"
                      class="alpheios-enabled-notifier" />
+        <broadcaster id="alph-trans-inter-status"
+                     disabled="true" 
+                     class="alpheios-pedagogical-notifier" />
     </broadcasterset>
 
     <!-- overlay the main command set -->
@@ -22,6 +25,10 @@
             id="alpheios-trans-toggle-cmd" 
             oncommand="Alph.main.toggle_panel(event,'alph-trans-panel');"
             observes="alph-trans-status"/>
+        <command 
+            id="alpheios-trans-toggle-inter-cmd" 
+            oncommand="Alph.Translation.toggle_interlinear(event);"
+            observes="alph-trans-inter-status"/>
     </commandset>    
     
     <popupset id="mainPopupSet">
@@ -105,6 +112,12 @@
                     
                 </tabpanels>
             </tabbox>
+               <menuitem id="alpheios-trans-opt-inter" 
+                  label="&alpheios.panel.trans.opt.inter;"  
+                  command="alpheios-trans-toggle-inter-cmd"
+                  disabled="true"
+                  type="checkbox"
+                  class="menuitem-iconic"/>
         </alpheiosPanel>
     </vbox>
 </overlay>

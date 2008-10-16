@@ -36,7 +36,7 @@ if (typeof Alph == "undefined") {
     // in which case it might be sufficient to skip the extreme flag
     Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
           .getService(Components.interfaces.mozIJSSubScriptLoader)
-          .loadSubScript("chrome://alpheios/content/jquery-1.2.1.min.js", Alph);
+          .loadSubScript("chrome://alpheios/content/jquery-1.2.6.min.js", Alph);
     Alph.$ = jQuery.noConflict(true);
 }
 

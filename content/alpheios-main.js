@@ -1156,6 +1156,9 @@ Alph.main =
             // if we support this language automatically setup the extension for it
             if (typeof Alph.Languages[ped_lang] != "undefined")
             {
+                // setup the prototype display
+                Alph.pproto.setup_display(bro.contentDocument);
+                
                 // if Alpheios is not enabled, auto-enable it
                 if (! this.is_enabled(bro))
                 {
@@ -1163,6 +1166,7 @@ Alph.main =
                     this.autoToggle(bro,ped_lang);
                     return;
                 }
+                // if alpheios is enabled set to the right language for the prototype
                 else if (this.is_enabled(bro) && cur_lang != ped_lang)
                 {
                     Alph.util.log("Auto-switching alpheios to " + ped_lang);
@@ -1170,7 +1174,7 @@ Alph.main =
                     // select_language calls onTabSelect which will re-call reset_state
                     return;  
                 }
-                        // if alpheios is enabled set to the right language for the prototype
+                        
             }
         }
         // if we're not on a pedagogical site but were and system automatically enabled 

@@ -23,6 +23,7 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-src-select.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-linking.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-prototype.js" />
 
     <broadcasterset id="mainBroadcasterSet">
         <broadcaster id="alpheios-inflect"

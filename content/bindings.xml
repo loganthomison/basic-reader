@@ -20,7 +20,9 @@
                         type="menu" 
                         class="toolbarbutton-class" 
                         label="&alpheios.panel.options;">
-                        <xul:menupopup anonid="panelOptionsPopup"/>
+                        <xul:menupopup anonid="panelOptionsPopup">
+                            <children includes="menuitem"/>
+                        </xul:menupopup>
                     </xul:toolbarbutton>
                     <xul:toolbarbutton 
                         anonid="panelCloseButton" 

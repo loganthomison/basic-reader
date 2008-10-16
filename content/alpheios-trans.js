@@ -66,6 +66,11 @@ Alph.Translation.prototype.show = function()
         // if we don't have a pedagogical translation, just set the external translation tab
         // as the selected tab
         Alph.$("#alph-trans-tab-external",tab_box).click();
+        // HACK - disable the interlinear options menu
+        // TODO - this should observe the pedagogical-reader-notifier broadcaster
+        // but it isn't -- maybe because it's defined in a custom element. Need
+        // too fix this.
+        Alph.$("#alpheios-trans-opt-inter").attr("disabled",true);
     }
     else
     {
@@ -87,9 +92,21 @@ Alph.Translation.prototype.show = function()
                 success: function(data, textStatus) 
                 {
                     Alph.$("body",trans_doc).html(data);
+                    
+                    // setup the display
+                    Alph.pproto.setup_display(trans_doc);
+                    
+                    // setup for interlinear
+                    Alph.pproto.add_interlinear(bro.contentDocument,trans_doc);
+                    
+                    // toggle the state of the interlinear display
+                    // according to the selected state of the menu item
+                    Alph.Translation.toggle_interlinear();
+                    
                     // TODO - need to take state into account
                     // (i.e. if user chose a different tab)
                     Alph.$("#alph-trans-tab-primary",tab_box).click();
+                    
                 } 
             }   
         );
@@ -162,4 +179,71 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
     {
         a_urlbar.value ="";
     }
+};
+
+/**
+ * Static helper method to toggle the selection of the source and parallel 
+ * aligned text
+ * @param {Element} a_elem the HTML element which contains the word for which
+ *                         to show the alignment
+ */
+Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem)
+{
+    
+    // the source text element uses the "ref" attribute to identify the
+    // corresponding element(s) in the parallel aligned translation
+    if (Alph.$(a_elem).attr("ref"))
+    {
+        var tab_box = Alph.$("tabbox",this.panel_elem).get(0);    
+        var browser_box = Alph.$("#alph-trans-panel-primary",tab_box); 
+        var trans_doc = 
+            Alph.$("browser",browser_box).get(0).contentDocument;
+     
+        var ids = Alph.$(a_elem).attr("ref").split(/\s/);
+        for (var i=0; i<ids.length; i++) {
+            Alph.$('.alph-proto-word[id="' + ids[i] + '"]',trans_doc)
+                .toggleClass("alph-highlight-parallel");    
+        }
+    }
+    // if the user is mousing over the the parallel aligned translation
+    // use the id attribute to find out which elements in the source
+    // text refer to the selected word
+    else if (Alph.$(a_elem).attr("id")) 
+    {
+        var parent_doc = Alph.main.getCurrentBrowser().contentDocument;
+        var match_id = Alph.$(a_elem).attr("id");
+        // find the aligned words in the parallel text
+        Alph.$('.alph-proto-word[ref~="' + match_id + '"]',parent_doc).each(
+            function()
+            {
+                var ids = Alph.$(this).attr("ref").split(/\s/);
+                for (var i=0; i<ids.length; i++) {
+                   if (ids[i] == match_id)
+                   {
+                        Alph.$(this).toggleClass("alph-highlight-parallel");
+                        break;
+                   }
+               }
+            }
+        );             
+
+    }  
+};
+
+/**
+ * Static helper method to toggle the display state of the interlinear
+ * alignment in the source text.  This method is invoked by the command 
+ * which responds to selection of the Interlinear Translation item in the
+ * Options menu 
+ */
+Alph.Translation.toggle_interlinear = function(a_event)
+{
+    var parent_doc = Alph.main.getCurrentBrowser().contentDocument;
+    if (Alph.$("#alpheios-trans-opt-inter").attr('checked') == 'true')
+    {
+        Alph.$(".alph-proto-iltrans",parent_doc).css('display','block');
+    } else {
+        Alph.$(".alph-proto-iltrans",parent_doc).css('display','none');
+    }
+    Alph.pproto.resize_interlinear(parent_doc);  
 };
