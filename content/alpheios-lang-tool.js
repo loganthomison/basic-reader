@@ -592,8 +592,11 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
         "click", 
         function(a_e)
         {
-            var rp = a_e.rangeParent;
-            var ro = a_e.rangeOffset;
+            // jquery Event API was changed in 1.2.2. Use the original
+            // Event object to access the rangeParent and Offset
+            var o_e = a_e.originalEvent;
+            var rp = o_e.rangeParent;
+            var ro = o_e.rangeOffset;
             var range = document.createRange();
             range.selectNode(rp);
 
@@ -619,7 +622,7 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
                     target += "-" + rngContext.split(/-/)[0];
                 }
     
-                myobj.openGrammar(a_e,range.startContainer,target);
+                myobj.openGrammar(o_e,range.startContainer,target);
             }            
          }
      );
