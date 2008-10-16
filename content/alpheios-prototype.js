@@ -154,7 +154,7 @@ Alph.pproto = {
                     {
                         accum_width = accum_width + Alph.$(this).outerWidth(true);
                         
-                        if (accum_width > (p_width)) {
+                        if (accum_width > (p_width - 50)) {
                             
                             Alph.$(this).before("<br class='alph-proto-spacer' clear='all'/>");
                             accum_width = Alph.$(this).outerWidth(true);
