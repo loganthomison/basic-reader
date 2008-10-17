@@ -696,6 +696,7 @@ Alph.xlate = {
      *                              a_start_call callback
      *  @param {function} a_load_call optional callback to be installed as an
      *                                onload event handler in the new window
+     *  @return the window 
      */
     openSecondaryWindow: function(
         a_name,
@@ -713,10 +714,11 @@ Alph.xlate = {
         // it doesn't seem possible to reset the window.arguments
         // so if arguments are being passed to the new window,
         // just proceed as if opening a new window
-
-        var a_window =
-            Alph.main.getCurrentBrowser().
-                alpheios.windows[a_name];
+        var windows = 
+            Alph.main.get_state_obj(Alph.main.getCurrentBrowser())
+            .get_var("windows");
+        
+        var a_window = windows[a_name];
                 
         // if the window exists already, is open, has the same location
         // and an update_args_callback property has been added to 
@@ -891,8 +893,8 @@ Alph.xlate = {
         // now focus the window
         a_window.focus();
         Alph.util.log("Secondary window should have focus at "+ a_url);
-        Alph.main.getCurrentBrowser().
-            alpheios.windows[a_name] = a_window;
+        windows[a_name] = a_window;
+        return a_window;
     },
 
     /**

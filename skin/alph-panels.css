@@ -2,7 +2,7 @@
     width: 400px;
 }
 
-#alph-morph-panel {
+#alph-morph-panel, #alph-tree-panel {
     height: 100px;
 }
 
@@ -16,6 +16,11 @@
 #alph-morph-body {
     height: 100%;
     width: 50%;
+}
+
+#alpheios-morph-inflection {
+    text-decoration: underline;
+    color: blue;
 }
 
 #alph-dict-body {

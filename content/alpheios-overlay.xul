@@ -2,8 +2,11 @@
 
 <!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd">
 
+<?xml-stylesheet href="chrome://alpheios/content/bindings.css"?>
+
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
+<?xul-overlay href="chrome://alpheios/content/alpheios-tree-panel.xul"?>
 
 
 <overlay id="alpheios" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -196,8 +199,19 @@
     </toolbarpalette>
     
     <vbox id="appcontent">
-        <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-splitter"/>
-        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel"/>
+        <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-section"/>
+        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">
+            <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
+                <splitter id="alph-tree-splitter" collapsed="false" class="alph-panel-splitter"/>
+                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
+                      collapsed="true"/>
+                <splitter/>
+                <spacer flex="1"/>
+            </hbox>
+            <splitter id="alph-tree-lexicon-splitter" collapsed="true" class="alph-panel-splitter"/>
+            <hbox id="alph-lexicon-box" class="alph-panel" flex="1" 
+                  persist="height" collapsed="true"/>
+        </vbox>
     </vbox>
     
     <tabbrowser id="content">

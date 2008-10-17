@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alph-toolbar.css" type="text/css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alph-panels.css" type="text/css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd"
+[<!ENTITY % treeDTD SYSTEM "chrome://alpheios/locale/alpheios-tree.dtd" >
+%treeDTD;
+]>
+
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    
+    <script type="application/x-javascript" 
+            src="chrome://alpheios/content/alpheios-tree.js" />
+
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="alph-tree-status"
+                     checked="false"
+                     disabled="true" 
+                     class="alpheios-pedagogical-notifier"/>
+    </broadcasterset>
+
+    <commandset id="mainCommandSet">
+        <command id="alpheios-tree-toggle-cmd" 
+             oncommand="Alph.main.toggle_panel(event,'alph-tree-panel');"
+             observes="alph-tree-status" />
+    </commandset>
+             
+    <!-- overlay the tools menu -->
+    <menupopup id="alpheios-tools-popup">
+        <menuitem
+            id="alpheios-tree-toggle"
+            type="checkbox"
+            label="&alpheios-tools-tree-label;"
+            command="alpheios-tree-toggle-cmd"
+            tooltiptext="&alpheios-tools-tree-tooltip;"
+            class="menuitem-iconic" />
+    </menupopup>
+
+    <!-- overlay the bottom panel -->
+    <hbox id="alph-tree-box">
+        <alpheiosPanel 
+                    flex="1" 
+                    id="alph-tree-panel" 
+                    notifier="alph-tree-status"
+                    paneltype="Tree"
+                    panelorient="vertical">
+                    <toolbaritem id="alpheios-tree-panel-label">
+                        <label id="alph-tree-label" 
+                               value="&alpheios-tree-toolbar-label;"/>
+                    </toolbaritem>
+                    <browser
+                        id="alph-tree-body"
+                        flex="1"
+                        type="content"
+                        src="chrome://alpheios/content/html/alph-panel.html"/>
+        </alpheiosPanel>
+    </hbox>
+      
+</overlay>

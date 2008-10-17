@@ -25,6 +25,10 @@
                         </xul:menupopup>
                     </xul:toolbarbutton>
                     <xul:toolbarbutton 
+                        anonid="panelDetachButton" 
+                        class="alph-detach-button"
+                        tooltiptext="&alpheios.panel.detach;"/>
+                    <xul:toolbarbutton 
                         anonid="panelCloseButton" 
                         class="alph-close-button"
                         tooltiptext="&alpheios.panel.close;"/>
@@ -46,8 +50,34 @@
                 document.getAnonymousElementByAttribute(this, "anonid", "panelCloseButton");
             this.closeButton.setAttribute("oncommand",
                 "Alph.main.toggle_panel(event,'" + this.panel_id + "')");
-            Alph.main.panelBound(this);
-        ]]></constructor>
+            this.detachButton =
+                document.getAnonymousElementByAttribute(this, "anonid", "panelDetachButton");
+            this.detachButton.setAttribute("oncommand", 
+                "document.getElementById('" + this.panel_id + "').toggle_detach()");
+            if (typeof Alph.main != 'undefined')
+            {
+                Alph.main.panelBound(this);
+            }
+            else
+            {
+                this.detachButton.setAttribute("hidden","true");
+                this.closeButton.setAttribute("hidden","true");
+            }
+            ]]></constructor>
+            <method name="toggle_detach">
+                <body><![CDATA[
+            var panelObj;
+            if (typeof Alph.main != "undefined")
+            {
+                panelObj = Alph.main.panels[this.panel_id];
+                if (typeof panelObj != "undefined")
+                {
+                    panelObj.detach();
+                }
+            }
+            ]]></body>
+            </method>
+            
         </implementation>
     </binding>
     

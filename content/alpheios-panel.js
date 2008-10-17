@@ -34,8 +34,10 @@ Alph.Panel = function(a_panel)
 {
     this.panel_elem = a_panel;
     this.panel_id = Alph.$(a_panel).attr("id");
-    this.parent_box = Alph.$(this.panel_elem).parent("vbox")[0];
+    this.parent_box = Alph.$(this.panel_elem).parent(".alph-panel")[0];
+    this.section_parent = Alph.$(this.panel_elem).parents(".alph-panel-section");
     this.notifier = Alph.$(this.panel_elem).attr("notifier");
+    this.panel_window = null;
     
 };
 
@@ -140,22 +142,72 @@ Alph.Panel.prototype.reset_state = function(a_bro)
 Alph.Panel.prototype.update_status = function(a_status)
 {
  
-    var parent_splitter = this.parent_box.previousSibling;
+    var parent_splitter = this.parent_box.previousSibling; 
     var notifier = Alph.$("#" + this.notifier);
     // uncollapse parent box and parent's sibling splitter
     // update notifier
-    if (a_status == Alph.Panel.STATUS_SHOW)
+    // but not if we're just detaching the panel (in which case
+    // panel_window will be non null)
+    if (a_status == Alph.Panel.STATUS_SHOW && this.panel_window == null)
     {
         Alph.$(this.parent_box).attr("collapsed",false);
         Alph.$(parent_splitter).attr("collapsed",false);
         Alph.$(notifier).attr("checked", "true");
+        // make sure any section parents are also expanded
+        Alph.$(this.section_parent).each(
+            function() {
+                Alph.$(this).attr("collapsed",false);
+                var splitter = Alph.$(this).prev("splitter");
+                if (splitter.length > 0)
+                {
+                    Alph.$(splitter).attr("collapsed",false);
+                }
+
+            }
+        ); 
+    
     }
     else
     {
         Alph.$(this.parent_box).attr("collapsed",true);
-        Alph.$(parent_splitter).attr("collapsed",true);       
-        Alph.$(notifier).attr("checked", "false");
+        Alph.$(parent_splitter).attr("collapsed",true);
+        // collapse the containing parent panel sections only 
+        // if all the panels in it are now collapsed
+
+        Alph.$(this.section_parent).each(
+            function() {
+                var still_open = 0;   
+                Alph.$(".alph-panel",this).each(
+                    function() {
+                        if (this.getAttribute("collapsed") == 'false')
+                        {
+                            still_open = still_open + 1;
+                            
+                        }
+                    }
+                ); 
+                if (still_open == 0)
+                {
+                    Alph.$(this).attr("collapsed",true);
+                    var splitter = Alph.$(this).prev("splitter");
+                    if (splitter.length > 0)
+                    {
+                        Alph.$(splitter).attr("collapsed",true);
+                    }
+                }
+            }
+        ); 
+             
+        
+        // update the state of the checkbox only if we're hiding the panel
+        // rather than detaching it (in which case we have STATUS_SHOW)
+        if (a_status == Alph.Panel.STATUS_HIDE)
+        {
+            Alph.$(notifier).attr("checked", "false");
+        }
     }
+    
+    
     // update the browser state object to reflect the current
     // panel status
     var bro = Alph.main.getCurrentBrowser();
@@ -192,6 +244,44 @@ Alph.Panel.prototype.show = function()
     return Alph.Panel.STATUS_SHOW;
         
 };
+
+/**
+ * Detach the panel (in the 'SHOW' state only)
+ */
+Alph.Panel.prototype.detach = function()
+{   
+    var chrome_url = this.get_detach_chrome();
+    if (chrome_url == null)
+    {
+        alert("Detach not yet supported for this panel.");
+        return;
+    }
+    try {
+        this.panel_window = 
+            Alph.xlate.openSecondaryWindow(
+                this.panel_id,
+                chrome_url
+            );
+    } catch(a_e) 
+    {
+        Alph.util.log("Error detaching panel: " + a_e);
+    }
+    this.update_status(Alph.Panel.STATUS_SHOW);
+};
+
+
+/**
+ * Restore the panel to it's inline SHOW state
+ */
+Alph.Panel.prototype.restore = function()
+{
+    if (this.panel_window != null)
+    {
+        this.panel_window.close();
+        this.panel_window = null;          
+    }
+    this.update_status(this.show());
+}
 
 /**
  * Hide (close) the panel.
@@ -307,3 +397,14 @@ Alph.Panel.prototype.get_status_pref_setting = function()
     }
     return status_pref; 
 };
+
+/**
+ * Get the chrome url for the detached version of the panel
+ * @return chrome url string
+ * @type String
+ */
+Alph.Panel.prototype.get_detach_chrome = function()
+{
+    // default returns null
+    return null;   
+}

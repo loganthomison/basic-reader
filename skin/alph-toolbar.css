@@ -10,3 +10,15 @@ toolbarbutton.alph-close-button:active {
     list-style-image: url("chrome://alpheios/skin/closeActive.png");
 }
 
+toolbarbutton.alph-detach-button {
+    list-style-image: url("chrome://alpheios/skin/detach.png");
+}
+
+toolbarbutton.alph-detach-button:hover {
+    list-style-image: url("chrome://alpheios/skin/detachHover.png");
+}
+
+toolbarbutton.alph-detach-button:active {
+    list-style-image: url("chrome://alpheios/skin/detachActive.png");
+}
+

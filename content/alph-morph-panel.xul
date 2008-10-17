@@ -37,42 +37,42 @@
     </menupopup>
 
     <!-- overlay the bottom panel -->
-    <vbox id="alph-bottom-panel" collapsed="true">
-        <alpheiosPanel 
-            flex="1" 
-            id="alph-morph-panel" 
-            notifier="alph-morph-status"
-            paneltype="Morph"
-            panelorient="horizontal">
-            <toolbaritem id="alpheios-morph-panel-label">
-                <label id="alph-morph-label" 
-                       value="&alpheios-morph-toolbar-label;"/>
-            </toolbaritem>
-            <toolbaritem id="alpheios-lookup-text-tbitem">
-                <textbox id="alpheios-lookup-text"
-                    command="alpheios-lookup-cmd"
-                    onkeypress="Alph.main.do_tb_lookup(event)"
-                    tooltiptext="&alpheios-morph-lookup-tooltip;"/>
-            </toolbaritem>
-            <toolbarbutton 
-                id="alpheios-morph-inflection" 
-                class="toolbarbutton-class"
-                label="&alpheios-tools-inflect-label;" 
-                tooltiptext="&alpheios-tools-inflect-label;"
-                type="button"
-                command="alpheios-morph-inflect-cmd"/>
-            <browser
-                id="alph-morph-body"
-                flex="1"
-                type="content"
-                src="chrome://alpheios/content/alph-morph.html"
-                class="alph-lexicon-output"/>
-            <splitter id="alph-morph-box-splitter" collapsed="false"/>
-            <browser 
-                id="alph-dict-body"
-                flex="1"
-                src="chrome://alpheios/content/alph-dict.html" 
-                class="alph-lexicon-output"/>
-        </alpheiosPanel>
-    </vbox>  
+    <hbox id="alph-lexicon-box">
+            <alpheiosPanel 
+                flex="1" 
+                id="alph-morph-panel" 
+                notifier="alph-morph-status"
+                paneltype="Morph"
+                panelorient="horizontal">
+                <toolbaritem id="alpheios-morph-panel-label">
+                    <label id="alph-morph-label" 
+                           value="&alpheios-morph-toolbar-label;"/>
+                </toolbaritem>
+                <toolbaritem id="alpheios-lookup-text-tbitem">
+                    <textbox id="alpheios-lookup-text"
+                        command="alpheios-lookup-cmd"
+                        onkeypress="Alph.main.do_tb_lookup(event)"
+                        tooltiptext="&alpheios-morph-lookup-tooltip;"/>
+                </toolbaritem>
+                <toolbarbutton 
+                    id="alpheios-morph-inflection" 
+                    class="toolbarbutton-class"
+                    label="&alpheios-tools-inflect-label;" 
+                    tooltiptext="&alpheios-tools-inflect-label;"
+                    type="button"
+                    command="alpheios-morph-inflect-cmd"/>
+                <browser
+                    id="alph-morph-body"
+                    flex="1"
+                    type="content"
+                    src="chrome://alpheios/content/alph-morph.html"
+                    class="alph-lexicon-output"/>
+                <splitter id="alph-morph-box-splitter" collapsed="false"/>
+                <browser 
+                    id="alph-dict-body"
+                    flex="1"
+                    src="chrome://alpheios/content/alph-dict.html" 
+                    class="alph-lexicon-output"/>
+            </alpheiosPanel>
+    </hbox>  
 </overlay>
