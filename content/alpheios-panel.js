@@ -144,6 +144,16 @@ Alph.Panel.prototype.update_status = function(a_status)
  
     var parent_splitter = this.parent_box.previousSibling; 
     var notifier = Alph.$("#" + this.notifier);
+    
+    // update the browser state object to reflect the new
+    // panel status
+    // NOTE - do this before changing the state of the panels
+    // so that any event handlers which need to know the new
+    // state get the correct value from the state object
+    var bro = Alph.main.getCurrentBrowser();
+    var panel_state = this.get_browser_state(bro);
+    panel_state.status = a_status;
+
     // uncollapse parent box and parent's sibling splitter
     // update notifier
     // but not if we're just detaching the panel (in which case
@@ -199,20 +209,21 @@ Alph.Panel.prototype.update_status = function(a_status)
         ); 
              
         
-        // update the state of the checkbox only if we're hiding the panel
-        // rather than detaching it (in which case we have STATUS_SHOW)
         if (a_status == Alph.Panel.STATUS_HIDE)
         {
+            // update the state of the checkbox only if we're hiding the panel
+            // rather than detaching it (in which case we have STATUS_SHOW)
             Alph.$(notifier).attr("checked", "false");
+            // if the panel is detached, close it 
+            if (this.panel_window != null && ! this.panel_window.closed )
+            {
+                this.panel_window.close();
+                this.panel_window = null;
+                // TODO - need to figure out how we want to handle detached panels
+                // across multiple tabs
+            }
         }
     }
-    
-    
-    // update the browser state object to reflect the current
-    // panel status
-    var bro = Alph.main.getCurrentBrowser();
-    var panel_state = this.get_browser_state(bro);
-    panel_state.status = a_status;
     
     // if we're responding to a user request, store the new
     // status as the default status for the panel
@@ -271,16 +282,22 @@ Alph.Panel.prototype.detach = function()
 
 
 /**
- * Restore the panel to it's inline SHOW state
+ * Restore the panel to the current inline state
  */
 Alph.Panel.prototype.restore = function()
 {
+    // Close the window if it's not already
     if (this.panel_window != null)
     {
-        this.panel_window.close();
+        if (! this.panel_window.closed) 
+        { 
+            this.panel_window.close();
+        }
         this.panel_window = null;          
     }
-    this.update_status(this.show());
+    
+    var panel_state = this.get_browser_state(Alph.main.getCurrentBrowser());
+    this.update_status(panel_state.status);
 }
 
 /**
@@ -318,16 +335,17 @@ Alph.Panel.prototype.hide = function(a_autoflag)
  */
 Alph.Panel.prototype.toggle = function()
 {
-  var status = Alph.$(this.parent_box).attr("collapsed");
-  if (status == "true")
-  {
-    this.update_status(this.show());
-  }
-  else
-  { 
-    this.update_status(this.hide());
-  }
+    var bro = Alph.main.getCurrentBrowser();
+    var panel_state = this.get_browser_state(bro);
     
+    if (panel_state.status == Alph.Panel.STATUS_SHOW)
+    {
+        this.update_status(this.hide());
+    }
+    else
+    { 
+        this.update_status(this.show());
+    }
 };
 
 /**

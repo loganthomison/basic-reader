@@ -62,7 +62,7 @@
             oncommand="window.openDialog('chrome://alpheios/content/alpheios-prefs.xul', 
                       'alpheios-options-dialog', 'chrome,titlebar,toolbar,centerscreen,modal')"/>;
         <command id="alpheios-feedback-cmd"
-            oncommand="window.open('http://groups.google.com/group/alpheios-reading-tools','alpheios-feedback')"/>
+            oncommand="window.open('http://alpheios.net/forum/21','alpheios-feedback')"/>
 	</commandset>
 
 	<popup id="contentAreaContextMenu">
