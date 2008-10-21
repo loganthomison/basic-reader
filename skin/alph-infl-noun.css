@@ -40,31 +40,70 @@ td.emptycol {
     border-left: 0;
 }
 
-.stem-classes {
-    display: none;
+ul.stem-class-block {
+    overflow: hidden;
+    text-align: center;
+    width: auto;
+    position: relative;
+    
+}
+ul.stem-class-block.show-list {
+    overflow: visible;
 }
 
-.stem-class {
+ul.stem-classes {
+    display: none;
     font-weight: normal;
     font-size: 90%;
+    z-index: 100;
+    width: auto;
+    overflow: visible;
 }
 
-.stem-class.highlight-ending {
-    background-color: yellow;
-}
-
-.show-stem {
-    display: inline;
+ul.stem-class-block.show-list ul.stem-classes{
+    display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 100px;
-    overflow: scroll;
-    color: black;
-    padding: 2px;
+    border: 1px solid black;
+    background-color: white;
+    right: 10px;
+}
+
+
+ul.stem-classes li {
+    list-style-type: none;
+    text-align: left;
+    padding-left: 2px;
+    padding-right: 2px;
+    white-space: nowrap;
+}
+
+li.stem-class-toggle {
     font-weight: normal;
-    border: 1px solid #BBC !important;
-    background-color: #F0F7FF;
-    white-space: normal;
+    color: blue;
+    cursor: pointer;
+ 
+}
+ul.stem-class-block li.stem-class-toggle {
+    list-style-image: url("chrome://alpheios/skin/twisty-clsd.png");
+}
+
+ul.stem-class-block.show-list li.stem-class-toggle {
+    list-style-image: url("chrome://alpheios/skin/twisty-open.png"); 
+}
+
+ul.stem-classes li.selected, ul.stem-classes li.primary {
+    list-style-image: url("chrome://alpheios/skin/cbox-check.gif");
+}
+
+ul.stem-classes li.highlight-ending {
+    list-style-image: url("chrome://alpheios/skin/cbox-check.gif");
+}
+
+.stem-class-desc {
+   text-align: left;
+}
+
+ul.stem-classes li.highlight-ending .stem-class-desc {
+    background-color: yellow;
 }
 

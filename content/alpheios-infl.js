@@ -166,7 +166,8 @@ Alph.infl = {
     init_table: function(a_tbl) {
         $(a_tbl).tableHover({colClass: "highlight-hover",
                            rowClass: "highlight-hover",
-                           headCols: true});
+                           headCols: true,
+                           allowHead: false});
     },
 
     /**
@@ -472,22 +473,14 @@ Alph.infl = {
             }
         );
         // add a toggle to show the stem classes
-        var show_stem = str.getString("alph-infl-show-stem"); 
-        var hide_stem = str.getString("alph-infl-hide-stem");
-        $("div.stem-classes",a_tbl).wrapAll('<div class="stem-classes-toggle/>');        
-        $("div.stem-classes-toggle",a_tbl).prepend('<a href="#stem-classes">' + show_stem + '</a>').click(
-            function() {
-                $("div.stem-classes",this).toggleClass("show-stem");
-                if ($("a",this).html().indexOf(show_stem) == -1)
-                {
-                    $("a",this).html(show_stem);
-                }
-                else
-                {
-                    $("a",this).html(hide_stem);
-                }
+        $(".stem-class-toggle",a_tbl).click(
+            function(event)
+            {
+                $(this).parents(".stem-class-block").toggleClass("show-list");
+                Alph.infl.resize_window(topdoc);
             }
         );
+
         // add a toggle item and handler     
         var expand = str.getString("alph-infl-expand");
         var collapse = str.getString("alph-infl-collapse");
@@ -515,9 +508,11 @@ Alph.infl = {
             function(e)
             {
                 var toggle = $(this).html();
+                var expanding = false;
                 if (toggle.indexOf(expand) != -1)
                 {
-                    $(this).html(collapse)
+                    expanding = true;
+                    $(this).html(collapse);
                     $(this).attr("title",collapse_tip);
                 }
                 else 
@@ -538,6 +533,25 @@ Alph.infl = {
                             $(this).toggleClass("ending-expanded");
                             var ending_index = $(this).attr("ending-index");
                             $(this).nextAll("[ending-index='" + ending_index +"']").toggleClass("ending-expanded");
+                            var stem_classes = $(this).attr('stem-class');
+                            if (stem_classes != null && stem_classes != '')
+                            {
+                                stem_classes.split(/\s/).forEach(
+                                    function(a_id,a_i)
+                                    {
+                                        // make sure the stem class selections
+                                        // reflect the displayed endings
+                                        if (expanding) 
+                                        {
+                                            $("#" + a_id,a_tbl).addClass("selected");
+                                        }
+                                        else
+                                        {
+                                            $("#" + a_id,a_tbl).removeClass("selected");
+                                        }
+                                    }
+                                );
+                            }
                         }
                     );
                                         
