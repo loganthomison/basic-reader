@@ -233,6 +233,7 @@ td {
 }
 
 .endings-toggle {
+    display: inline;
     color: blue;
     text-decoration: none;
     cursor: pointer;
@@ -241,3 +242,8 @@ td {
     padding-left: .5em;
 }
 
+th.reloading {
+    padding-right: 10px;
+    background: transparent url(loading.gif) right no-repeat;
+    cursor: progress;
+}

@@ -153,8 +153,7 @@ Alph.infl = {
             'chrome://' +
             window.opener.Alph.main.getLanguageTool().getchromepkg() + 
             '/content/inflections/alph-infl-' + base_pofs + '.html';
-        $(infl_browser).attr("src",url);
-        
+        $(infl_browser).attr("src",url);        
     },
     
     /**
@@ -194,20 +193,8 @@ Alph.infl = {
         }
         
         // add handler for the reorder links
-        $("#sortorder",topdoc).change(
-            function(e)
-            {
-                $(".loading",topdoc).show();
-                var showorder = $(":selected", this).val();
-                window.opener.Alph.main.getLanguageTool().
-                    handleInflections(
-                        e,
-                        a_link_target.source_node,
-                        {showpofs: 'verb',
-                        order: showorder 
-                        }
-                    );
-            }
+        $("#sortorder",topdoc).change( 
+            function(e) { Alph.infl.resort(e,this,a_link_target.source_node,topdoc); }
         );
         
         //show the words for this inflection type
@@ -221,105 +208,53 @@ Alph.infl = {
         // TODO -- should fix the XSLT to populate this instead
         $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
 
-        // replace the table header text
-        var str = document.getElementById("alph-infl-strings");
+
+        var str_props = document.getElementById("alph-infl-strings");
     
         var start = (new Date()).getTime();
-        $(".header-text",topdoc).each(
-            function()
-            {
-                var $text = jQuery.trim($(this).text());
-                try 
-                {
-                    var $newtext = str.getString($text);
-                    if ($newtext)
-                    {
-                        $(this).text($newtext);        
-                    }
-                } 
-                catch(e)
-                {
-                    window.opener.Alph.util.log("Couldn't find string for " + $text);   
-                }
-            }
-        );
+        
+        // replace the table header text
+        $(".header-text",topdoc).each( 
+            function(e) { Alph.infl.replace_string(this,str_props) } );
+        
         var end = (new Date()).getTime();
         window.opener.Alph.util.log("Translation time: " + (end-start));
 
         // for each ending in the table, highlight it if there's a matching suffix
         // in the link source but only if we haven't been asked not to look for matches
         start = end;
-
+        
+        var lang_tool = window.opener.Alph.main.getLanguageTool();
+        var all_cols = $("col",a_tbl);
+        
+        end = (new Date()).getTime();
+        window.opener.Alph.util.log("Endings Processed: " + (end-start));
+        start=end;
+        
         if ( a_link_target.suffixes[showpofs] != null 
              && a_link_target.suffixes[showpofs].length > 0 
              && ! a_link_target.suppress_match) {
             var col_parents = [];
-            var pre_selected = $("span.selected",a_tbl);
-            if (pre_selected.length > 0)
-            {
-                $(pre_selected).each( function(i) {
-          
-                    $(this).addClass("highlight-ending");
-                    var td_parent = $(this).parent("td");
-                    $(td_parent).addClass("highlight-ending");
-    
-                    // get the realIndex (column index) for each cell containing
-                    // a matched ending, so that we can make all cells in this column
-                    // visible
-                    col_parents.push($(td_parent).get(0).realIndex);
-                    
-                });
-            }
-            else 
-            {
-                var lang_tool = window.opener.Alph.main.getLanguageTool();
-                if (lang_tool)
+            
+            $("span.ending",a_tbl).each(
+                function()
                 {
-                    $("span.ending",a_tbl).each( function(i) {          
-                        for (var j=0; j<a_link_target.suffixes[showpofs].length; j++ ) {
-                            var ending_text = lang_tool.convertString($(this).text());
-                            ending_text = Alph.infl.decode(ending_text);
-                            
-                            if (ending_text == 
-                                jQuery.trim($(a_link_target.suffixes[showpofs][j]).text()) ) {
-                                $(this).addClass("highlight-ending");
-                                var td_parent = $(this).parent("td");
-                                $(td_parent).addClass("highlight-ending");
-        
-                                // get the realIndex (column index) for each cell containing
-                                // a matched ending, so that we can make all cells in this column
-                                // visible
-                                col_parents.push($(td_parent).get(0).realIndex);
-                            }
-                        }
-                    });
-                }
-            }                        
+                    if (  
+                        (a_link_target.xslt_params && $(this).hasClass("selected")) || 
+                        (typeof a_link_target.xslt_params == "undefined" && 
+                            Alph.infl.is_ending_match(a_link_target.suffixes[showpofs],this,lang_tool) )
+                       )
+                    {
+                            Alph.infl.highlight_ending(this,col_parents);
+                    }                       }
             
-            var col_parent_elements = $("col",a_tbl);
-            var sib_cols = [];
+            );
+            end = (new Date()).getTime();
+            window.opener.Alph.util.log("Endings Highlighted: " + (end-start));
+            start=end;
             
-            // iterate through the col elements with the same realIndex as those
-            // of the matched cells, identifying the realIndexes of the 
-            // sibling columns (i.e. columns in the same colgroup), so that we can 
-            // display all columns in the column group.
-            // ideally we wouldn't need to do this, and could just set visibility
-            // at the colgroup level, but Firefox's handling of the visibility css
-            // style on tables is very buggy
-            for (var i=0; i<col_parents.length; i++) {
-                var col_index = col_parents[i];
-                var col_realIndex = $(col_parent_elements[col_index]).attr("realIndex"); 
-                if (sib_cols.indexOf(col_realIndex) == -1) {
-                    sib_cols.push(col_realIndex);
-                }
-                $(col_parent_elements[col_index]).siblings().each(function(){
-                    var sib_index = $(this).attr("realIndex");
-                    if (sib_cols.indexOf(sib_index) == -1) {
-                        sib_cols.push(sib_index);
-                    }
-                });
-            }
-            
+            var sib_cols = Alph.infl.find_sib_cols(col_parents,all_cols);
+                        
             // unhide all the cells in the colgroups to which the matched
             // endings belonged
             for (var i=0; i<sib_cols.length; i++) {
@@ -335,237 +270,72 @@ Alph.infl = {
             }
             else 
             {
-                $("#expand-table-link",topdoc).css("display","inline");
-                $("#expand-table-link",topdoc).click( function(e) {
-                    Alph.infl.expand_table(a_tbl,topdoc);
-                    return false;
-                });
+                $("#expand-table-link",topdoc)
+                    .css("display","inline")
+                    .click( function(e) {
+                        Alph.infl.expand_table(a_tbl,topdoc);
+                        return false;
+                    });
             }
         } 
         else {
             Alph.infl.expand_table(a_tbl,topdoc);            
         }
         end = (new Date()).getTime();
-        window.opener.Alph.util.log("Display time: " + (end-start));
+        window.opener.Alph.util.log("Selected Endings Displayed: " + (end-start));
+        start=end;
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted
         
-        // add links for the other relevant inflections
-        if (a_pofs_set.length > 1) {
-            for (var i=0; i<a_pofs_set.length; i++)
-            {
-                // if a part of speech is broken down further,
-                // format will be <primary pofs>_<secondary info>
-                // e.g. verb_suppine, etc.
-                var parts = a_pofs_set[i].split(/_/);
-                var linktype;
-                var linkname;
-                if (parts.length >1)
-                { 
-                    linktype = parts[0];
-                    linkname = parts[0] + '(' + parts[1] + ')';
-                }
-                else {
-                    linktype = a_pofs_set[i];
-                    linkname = a_pofs_set[i];
-                }
-    
-                var link =
-                   topdoc.createElementNS("http://www.w3.org/1999/xhtml",
-                                        "option");
-                    link.setAttribute("value",a_pofs_set[i]);
-                    link.innerHTML =  
-                        document
-                            .getElementById("alph-infl-strings")
-                            .getFormattedString(
-                                "alph-infl-link-"+linktype, 
-                                [linkname]);
-                if (a_pofs_set[i] == a_link_target.showpofs)
-                {
-                    link.setAttribute("selected",true);
-                }
-    
-                $("#infl-links-select",topdoc).append(link);
-            }
-        }
+        // add the inflection links for the other parts of speech 
+        this.add_infl_links(a_pofs_set,showpofs,topdoc,str_props);
         
+        // add the auxiliary inflection links
+        this.add_infl_links(a_link_target.links,showpofs,topdoc,str_props);
+
+        // TODO - dedupe all the inflection links? See congestaque
         
-        // TODO - dedupe? See congestaque
-        if (a_link_target.links)
-        {
-            for (i=0; i<a_link_target.links.length; i++)
-            {
-                var parts = a_link_target.links[i].split(/_/);
-                var linktype;
-                var linkname;
-                if (parts.length >1)
-                { 
-                    linktype = parts[0];
-                    linkname = parts[0] + '(' + parts[1] + ')';
-                }
-                else {
-                    linktype = a_link_target.links[i];
-                    linkname = a_link_target.links[i];
-                }
-                
-                var link =
-                   topdoc.createElementNS("http://www.w3.org/1999/xhtml",
-                                        "option");
-                    link.setAttribute("value",a_link_target.links[i]);
-                    link.innerHTML =  
-                        document
-                            .getElementById("alph-infl-strings")
-                            .getFormattedString(
-                                "alph-infl-link-"+linktype, 
-                                [linkname]);
-
-                $("#infl-links-select",topdoc).append(link);
-            }
-        }
-
+        // if we have any additional inflection links, show them
         if ($("select#infl-links-select option",topdoc).length > 1)
         {
-            var label = document
-                .getElementById("alph-infl-strings")
-                .getString("alph-infl-links-label"); 
+            var label = str_props.getString("alph-infl-links-label"); 
             $("#infl-links-label",topdoc).text(label);
             $("#infl-links",topdoc).css("display","block");
-        }
-        $("#infl-links-select",topdoc).change(
-            function(e) {
-                $(".loading",topdoc).show();
-                var newpofs = $(":selected",this).val();
-                window.opener.Alph.util.log("Switching to " + newpofs);
-                window.opener.Alph.main.getLanguageTool().
-                    handleInflections(e,a_link_target.source_node,{showpofs: newpofs});
-            }
-        );
-                
-        $(".footnote",a_tbl).click(
-            function(e)
-            {
-                var text = $(this).next(".footnote-text");
-                if (text.length > 0)
-                {
-                    $(text).toggleClass("footnote-visible");
-                    return false;
+            
+            // add the click handler to the inflections links
+            $("#infl-links-select",topdoc).change(
+                function(e) {
+                    Alph.infl.switch_inflection(e,this,a_link_target.source_node,topdoc);
                 }
-            }
-        );
+            );
+        }
+        
+        // add a click handler to the footnotes
+        $(".footnote",a_tbl).click(function(e){return Alph.infl.show_footnote(e,this)});
 
         // add a click handler to the reference links
-        $(".alph-reflink",a_tbl).click(
-            function(e) 
-            {
-                var link_target = $(this).attr("href").split(/:/);
-                // only handle grammar links for now
-                // TODO this code will change once we have the real linking architecture
-                if (link_target[0] == 'grammar')
-                {
-                    window.opener.Alph.main.getLanguageTool().openGrammar(null,null,link_target[2]);
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-                
-            }
-        );
+        $(".alph-reflink",a_tbl).click(function(e){return Alph.infl.follow_reflink(e,this)});
+        
         // add a toggle to show the stem classes
         $(".stem-class-toggle",a_tbl).click(
-            function(event)
-            {
-                $(this).parents(".stem-class-block").toggleClass("show-list");
-                Alph.infl.resize_window(topdoc);
-            }
-        );
-
-        // add a toggle item and handler     
-        var expand = str.getString("alph-infl-expand");
-        var collapse = str.getString("alph-infl-collapse");
-        var expand_tip = str.getString("alph-infl-expand-tooltip");
-        var collapse_tip = str.getString("alph-infl-collapse-tooltip");
-                
-        var collapse_index = {};
-        var collapsed = window.opener.Alph.main.getLanguageTool().handleInflectionDisplay(a_tbl,str);
-        if (typeof collapsed != "undefined")
-        {
-            for (var i=0; i<collapsed.length; i++)
-            {
-                var index = $(collapsed[i]).get(0).realIndex;
-                if (typeof collapse_index[index] == "undefined")
-                {
-                    $("tr#headerrow2 th[realIndex='" + index + "']",a_tbl)
-                        .append("<a class='endings-toggle' title='" 
-                            + expand_tip + "'>" + expand + "</a>");
-                    collapse_index[index] = 1;    
-                }
-                
-            }
-        }
-        $(".endings-toggle",a_tbl).click(
             function(e)
             {
-                var toggle = $(this).html();
-                var expanding = false;
-                if (toggle.indexOf(expand) != -1)
-                {
-                    expanding = true;
-                    $(this).html(collapse);
-                    $(this).attr("title",collapse_tip);
-                }
-                else 
-                {
-                    $(this).html(expand);
-                    $(this).attr("title",expand_tip);
-                }
-                var index = $(this).parent("th").get(0).realIndex;
-                var cell_span = $(this).parent("th").attr("colspan");
-                if (cell_span == null || cell_span == '') 
-                {
-                    cell_span = 1;
-                }
-                for (var i=0; i<cell_span; i++) {
-                    $("td[realIndex='" + (index + i) + "'] .ending.ending-collapsed",a_tbl).each(
-                        function()
-                        {
-                            $(this).toggleClass("ending-expanded");
-                            var ending_index = $(this).attr("ending-index");
-                            $(this).nextAll("[ending-index='" + ending_index +"']").toggleClass("ending-expanded");
-                            var stem_classes = $(this).attr('stem-class');
-                            if (stem_classes != null && stem_classes != '')
-                            {
-                                stem_classes.split(/\s/).forEach(
-                                    function(a_id,a_i)
-                                    {
-                                        // make sure the stem class selections
-                                        // reflect the displayed endings
-                                        if (expanding) 
-                                        {
-                                            $("#" + a_id,a_tbl).addClass("selected");
-                                        }
-                                        else
-                                        {
-                                            $("#" + a_id,a_tbl).removeClass("selected");
-                                        }
-                                    }
-                                );
-                            }
-                        }
-                    );
-                                        
-                }
-                Alph.infl.resize_window(topdoc);
-                return false;
+                $(this).parents(".stem-class-block").toggleClass("show-list");
             }
         );
 
+        end = (new Date()).getTime();
+        window.opener.Alph.util.log("Handlers Added: " + (end-start));
+        start=end;
+        
+        var collapsed = window.opener.Alph.main.getLanguageTool().handleInflectionDisplay(a_tbl,str_props);
+        this.enable_expand_cols(collapsed,str_props,a_tbl);
+        
         var start = (new Date()).getTime();
         var data_rows = $("tr.data-row",a_tbl).length;
         var empty_cols = [];
         // iterate through the columns, hiding any which are completely empty
-        $("col",a_tbl).each (
+        $(all_cols).each (
           function() {
             var index = $(this).attr("realIndex");
             var num_empty = $("td[realIndex='" + index + "'] span.emptycell",a_tbl).length;
@@ -628,8 +398,7 @@ Alph.infl = {
         // TODO - need to reset screenX and screenY to original 
         // requested location
         window.resizeTo(x,y);
-        
-        
+        $(".reloading",topdoc).removeClass("reloading");
     },
     
         /**
@@ -667,6 +436,7 @@ Alph.infl = {
      * Shift key handler for the window -- hands the event off to the
      * parent window. Only effective while the mouseover popup is visible.
      * @param {Event} a_e the the keydown event 
+     * @return true to allow event propogation
      */
     onKeyDown: function(a_e) {
         if (a_e.keyCode == 16) {
@@ -677,5 +447,340 @@ Alph.infl = {
         }
         // return true to allow event propogation if needed
         return true;
-    }
+    },
+    
+    /**
+     * Click handler for changing the table sort order
+     * @param {Event} a_e the event which triggered the action
+     * @param {Element} a_elem the target of the action
+     * @param {Node} a_node the node which contains the morphology for the selected word (from the source text)
+     * @param {Document} a_doc the contentDocument which contains the inflection table
+     */
+    resort: function(a_e,a_elem,a_node,a_doc) 
+    {
+        $(".loading",a_doc).show();
+        var showorder = $(":selected", a_elem).val();
+        window.opener.Alph.main.getLanguageTool()
+            .handleInflections(a_e,a_node,{showpofs: 'verb', order: showorder}
+            );
+    },
+    
+    /**
+     * Click handler for switching the inflection type
+     * @param {Event} a_e the event which triggered the action
+     * @param {Element} a_elem the target of the action
+     * @param {Node} the a_node node which contains the morphology for the selected word (from the source text)
+     * @param {Document} a_doc the contentDocument which contains the inflection table
+     */
+    switch_inflection: function(a_e,a_elem,a_node,a_doc)
+    {
+        $(".loading",a_doc).show();
+        var newpofs = $(":selected",a_elem).val();
+        window.opener.Alph.util.log("Switching to " + newpofs);
+        window.opener.Alph.main.getLanguageTool().
+            handleInflections(a_e,a_node,{showpofs: newpofs});
+    },
+    
+    /**
+     * Click handler for showing a popup footnote
+     * @param {Event} a_event the event which triggered the action
+     * @param {Element} a_elem the target of the action
+     * @param return false to cancel the action
+     */
+    show_footnote: function(a_e,a_elem)
+    {
+        var text = $(a_elem).next(".footnote-text");
+        if (text.length > 0)
+        {
+            $(text).toggleClass("footnote-visible");
+            return false;
+        }        
+    },
+    
+    /**
+     * Click handler for reference links
+     * @param {Event} a_event the event which triggered the action
+     * @param {Element} a_elem the target of the action
+     * @return false if this is a reference link we can follow, otherwise true to
+     *         allow event propogation
+     */
+    follow_reflink: function(a_e,a_elem)
+    {
+        var link_target = $(a_elem).attr("href").split(/:/);
+        // only handle grammar links for now
+        // TODO this code will change once we have the real linking architecture
+        if (link_target[0] == 'grammar')
+        {
+            window.opener.Alph.main.getLanguageTool().openGrammar(null,null,link_target[2]);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    },
+    
+    /**
+     * Populate a text string in table from the localizable properties
+     * @param {Element} the element whose text should be translated
+     * @param {Properties} the properties object containing the display strings  
+     */
+    replace_string: function(a_elem,a_props)
+    {
+        var $text = jQuery.trim($(a_elem).text());
+        try 
+        {
+            var $newtext = a_props.getString($text);
+            if ($newtext)
+            {
+                $(a_elem).text($newtext);        
+            }
+        } 
+        catch(e)
+        {
+            window.opener.Alph.util.log("Couldn't find string for " + $text);   
+        }  
+    },
+    
+    /**
+     * Checks to see if a particular ending from the table is identical to the 
+     * ending of the word which is the subject of the table
+     * @param {Array} a_suffixes list of possible endings for the selected word
+     * @param {Element} a_elem DOM element which contains the inflection table ending
+     * @parma {Alph.LanguageTool} a_lang_tool current language tool
+     */
+    is_ending_match: function(a_suffixes,a_elem,a_lang_tool)
+    {    
+        var matches = false;
+        for (var j=0; j<a_suffixes.length; j++ ) {
+            var ending_text = a_lang_tool.convertString($(a_elem).text());
+            ending_text = Alph.infl.decode(ending_text);
+            if (ending_text == $.trim($(a_suffixes[j]).text()))
+            { 
+                matches = true;
+                break;
+            }
+        }
+        return matches;
+    },
+      
+    /**
+     * Highlights a matched ending and adds the parent table element to the 
+     * the supplied list of parent cells
+     * @param {Element} a_elem the DOM element which contains the ending
+     * @param {Array} a_col_parents Array which holds indices of the parent cells 
+     */
+    highlight_ending: function(a_elem,a_col_parents)
+    {
+        
+        $(a_elem).addClass("highlight-ending");
+        var td_parent = $(a_elem).parent("td");
+        $(td_parent).addClass("highlight-ending");
+    
+        // get the realIndex (column index) for each cell containing
+        // a matched ending, so that we can make all cells in this column
+        // visible
+        a_col_parents.push($(td_parent).get(0).realIndex);
+    },
+    
+    /**
+     * Finds sibling columns 
+     * @param {Array} a_cols a list of column indices
+     * @param {Array} a_all_cols a list of all the Column cells in the table 
+     * @return array of sibling column indices
+     * @type Array
+     */
+    find_sib_cols: function(a_cols,a_all_cols)
+    {
+        var sib_cols = [];
+        
+        // iterate through the col elements with the same realIndex as those
+        // of the matched cells, identifying the realIndexes of the 
+        // sibling columns (i.e. columns in the same colgroup), so that we can 
+        // display all columns in the column group.
+        // ideally we wouldn't need to do this, and could just set visibility
+        // at the colgroup level, but Firefox's handling of the visibility css
+        // style on tables is very buggy
+        for (var i=0; i<a_cols.length; i++) {
+            var col_index = a_cols[i];
+            var col_realIndex = $(a_all_cols[col_index]).attr("realIndex"); 
+            if (sib_cols.indexOf(col_realIndex) == -1) {
+                sib_cols.push(col_realIndex);
+            }
+            $(a_all_cols[col_index]).siblings().each(function(){
+                var sib_index = $(this).attr("realIndex");
+                if (sib_cols.indexOf(sib_index) == -1) {
+                    sib_cols.push(sib_index);
+                }
+            });
+        }
+        return sib_cols;            
+    },
+
+    /**
+     * Adds inflection links for the other possible inflections
+     * to the inflection table display
+     * (if there are any) 
+     * @param {Array} a_pofs_set the array of possible inflection types
+     * @param {String} a_showpofs the current part of speech
+     * @param {Document} a_doc the contentDocument containing the table
+     * @param {Properties} a_str_props string properties for the display
+     */
+    add_infl_links: function(a_pofs_set,a_showpofs, a_doc,a_str_props)
+    {
+        if (typeof a_pofs_set == "undefined" || a_pofs_set.length == 0) 
+        {
+            return;
+        }
+        for (var i=0; i<a_pofs_set.length; i++)
+        {
+            // if a part of speech is broken down further,
+            // format will be <primary pofs>_<secondary info>
+            // e.g. verb_suppine, etc.
+            var parts = a_pofs_set[i].split(/_/);
+            var linktype;
+            var linkname;
+            if (parts.length >1)
+            { 
+                linktype = parts[0];
+                linkname = parts[0] + '(' + parts[1] + ')';
+            }
+            else {
+                linktype = a_pofs_set[i];
+                linkname = a_pofs_set[i];
+            }
+
+            var link =
+               a_doc.createElementNS("http://www.w3.org/1999/xhtml",
+                                    "option");
+                link.setAttribute("value",a_pofs_set[i]);
+                link.innerHTML = a_str_props.getFormattedString(
+                    "alph-infl-link-"+linktype, [linkname]);
+            if (a_pofs_set[i] == a_showpofs)
+            {
+                link.setAttribute("selected",true);
+            }
+
+            $("#infl-links-select",a_doc).append(link);
+        }
+    },
+    
+    /**
+     * Adds toggle and click handler to columns which are collapsed
+     * @param {Array} a_collapsed arry of the collapsed columns
+     * @param {Properties} a_str_props string properties for the display
+     * @param {Element} the inflection table element 
+     */
+    enable_expand_cols: function(a_collapsed,a_str_props,a_tbl)
+    {
+            
+        var expand = a_str_props.getString("alph-infl-expand");
+        var expand_tip = a_str_props.getString("alph-infl-expand-tooltip");
+                
+        var collapse_index = {};
+        
+        if (typeof a_collapsed != "undefined")
+        {
+            // for each collapsed ending, make sure a toggle
+            // to expand the column is added to the column header
+            for (var i=0; i<a_collapsed.length; i++)
+            {
+                var th = $(a_collapsed[i]).get(0);
+                var index = th.realIndex;
+                // only do this once per column index
+                if (typeof collapse_index[index] == "undefined")
+                {
+                    $("tr#headerrow2 th[realIndex='" + index + "']",a_tbl)
+                        .append("<div class='endings-toggle'>" + expand + "</div>")
+                        .click( function(e) { Alph.infl.expand_column(e,this,a_tbl) });
+                    collapse_index[index] = 1;    
+                }                
+            }
+        }        
+    },
+
+    /**
+     * Click handler for the column expansion widgets
+     * @param {Event} a_e the event which triggered the action
+     * @param {Element} a_elem the target of the action
+     * @param {Element} the inflection table element
+     */
+    expand_column: function(a_e,a_elem,a_tbl)
+    {
+        // TODO - for some reaons the display is to show to reflect the class change
+        // need to figure out how to fix this so that display can reflect the fact that  
+        // action is in progress
+        $(a_elem).addClass("reloading");
+        var str_props = document.getElementById("alph-infl-strings");
+        var expand = str_props.getString("alph-infl-expand");
+        var collapse = str_props.getString("alph-infl-collapse");
+        var expand_tip = str_props.getString("alph-infl-expand-tooltip");
+        var collapse_tip = str_props.getString("alph-infl-collapse-tooltip");
+
+        var toggle_elem = $(".endings-toggle",a_elem);
+        var toggle = $(toggle_elem).html();
+        
+        var expanding = false;
+        if (toggle.indexOf(expand) != -1)
+        {
+            expanding = true;
+            $(toggle_elem).html(collapse);
+            $(toggle_elem).attr("title",collapse_tip);
+        }
+        else 
+        {
+            $(toggle_elem).html(expand);
+            $(toggle_elem).attr("title",expand_tip);
+        }
+        //var parent = $(a_elem).parent("th");
+        var index = $(a_elem).get(0).realIndex;
+        var cell_span = $(a_elem).attr("colspan");
+        if (cell_span == null || cell_span == '') 
+        {
+            cell_span = 1;
+        }
+        for (var i=0; i<cell_span; i++) {
+            // iterate through the endings which are in this column
+            // and which also may be collapsed
+            // toggling the expanded state for each ending
+            // and also updating the selection state of the stem class
+            // for that ending
+            var selected_stems = [];
+            $("td[realIndex="+ (index+i) +"] span.ending.ending-collapsed",a_tbl).each(
+                function()
+                {
+                    $(this).toggleClass("ending-expanded");
+                    var ending_index = $(this).attr("ending-index");
+                    $(this)
+                        .nextAll("[ending-index='" + ending_index +"']")
+                        .toggleClass("ending-expanded");
+                    var stem_classes = $(this).attr('stem-class');
+                    if (stem_classes != null && stem_classes != '')
+                    {
+                        stem_classes.split(/\s/).forEach(
+                            function(a){ selected_stems.push(a) }
+                        );
+                    }
+                }
+            );
+        }
+        $.unique(selected_stems).forEach(
+            function(a_id,a_i)
+            {
+                // make sure the stem class selections
+                // reflect the displayed endings
+                if (expanding) 
+                {
+                    $("#" + a_id,a_tbl).addClass("selected");
+                 }
+                 else
+                 {
+                    $("#" + a_id,a_tbl).removeClass("selected");
+                 }
+            }
+        );
+        
+        Alph.infl.resize_window(window.content.document || window.document);
+        return false;
+    }    
 };
