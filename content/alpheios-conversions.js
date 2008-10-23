@@ -34,6 +34,13 @@ if (typeof Alph == "undefined") {
 Alph.convert = {
   
     /**
+     * An XSLT Processor for unicode to betacode conversion
+     * @private
+     * @type XSLTProcessor
+     */
+    u2bConverter: null,
+
+    /**
      * @type nsIScriptableUnicodeConverter
      */
     unicode_conv: 
@@ -103,5 +110,36 @@ Alph.convert = {
         a_str.replace(/\?/,'');
         
         return a_str;
+    },
+
+    /**
+     * greek ascii transliteration (unicode to betacode)
+     * @param {String} a_str the string to convert
+     * @return the converted string
+     * @type {String}
+     */
+    greek_to_ascii: function(a_str)
+    {
+        /* initialize the XSLT converter if we haven't done so already */
+        if (this.u2bConverter == null)
+        {
+            var xmlDoc = document.implementation.createDocument("", "", null);
+            xmlDoc.async = "false";
+            xmlDoc.load("chrome://alpheios/skin/alpheios-uni2betacode.xsl");
+            this.u2bConverter = new XSLTProcessor();
+            this.u2bConverter.importStylesheet(xmlDoc);
+        }
+        var betaText = '';
+        try
+        {
+            this.u2bConverter.setParameter(null, "input", a_str);
+            var dummy = (new DOMParser()).parseFromString("<root/>","text/xml");
+            betaText = this.u2bConverter.transformToDocument(dummy).documentElement.textContent;
+        }
+        catch (e)
+        {
+            Alph.util.log(e);
+        }
+        return betaText;
     }
 };
