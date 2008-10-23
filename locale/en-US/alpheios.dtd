@@ -38,3 +38,5 @@
 <!ENTITY alpheios.panel.trans.tab.ped.primary "Alpheios Pedagogical">
 <!ENTITY alpheios.panel.trans.tab.external.url "Enter URL of Translation">
 <!ENTITY alpheios.panel.trans.opt.inter "Interlinear Translation">
+<!ENTITY alpheios.panel.trans.opt.inter.src "In Source Text">
+<!ENTITY alpheios.panel.trans.opt.inter.trans "In Translated Text">

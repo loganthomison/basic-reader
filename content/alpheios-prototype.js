@@ -30,9 +30,12 @@ Alph.pproto = {
     /**
      * Add CSS and Javascript handlers to the source and parallel text 
      * displays to provide prototype functionality
-     * @param {Document} a_doc the contentDocument for the target panel/window 
+     * @param {Document} a_doc the contentDocument for the target panel/window
+     * @param {String} a_type identifies the target display type 
+     *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
+     *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
      */
-    setup_display: function(a_doc)
+    setup_display: function(a_doc,a_type)
     {
         // add the pedagogical text stylesheet
         var ped_text_css = "chrome://alpheios/skin/alph-ped-text.css";
@@ -49,8 +52,13 @@ Alph.pproto = {
         }
         
         // add the mouseover handlers for the parallel alignment
-        Alph.$(".alph-proto-word",a_doc).mouseover( Alph.pproto.toggle_alignment );
-        Alph.$(".alph-proto-word",a_doc).mouseout( Alph.pproto.toggle_alignment );
+        Alph.$(".alph-proto-word",a_doc).mouseover(  
+            function(e) { Alph.pproto.toggle_alignment(e,this,a_type)}
+        );
+        
+        Alph.$(".alph-proto-word",a_doc).mouseout( 
+            function(e) { Alph.pproto.toggle_alignment(e,this,a_type) }
+        );
         
         // cancel mousemove over next/previous links - to kill the Alpheios popup
         // TODO - need to do this more general for ped reader interface elements
@@ -59,17 +67,22 @@ Alph.pproto = {
     },
     
     /**
-     * toggle the state of the source and parallel aligned text
+     * toggle the state of the target and parallel aligned text
+     * @param {Event} the event which triggered the action
+     * @param {Element} the target element
+     * @param {String} type of target text 
+     *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
+     *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
      */
-    toggle_alignment: function()
+    toggle_alignment: function(a_event,a_elem,a_type)
     {
         // toggle the selector class for the source text
-        Alph.$(this).toggleClass('alph-highlight-source');
+        Alph.$(a_elem).toggleClass('alph-highlight-source');
         
         // toggle the selection of the parallel aligned text
         try {
             var panel_obj = Alph.main.panels['alph-trans-panel'];
-            panel_obj.toggle_parallel_alignment(this);
+            panel_obj.toggle_parallel_alignment(a_elem,a_type);
         }
         catch(a_e)
         {
@@ -77,56 +90,78 @@ Alph.pproto = {
         }
     },
     
-    
     /**
-     * Add the parallel aligned text interlinearly to the source display
-     * @param {Document} a_src the contentDocument for the source window
-     * @param {Document} a_parallel the contentDocument for 
-     *                   the parallel translation panel
+     * Enable the interlinear alignment
+     * @param {Document} a_target the target document for the interlinear translation
+     * @param {Document} a_source the source of the interlinear translation
+     *                   
      */
-    add_interlinear: function(a_src,a_parallel)
-    {
-        
-        if ( Alph.$("p.alph-proto-sentence",a_src).length == 0 ||
-             Alph.$("p.alph-proto-sentence",a_parallel).length == 0 )
+    enable_interlinear: function(a_target,a_source)
+    {    
+        if ( Alph.$("p.alph-proto-sentence",a_target).length == 0 ||
+             Alph.$("p.alph-proto-sentence",a_source).length == 0 )
         {
             // If we don't have interlinear markup in both the source
             // and parallel text, just disable the interlinear option and return
+            // TODO we shouldn't assume that if interlinear is available one way
+            // it is also available the other way 
             Alph.util.log("Disable interlinear");
-            Alph.$("#alpheios-trans-opt-inter").attr("disabled",true);
-            return;    
+            Alph.$("#alpheios-trans-opt-inter-menu").attr("disabled",true);
+        }
+        else
+        {
+            Alph.$("#alpheios-trans-opt-inter-menu").attr("disabled",false);
+        }
+    },
+    
+    /**
+     * Add the parallel aligned text interlinearly to the source display
+     * @param {Document} a_target the target document for the interlinear translation
+     * @param {Document} a_source the source document for the interlinear translation 
+     */
+    add_interlinear: function(a_target,a_source)
+    {
+
+        // only do this once per document
+        {
+            if (Alph.$(".alph-proto-iltrans",a_target).length > 0)
+            {
+                return;
+            }
         }
         
-        Alph.$("#alpheios-trans-opt-inter").attr("disabled",false);
         // wrap a div around each source sord so that the aligned text can
         // be floated under it
-        Alph.$(".alph-proto-word",a_src).wrap("<div class='alph-word-wrap'></div>");
+        Alph.$(".alph-proto-word",a_target).wrap("<div class='alph-word-wrap'></div>");
         
         // add the aligned text to each source word
-        Alph.$("p.alph-proto-sentence",a_src).each(
+        Alph.$("p.alph-proto-sentence",a_target).each(
             function()
             {
                 Alph.$(".alph-proto-word",this).each(
                     function()
                     {
-                        var offset_left = 1 - Alph.$(this).position().left;
+                        //var offset_left = 1 - Alph.$(this).position().left;
                         var offset_left = "0";
                         var offset_top = Alph.$(this).height();
-                        var my_ids = Alph.$(this).attr("ref").split(/\s/);
-                        for (var i=0; i<my_ids.length; i++) {
-                           if (my_ids[i]) { 
-                               var elem = Alph.$("p.alph-proto-sentence span.alph-proto-word[id='" 
-                                + my_ids[i] + "']",a_parallel);
-                               if (elem.length == 0) {
-                                    continue;
+                        if (Alph.$(this).attr("ref"))
+                        {
+                            var my_ids = Alph.$(this).attr("ref").split(/\s/);
+                            for (var i=0; i<my_ids.length; i++) {
+                               if (my_ids[i]) { 
+                                   var elem = Alph.$("p.alph-proto-sentence span.alph-proto-word[id='" 
+                                    + my_ids[i] + "']",a_source);
+                                   if (elem.length == 0) {
+                                        continue;
+                                   }
+                                   var id_copy = Alph.$(Alph.$(elem)[0]).clone().appendTo(Alph.$(this).parent(".alph-word-wrap"));
+                                   Alph.$(id_copy).attr("id", "il-" + my_ids[i]);
+                                   Alph.$(id_copy).addClass("alph-proto-iltrans");
+                                   Alph.$(id_copy).removeClass("alph-proto-word");
+                                   Alph.$(id_copy).css("top",offset_top);
+                                   
                                }
-                               var id_copy = Alph.$(Alph.$(elem)[0]).clone().appendTo(Alph.$(this).parent(".alph-word-wrap"));
-                               Alph.$(id_copy).attr("id", "il-" + my_ids[i]);
-                               Alph.$(id_copy).addClass("alph-proto-iltrans");
-                               Alph.$(id_copy).removeClass("alph-proto-word");
-                               Alph.$(id_copy).css("top",offset_top);
-                               
-                           }
+                            }
                         }
     
                     }
@@ -134,7 +169,7 @@ Alph.pproto = {
             }
         );
         // resize the source display to account for the new elements
-        Alph.pproto.resize_interlinear(a_src);
+        Alph.pproto.resize_interlinear(a_target);
     },
     
     /**

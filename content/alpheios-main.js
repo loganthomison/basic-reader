@@ -1156,8 +1156,6 @@ Alph.main =
             // if we support this language automatically setup the extension for it
             if (typeof Alph.Languages[ped_lang] != "undefined")
             {
-                // setup the prototype display
-                Alph.pproto.setup_display(bro.contentDocument);
                 
                 // if Alpheios is not enabled, auto-enable it
                 if (! this.is_enabled(bro))
@@ -1185,6 +1183,16 @@ Alph.main =
             return;
         }
         
+        if (ped_site != null)
+        {
+            // setup the prototype display
+            // this should only be called after Alpheios has been auto-toggled
+            // on because otherwise it gets done twice via the send call to reset_state
+            // from Alph.main.onTabSelect
+            Alph.pproto.setup_display(bro.contentDocument,
+                Alph.Translation.INTERLINEAR_TARGET_SRC);
+        }
+                
         // notify the pedagogical reader observers
         Alph.$("broadcaster.alpheios-pedagogical-notifier").each(
             function()

@@ -70,7 +70,8 @@ Alph.Translation.prototype.show = function()
         // TODO - this should observe the pedagogical-reader-notifier broadcaster
         // but it isn't -- maybe because it's defined in a custom element. Need
         // too fix this.
-        Alph.$("#alpheios-trans-opt-inter").attr("disabled",true);
+        Alph.$("#alpheios-trans-opt-inter-menu")
+            .attr("disabled",true);
     }
     else
     {
@@ -94,14 +95,17 @@ Alph.Translation.prototype.show = function()
                     Alph.$("body",trans_doc).html(data);
                     
                     // setup the display
-                    Alph.pproto.setup_display(trans_doc);
+                    Alph.pproto.setup_display(trans_doc,'trans');
                     
                     // setup for interlinear
-                    Alph.pproto.add_interlinear(bro.contentDocument,trans_doc);
+                    Alph.pproto.enable_interlinear(bro.contentDocument,trans_doc);
                     
                     // toggle the state of the interlinear display
                     // according to the selected state of the menu item
-                    Alph.Translation.toggle_interlinear();
+                    Alph.Translation
+                        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_SRC);
+                    Alph.Translation
+                        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_TRANS);
                     
                     // TODO - need to take state into account
                     // (i.e. if user chose a different tab)
@@ -186,13 +190,16 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
  * aligned text
  * @param {Element} a_elem the HTML element which contains the word for which
  *                         to show the alignment
+ * @param {String} a_type type of text being toggled 
+ *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
+ *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
  */
-Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem)
+Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type)
 {
     
     // the source text element uses the "ref" attribute to identify the
     // corresponding element(s) in the parallel aligned translation
-    if (Alph.$(a_elem).attr("ref"))
+    if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC && Alph.$(a_elem).attr("ref"))
     {
         var tab_box = Alph.$("tabbox",this.panel_elem).get(0);    
         var browser_box = Alph.$("#alph-trans-panel-primary",tab_box); 
@@ -208,7 +215,8 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem)
     // if the user is mousing over the the parallel aligned translation
     // use the id attribute to find out which elements in the source
     // text refer to the selected word
-    else if (Alph.$(a_elem).attr("id")) 
+    else if (a_type == Alph.Translation.INTERLINEAR_TARGET_TRANS
+             && Alph.$(a_elem).attr("id")) 
     {
         var parent_doc = Alph.main.getCurrentBrowser().contentDocument;
         var match_id = Alph.$(a_elem).attr("id");
@@ -235,15 +243,55 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem)
  * alignment in the source text.  This method is invoked by the command 
  * which responds to selection of the Interlinear Translation item in the
  * Options menu 
+ * @param {String} a_type identifieds target location for interlinear translation 
+ *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
+ *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
+ * @param {Event} a_event the Event which initiated the action (may be null)
  */
-Alph.Translation.toggle_interlinear = function(a_event)
+Alph.Translation.toggle_interlinear = function(a_type,a_event)
 {
-    var parent_doc = Alph.main.getCurrentBrowser().contentDocument;
-    if (Alph.$("#alpheios-trans-opt-inter").attr('checked') == 'true')
+    var panel = Alph.$("#alph-trans-panel");
+    var src_doc;
+    var target_doc;
+    var browser_doc = Alph.main.getCurrentBrowser().contentDocument;
+    var trans_doc =  
+            Alph.$("#alph-trans-panel-primary browser",panel).get(0).contentDocument;
+            
+    if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
     {
-        Alph.$(".alph-proto-iltrans",parent_doc).css('display','block');
-    } else {
-        Alph.$(".alph-proto-iltrans",parent_doc).css('display','none');
+        target_doc = browser_doc;
+        src_doc = trans_doc;
     }
-    Alph.pproto.resize_interlinear(parent_doc);  
+    else
+    {
+        target_doc = trans_doc;
+        src_doc = browser_doc;
+    }
+
+    if (Alph.$("#alpheios-trans-opt-inter-" + a_type).attr('checked') == 'true')
+    {
+        // make sure the interlinear translation has been added to the display
+        Alph.pproto.add_interlinear(target_doc,src_doc);
+        Alph.$(".alph-proto-iltrans",target_doc).css('display','block');
+    } else {
+        Alph.$(".alph-proto-iltrans",target_doc).css('display','none');
+    }
+    Alph.pproto.resize_interlinear(target_doc);  
 };
+
+/**
+ * Public static class variable for identifying the target of the
+ * interlinear translation as the source (i.e. browser) document 
+ * @public
+ * @type String
+ */ 
+Alph.Translation.INTERLINEAR_TARGET_SRC = 'src';
+
+/**
+ * Public static class variable for identifying the target of the
+ * interlinear translation as the translation panel document
+ * TODO eventually we may need to support mutiple translations 
+ * @public
+ * @type String
+ */ 
+Alph.Translation.INTERLINEAR_TARGET_TRANS = 'trans';
