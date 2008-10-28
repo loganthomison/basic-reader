@@ -3,9 +3,6 @@
 <!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd">
 
 <?xml-stylesheet href="chrome://alpheios/content/bindings.css"?>
-<?xml-stylesheet href="chrome://alpheios/skin/alph-panels.css"?>
-<?xml-stylesheet href="chrome://alpheios/skin/alph-toolbar.css"?>
-<?xml-stylesheet href="chrome://alpheios/skin/alpheios-os.css"?>
 
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
@@ -30,6 +27,7 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-linking.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-prototype.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-datafile.js" />
 
     <broadcasterset id="mainBroadcasterSet">
         <broadcaster id="alpheios-inflect"
@@ -202,12 +200,13 @@
     </toolbarpalette>
     
     <vbox id="appcontent">
-        <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-splitter"/>
+        <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-section"/>
         <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">
             <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
+                <splitter id="alph-tree-splitter" collapsed="false" class="alph-panel-splitter"/>
                 <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
                       collapsed="true"/>
-                <splitter class="alph-panel-splitter"/>
+                <splitter/>
                 <spacer flex="1"/>
             </hbox>
             <splitter id="alph-tree-lexicon-splitter" collapsed="true" class="alph-panel-splitter"/>
