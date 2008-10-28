@@ -1,0 +1,44 @@
+#alph-trans-tabs .tabs-left {
+    -moz-box-flex: 0 !important;
+}
+
+toolbarbutton.alph-close-button {
+    -moz-appearance: none;
+    -moz-image-region: rect(auto, auto, auto, auto);
+    margin: 0 4px 0 1px !important;
+    padding: 0 !important;
+    border: none;
+    background: transparent !important;
+    list-style-image: url("chrome://alpheios/skin/classic/mac/close.png");
+}
+
+toolbarbutton.alph-close-button:hover {
+    list-style-image: url("chrome://alpheios/skin/classic/mac/closeHover.png");
+}
+
+toolbarbutton.alph-close-button:hover:active {
+    list-style-image: url("chrome://alpheios/skin/classic/mac/closeActive.png");
+}
+
+toolbarbutton.alph-detach-button {
+    -moz-appearance: none;
+    -moz-image-region: rect(auto, auto, auto, auto);
+    margin: 1px 1px 0 1px !important;
+    padding: 0 !important;
+    border: none;
+    background: transparent !important;
+    list-style-image: url("chrome://alpheios/skin/classic/mac/detach.png");
+}
+
+toolbarbutton.alph-detach-button:hover {
+    list-style-image: url("chrome://alpheios/skin/classic/mac/detachHover.png");
+}
+
+toolbarbutton.alph-detach-button:hover:active {
+    list-style-image: url("chrome://alpheios/skin/classic/mac/detachActive.png");
+}
+
+toolbarbutton.alph-detach-button > .toolbarbutton-text {
+    display: none;
+}
+

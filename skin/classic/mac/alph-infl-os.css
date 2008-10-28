@@ -1,0 +1,16 @@
+ul.stem-class-block li.stem-class-toggle {
+    background: transparent !important;
+    list-style-image: url("chrome://alpheios/skin/classic/mac/twisty-clsd.png");
+}
+
+ul.stem-class-block.show-list li.stem-class-toggle {
+    list-style-image: url("chrome://alpheios/skin/classic/mac/twisty-open.png"); 
+}
+
+ul.stem-classes li.selected, ul.stem-classes li.primary {
+    list-style-image: url("chrome://alpheios/skin/cbox-check.gif");
+}
+
+ul.stem-classes li.highlight-ending {
+    list-style-image: url("chrome://alpheios/skin/cbox-check.gif");
+}

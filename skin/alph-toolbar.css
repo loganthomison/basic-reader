@@ -1,4 +1,11 @@
+
 toolbarbutton.alph-close-button {
+    -moz-appearance: none;
+    -moz-image-region: rect(auto, auto, auto, auto);
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    margin: 0 4px 0 0;
     list-style-image: url("chrome://alpheios/skin/close.png");
 }
 
@@ -6,11 +13,17 @@ toolbarbutton.alph-close-button:hover {
     list-style-image: url("chrome://alpheios/skin/closeHover.png");
 }
 
-toolbarbutton.alph-close-button:active {
+toolbarbutton.alph-close-button:hover:active {
     list-style-image: url("chrome://alpheios/skin/closeActive.png");
 }
 
 toolbarbutton.alph-detach-button {
+    -moz-appearance: none;
+    -moz-image-region: rect(auto, auto, auto, auto);
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    margin: 0;
     list-style-image: url("chrome://alpheios/skin/detach.png");
 }
 
@@ -18,7 +31,7 @@ toolbarbutton.alph-detach-button:hover {
     list-style-image: url("chrome://alpheios/skin/detachHover.png");
 }
 
-toolbarbutton.alph-detach-button:active {
+toolbarbutton.alph-detach-button:hover:active {
     list-style-image: url("chrome://alpheios/skin/detachActive.png");
 }
 

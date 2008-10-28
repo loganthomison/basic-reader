@@ -122,8 +122,8 @@
 	        	<include name="content/**" />
 	        	<include name="locale/**" />
 	            <include name="skin/**" />
+	        	<include name="platform/**" />
 	            <exclude name="**/.*" />
-	            <exclude name="**/CVS/**" />
 	         </fileset>
 	    </zip>
 	</target>

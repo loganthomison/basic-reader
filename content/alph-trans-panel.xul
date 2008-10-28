@@ -1,6 +1,4 @@
 <?xml version="1.0"?>
-<?xml-stylesheet href="chrome://alpheios/skin/alph-toolbar.css" type="text/css"?>
-<?xml-stylesheet href="chrome://alpheios/skin/alph-panels.css" type="text/css"?>
 
 <!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd">
 
@@ -72,7 +70,7 @@
                        value="&alpheios.panel.trans.label;"/>
             </toolbaritem>
             <tabbox flex="1">
-                <tabs>
+                <tabs flex="0" id="alph-trans-tabs">
                     <tab id="alph-trans-tab-primary"
                          label="&alpheios.panel.trans.tab.ped.primary;"
                          observes="alpheios-pedagogical-status"/>
@@ -81,7 +79,7 @@
                          selected="true"/>
 
                 </tabs>
-                <tabpanels flex="1">
+                <tabpanels flex="10">
                     <tabpanel flex="1" id="alph-trans-panel-primary">
                         <browser
                             flex="1"
