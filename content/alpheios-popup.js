@@ -59,20 +59,15 @@ Alph.xlate = {
         /* initialze the xsltProcessor if we haven't done so already */
         if (this.xsltProcessor == null)
         {
-            /* TODO Revisit this. Probably ought to read directly from the
-             * filesystem rather than loading via an ajax request to the chrome
-             */
+            var xmlDoc = document.implementation.createDocument("", "", null);
+            xmlDoc.async = "false";
+            xmlDoc.load("chrome://alpheios/skin/alpheios.xsl");
             this.xsltProcessor = new XSLTProcessor();
-            var p = new XMLHttpRequest();
-            p.open("GET", "chrome://alpheios/skin/alpheios.xsl", false);
-            p.send(null);
-            var xslRef = p.responseXML;
-            this.xsltProcessor.importStylesheet(xslRef)
+            this.xsltProcessor.importStylesheet(xmlDoc);
         }
         var wordHTML = '';
         try
         {
-
             var wordXML = (new DOMParser()).parseFromString(a_text,"text/xml");
             wordHTML = this.xsltProcessor.transformToDocument(wordXML);
         }
