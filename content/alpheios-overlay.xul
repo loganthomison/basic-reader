@@ -3,6 +3,9 @@
 <!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd">
 
 <?xml-stylesheet href="chrome://alpheios/content/bindings.css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alph-panels.css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alph-toolbar.css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alpheios-os.css"?>
 
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
