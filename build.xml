@@ -18,7 +18,7 @@
 	<property name="release.id" value="0.3" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
 	<property name="package" value="${app.name}-${release.id}.xpi"/>
-	<property name="extras" value="mhttpd"/>
+	<property name="extras" value="mhttpd,xsl"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 	
@@ -137,7 +137,8 @@
 		  		<export 
 		         srcUrl="${@{type}.repository}"
 		  	     revision="${@{type}.revision}"
-		  	     destPath="${alpheios.basedir}/${@{type}.target_dir}"/>
+		  	     destPath="${alpheios.basedir}/${@{type}.target_dir}"
+		  		 force="true"/>
 		    </svn>
 		  </sequential>
 		</for>
@@ -224,8 +225,15 @@
 		<property file="extras.properties"/>
         <for list="${extras}" param="type">
           <sequential>
-          	<echo message="cleaning ${alpheios.basedir}/${@{type}.target_dir}"/>
-            <delete dir="${alpheios.basedir}/${@{type}.target_dir}" failonerror="true" />
+          	<condition property="@{type}.delete.ok">
+          	 <not>
+          	    <istrue value="${@{type}.target_dir_shared}"/>
+          	 </not>
+          	</condition>
+          	<antcall target="clean.extra.dir">
+          		<param name="type" value="@{type}"/>
+          		<param name="dir" value="${@{type}.target_dir}"/>
+          	</antcall>
           </sequential>
         </for>
 	</target>
@@ -257,4 +265,9 @@
 		  <fileset dir="${docs.dir}"/>
 		</copy>
 	</target>
+	
+	<target name="clean.extra.dir" if="${type}.delete.ok">
+		<echo message="cleaning ${dir}"/>
+        <delete dir="${dir}" failonerror="true"/>
+	</target>  
 </project>

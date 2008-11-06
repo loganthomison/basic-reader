@@ -60,7 +60,7 @@ Alph.xlate = {
         if (this.xsltProcessor == null)
         {
             var xmlDoc = document.implementation.createDocument("", "", null);
-            xmlDoc.async = "false";
+            xmlDoc.async = false;
             xmlDoc.load("chrome://alpheios/skin/alpheios.xsl");
             this.xsltProcessor = new XSLTProcessor();
             this.xsltProcessor.importStylesheet(xmlDoc);

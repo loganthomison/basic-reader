@@ -205,8 +205,10 @@ Alph.infl = {
         }
         wordlist = wordlist.replace(/\,\s$/,'');
         
-        // TODO -- should fix the XSLT to populate this instead
-        $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
+        if ($("caption",a_tbl).html() == '')
+        {
+            $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
+        }
 
 
         var str_props = document.getElementById("alph-infl-strings");
@@ -240,7 +242,8 @@ Alph.infl = {
                 function()
                 {
                     if (  
-                        (a_link_target.xslt_params && $(this).hasClass("selected")) || 
+                        (a_link_target.xslt_params && 
+                            ($(this).hasClass("selected") || $(this).hasClass("matched"))) || 
                         (typeof a_link_target.xslt_params == "undefined" && 
                             Alph.infl.is_ending_match(a_link_target.suffixes[showpofs],this,lang_tool) )
                        )

@@ -189,6 +189,12 @@ span.highlight-ending {
     font-size: 1.25em;
 }
 
+span.highlight-ending.matched {
+    background-color: #CCFFFF;
+    font-weight: bold;
+    font-size: 1em;
+}
+
 .highlight-hover {
    background-color: #c7b589;
    
@@ -246,4 +252,8 @@ th.reloading {
     padding-right: 10px;
     background: transparent url(loading.gif) right no-repeat;
     cursor: progress;
+}
+
+.alph-infl-term {
+    display: inline;
 }

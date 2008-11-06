@@ -124,7 +124,7 @@ Alph.convert = {
         if (this.u2bConverter == null)
         {
             var xmlDoc = document.implementation.createDocument("", "", null);
-            xmlDoc.async = "false";
+            xmlDoc.async = false;
             xmlDoc.load("chrome://alpheios/skin/alpheios-uni2betacode.xsl");
             this.u2bConverter = new XSLTProcessor();
             this.u2bConverter.importStylesheet(xmlDoc);
