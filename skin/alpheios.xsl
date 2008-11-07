@@ -86,9 +86,9 @@
     <div class="alph-unknown">
       <xsl:text>Unknown: </xsl:text>
       <span class="alph-hdwd">
-      	<xsl:call-template name="convert-text">
-	        <xsl:with-param name="item" select="."/>
-   	   </xsl:call-template>
+        <xsl:call-template name="convert-text">
+          <xsl:with-param name="item" select="."/>
+        </xsl:call-template>
       </span>
     </div>
   </xsl:template>
@@ -103,7 +103,15 @@
   </xsl:template>
 
   <xsl:template match="dict">
-    <div class="alph-dict">
+    <xsl:element name="div">
+      <xsl:attribute name="class">alph-dict</xsl:attribute>
+      <xsl:attribute name="key">
+        <xsl:call-template name="convert-text">
+          <xsl:with-param name="item" select="hdwd"/>
+          <xsl:with-param name="strip" select="true()"/>
+        </xsl:call-template>
+      </xsl:attribute>
+
       <!-- define order in which elements should appear -->
       <xsl:call-template name="item-plus-text">
         <xsl:with-param name="item" select="hdwd"/>
@@ -142,7 +150,7 @@
       <xsl:call-template name="item-plus-text">
         <xsl:with-param name="item" select="note"/>
       </xsl:call-template>
-    </div>
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="mean">
@@ -426,6 +434,7 @@
   <xsl:template name="convert-text">
     <xsl:param name="item"/>
     <xsl:param name="partial" select="false()"/>
+    <xsl:param name="strip" select="false()"/>
 
     <!-- switch on language -->
     <xsl:choose>
@@ -438,17 +447,32 @@
           </xsl:call-template>
         </xsl:variable>
 
+        <!-- get text in Unicode -->
+        <xsl:variable name="text">
+          <xsl:choose>
+            <!-- if betacode -->
+            <xsl:when test="$isbeta > 0">
+              <!-- convert it to unicode -->
+              <xsl:call-template name="beta-to-uni">
+                <xsl:with-param name="input" select="$item"/>
+                <xsl:with-param name="partial" select="$partial"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$item"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <!-- strip length diacritics if requested -->
         <xsl:choose>
-          <!-- if betacode -->
-          <xsl:when test="$isbeta > 0">
-            <!-- convert it to unicode -->
-            <xsl:call-template name="beta-to-uni">
-              <xsl:with-param name="input" select="$item"/>
-              <xsl:with-param name="partial" select="$partial"/>
+          <xsl:when test="$strip">
+            <xsl:call-template name="uni-strip-length">
+              <xsl:with-param name="input" select="$text"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$item"/>
+            <xsl:value-of select="$text"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
