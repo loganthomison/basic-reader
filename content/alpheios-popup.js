@@ -228,7 +228,6 @@ Alph.xlate = {
             err_msg +
             '</div>'
         );
-        Alph.main.broadcast_ui_event();
     },
 
     /**
@@ -283,7 +282,6 @@ Alph.xlate = {
         // are going to be invoked (i.e. if a textbox elsewhere is focused, the keydown
         // event listener might be hijacked) See Bug 149.
         Alph.$("#alph-window-anchor",a_topdoc).focus();
-        Alph.main.broadcast_ui_event();
         // TODO - we probably should reposition the popup now that we 
         // know it's final size
     },
@@ -585,6 +583,7 @@ Alph.xlate = {
                         Alph.xlate.showTranslation(data,a_alphtarget,doc);
                     }
                 );
+                Alph.main.broadcast_ui_event();
 
             },
             function(a_msg)
@@ -598,6 +597,7 @@ Alph.xlate = {
                         Alph.xlate.translationError(a_msg,doc);
                     }
                 );
+                Alph.main.broadcast_ui_event();
             }
         );
     },

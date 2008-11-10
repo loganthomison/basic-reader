@@ -10,6 +10,7 @@
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-tree-panel.xul"?>
+<?xul-overlay href="chrome://alpheios/content/alpheios-etym-panel.xul"?>
 
 
 <overlay id="alpheios" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -210,7 +211,8 @@
                 <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
                       collapsed="true"/>
                 <splitter/>
-                <spacer flex="1"/>
+                <hbox id="alph-etym-box" class="alph-panel" flex="1" persist="height" 
+                      collapsed="true"/>
             </hbox>
             <splitter id="alph-tree-lexicon-splitter" collapsed="true" class="alph-panel-splitter"/>
             <hbox id="alph-lexicon-box" class="alph-panel" flex="1" 

@@ -1009,6 +1009,7 @@ Alph.main =
                         Alph.xlate.showTranslation(data,target,doc);
                     }
                 );
+                Alph.main.broadcast_ui_event();
             },
             function(a_msg)
             {   
@@ -1018,7 +1019,8 @@ Alph.main =
                         var doc = Alph.$(this).get(0).contentDocument
                         Alph.xlate.translationError(a_msg,doc);
                     }
-                );                
+                );
+                Alph.main.broadcast_ui_event();
             }
         );
     },
@@ -1113,6 +1115,7 @@ Alph.main =
                 try 
                 {
                     var panel_obj = Alph.main.panels[panel_id];
+                    Alph.util.log("Observing ui event for panel " + panel_id); 
                     panel_obj.observe_ui_event(bro);    
                 } 
                 catch (e)

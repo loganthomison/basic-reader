@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd"
+[<!ENTITY % etymDTD SYSTEM "chrome://alpheios/locale/alpheios-etym.dtd" >
+%etymDTD;
+]>
+
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    
+    <script type="application/x-javascript" 
+            src="chrome://alpheios/content/alpheios-etym.js" />
+
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="alph-etym-status"
+                     checked="false"
+                     disabled="true" 
+                     class="alpheios-enabled-notifier"/>
+    </broadcasterset>
+
+    <commandset id="mainCommandSet">
+        <command id="alpheios-etym-toggle-cmd" 
+             oncommand="Alph.main.toggle_panel(event,'alph-etym-panel');"
+             observes="alph-etym-status" />
+    </commandset>
+             
+    <!-- overlay the tools menu -->
+    <menupopup id="alpheios-tools-popup">
+        <menuitem
+            id="alpheios-etym-toggle"
+            type="checkbox"
+            label="&alpheios-tools-etym-label;"
+            command="alpheios-etym-toggle-cmd"
+            tooltiptext="&alpheios-tools-etym-tooltip;"
+            class="menuitem-iconic" />
+    </menupopup>
+
+    <!-- overlay the bottom panel -->
+    <hbox id="alph-etym-box">
+        <alpheiosPanel 
+                    flex="1" 
+                    id="alph-etym-panel" 
+                    notifier="alph-etym-status"
+                    paneltype="Etymology"
+                    panelorient="vertical">
+                    <toolbaritem id="alpheios-etym-panel-label">
+                        <label id="alph-etym-label" 
+                               value="&alpheios-etym-toolbar-label;"/>
+                    </toolbaritem>
+                    <browser
+                        id="alph-etym-body"
+                        flex="1"
+                        type="content"
+                        class="alph-lexicon-output"
+                        src="chrome://alpheios/content/html/alph-panel.html"/>
+        </alpheiosPanel>
+    </hbox>
+      
+</overlay>

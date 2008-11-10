@@ -280,7 +280,6 @@ Alph.Panel.prototype.detach = function()
     this.update_status(Alph.Panel.STATUS_SHOW);
 };
 
-
 /**
  * Restore the panel to the current inline state
  */

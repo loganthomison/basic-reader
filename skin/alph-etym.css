@@ -1,0 +1,19 @@
+body {
+    background: white;
+}
+
+#alph-window {
+    border: none !important;
+    padding: 4px;
+    background: white;
+}
+
+/** hide everything except the headword etymology view **/
+.alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error, .alph-mean, .alph-pofs{
+    display: none;
+}
+
+.alph-hdwd:before {
+    content: "Etymology for ";
+
+}
