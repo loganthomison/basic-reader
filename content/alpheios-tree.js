@@ -105,7 +105,7 @@ Alph.Tree.prototype.show = function()
                     // (text width computation doesn't work without
                     // this before calling position())
                     Alph.$("#dependency-tree", treeDoc).
-                            append(svgXML.firstChild);
+                            append(svgXML.firstChild.childNodes);
                     svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
 
 //                  Alph.util.log("SVG before: " +
