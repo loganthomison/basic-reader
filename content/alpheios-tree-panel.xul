@@ -51,7 +51,8 @@
                         id="alph-tree-body"
                         flex="1"
                         type="content"
-                        src="chrome://alpheios/content/html/alph-panel.html"/>
+                        src="chrome://alpheios/content/svg/alph-panel.svg"
+                        overflow="scroll"/>
         </alpheiosPanel>
     </hbox>
       
