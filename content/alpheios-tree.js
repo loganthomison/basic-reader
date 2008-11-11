@@ -52,15 +52,7 @@ Alph.Tree.prototype.show = function()
 {
     var panel_obj = this;
     var bro = Alph.main.getCurrentBrowser();
-    var treeDoc;
-    if (this.panel_window == null)
-    {
-        treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
-    }
-    else
-    {
-        treeDoc = this.panel_window.Alph.$("#" + this.panel_id + " browser").get(0).contentDocument;
-    }
+    var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
 
     var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
     if (sentence.length == 0)
@@ -128,6 +120,22 @@ Alph.Tree.prototype.show = function()
             }
         );
     }
+    
+    // make sure to update the detached window document too...
+    // update the panel document whether or not the window is detached
+    // because otherwise the screen doesn't seem to redraw right
+    if (this.panel_window != null)
+    {
+        var window_doc = 
+            this.panel_window.Alph.$("#" + this.panel_id + " browser").get(0).contentDocument;
+        var panel_tree = Alph.$("#dependency-tree", treeDoc);
+        Alph.$("#dependency-tree", window_doc).empty();
+        Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone());
+        Alph.$("#dependency-tree", window_doc).attr("width",Alph.$(panel_tree).attr("width"));
+        Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
+
+    }
+    
     return Alph.Panel.STATUS_SHOW;
 };
 
