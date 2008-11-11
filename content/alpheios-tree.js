@@ -110,11 +110,14 @@ Alph.Tree.prototype.show = function()
 
 //                  Alph.util.log("SVG before: " +
 //                                xmlSerializer.serializeToString(svgXML));
-                    position(svgXML.getElementsByTagName('g').item(0),
-                             true,
-                             marginLeft,
-                             marginTop + fontSize,
-                             0);
+                    var returned =
+                            position(svgXML.getElementsByTagName('g').item(0),
+                                     true,
+                                     marginLeft,
+                                     marginTop + fontSize,
+                                     0);
+                    svgXML.setAttribute("width", returned[2]);
+                    svgXML.setAttribute("height", returned[3]);
                     Alph.util.log("SVG: " +
                                   xmlSerializer.serializeToString(svgXML));
                 }
@@ -179,6 +182,8 @@ function position(a_containerNode,
     var nodeLabel;
     var nodeLabelWidth;
     var nodeBranch;
+    var maxX = 0;
+    var maxY = 0;
 
     //get and handle children ============================
     for (var i = 0; i < a_containerNode.childNodes.length; i++)
@@ -221,6 +226,12 @@ function position(a_containerNode,
                            nodeLabelWidth);
             childrenLabels.push(returned[0]);
             childrenWidth += returned[1];
+
+            // update size
+            if (returned[2] > maxX)
+                maxX = returned[2];
+            if (returned[3] > maxY)
+                maxY = returned[3];
         }
     }
 
@@ -259,6 +270,14 @@ function position(a_containerNode,
                             'px');
     }
 
+    // update size
+    thisX += nodeLabelWidth/2;
+    if (thisX > maxX)
+        maxX = thisX;
+    thisY += (isEmpty ? 0: fontSize);
+    if (thisY > maxY)
+        maxY = thisY;
+
     //below root: anchor one end of the branch to the label
     if (!a_isRoot)
     {
@@ -273,5 +292,5 @@ function position(a_containerNode,
         }
     }
 
-    return Array({label:nodeLabel, branch:nodeBranch}, childrenWidth);
+    return Array({label:nodeLabel, branch:nodeBranch}, childrenWidth, maxX, maxY);
 }
