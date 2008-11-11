@@ -8,6 +8,7 @@
 <?xml-stylesheet href="chrome://alpheios/skin/alpheios-os.css"?>
 
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
+<?xul-overlay href="chrome://alpheios/content/alpheios-dict-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-tree-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-etym-panel.xul"?>
@@ -210,13 +211,20 @@
                 <splitter id="alph-tree-splitter" collapsed="false" class="alph-panel-splitter"/>
                 <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
                       collapsed="true"/>
-                <splitter/>
+                <splitter class="alph-panel-splitter" collapsed="true"/>
                 <hbox id="alph-etym-box" class="alph-panel" flex="1" persist="height" 
                       collapsed="true"/>
             </hbox>
-            <splitter id="alph-tree-lexicon-splitter" collapsed="true" class="alph-panel-splitter"/>
-            <hbox id="alph-lexicon-box" class="alph-panel" flex="1" 
-                  persist="height" collapsed="true"/>
+            <splitter collapsed="true" class="alph-panel-section"/>
+            <hbox id="alph-lex-tools" class="alph-panel-section" collapsed="true"
+                  flex="1" persist="height">
+                <splitter collapsed="true" class="alph-panel-splitter"/>
+                <hbox id="alph-morph-box" class="alph-panel" flex="1" 
+                      persist="height" collapsed="true"/>
+                <splitter class="alph-panel-splitter" collapsed="true"/>
+                <hbox id="alph-dict-box" class="alph-panel" flex="1" 
+                      collapsed="true" persist="height"/>
+            </hbox>
         </vbox>
     </vbox>
     

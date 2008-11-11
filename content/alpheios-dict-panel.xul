@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-dict.dtd">
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-dict.js" />
+
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="alph-dict-status"
+                     checked="false"
+                     disabled="true" 
+                     class="alpheios-enabled-notifier"/>
+    </broadcasterset>
+
+    <commandset id="mainCommandSet">
+        <command id="alpheios-dict-toggle-cmd" 
+             oncommand="Alph.main.toggle_panel(event,'alph-dict-panel');"
+             observes="alph-dict-status" />
+    </commandset>
+             
+    <!-- overlay the tools menu -->
+    <menupopup id="alpheios-tools-popup">
+        <menuitem
+            id="alpheios-dict-button"
+            type="checkbox"
+            label="&alpheios-tools-dict-label;"
+            command="alpheios-dict-toggle-cmd"
+            tooltiptext="&alpheios-tools-dict-tooltip;"
+            class="menuitem-iconic" />
+    </menupopup>
+
+    <!-- overlay the bottom panel -->
+    <hbox id="alph-dict-box">
+            <alpheiosPanel 
+                flex="1" 
+                id="alph-dict-panel" 
+                notifier="alph-dict-status"
+                paneltype="Dict"
+                panelorient="horizontal">
+                <toolbaritem id="alpheios-dict-panel-label">
+                    <label id="alph-dict-label" 
+                           value="&alpheios-dict-toolbar-label;"/>
+                </toolbaritem>
+                      <browser 
+                    id="alph-dict-body"
+                    flex="1"
+                    src="chrome://alpheios/content/alph-dict.html" 
+                    class="alph-lexicon-output"/>
+            </alpheiosPanel>
+    </hbox>  
+</overlay>

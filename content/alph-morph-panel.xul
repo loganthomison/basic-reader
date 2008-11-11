@@ -35,7 +35,7 @@
     </menupopup>
 
     <!-- overlay the bottom panel -->
-    <hbox id="alph-lexicon-box">
+    <hbox id="alph-morph-box">
             <alpheiosPanel 
                 flex="1" 
                 id="alph-morph-panel" 
@@ -64,12 +64,6 @@
                     flex="1"
                     type="content"
                     src="chrome://alpheios/content/alph-morph.html"
-                    class="alph-lexicon-output"/>
-                <splitter id="alph-morph-box-splitter" collapsed="false"/>
-                <browser 
-                    id="alph-dict-body"
-                    flex="1"
-                    src="chrome://alpheios/content/alph-dict.html" 
                     class="alph-lexicon-output"/>
             </alpheiosPanel>
     </hbox>  
