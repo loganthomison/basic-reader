@@ -53,12 +53,36 @@ Alph.Tree.prototype.show = function()
     var panel_obj = this;
     var bro = Alph.main.getCurrentBrowser();
     var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
-
+    // clear out the prior tree
+    Alph.$("#dependency-tree", treeDoc).empty();
     var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
     if (sentence.length == 0)
     {
-        Alph.$("#alph-panel-body-template",treeDoc)
-            .addClass("error").text("No dependency tree information available for this text.")
+        // Just add the default message to the display
+        var svgXML = (new DOMParser()).parseFromString(
+            '<svg xmlns="http://www.w3.org/2000/svg">' +
+            '<g><text class="error">' +
+            "No dependency tree information available for this text." +
+            "</text></g>" +
+            "</svg>",
+            "text/xml");
+        try 
+        {
+            Alph.$("#dependency-tree", treeDoc).
+                            append(svgXML.firstChild.childNodes);
+            svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
+            position(svgXML.getElementsByTagName('g').item(0),
+                true,
+                marginLeft,
+                marginTop + fontSize,
+                0);
+            svgXML.setAttribute("width", returned[2]);
+            svgXML.setAttribute("height", returned[3]);
+        }
+        catch(e)
+        {
+            Alph.util.log(e);
+        }
     }
     else
     {
@@ -79,7 +103,7 @@ Alph.Tree.prototype.show = function()
             Alph.util.log(e);
         }
 
-        Alph.$("#dependency-tree", treeDoc).empty();
+        
         Alph.$(sentence).each
         (
             function(a_i)
