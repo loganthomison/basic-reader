@@ -1,0 +1,54 @@
+svg {
+    overflow:scroll;
+}
+
+g text {
+    text-anchor:middle;
+    font-family:Times, Arial, Helvetica, Serif;
+    font-size:20px;
+    stroke: none;
+    fill: gray;
+}
+
+/* color text according to part of speech:
+adjective    blue
+adverb       orange
+article      pale blue   gray
+conjunction  pink        purple/mauve
+interjection yellow
+noun         black
+preposition  green
+pronoun      purple      light pink
+verb         red
+*/
+g text.adjective {
+    fill: blue;
+}
+g text.adverb {
+    fill: darkorange;
+}
+g text.article {
+    fill: lightblue;
+}
+g text.conjunction {
+    fill: hotpink;
+}
+g text.interjection {
+    fill: yellow;
+}
+g text.noun {
+    fill: black;
+}
+g text.preposition {
+    fill: green;
+}
+g text.pronoun {
+    fill: purple;
+}
+g text.verb {
+    fill: red;
+}
+
+g line {
+    stroke:black;
+}
