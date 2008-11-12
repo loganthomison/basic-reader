@@ -49,6 +49,9 @@ Alph.Etymology.prototype = new Alph.Panel();
 Alph.Etymology.prototype.init = function(a_panel_state)
 {
     Alph.util.log("etymology panel init");
+    // hack to hold etymology data until we have a real service
+    this.temp_data = {};
+    
     // initialize the contents array
     a_panel_state.contents = [];
     a_panel_state.css = [];
@@ -121,7 +124,7 @@ Alph.Etymology.prototype.init_document = function(a_doc,a_doc_state)
     }
     Alph.$("#alph-panel-body-template",a_doc).html("");
     Alph.$("#alph-window",a_doc).remove();
-    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone());    
+    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone());
     Alph.$("link[rel=stylesheet]",a_doc).remove();
     Alph.$("head",a_doc).append(Alph.$(a_doc_state.css).clone());
     return a_doc_state;
@@ -179,12 +182,27 @@ Alph.Etymology.prototype.observe_ui_event = function(a_bro)
 {
     // store the current contents of the morph window in this browser's panel state
     var panel_state = this.get_browser_state(a_bro);
+    var data = this.get_etym_data();
+    var panel_obj = this;
      
     Alph.$("browser",this.panel_elem).each( 
         function(i) 
         {
             var etym_doc = this.contentDocument;
             var alph_window = Alph.$("#alph-window",etym_doc).get(0);
+            Alph.$("#alph-etym-block",etym_doc).remove();
+            var dict = Alph.$(".alph-dict",alph_window);
+            
+            if (dict.length != 0 && data != null)
+            {
+                var hdwd = Alph.$(dict).attr("key");
+                var etym_block = Alph.$("div[key=" + hdwd + "]",data).clone();
+                if (etym_block != null && typeof etym_block != "undefined")
+                {
+                    Alph.$(etym_block).attr("id","alph-etym-block");
+                    Alph.$("#alph-window",etym_doc).append(etym_block);
+                }
+            }
             panel_state.contents[i] = Alph.$("#alph-window",etym_doc).clone();
             panel_state.css[i] = Alph.$("link[rel=stylesheet]",etym_doc).clone();
         }
@@ -193,7 +211,7 @@ Alph.Etymology.prototype.observe_ui_event = function(a_bro)
     // update the panel window
     if (this.panel_window != null)
     {
-        var panel_obj = this;
+        
         this.panel_window.Alph.$("#" + this.panel_id + " browser").each( 
             function(i) 
             {
@@ -206,3 +224,36 @@ Alph.Etymology.prototype.observe_ui_event = function(a_bro)
     }
 }
 
+/**
+ * Get the etymology data -- hack until we have a real etymology service
+ * @return the etymology data for the current language or null 
+ */
+Alph.Etymology.prototype.get_etym_data = function()
+{
+    // initialize the etymology lookup data object
+    // this is a temporary hack until we have a real etymology service
+    var language_tool = Alph.main.getLanguageTool();
+    if (typeof language_tool != "undefined")
+    {
+        var chromepkg = language_tool.getchromepkg();
+        if (typeof this.temp_data[chromepkg] == "undefined")
+        {
+            try 
+            {
+                Alph.util.log("Loading etymology file for " + chromepkg);
+                var data = document.implementation.createDocument("", "", null);
+                data.async = false;
+                var chrome_url = "chrome://" + chromepkg + "/content/testetym.xml";
+                data.load(chrome_url);
+                this.temp_data[chromepkg] = data;
+            }
+            catch(e)
+            {
+                this.temp_data[chromepkg] = null;
+                Alph.util.log("Error loading etymology file for " + chromepkg);
+            }
+        }
+        return this.temp_data[chromepkg];
+    }
+    return null;
+}

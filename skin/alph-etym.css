@@ -9,11 +9,38 @@ body {
 }
 
 /** hide everything except the headword etymology view **/
-.alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error, .alph-mean, .alph-pofs{
+.alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error, .alph-mean, .alph-pofs, .alph-attr, .alph-decl, .alph-attrlist, .alph-src, .alph-conj {
     display: none;
 }
 
-.alph-hdwd:before {
-    content: "Etymology for ";
+.alph-etym-block {}
 
+.alph-cognate,.alph-etymology {
+    clear: both;
+}
+
+.label {
+    font-weight: bold;
+    padding-right: 1em;
+}
+
+.caption {
+    font-style: italic;
+    float: left;
+    padding-left: 1em;
+}
+
+.label.caption {
+   font-style: normal;
+   padding-left: 0;
+}
+
+.cognate-list, .etymology-list {
+    margin-top: 0;
+    margin-left: 5em;
+    list-style-type: none; 
+}
+
+.meaning {
+    padding-left: 1.5em;
 }
