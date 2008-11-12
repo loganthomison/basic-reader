@@ -7,10 +7,15 @@ g text {
     font-family:Times, Arial, Helvetica, Serif;
     font-size:20px;
     stroke: none;
-    fill: gray;
+    fill: dimgray;
+}
+
+g text.error {
+    fill: black;
 }
 
 /* color text according to part of speech:
+POS          color       alternate?
 adjective    blue
 adverb       orange
 article      pale blue   gray
@@ -20,6 +25,8 @@ noun         black
 preposition  green
 pronoun      purple      light pink
 verb         red
+
+exclamation=interjection
 */
 g text.adjective {
     fill: blue;
@@ -28,13 +35,16 @@ g text.adverb {
     fill: darkorange;
 }
 g text.article {
-    fill: lightblue;
+    fill: skyblue;
 }
 g text.conjunction {
-    fill: hotpink;
+    fill: deeppink;
+}
+g text.exclamation {
+    fill: gold;
 }
 g text.interjection {
-    fill: yellow;
+    fill: gold;
 }
 g text.noun {
     fill: black;
