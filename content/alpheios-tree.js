@@ -89,9 +89,26 @@ Alph.Tree.prototype.show = function()
                     var sentenceId = "#" + Alph.$(this).attr("id");
                     var aldtXML = Alph.$(sentenceId, treebankDoc).get(0);
                     var xmlSerializer = new XMLSerializer();
-//                  Alph.util.log("ALDT: " +
-//                                xmlSerializer.serializeToString(aldtXML));
-                    var svgXML = xsltProc.transformToDocument(aldtXML);
+                    var svgXML;
+
+                    // if no treebank data found, use error message
+                    if (aldtXML == null)
+                    {
+                        svgXML = (new DOMParser()).parseFromString(
+                            '<svg xmlns="http://www.w3.org/2000/svg">' +
+                              '<g><text class="error">' +
+                                "No dependency tree information available for this text." +
+                              "</text></g>" +
+                            "</svg>",
+                            "text/xml");
+                    }
+                    // if treebank data found, transform it to SVG
+                    else
+                    {
+//                      Alph.util.log("ALDT: " +
+//                                    xmlSerializer.serializeToString(aldtXML));
+                        svgXML = xsltProc.transformToDocument(aldtXML);
+                    }
 
                     // insert new SVG in tree, then retrieve it
                     // (text width computation doesn't work without
