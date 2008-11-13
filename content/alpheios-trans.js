@@ -80,44 +80,83 @@ Alph.Translation.prototype.show = function()
         var browser_box = Alph.$("#alph-trans-panel-primary",tab_box); 
         var trans_doc = 
             Alph.$("browser",browser_box).get(0).contentDocument;
-        Alph.$.ajax(
+        var trans_url = Alph.$(trans_url).attr("url")  
+        // jQuery can't handle a request to chrome which doesn't return expected
+        // http headers --- this is a temporary hack to allow the interlinear
+        // prototype to be run locally
+        if (  trans_url.indexOf('chrome://') == 0 )
+        {
+            var r = new XMLHttpRequest();
+            r.onreadystatechange = function()
             {
-                type: "GET",
-                url: Alph.$(trans_url).attr("url"),
-                dataType: 'html', 
-                error: function(req,textStatus,errorThrown)
+                if (r.readyState == 4 && r.responseText) 
                 {
-                    Alph.$("body",trans_doc)
-                        .html(textStatus || errorThrown);
-                },
-                success: function(data, textStatus) 
+                    Alph.Translation.process_translation(r.responseText,bro,trans_doc,tab_box);
+                }
+                else 
                 {
-                    Alph.$("body",trans_doc).html(data);
-                    
-                    // setup the display
-                    Alph.pproto.setup_display(trans_doc,'trans');
-                    
-                    // setup for interlinear
-                    Alph.pproto.enable_interlinear(bro.contentDocument,trans_doc);
-                    
-                    // toggle the state of the interlinear display
-                    // according to the selected state of the menu item
-                    Alph.Translation
-                        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_SRC);
-                    Alph.Translation
-                        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_TRANS);
-                    
-                    // TODO - need to take state into account
-                    // (i.e. if user chose a different tab)
-                    Alph.$("#alph-trans-tab-primary",tab_box).click();
-                    
-                } 
-            }   
-        );
-        
+                    Alph.Translation.handle_error("error",trans_doc);
+                }
+            }
+            r.open("GET", trans_url);
+            r.send(null);
+  
+        }
+        else
+        {
+            Alph.$.ajax(
+                {
+                    type: "GET",
+                    url: trans_url,
+                    dataType: 'html', 
+                    error: function(req,textStatus,errorThrown)
+                    {
+                        Alph.Translation.handle_error(textStatus||errorThrown,trans_doc);
+    
+                    },
+                    success: function(data, textStatus) 
+                    {
+                        
+                        Alph.Translation.process_translation(data,bro,trans_doc,tab_box);
+                    } 
+                }   
+            );
+        }
    }
    return Alph.Panel.STATUS_SHOW;
 };
+
+/**
+ * Display error returned by request for translation
+ */
+Alph.Translation.handle_error = function(a_error,a_trans_doc)
+{
+    Alph.$("body",a_trans_doc).html(a_error);
+}
+
+/**
+ * Populate the pedagogical panel with the translation
+ */
+Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc,a_tab_box) {
+    Alph.$("body",a_trans_doc).html(a_data);
+
+    // setup the display
+    Alph.pproto.setup_display(a_trans_doc,'trans');
+                    
+    // setup for interlinear
+    Alph.pproto.enable_interlinear(a_bro.contentDocument,a_trans_doc);
+                    
+    // toggle the state of the interlinear display
+    // according to the selected state of the menu item
+    Alph.Translation
+        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_SRC);
+    Alph.Translation
+        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_TRANS);
+                    
+    // TODO - need to take state into account
+    // (i.e. if user chose a different tab)
+    Alph.$("#alph-trans-tab-primary",a_tab_box).click();   
+}
 
 /**
  * Translation panel specific implementation of 
