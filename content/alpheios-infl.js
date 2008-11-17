@@ -198,15 +198,15 @@ Alph.infl = {
         );
         
         //show the words for this inflection type
-        var wordlist = "";
-        for (var word in a_link_target.words[showpofs])
+        if ($("caption",a_tbl).html() == '' && typeof a_link_target.words != "undefined")
         {
-            wordlist = wordlist + word + ", ";
-        }
-        wordlist = wordlist.replace(/\,\s$/,'');
+            var wordlist = "";
+            for (var word in a_link_target.words[showpofs])
+            {
+                wordlist = wordlist + word + ", ";
+            }
+            wordlist = wordlist.replace(/\,\s$/,'');
         
-        if ($("caption",a_tbl).html() == '')
-        {
             $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
         }
 
