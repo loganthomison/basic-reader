@@ -12,6 +12,10 @@ body, th, td {
     font-size: 110%;
 }
 
+div#alph-infl-index-link {
+    color: blue;
+}
+
 #links a, #infl-links a {
     padding-right: 1em;
 }
@@ -257,3 +261,4 @@ th.reloading {
 .alph-infl-term {
     display: inline;
 }
+

@@ -86,7 +86,41 @@ Alph.infl = {
     onLoad: function() {
         var link_target = window.arguments[0];
 
+        var infl_browser = $("#alph-infl-browser");
         
+        // if we don't have a requested part of speech, show the index
+        if (typeof link_target.showpofs == 'undefined' && link_target.xml_url)
+        {
+            var doc = $(infl_browser).get(0).contentDocument;
+            var infl_html = Alph.infl.transform(link_target);
+            var infl_node = 
+                doc.importNode(infl_html.getElementById("alph-infl-index"),true);
+            $("body",doc).append(infl_node);   
+            // add a click handler to each index link to bring up the 
+            // corresponding inflection table
+            $("a.alph-infl-index-link",doc).click(
+                function(e)
+                {
+                    $(this).addClass("loading");
+                    // TODO syntax will change with linking architecture
+                    // for now, index link syntax is
+                    // #<pofs>[|<addt'l param_name:addt'lparam_value>+]
+                    var target = $(this).attr("href").slice(1).split(/\|/);
+                    var params = {};
+                    params.showpofs = target[0];
+                    for (var i=1; i<target.length; i++)
+                    {
+                        var param = target[i].split(/:/);
+                        params[param[0]]= param[1];
+                    }
+                    window.opener.Alph.main.getLanguageTool().
+                        handleInflections(e,$(this),params);
+                }
+            );
+            $(".loading",doc).hide();
+            return;
+        }
+
         var pofs_set = [];
         for (var pofs in link_target.suffixes)
         {
@@ -97,32 +131,33 @@ Alph.infl = {
             }
         }
         
-        var suffix_map = {};
-        var suffix_list = jQuery.map(link_target.suffixes[link_target.showpofs],function(n){
-            var ending = $(n).text();
-            if (ending == '') {
-                ending = '&lt;none&gt;'
-            }
-            // remove duplicates from the list of suffixes
-            // for some reason the jQuery.unique function doesn't work
-            if (suffix_map[ending]) 
-            {
-                return;
-            }
-            else 
-            {
-                suffix_map[ending] = true;
-                return ending;
-            } 
-        });
-        link_target.suffix_list = suffix_list.join(',');
-
-        // if we don't have the primary case, just use the first one we found
-        if (typeof link_target.showpofs == 'undefined')
-        {
-            link_target.showpofs = pofs_set[0]
-        }
         
+        var suffix_map = {};
+        if (typeof link_target.suffixes[link_target.showpofs] != "undefined")
+        {
+            var suffix_list = jQuery.map(link_target.suffixes[link_target.showpofs],function(n){
+                if ($(n).length == 0)
+                {
+                    return;
+                }
+                var ending = $(n).text();
+                if (ending == '') {
+                    ending = '&lt;none&gt;'
+                }
+                // remove duplicates from the list of suffixes
+                // for some reason the jQuery.unique function doesn't work
+                if (suffix_map[ending]) 
+                {
+                    return;
+                }
+                else 
+                {
+                    suffix_map[ending] = true;
+                    return ending;
+                } 
+            });
+            link_target.suffix_list = suffix_list.join(',');
+        }
         document.getElementById("alph-infl-browser")
             .addEventListener(
                 "DOMContentLoaded",
@@ -145,7 +180,7 @@ Alph.infl = {
                 true
                 );
                 
-        var infl_browser = $("#alph-infl-browser");
+        
         
         var base_pofs = (link_target.showpofs.split(/_/))[0];
         
@@ -213,6 +248,19 @@ Alph.infl = {
 
         var str_props = document.getElementById("alph-infl-strings");
     
+        // add a link to the index
+        $("body",topdoc).prepend(
+            "<div id='alph-infl-index-link'>"
+            + str_props.getString("alph-infl-index-link") 
+            + '</div>');
+            
+        $("#alph-infl-index-link",topdoc).click(
+            function(e)
+            {
+                window.opener.Alph.main.getLanguageTool().
+                        handleInflections(e,$(this),null);
+            }
+        );
         var start = (new Date()).getTime();
         
         // replace the table header text

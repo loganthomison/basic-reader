@@ -154,3 +154,17 @@
     height: 100px;
 }
 
+#alph-infl-index h1 {
+    font-size: 110%
+}
+
+#alph-infl-index a.alph-infl-index-link {
+    color: blue;
+    text-decoration: none;
+}
+
+#alph-infl-index a.loading {
+    background: transparent url(loading.gif) no-repeat;
+    cursor: progress;
+    color: gray;
+}

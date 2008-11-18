@@ -688,39 +688,41 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     {
         a_node = Alph.$("#alph-text", content.document).clone();
     }
-    if (Alph.$(a_node).length == 0)
+    if (Alph.$(a_node).length != 0)
     {
-        return;
+            params = this.getInflectionTable(a_node,params);
     }
-    params = this.getInflectionTable(a_node,params)
-    if (! params)
-    {
-        return;
-    }
-    if (typeof params.showpofs != 'undefined')
-    {
-        params.source_node = a_node;
-        Alph.util.log("Handling inflections for " + params.showpofs);
         
-        // send the word endings to the declension table
-        // if the window isn't already open, open it
-        // TODO window features should be language-specific
-        var features =
-        {
-            width:"300",
-            height:"620",
-            screen: Alph.util.getPref("shift.window.loc"),
-            menubar: "yes",
-            toolbar: "yes"
-        }
-        Alph.xlate.openSecondaryWindow(
-                        "alph-infl-table",
-                        "chrome://alpheios/content/alpheios-infl.xul",
-                        features,
-                        params);
-            Alph.util.log("Inflections window should have focus with " 
-                + Alph.main.get_state_obj().get_var("word"));
+    if (typeof params.showpofs == 'undefined')
+    {
+        params.xml_url = 
+                "chrome://"
+                + this.getchromepkg()
+                + "/content/inflections/alph-infl-index.xml";
+        params.xslt_url = 
+                "chrome://alpheios/skin/alph-infl-index.xsl";
     }
+    params.source_node = a_node;
+    Alph.util.log("Handling inflections for " + params.showpofs);
+    
+    // send the word endings to the declension table
+    // if the window isn't already open, open it
+    // TODO window features should be language-specific
+    var features =
+    {
+        width:"300",
+        height:"620",
+        screen: Alph.util.getPref("shift.window.loc"),
+        menubar: "yes",
+        toolbar: "yes"
+    }
+    Alph.xlate.openSecondaryWindow(
+                    "alph-infl-table",
+                    "chrome://alpheios/content/alpheios-infl.xul",
+                    features,
+                    params);
+        Alph.util.log("Inflections window should have focus with " 
+            + Alph.main.get_state_obj().get_var("word"));
 }
 
 /**
