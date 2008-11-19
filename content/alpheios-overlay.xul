@@ -66,7 +66,7 @@
             observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
             oncommand="window.openDialog('chrome://alpheios/content/alpheios-prefs.xul', 
-                      'alpheios-options-dialog', 'chrome,titlebar,toolbar,centerscreen,modal')"/>;
+                      'alpheios-options-dialog', 'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes')"/>;
         <command id="alpheios-feedback-cmd"
             oncommand="window.open('http://alpheios.net/forum/21','alpheios-feedback')"/>
 	</commandset>
