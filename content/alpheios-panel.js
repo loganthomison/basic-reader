@@ -54,7 +54,7 @@ Alph.Panel.STATUS_SHOW = 1;
  * @public
  * @type int
  */ 
-Alph.Panel.STATUS_HIDE = 2;
+Alph.Panel.STATUS_HIDE = 0;
 
 /**
  * Public static class variable for panel status meaning the panel was automatically
@@ -86,9 +86,19 @@ Alph.Panel.prototype.reset_to_default = function()
 {
     // if a preference is stored, use it
     var status_pref = this.get_status_pref_setting();
-    var status = Alph.util.getPrefOrDefault(status_pref,
-        Alph.main.get_state_obj().get_var("current_language"));
-        
+    
+    var lang = Alph.main.get_state_obj().get_var("current_language");
+    var status;
+    // use the global prefs unless we're overriding for this language
+    if (Alph.util.getPref("panels.use.defaults",lang))
+    {
+        status = Alph.util.getPref(status_pref);
+    }
+    else
+    {
+        status = Alph.util.getPref(status_pref,lang);
+    }
+    
     if (typeof status != "undefined" && status == Alph.Panel.STATUS_SHOW)
     {
         return this.show();
@@ -225,17 +235,28 @@ Alph.Panel.prototype.update_status = function(a_status)
         }
     }
     
-    // if we're responding to a user request, store the new
-    // status as the default status for the panel
-    if (a_status != Alph.Panel.STATUS_AUTOHIDE)
+    // if we're responding to a user request, and panel changes
+    // are sticky, store the new status as the default status for the panel
+    if (a_status != Alph.Panel.STATUS_AUTOHIDE 
+        && Alph.util.getPref("panels.sticky")
+        )
+
     {
-        // only store language-specific status for now 
-        // TODO support user override of global preferences ?
-        // TODO support per url preferences ?
+        // TODO support per url preferences ?   
         var lang = Alph.main.get_state_obj(bro).get_var("current_language");
         if (lang != "")
         {
-            Alph.util.setPref(this.get_status_pref_setting(),a_status,lang)
+            // if we're using the defaults, store to defaults
+            // otherwise store to the language 
+            if (Alph.util.getPref("panels.use.defaults",lang))
+            {
+                Alph.util.setPref(this.get_status_pref_setting(),a_status);
+            }
+            else
+            {
+                Alph.util.setPref(this.get_status_pref_setting(),a_status,lang)
+                
+            }
         }
     }
     

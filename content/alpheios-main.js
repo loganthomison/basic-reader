@@ -346,9 +346,10 @@ Alph.main =
     {
         // if any one of our languages use the local daemon
         // return true
-        for (var lang in Alph.Languages)
+        var lang_list = Alph.Languages.get_lang_list();
+        for (var i=0; i<lang_list.length; i++)
         {
-            if (Alph.Languages[lang].getusemhttpd())
+            if (Alph.Languages.get_lang_tool(lang_list[i]).getusemhttpd())
             {
                 return true;
             }
@@ -666,12 +667,14 @@ Alph.main =
         // iterate through the supported languages concatonating their mhttpd.conf files
         var mhttpd_conf_lines = [];
         
-        for (var lang in Alph.Languages)
+        var lang_list = Alph.Languages.get_lang_list();
+        for (var i=0; i<lang_list.length; i++)
         {
-            if (Alph.Languages[lang].getusemhttpd())
+            var lang = lang_list[i]; 
+            if (Alph.Languages.get_lang_tool(lang).getusemhttpd())
             {
                 var chromepkg = 
-                    Alph.Languages[lang].getchromepkg();
+                    Alph.Languages.get_lang_tool(lang).getchromepkg();
                 Alph.util.log("setting up mhttpd for " + chromepkg);
                 var chrome_path = 
                     Alph.util.getExtensionBasePath(chromepkg);
@@ -778,14 +781,14 @@ Alph.main =
                     {
                         // if a derived class for this language isn't defined,
                         //  instantiate an instance of the base class
-                        Alph.Languages[lang] = new Alph.LanguageTool(lang)
+                        Alph.Languages.add_lang_tool(lang,new Alph.LanguageTool(lang));
                     }
                     else if (Alph.LanguageToolSet[lang].implementsAlphLanguageTool)
                     {
                         // if we have a derived class for this language,
                         // instantiate an instance of the derived class
-                        Alph.Languages[lang] = new Alph.LanguageToolSet[lang](lang);
-                    }
+                        Alph.Languages.add_lang_tool(lang,new Alph.LanguageToolSet[lang](lang));
+                    }   
                     language_count++;
                 }
                 else
@@ -808,7 +811,7 @@ Alph.main =
             // set the default language from preferences if possible
             var pref_lang = Alph.util.getPref("default_language");
             if (pref_lang != null && pref_lang != '' &&
-                typeof Alph.Languages[pref_lang] != "undefined")
+                Alph.Languages.has_lang(pref_lang))
             {
                 Alph.main.defaultLanguage = pref_lang;
             }
@@ -846,7 +849,7 @@ Alph.main =
         {   
             return this.alph_inlineToggle(bro,a_lang);
         }
-        if (typeof Alph.Languages[a_lang] == "undefined")
+        if (! Alph.Languages.has_lang(a_lang))
         {
             //TODO handle error more fully?
             alert("Alpheios language " + a_lang + "is not available");
@@ -889,7 +892,8 @@ Alph.main =
         var lang_tool;
         if (this.is_enabled(bro))
         {
-            lang_tool = Alph.Languages[this.get_state_obj(bro).get_var("current_language")];
+            lang_tool = 
+                Alph.Languages.get_lang_tool(this.get_state_obj(bro).get_var("current_language"));
         }
         return lang_tool;
     },
@@ -1157,7 +1161,7 @@ Alph.main =
             var cur_lang = this.get_state_obj(bro).get_var("current_language");
             
             // if we support this language automatically setup the extension for it
-            if (typeof Alph.Languages[ped_lang] != "undefined")
+            if (Alph.Languages.has_lang(ped_lang))
             {
                 
                 // if Alpheios is not enabled, auto-enable it

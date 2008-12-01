@@ -108,6 +108,7 @@
 				<include name="chrome.manifest" />
 				<include name="install.rdf" />
 				<include name="defaults/**" />
+				<include name="modules/**" />
 				<include name="**/platform/**" />
 				<exclude name="**/.*" />
 			</fileset>

@@ -22,27 +22,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+ var EXPORTED_SYMBOLS = ["Languages","LanguageToolSet"];
+
 /**
- * The Alph.Languages object holds
+ * The Languages object holds
  * the instantiated instances of the {@link Alph.LanguageTool}
  * objects for each supported language.
  * It is populated by {@link Alph.main#set_languages}
  * @type Object
  */
-Alph.Languages = 
+Languages = 
 {
+    lang_list: [],
+    
+    get_lang_tool: function(a_lang)
+    {
+        return this[a_lang];
+    },
+    
+    has_lang: function(a_lang)
+    {        
+        if (typeof this[a_lang] == "undefined")
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    },
+    
+    get_lang_list: function()
+    {
+        return this.lang_list;
+    },
+    
+    add_lang_tool: function(a_lang,a_lang_tool)
+    {
+        if (typeof this[a_lang] == "undefined")
+        {
+            this[a_lang] = a_lang_tool;
+            this.lang_list.push(a_lang);
+        }
+    }
 }
 
-if ( typeof Alph.LanguageToolSet == "undefined") 
-{
-    /**
-     * The Alph.LanguageToolSet object holds
-     * language-specific prototypes derived from the 
-     * base {@link Alph.LanguageTool} class.
-     * It is populated by code in the external  
-     * language-specific extensions, which are dependent upon Alpheios
-     * @type Object 
-     */
-    Alph.LanguageToolSet = {};
-}
-
+/**
+ * The LanguageToolSet object holds
+ * language-specific prototypes derived from the 
+ * base {@link Alph.LanguageTool} class.
+ * It is populated by code in the external  
+ * language-specific extensions, which are dependent upon Alpheios
+ * @type Object 
+ */
+LanguageToolSet = {};

@@ -5,3 +5,11 @@
 #url-grammar {
     width: 50em;
 }
+
+.row-header {
+    font-weight: bold;
+}
+
+#alpheios-panel-prefs rows row {
+    -moz-box-align: center;
+}

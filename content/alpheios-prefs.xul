@@ -2,11 +2,16 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://alpheios/skin/prefs/alpheios-prefs.css/" type="text/css"?>
 
-<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<!DOCTYPE window SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
 <prefwindow id="alpheios-prefs" title="&alpheios.prefs.preferences;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         buttons="accept,cancel"
         type="prefwindow">
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />
+
+ <stringbundleset id="alpheios-prefs-stringbundleset"/>
+  
 <prefpane id="alpheios-prefs-system" 
           label="&alpheios.prefs.system;" 
           image="chrome://alpheios/skin/prefs/emblem-system.png">
@@ -45,6 +50,7 @@
         </groupbox>
         </hbox>
 </prefpane>
+
 <prefpane id="alpheios-prefs-windows"
           label="&alpheios.prefs.windows;"
           image="chrome://alpheios/skin/prefs/preferences-system-windows.png">
@@ -57,8 +63,9 @@
                     type="string"/>
     </preferences>
     <hbox flex="1" align="center">
-        <vbox flex="1">
-            <label value="&alpheios.prefs.shift.window.loc;"
+        <vbox flex="1" id="window-prefs-box">
+            <label id="shift-window-loc-label"
+                   value="&alpheios.prefs.shift.window.loc;"
                    control="shift-window-loc"/>
             <menulist id="shift-window-loc" 
                       preference="pref-shift-window-loc">

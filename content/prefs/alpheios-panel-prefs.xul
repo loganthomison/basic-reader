@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<!-- Alpheios Panel Preferences Overlay -->
+<overlay id="alpheios-panel-prefs"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
+
+    <prefpane id="alpheios-prefs-windows"
+              onpaneload="Alph.prefs.init_panel_prefs();">
+        <preferences>
+            <preference id="pref-panels-sticky"
+                        name="extensions.alpheios.panels.sticky"
+                        type="bool"/>
+            <preference id="pref-panel-morph-ped" 
+                        name="extensions.alpheios.panels.alph-morph-panel.pedagogical" 
+                        type="int"/>
+            <preference id="pref-panel-morph-basic" 
+                        name="extensions.alpheios.panels.alph-morph-panel.basic" 
+                        type="int"/>
+            <preference id="pref-panel-dict-ped" 
+                        name="extensions.alpheios.panels.alph-dict-panel.pedagogical" 
+                        type="int"/>
+            <preference id="pref-panel-dict-basic" 
+                        name="extensions.alpheios.panels.alph-dict-panel.basic" 
+                        type="int"/>
+            <preference id="pref-panel-trans-ped" 
+                        name="extensions.alpheios.panels.alph-trans-panel.pedagogical" 
+                        type="int"/>
+            <preference id="pref-panel-trans-basic" 
+                        name="extensions.alpheios.panels.alph-trans-panel.basic" 
+                        type="int"/>
+            <preference id="pref-panel-tree-ped" 
+                        name="extensions.alpheios.panels.alph-tree-panel.pedagogical" 
+                        type="int"/>
+            <preference id="pref-panel-tree-basic" 
+                        name="extensions.alpheios.panels.alph-tree-panel.basic" 
+                        type="int"/>
+            <preference id="pref-panel-etym-ped" 
+                        name="extensions.alpheios.panels.alph-etym-panel.pedagogical" 
+                        type="int"/>
+            <preference id="pref-panel-etym-basic" 
+                        name="extensions.alpheios.panels.alph-etym-panel.basic" 
+                        type="int"/>
+        </preferences>
+    </prefpane>
+    
+    <vbox id ="window-prefs-box">
+        <tabbox id="alpheios-panel-prefs" insertbefore="shift-window-loc-label">
+            <tabs id="panel-prefs-tabs">
+                <tab label="&alpheios.prefs.panels.default;"/>
+            </tabs>
+            <tabpanels id="panel-prefs-tabpanels">
+                <tabpanel>
+                    <vbox>
+                        <hbox align="center">
+                            <label 
+                                control="panels-sticky" 
+                                value="&alpheios.prefs.panels.sticky;"/>
+                            <checkbox 
+                                id="panels-sticky"
+                                preference="pref-panels-sticky"/>
+                        </hbox>
+                        <groupbox>
+                            <grid id="alpheios-panel-prefs-default">
+                                <columns>
+                                    <column flex="2"/>
+                                    <column flex="1"/>
+                                    <column flex="1"/>
+                                </columns>
+                                <rows>
+                                    <row>
+                                        <label 
+                                            class="row-header" 
+                                            value="&alpheios.prefs.panel.name;"/>
+                                        <label 
+                                            class="row-header"
+                                            value="&alpheios.prefs.panel.basic;"/>
+                                        <label 
+                                            class="row-header"
+                                            value="&alpheios.prefs.panel.ped;"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.morph;"/>
+                                        <checkbox 
+                                            id="morph-basic" 
+                                            preference="pref-panel-morph-basic"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                        <checkbox 
+                                            id="morph-ped" 
+                                            preference="pref-panel-morph-ped"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.dict;"/>
+                                        <checkbox
+                                            id="dict-basic" 
+                                            preference="pref-panel-dict-basic"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                        <checkbox 
+                                            id="dict-ped" 
+                                            preference="pref-panel-dict-ped"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.trans;"/>
+                                        <checkbox 
+                                            id="trans-basic" 
+                                            preference="pref-panel-trans-basic"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                        <checkbox 
+                                            id="trans-ped" 
+                                            preference="pref-panel-trans-ped"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.tree;"/>
+                                        <spacer/><!-- tree is never available to basic -->
+                                        <checkbox 
+                                            id="tree-ped" 
+                                            preference="pref-panel-tree-ped"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.etym;"/>
+                                        <checkbox 
+                                            id="etym-basic" 
+                                            preference="pref-panel-etym-basic"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                        <checkbox 
+                                            id="etym-ped" 
+                                            preference="pref-panel-etym-ped"
+                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            preference-editable="true"/>
+                                    </row>
+                                </rows>
+                            </grid>
+                        </groupbox>
+                    </vbox>
+                </tabpanel>           
+            </tabpanels>
+        </tabbox>
+    </vbox>
+</overlay>

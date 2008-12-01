@@ -38,6 +38,8 @@ if (typeof Alph == "undefined") {
           .getService(Components.interfaces.mozIJSSubScriptLoader)
           .loadSubScript("chrome://alpheios/content/jquery-1.2.6.min.js", Alph);
     Alph.$ = jQuery.noConflict(true);
+    
+    Components.utils.import("resource://alpheios/alpheios-languages.js", Alph);
 }
 
 /**
@@ -129,7 +131,8 @@ Alph.util = {
                     Alph.main.setXlateTrigger(bro,a_value);
                 }
             }
-        }        
+        }     
+            
     },
 
     /**

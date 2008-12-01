@@ -16,3 +16,16 @@
 <!ENTITY alpheios.prefs.bottom.left "Bottom Left">
 <!ENTITY alpheios.prefs.bottom.right "Bottom Right">
 <!ENTITY alpheios.prefs.default.language "Preferred Language">
+<!ENTITY alpheios.prefs.panels.default "Panel Defaults">
+<!ENTITY alpheios.prefs.panels.use.defaults "Use Defaults">
+<!ENTITY alpheios.prefs.panels.sticky "Interface Changes Sticky">
+<!ENTITY alpheios.prefs.panel.name "Panel Name">
+<!ENTITY alpheios.prefs.panel.ped "Pedagogical">
+<!ENTITY alpheios.prefs.panel.basic "Basic">
+<!ENTITY alpheios.prefs.panel.morph "Morphology Panel">
+<!ENTITY alpheios.prefs.panel.dict "Dictionary Panel">
+<!ENTITY alpheios.prefs.panel.trans "Translation Panel">
+<!ENTITY alpheios.prefs.panel.tree "Dependency Tree Panel">
+<!ENTITY alpheios.prefs.panel.etym "Etymology/Cognates Panel">
+
+
