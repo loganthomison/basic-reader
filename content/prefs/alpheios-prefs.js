@@ -182,6 +182,43 @@ Alph.prefs = {
         {
             // no match 
         }
-    }
+    },
     
+    restore_panel_defaults: function(a_lang)
+    {
+            var grid_id = "#alpheios-panel-prefs";
+            if (typeof a_lang == "undefined")
+            {
+                grid_id = grid_id + "-default";
+            }
+            else
+            {
+                grid_id = grid_id + "-" + a_lang;
+            }
+            var grid = Alph.$(grid_id);
+            // iterate through the panel preference checkboxes for this
+            // language, refreshing the defaults
+            Alph.$("checkbox",grid).each(
+                function()
+                {
+                    var pref_id = this.getAttribute("preference");
+                    var pref = document.getElementById(pref_id);
+                    if (pref.defaultValue == null)
+                    {
+                        // get the global default if none was specified
+                        // in the language defaults
+                        var match_string = new RegExp('\.' + a_lang);
+                        var g_pref_id = pref_id.replace(match_string,"");
+                        pref.value = 
+                            document.getElementById(g_pref_id)
+                            .defaultValue;
+                    }
+                    else
+                    {
+                        pref.value = pref.defaultValue;
+                    }
+                }
+            );
+
+    }
 };

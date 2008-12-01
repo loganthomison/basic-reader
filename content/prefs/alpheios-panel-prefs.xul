@@ -60,6 +60,8 @@
                             <checkbox 
                                 id="panels-sticky"
                                 preference="pref-panels-sticky"/>
+                            <button oncommand="Alph.prefs.restore_panel_defaults();"
+                                label="&alpheios.prefs.panels.restore.defaults;"/>
                         </hbox>
                         <groupbox>
                             <grid id="alpheios-panel-prefs-default">
