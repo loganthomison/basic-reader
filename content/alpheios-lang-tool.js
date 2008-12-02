@@ -358,7 +358,10 @@ function(a_ro, a_rngstr)
     
     // clean string:
     //   convert punctuation to spaces
-    a_rngstr = a_rngstr.replace(/[.,;:!?'\"(){}\[\]\/\\\xA0\n\r]/g, " ");
+    a_rngstr =
+      a_rngstr.replace(
+        /[.,;:!?'\"(){}\[\]\/\\\u00A0\u2018\u2019\u201C\u201D\u0387\n\r]/g,
+        " ");
     
     Alph.util.log("In doSpaceSeparatedWordSelection for " + a_rngstr);
 
