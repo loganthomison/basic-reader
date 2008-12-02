@@ -204,20 +204,23 @@
     </toolbarpalette>
     
     <vbox id="appcontent">
-        <splitter id="alph-bottom-panel-splitter" collapsed="true" class="alph-panel-section"/>
+        <splitter id="alph-bottom-panel-splitter" collapsed="true" 
+                  class="alph-panel-splitter alph-panel-section-splitter"/>     
         <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">
+            
             <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
-                <splitter id="alph-tree-splitter" collapsed="false" class="alph-panel-splitter"/>
+                <splitter class="alph-panel-splitter" collapsed="true"/>
                 <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
                       collapsed="true"/>
                 <splitter class="alph-panel-splitter" collapsed="true"/>
                 <hbox id="alph-etym-box" class="alph-panel" flex="1" persist="height" 
                       collapsed="true"/>
             </hbox>
-            <splitter collapsed="true" class="alph-panel-section"/>
+            <splitter collapsed="true" 
+                      class="alph-panel-splitter alph-panel-section-splitter"/>
             <hbox id="alph-lex-tools" class="alph-panel-section" collapsed="true"
                   flex="1" persist="height">
-                <splitter collapsed="true" class="alph-panel-splitter"/>
+                <splitter class="alph-panel-splitter" collapsed="true"/>
                 <hbox id="alph-morph-box" class="alph-panel" flex="1" 
                       persist="height" collapsed="true"/>
                 <splitter class="alph-panel-splitter" collapsed="true"/>
@@ -228,7 +231,12 @@
     </vbox>
     
     <tabbrowser id="content">
-        <splitter id="alph-right-panel-splitter" collapsed="true" class="alph-panel-splitter"/>
-        <vbox id="alph-right-panel" persist="width" collapsed="true" class="alph-panel"/>
+        <splitter collapsed="true" 
+                  class="alph-panel-splitter alph-panel-section-splitter"/>     
+        <vbox persist="width" collapsed="true" class="alph-panel-section">
+            <vbox id="alph-right-panel" 
+                  flex="1"
+                  persist="width" collapsed="true" class="alph-panel"/>
+        </vbox>
     </tabbrowser>
 </overlay>

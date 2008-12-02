@@ -152,7 +152,10 @@ Alph.Panel.prototype.reset_state = function(a_bro)
 Alph.Panel.prototype.update_status = function(a_status)
 {
  
-    var parent_splitter = this.parent_box.previousSibling; 
+    var panel_obj = this;
+    var sib_splitters = 
+        Alph.$(this.parent_box).siblings(".alph-panel-splitter");
+    
     var notifier = Alph.$("#" + this.notifier);
     
     // update the browser state object to reflect the new
@@ -171,18 +174,27 @@ Alph.Panel.prototype.update_status = function(a_status)
     if (a_status == Alph.Panel.STATUS_SHOW && this.panel_window == null)
     {
         Alph.$(this.parent_box).attr("collapsed",false);
-        Alph.$(parent_splitter).attr("collapsed",false);
+        
+        Alph.$(sib_splitters).each(
+            function()
+            {
+                panel_obj.toggle_splitter(this,true);
+            }
+        );
+            
         Alph.$(notifier).attr("checked", "true");
-        // make sure any section parents are also expanded
+        // make sure any section parents and section splitters are also expanded
         Alph.$(this.section_parent).each(
             function() {
                 Alph.$(this).attr("collapsed",false);
-                var splitter = Alph.$(this).prev("splitter");
-                if (splitter.length > 0)
-                {
-                    Alph.$(splitter).attr("collapsed",false);
-                }
-
+                Alph.$(this)
+                    .siblings(".alph-panel-section-splitter")
+                    .each(
+                        function()
+                        {
+                            panel_obj.toggle_section_splitter(this, true);
+                        }
+                    );
             }
         ); 
     
@@ -190,7 +202,14 @@ Alph.Panel.prototype.update_status = function(a_status)
     else
     {
         Alph.$(this.parent_box).attr("collapsed",true);
-        Alph.$(parent_splitter).attr("collapsed",true);
+        Alph.$(sib_splitters).each(
+            function()
+            {
+                panel_obj.toggle_splitter(this,false);
+            }
+        );
+
+        
         // collapse the containing parent panel sections only 
         // if all the panels in it are now collapsed
 
@@ -209,11 +228,17 @@ Alph.Panel.prototype.update_status = function(a_status)
                 if (still_open == 0)
                 {
                     Alph.$(this).attr("collapsed",true);
-                    var splitter = Alph.$(this).prev("splitter");
-                    if (splitter.length > 0)
-                    {
-                        Alph.$(splitter).attr("collapsed",true);
-                    }
+                    Alph.$(this)
+                        .siblings(".alph-panel-section-splitter")
+                        .each(
+                            function() 
+                            {
+                                panel_obj.toggle_section_splitter(
+                                    this,
+                                    false
+                                );
+                            }
+                        );
                 }
             }
         ); 
@@ -445,4 +470,84 @@ Alph.Panel.prototype.get_detach_chrome = function()
 {
     // default returns null
     return null;   
+};
+
+/**
+ * toggle the collapsed attribute of a panel splitter, taking into 
+ * account the status of the surrounding panels, if any
+ * @param {XULElement} a_splitter the splitter to be toggled
+ * @param {boolean} a_open_panel flag to indicate whether the toggling
+ *                     is the result of opening (true) or closing (false)
+ *                     a panel  
+ */
+Alph.Panel.prototype.toggle_splitter = function(a_splitter,a_open_panel)
+{
+
+    var prev_panels = Alph.$(a_splitter).prev(".alph-panel");
+    var post_panels = Alph.$(a_splitter).next(".alph-panel");
+    var open_surrounding_panels = false;
+    if ((prev_panels.length > 0 
+            && Alph.$(prev_panels[0]).attr("collapsed") == "false")
+         &&
+          (post_panels.length > 0 
+            && Alph.$(post_panels[0]).attr("collapsed") == "false")
+         )
+    {
+        open_surrounding_panels = true;
+    }
+    // if we're opening a panel, this splitter should be opened if it 
+    // has sibling panels immediately before and after it 
+    // which are not collapsed
+    if (a_open_panel && open_surrounding_panels)
+    {
+        Alph.$(a_splitter).attr("collapsed",false);
+    }
+    // if we're closing a panel, this splitter should be collapsed 
+    // unless it has sibling panels immediately before and after it 
+    // which are not collapsed
+    else if (! a_open_panel && ! open_surrounding_panels)
+    {
+           Alph.$(a_splitter).attr("collapsed",true);
+    }
+};
+
+/**
+ * toggle the collapsed attribute of a panel section splitter, taking into 
+ * account the status of the surrounding panel sections, if any. Conditions
+ * are different for panel sections vs panels, hence the separate method.
+ * @param {XULElement} a_splitter the splitter to be toggled
+ * @param {boolean} a_open_panel flag to indicate whether the toggling
+ *                     is the result of opening (true) or closing (false)
+ *                     a panel  
+ */
+Alph.Panel.prototype.toggle_section_splitter = function(a_splitter,a_open_panel)
+{
+
+    var prev_panels = Alph.$(a_splitter).prev(".alph-panel-section");
+    var post_panels = Alph.$(a_splitter).next(".alph-panel-section");
+    var open_surrounding_panels = false;
+    if ( (prev_panels.length > 0 
+            && Alph.$(prev_panels[0]).attr("collapsed") == "false")
+         &&
+          (post_panels.length > 0 
+            && Alph.$(post_panels[0]).attr("collapsed") == "false")
+         )
+    {
+        open_surrounding_panels = true;
+    }
+    // if we're opening a panel section, this splitter should be opened if it 
+    // has sibling panels immediately before and after it 
+    // which are not collapsed; OR if it doesn't have any other panel-sections
+    // before it
+    if (a_open_panel && ( open_surrounding_panels || prev_panels.length == 0))
+    {
+        Alph.$(a_splitter).attr("collapsed",false);
+    }
+    // if we're closing a panel, this splitter should be collapsed 
+    // unless it has sibling panels immediately before and after it 
+    // which are not collapsed
+    else if (! a_open_panel && ! open_surrounding_panels)
+    {
+           Alph.$(a_splitter).attr("collapsed",true);
+    }
 }

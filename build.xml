@@ -255,7 +255,7 @@
 	<target name="prepare.docs">
 		<mkdir dir="${docs.dir}" />
 		<exec dir="${src.dir}" executable="${perl.path}">
-			<arg line="${jsdoc.path} -p -d ${docs.dir} -project-name Alpheios --no-lexical-privates content"/>
+			<arg line="${jsdoc.path} -p -d ${docs.dir} -project-name Alpheios --no-lexical-privates content modules"/>
 		</exec>
 	</target>
 	

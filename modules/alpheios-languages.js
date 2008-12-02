@@ -25,11 +25,12 @@
  var EXPORTED_SYMBOLS = ["Languages","LanguageToolSet"];
 
 /**
+ * @singleton
+ * 
  * The Languages object holds
  * the instantiated instances of the {@link Alph.LanguageTool}
  * objects for each supported language.
  * It is populated by {@link Alph.main#set_languages}
- * @type Object
  */
 Languages = 
 {
@@ -65,14 +66,15 @@ Languages =
             this.lang_list.push(a_lang);
         }
     }
-}
+};
 
 /**
+ * @singleton
+ * 
  * The LanguageToolSet object holds
  * language-specific prototypes derived from the 
  * base {@link Alph.LanguageTool} class.
  * It is populated by code in the external  
  * language-specific extensions, which are dependent upon Alpheios
- * @type Object 
  */
 LanguageToolSet = {};
