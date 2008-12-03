@@ -77,7 +77,12 @@ Alph.tei_grammar = {
             
         // Add a click handler to the links in the toc: they set the 
         // src of the alph-grammar-content iframe
-        $("a.toc",toc_doc).click(Alph.tei_grammar.tocClickHandler);
+        $("a.toc",toc_doc).click(
+            function(a_e)
+            {
+                Alph.tei_grammar.tocClickHandler(a_e,params.lang_tool);
+            }
+        );
     
 
         // add the toggle widgets
@@ -102,14 +107,16 @@ Alph.tei_grammar = {
      * Click handler for links in the toc frame. Set the src
      * of the alph-grammar-content browser.
      * @param {Event} a_event the triggering click event
+     * @param {Alph.LanguageTool} a_lang_tool the LanguageTool which is
+     *                                        responsible for this grammar
      */
-    tocClickHandler: function(a_event)
+    tocClickHandler: function(a_event,a_lang_tool)
     {
         var toc_doc = $("#alph-grammar-toc").get(0).contentDocument;
         var href = $(this).attr("href");
         $("#alph-grammar-content").attr("src",
                 
-                Alph.tei_grammar.get_base_url() + href 
+                Alph.tei_grammar.get_base_url(a_lang_tool) + href 
             );
         $('.highlighted',toc_doc).removeClass('highlighted');
         $(this).addClass('highlighted');
@@ -176,26 +183,38 @@ Alph.tei_grammar = {
                 a_params.target_href  : 
                 'preface';
         
-        var start_href_target = window.opener.Alph.linking.find_link_target(start_href,a_index);
+        // TODO - eventually, if we keep Alph.Linking, it
+        // should be made a JS Module singleton and 
+        // moved to the /modules directory eliminating the reference 
+        // to window.opener
+        var start_href_target = 
+            window.opener.Alph.linking.find_link_target(
+                start_href,
+                a_index,
+                a_params.lang_tool
+        );
         if (typeof start_href_target != "undefined")
         {
             $("#alph-grammar-content").attr("src", 
-                Alph.tei_grammar.get_base_url() + start_href_target
+                  Alph.tei_grammar.get_base_url(a_params.lang_tool) 
+                + start_href_target
             );
         }
      },
      
      /**
       * get the base url for the current grammar
+      * @param {Alph.LanguageTool) a_lang_tool the LanguageTool which produced
+      *                                        the current grammar window
       * @return the url for the current grammar
-      * @type {String}
+      * @type String
       */
-     get_base_url: function()
+     get_base_url: function(a_lang_tool)
      {
         //TODO - eventually need to support multiple grammars per language
         var url = 
             'chrome://' 
-                + window.opener.Alph.main.getLanguageTool().getchromepkg() 
+                + a_lang_tool.getchromepkg() 
                 + '/content/grammar/';
         return url;
      }

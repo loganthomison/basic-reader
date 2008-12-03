@@ -43,16 +43,18 @@ Alph.linking = {
      * function until we figure out how we really want to handle
      * linking.
      * @param {String} a_link the string to lookup in the linking index file
-     * @param {String} a_docid the id (Name) of the linking index file 
+     * @param {String} a_docid the id (Name) of the linking index file
+     * @param {Alph.LanguageTool} the LanguageTool which is to be used to retrieve
+     *                            the index file 
      */
-    find_link_target: function(a_link,a_docid)
+    find_link_target: function(a_link,a_docid,a_lang_tool)
     {
         // load the index if we haven't already done so
         if (typeof this.loaded_indices[a_docid] == "undefined")
         {
             this.loaded_indices[a_docid] = {};
             try {
-                var index_file_url = Alph.main.getLanguageTool().getIndexFile(a_docid);
+                var index_file_url = a_lang_tool.getIndexFile(a_docid);
                 Alph.util.log("Reading index from file system: " + index_file_url);
                 var channel = this.io_service.newChannel(index_file_url, null, null);
                 var input = channel.open();

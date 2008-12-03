@@ -113,7 +113,7 @@ Alph.infl = {
                         var param = target[i].split(/:/);
                         params[param[0]]= param[1];
                     }
-                    window.opener.Alph.main.getLanguageTool().
+                    link_target.lang_tool.
                         handleInflections(e,$(this),params);
                 }
             );
@@ -186,7 +186,7 @@ Alph.infl = {
         
         var url =
             'chrome://' +
-            window.opener.Alph.main.getLanguageTool().getchromepkg() + 
+            link_target.lang_tool.getchromepkg() + 
             '/content/inflections/alph-infl-' + base_pofs + '.html';
         $(infl_browser).attr("src",url);        
     },
@@ -229,7 +229,14 @@ Alph.infl = {
         
         // add handler for the reorder links
         $("#sortorder",topdoc).change( 
-            function(e) { Alph.infl.resort(e,this,a_link_target.source_node,topdoc); }
+            function(e) { 
+                Alph.infl.resort(
+                    e,
+                    this,
+                    a_link_target.source_node,
+                    topdoc,
+                    a_link_target.lang_tool); 
+            }
         );
         
         //show the words for this inflection type
@@ -257,7 +264,7 @@ Alph.infl = {
         $("#alph-infl-index-link",topdoc).click(
             function(e)
             {
-                window.opener.Alph.main.getLanguageTool().
+                a_link_target.lang_tool.
                         handleInflections(e,$(this),null);
             }
         );
@@ -274,7 +281,7 @@ Alph.infl = {
         // in the link source but only if we haven't been asked not to look for matches
         start = end;
         
-        var lang_tool = window.opener.Alph.main.getLanguageTool();
+        
         var all_cols = $("col",a_tbl);
         
         end = (new Date()).getTime();
@@ -293,7 +300,7 @@ Alph.infl = {
                         (a_link_target.xslt_params && 
                             ($(this).hasClass("selected") || $(this).hasClass("matched"))) || 
                         (typeof a_link_target.xslt_params == "undefined" && 
-                            Alph.infl.is_ending_match(a_link_target.suffixes[showpofs],this,lang_tool) )
+                            Alph.infl.is_ending_match(a_link_target.suffixes[showpofs],this,a_link_target.lang_tool) )
                        )
                     {
                             Alph.infl.highlight_ending(this,col_parents);
@@ -356,7 +363,12 @@ Alph.infl = {
             // add the click handler to the inflections links
             $("#infl-links-select",topdoc).change(
                 function(e) {
-                    Alph.infl.switch_inflection(e,this,a_link_target.source_node,topdoc);
+                    Alph.infl.switch_inflection(
+                        e,
+                        this,
+                        a_link_target.source_node,
+                        topdoc,
+                        a_link_target.lang_tool);
                 }
             );
         }
@@ -365,7 +377,7 @@ Alph.infl = {
         $(".footnote",a_tbl).click(function(e){return Alph.infl.show_footnote(e,this)});
 
         // add a click handler to the reference links
-        $(".alph-reflink",a_tbl).click(function(e){return Alph.infl.follow_reflink(e,this)});
+        $(".alph-reflink",a_tbl).click(function(e){return Alph.infl.follow_reflink(e,this,a_link_target.lang_tool)});
         
         // add a toggle to show the stem classes
         $(".stem-class-toggle",a_tbl).click(
@@ -379,7 +391,7 @@ Alph.infl = {
         window.opener.Alph.util.log("Handlers Added: " + (end-start));
         start=end;
         
-        var collapsed = window.opener.Alph.main.getLanguageTool().handleInflectionDisplay(a_tbl,str_props);
+        var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props);
         this.enable_expand_cols(collapsed,str_props,a_tbl);
         
         var start = (new Date()).getTime();
@@ -492,7 +504,12 @@ Alph.infl = {
     onKeyDown: function(a_e) {
         if (a_e.keyCode == 16) {
             if (window.opener.Alph.xlate.popupVisible()) {
-                var popup = $("#alph-text", window.opener.content.document).clone();    
+                var popup = $("#alph-text", window.opener.content.document).clone();
+                // in this case we DO want to retrieve the current LanguageTool
+                // from the opening window, because if we're in a different tab, 
+                // the current language may be different than the one which opened
+                // the inflection window.  And if Alpheios isn't enabled on the 
+                // current tab, the shift key shouldn't do anything
                 window.opener.Alph.main.getLanguageTool().handleInflections(a_e,popup);
             }
         }
@@ -506,12 +523,13 @@ Alph.infl = {
      * @param {Element} a_elem the target of the action
      * @param {Node} a_node the node which contains the morphology for the selected word (from the source text)
      * @param {Document} a_doc the contentDocument which contains the inflection table
+     * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced the inflection table
      */
-    resort: function(a_e,a_elem,a_node,a_doc) 
+    resort: function(a_e,a_elem,a_node,a_doc,a_lang_tool) 
     {
         $(".loading",a_doc).show();
         var showorder = $(":selected", a_elem).val();
-        window.opener.Alph.main.getLanguageTool()
+        a_lang_tool
             .handleInflections(a_e,a_node,{showpofs: 'verb', order: showorder}
             );
     },
@@ -522,13 +540,15 @@ Alph.infl = {
      * @param {Element} a_elem the target of the action
      * @param {Node} the a_node node which contains the morphology for the selected word (from the source text)
      * @param {Document} a_doc the contentDocument which contains the inflection table
+     * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced
+     *                                        the inflection table
      */
-    switch_inflection: function(a_e,a_elem,a_node,a_doc)
+    switch_inflection: function(a_e,a_elem,a_node,a_doc,a_lang_tool)
     {
         $(".loading",a_doc).show();
         var newpofs = $(":selected",a_elem).val();
         window.opener.Alph.util.log("Switching to " + newpofs);
-        window.opener.Alph.main.getLanguageTool().
+        a_lang_tool.
             handleInflections(a_e,a_node,{showpofs: newpofs});
     },
     
@@ -552,17 +572,19 @@ Alph.infl = {
      * Click handler for reference links
      * @param {Event} a_event the event which triggered the action
      * @param {Element} a_elem the target of the action
+     * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced 
+     *                                        the inflection table
      * @return false if this is a reference link we can follow, otherwise true to
      *         allow event propogation
      */
-    follow_reflink: function(a_e,a_elem)
+    follow_reflink: function(a_e,a_elem,a_lang_tool)
     {
         var link_target = $(a_elem).attr("href").split(/:/);
         // only handle grammar links for now
         // TODO this code will change once we have the real linking architecture
         if (link_target[0] == 'grammar')
         {
-            window.opener.Alph.main.getLanguageTool().openGrammar(null,null,link_target[2]);
+            a_lang_tool.openGrammar(null,null,link_target[2]);
             return false;
         }
         else

@@ -640,6 +640,7 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
  */
 Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_params)
 {   
+    var thisObj = this;
     var targetURL = Alph.util.getPref("url.grammar",this.source_language) || "";
     targetURL = targetURL.replace(/\<ITEM\>/, a_target || "");
     
@@ -658,7 +659,8 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
     var params = Alph.$.extend( 
         {
             target_href: a_target,
-            callback: Alph.xlate.hideLoadingMessage
+            callback: Alph.xlate.hideLoadingMessage,
+            lang_tool: thisObj
         },
         a_params || {}
     );
@@ -706,6 +708,10 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
                 "chrome://alpheios/skin/alph-infl-index.xsl";
     }
     params.source_node = a_node;
+    
+    // give the inflections window a reference to this language tool
+    params.lang_tool = this;
+    
     Alph.util.log("Handling inflections for " + params.showpofs);
     
     // send the word endings to the declension table
