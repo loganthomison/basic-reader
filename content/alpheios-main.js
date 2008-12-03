@@ -1001,6 +1001,8 @@ Alph.main =
         target.setContext(word);
         target.setContextPos(0);
         
+        this.getLanguageTool().handleConversion(target);
+        
         this.getLanguageTool().lexiconLookup(
             target,
             function(data)
