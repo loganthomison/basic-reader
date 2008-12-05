@@ -257,8 +257,8 @@ Alph.main =
     {        
         this.mouseButtons = 0;
         
-        window.addEventListener("keydown", this.onKeyDown, true);
-        window.addEventListener("keyup", this.onKeyUp, true);
+        a_bro.addEventListener("keydown", this.onKeyDown, true);
+        a_bro.addEventListener("keyup", this.onKeyUp, true);
         this.get_state_obj(a_bro).set_var("enabled",true);
         if (! this.has_languages)
         {
@@ -301,8 +301,8 @@ Alph.main =
             return;
         }
         this.removeXlateTrigger(a_bro);
-        window.removeEventListener("keydown", this.onKeyDown, true);
-        window.removeEventListener("keyup", this.onKeyUp, true);
+        a_bro.removeEventListener("keydown", this.onKeyDown, true);
+        a_bro.removeEventListener("keyup", this.onKeyUp, true);
 
         Alph.xlate.removePopup(a_bro);
 

@@ -22,17 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- var EXPORTED_SYMBOLS = ["Languages","LanguageToolSet"];
-
 /**
  * @singleton
  * 
- * The Languages object holds
+ * The Alph.Languages object holds
  * the instantiated instances of the {@link Alph.LanguageTool}
  * objects for each supported language.
  * It is populated by {@link Alph.main#set_languages}
  */
-Languages = 
+Alph.Languages = 
 {
     lang_list: [],
     
@@ -71,10 +69,10 @@ Languages =
 /**
  * @singleton
  * 
- * The LanguageToolSet object holds
+ * The Alph.LanguageToolSet object holds
  * language-specific prototypes derived from the 
  * base {@link Alph.LanguageTool} class.
  * It is populated by code in the external  
  * language-specific extensions, which are dependent upon Alpheios
  */
-LanguageToolSet = {};
+Alph.LanguageToolSet = {};

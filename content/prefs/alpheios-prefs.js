@@ -37,98 +37,88 @@ Alph.prefs = {
      */
     init_panel_prefs: function()
     {
-
-        var lang_list = Alph.Languages.get_lang_list();
         
         var prefs = Alph.$("#alpheios-prefs-windows preferences").get(0);
         
-        for (var i=0; i<lang_list.length; i++)
-        {
-            var lang = lang_list[i];
-            
-            var box = Alph.$("#panel-prefs-box-" + lang).get(0);
-            
-            // if we don't have a place to put the grid for this language, just 
-            // continue to the next language
-            if (typeof box == "undefined")
-            { 
-                continue;
-            }
-            
-            var use_defs_cbx = Alph.$("#panel-override-"+lang).get(0);
-            // if we don't have a control for overriding the panel
-            // prefs for this language just continue to the next language
-            if (typeof use_defs_cbx == "undefined")
-            {
-                continue;
-            }
-            
-            // clone the default panel preferences grid
-            // repurpose the cloned copy for this language
-            var grid = Alph.$("grid#alpheios-panel-prefs-default").clone();
-            Alph.$(grid).get(0).setAttribute("id","alpheios-panel-prefs-"+lang);
-            
-            // iterate through the checkboxes on the grid, updating
-            // attributes to reference this language and adding a preference
-            // to the prefpane for each item
-            Alph.$("checkbox",grid).each(
-                function()
-                {
+        Alph.$("[id^=panel-prefs-box-]").each(
+        
+            function() {
+                
+                var box = this;
+                var lang = this.id.match(/panel-prefs-box-(.+)$/)[1];
+                
+                var use_defs_cbx = Alph.$("#panel-override-"+lang).get(0);
+                // if we don't have a control for overriding the panel
+                // prefs for this language just continue to the next language
+                if (typeof use_defs_cbx != "undefined")
+                {                
+                    // clone the default panel preferences grid
+                    // repurpose the cloned copy for this language
+                    var grid = Alph.$("grid#alpheios-panel-prefs-default").clone();
+                    Alph.$(grid).get(0).setAttribute("id","alpheios-panel-prefs-"+lang);
                     
-                    var id = this.getAttribute("id");
-                    if (id != null)
-                    {
-                        this.setAttribute("id",id + "-" + lang);
-                    }
-                    
-                    var pref_id = this.getAttribute("preference");
-                    var new_pref_id = pref_id + "-" + lang;
-                    
-                    this.setAttribute("preference",new_pref_id);
-                    
-   
-                    // add a preference to the pane for this checkbox
-                    var def_pref = Alph.$("preference#"+pref_id);
-                    
-                    var new_pref_name = 
-                        def_pref.attr("name").
-                        replace(
-                            /(extensions.alpheios)/,
-                            "$1."+lang);
+                    // iterate through the checkboxes on the grid, updating
+                    // attributes to reference this language and adding a preference
+                    // to the prefpane for each item
+                    Alph.$("checkbox",grid).each(
+                        function()
+                        {
                             
-                    var new_pref = document.createElementNS(
-                            "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", 
-                            "preference");
+                            var id = this.getAttribute("id");
+                            if (id != null)
+                            {
+                                this.setAttribute("id",id + "-" + lang);
+                            }
                             
-                    new_pref.setAttribute("id",new_pref_id);
-                    new_pref.setAttribute("type","int");
-                    new_pref.setAttribute("name",new_pref_name); 
-                    prefs.appendChild(new_pref);
-                    
-                    // if we're using the defaults, show whatever
-                    // we last had set for the language preferences
-                    // but disable the checkboxes
-                    if (use_defs_cbx.checked)
-                    {
-                        this.setAttribute("disabled",true);
-                    }
-
-                    
-                }
-            );
-    
-            // add a handler to the override checkbox
-            Alph.$(use_defs_cbx).click(
-                function()
-                {
-                    Alph.prefs.toggle_panel_pref_cbx(this);
-                }
-            );
-
-            // add the new grid to the box
-            box.appendChild(Alph.$(grid).get(0));
+                            var pref_id = this.getAttribute("preference");
+                            var new_pref_id = pref_id + "-" + lang;
+                            
+                            this.setAttribute("preference",new_pref_id);
+                            
+           
+                            // add a preference to the pane for this checkbox
+                            var def_pref = Alph.$("preference#"+pref_id);
+                            
+                            var new_pref_name = 
+                                def_pref.attr("name").
+                                replace(
+                                    /(extensions.alpheios)/,
+                                    "$1."+lang);
+                                    
+                            var new_pref = document.createElementNS(
+                                    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", 
+                                    "preference");
+                                    
+                            new_pref.setAttribute("id",new_pref_id);
+                            new_pref.setAttribute("type","int");
+                            new_pref.setAttribute("name",new_pref_name); 
+                            prefs.appendChild(new_pref);
+                            
+                            // if we're using the defaults, show whatever
+                            // we last had set for the language preferences
+                            // but disable the checkboxes
+                            if (use_defs_cbx.checked)
+                            {
+                                this.setAttribute("disabled",true);
+                            }
+        
+                            
+                        }
+                    );
             
-        }
+                    // add a handler to the override checkbox
+                    Alph.$(use_defs_cbx).click(
+                        function()
+                        {
+                            Alph.prefs.toggle_panel_pref_cbx(this);
+                        }
+                    );
+        
+                    // add the new grid to the box
+                    box.appendChild(Alph.$(grid).get(0));
+                }        
+            }
+        );
     },
     
     /**
@@ -218,7 +208,8 @@ Alph.prefs = {
                         pref.value = pref.defaultValue;
                     }
                 }
+                
             );
-
+        
     }
 };

@@ -39,7 +39,6 @@ if (typeof Alph == "undefined") {
           .loadSubScript("chrome://alpheios/content/jquery-1.2.6.min.js", Alph);
     Alph.$ = jQuery.noConflict(true);
     
-    Components.utils.import("resource://alpheios/alpheios-languages.js", Alph);
 }
 
 /**

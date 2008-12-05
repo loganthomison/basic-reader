@@ -21,7 +21,9 @@
                       src="chrome://alpheios/locale/alpheios.properties"/>
     </stringbundleset>
 
+    
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-languages.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-state.js" />
 	<script type="application/x-javascript" src="chrome://alpheios/content/alpheios-main.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-popup.js" />
