@@ -262,3 +262,6 @@ th.reloading {
     display: inline;
 }
 
+.footnote-text ul, .footnote-text li {
+    text-align: left;
+}

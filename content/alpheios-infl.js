@@ -239,20 +239,6 @@ Alph.infl = {
             }
         );
         
-        //show the words for this inflection type
-        if ($("caption",a_tbl).html() == '' && typeof a_link_target.words != "undefined")
-        {
-            var wordlist = "";
-            for (var word in a_link_target.words[showpofs])
-            {
-                wordlist = wordlist + word + ", ";
-            }
-            wordlist = wordlist.replace(/\,\s$/,'');
-        
-            $("caption",a_tbl).html( wordlist + " (" + suffix_list + ")");
-        }
-
-
         var str_props = document.getElementById("alph-infl-strings");
     
         // add a link to the index
@@ -331,7 +317,7 @@ Alph.infl = {
                 $("#expand-table-link",topdoc)
                     .css("display","inline")
                     .click( function(e) {
-                        Alph.infl.expand_table(a_tbl,topdoc);
+                        Alph.infl.expand_table(a_tbl,topdoc,true);
                         return false;
                     });
             }
@@ -395,28 +381,8 @@ Alph.infl = {
         this.enable_expand_cols(collapsed,str_props,a_tbl);
         
         var start = (new Date()).getTime();
-        var data_rows = $("tr.data-row",a_tbl).length;
-        var empty_cols = [];
-        // iterate through the columns, hiding any which are completely empty
-        $(all_cols).each (
-          function() {
-            var index = $(this).attr("realIndex");
-            var num_empty = $("td[realIndex='" + index + "'] span.emptycell",a_tbl).length;
-            if (num_empty == data_rows) 
-            {
-                empty_cols.push(index);    
-            }
-  
-          }
-        );
         
-        empty_cols.forEach( 
-            function(a_o, a_i)
-            {
-                $("td[realIndex='" + a_o + "']",a_tbl).addClass("emptycol")
-                $("th[realIndex='" + a_o + "']",a_tbl).addClass("emptycol");
-            }
-        );
+        this.hide_empty_cols(a_tbl,all_cols);
         
         var end = (new Date()).getTime();
         window.opener.Alph.util.log("Hiding time: " + (end-start));
@@ -428,10 +394,22 @@ Alph.infl = {
      * @param {HTMLElement} a_tbl the table
      * @param {Document} the Document containing the table
      */
-    expand_table: function(tbl,topdoc) {
+    expand_table: function(tbl,topdoc,a_hide_empty) {
         $("th",tbl).css("display","table-cell");
         $("td",tbl).css("display","table-cell");
         $("#expand-table-link",topdoc).css("display","none");
+        if (a_hide_empty)
+        {
+            var all_cols = $("col",tbl);
+            $("th[origColspan]",tbl).each(
+                function()
+                {
+                    var origColspan = $(this).attr("origColspan");
+                    this.setAttribute("colspan",origColspan);
+                }
+            );
+            Alph.infl.hide_empty_cols(tbl,all_cols);
+        }
         Alph.infl.resize_window(topdoc);
     },
     
@@ -855,5 +833,101 @@ Alph.infl = {
         
         Alph.infl.resize_window(window.content.document || window.document);
         return false;
-    }    
+    },
+    
+    /**
+     * hides the th and td cells for columns in which all of the endings
+     * are empty; also modifies the colspan of the th elements to reduce
+     * them by the number of td cells which have been hidden 
+     * (use css display: none to hide the cells to completely hide them 
+     * from the table - using visibility:hidden or visibility:collapse doesn't
+     * work fully
+     * @param {Node} a_tbl the inflection table node
+     * @param a_all_colls jQuery wrapped set of the col elements
+     * 
+     */
+    hide_empty_cols: function(a_tbl,a_all_cols)
+    {
+        var data_rows = $("tr.data-row",a_tbl).length;
+        var empty_cols = [];
+        // iterate through the columns, hiding any which are completely empty
+        $(a_all_cols).each (
+          function() {
+            var index = $(this).attr("realIndex");
+            var num_empty = $("td[realIndex='" + index + "'] span.emptycell",a_tbl).length;
+            if (num_empty == data_rows) 
+            {
+                empty_cols.push(index);    
+            }
+  
+          }
+        );
+
+        var reduce_cols = {headerrow1: {},
+                           headerrow2: {}};
+        empty_cols.forEach( 
+            function(a_o, a_i)
+            {
+                $("td[realIndex='" + a_o + "']",a_tbl).css("display","none");
+                    
+                $("tr[id^=headerrow] th",a_tbl).each(
+                    function()
+                    {
+                        var realIndex = this.realIndex;
+                        var colspan;
+                        var id = $(this).parent("tr").attr("id");
+                        try 
+                        {
+                            colspan = parseInt($(this).attr("colspan"));
+                        }
+                        catch(e)
+                        {
+                            window.opener.Alph.util.log("Invalid colspan");
+                        }
+                        
+                        if (typeof realIndex != "undefined" && 
+                            (realIndex == a_o
+                              || (a_o > realIndex && a_o < (realIndex + colspan))))
+                        {
+                            if (typeof reduce_cols[id][realIndex] == "undefined")
+                            {
+                                reduce_cols[id][realIndex] = 1;
+                            }
+                            else
+                            {
+                                reduce_cols[id][realIndex] = reduce_cols[id][realIndex] + 1;    
+                            }
+                            
+                        }
+                    }
+                );
+            }
+        );
+        for (var id in reduce_cols)
+        {
+            if (id.substring("headerrow") == -1)
+            {
+                continue;
+            }
+            for (var colindex in reduce_cols[id])
+            {
+                if (typeof reduce_cols[id][colindex] == "number")
+                {
+                    var col_header = 
+                        $("tr#" + id + " th[realIndex='" + colindex + "']",a_tbl)
+                        .get(0);
+                    var col_span = parseInt(col_header.getAttribute("colspan"));
+                    if (reduce_cols[id][colindex] == col_span)
+                    {
+                        $(col_header).css("display","none");
+                    }
+                    else
+                    {
+                        col_header.setAttribute("colspan",col_span - reduce_cols[id][colindex]);
+                        col_header.setAttribute("origColspan",col_span);
+                    }
+                }
+            }
+        } 
+    }
 };
