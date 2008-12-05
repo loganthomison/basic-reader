@@ -80,7 +80,7 @@ Alph.tei_grammar = {
         $("a.toc",toc_doc).click(
             function(a_e)
             {
-                Alph.tei_grammar.tocClickHandler(a_e,params.lang_tool);
+                return Alph.tei_grammar.tocClickHandler(a_e,this,params.lang_tool);
             }
         );
     
@@ -107,19 +107,20 @@ Alph.tei_grammar = {
      * Click handler for links in the toc frame. Set the src
      * of the alph-grammar-content browser.
      * @param {Event} a_event the triggering click event
+     * @param {Element} a_elem the element which was clicked
      * @param {Alph.LanguageTool} a_lang_tool the LanguageTool which is
      *                                        responsible for this grammar
      */
-    tocClickHandler: function(a_event,a_lang_tool)
+    tocClickHandler: function(a_event,a_elem,a_lang_tool)
     {
         var toc_doc = $("#alph-grammar-toc").get(0).contentDocument;
-        var href = $(this).attr("href");
+        var href = $(a_elem).attr("href");
         $("#alph-grammar-content").attr("src",
                 
                 Alph.tei_grammar.get_base_url(a_lang_tool) + href 
             );
         $('.highlighted',toc_doc).removeClass('highlighted');
-        $(this).addClass('highlighted');
+        $(a_elem).addClass('highlighted');
         return false;
     },
 
