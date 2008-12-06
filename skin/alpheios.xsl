@@ -108,7 +108,7 @@
       <xsl:attribute name="key">
         <xsl:call-template name="convert-text">
           <xsl:with-param name="item" select="hdwd"/>
-          <xsl:with-param name="strip" select="true()"/>
+          <xsl:with-param name="strip-diacritics" select="true()"/>
         </xsl:call-template>
       </xsl:attribute>
 
@@ -116,6 +116,7 @@
       <xsl:call-template name="item-plus-text">
         <xsl:with-param name="item" select="hdwd"/>
         <xsl:with-param name="suffix" select="': '"/>
+        <xsl:with-param name="strip-sense" select="true()"/>
       </xsl:call-template>
       <xsl:call-template name="item-plus-text">
         <xsl:with-param name="item" select="pron"/>
@@ -419,11 +420,13 @@
     <xsl:param name="item"/>
     <xsl:param name="prefix" select="''"/>
     <xsl:param name="suffix" select="''"/>
+    <xsl:param name="strip-sense" select="false()"/>
     <xsl:for-each select="$item">
       <span class="alph-{name(.)}">
         <xsl:value-of select="$prefix"/>
         <xsl:call-template name="convert-text">
           <xsl:with-param name="item" select="."/>
+          <xsl:with-param name="strip-sense" select="$strip-sense"/>
         </xsl:call-template>
         <xsl:value-of select="$suffix"/>
       </span>
@@ -434,55 +437,96 @@
   <xsl:template name="convert-text">
     <xsl:param name="item"/>
     <xsl:param name="partial" select="false()"/>
-    <xsl:param name="strip" select="false()"/>
+    <xsl:param name="strip-diacritics" select="false()"/>
+    <xsl:param name="strip-sense" select="false()"/>
 
-    <!-- switch on language -->
-    <xsl:choose>
-      <!-- ancient Greek -->
-      <xsl:when test="starts-with($item/ancestor-or-self::*/@xml:lang, 'grc')">
-        <!-- is this betacode? -->
-        <xsl:variable name="isbeta">
-          <xsl:call-template name="is-beta">
-            <xsl:with-param name="input" select="$item"/>
-          </xsl:call-template>
-        </xsl:variable>
+    <xsl:variable name="text">
+      <!-- switch on language -->
+      <xsl:choose>
+        <!-- ancient Greek -->
+        <xsl:when test="starts-with($item/ancestor-or-self::*/@xml:lang, 'grc')">
+          <!-- is this betacode? -->
+          <xsl:variable name="isbeta">
+            <xsl:call-template name="is-beta">
+              <xsl:with-param name="input" select="$item"/>
+            </xsl:call-template>
+          </xsl:variable>
 
-        <!-- get text in Unicode -->
-        <xsl:variable name="text">
+          <!-- get text in Unicode -->
+          <xsl:variable name="text">
+            <xsl:choose>
+              <!-- if betacode -->
+              <xsl:when test="$isbeta > 0">
+                <!-- convert it to unicode -->
+                <xsl:call-template name="beta-to-uni">
+                  <xsl:with-param name="input" select="$item"/>
+                  <xsl:with-param name="partial" select="$partial"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$item"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <!-- strip length diacritics if requested -->
           <xsl:choose>
-            <!-- if betacode -->
-            <xsl:when test="$isbeta > 0">
-              <!-- convert it to unicode -->
-              <xsl:call-template name="beta-to-uni">
-                <xsl:with-param name="input" select="$item"/>
-                <xsl:with-param name="partial" select="$partial"/>
+            <xsl:when test="$strip-diacritics">
+              <xsl:call-template name="uni-strip-length">
+                <xsl:with-param name="input" select="$text"/>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$item"/>
+              <xsl:value-of select="$text"/>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:variable>
+        </xsl:when>
 
-        <!-- strip length diacritics if requested -->
-        <xsl:choose>
-          <xsl:when test="$strip">
-            <xsl:call-template name="uni-strip-length">
-              <xsl:with-param name="input" select="$text"/>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$text"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <!-- other language, do nothing -->
+        <xsl:otherwise>
+          <xsl:value-of select="$item"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- strip sense indication if requested -->
+    <xsl:choose>
+      <xsl:when test="$strip-sense">
+        <xsl:call-template name="strip-trailing">
+          <xsl:with-param name="input" select="$text"/>
+        </xsl:call-template>
       </xsl:when>
-
-      <!-- other language, do nothing -->
       <xsl:otherwise>
-        <xsl:value-of select="$item"/>
+        <xsl:value-of select="$text"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
 
+  <!-- strip trailing characters from input -->
+  <!-- default is to strip trailing digits -->
+  <xsl:template name="strip-trailing">
+    <xsl:param name="input"/>
+    <xsl:param name="to-strip" select="'0123456789'"/>
+
+    <xsl:variable name="last-char"
+      select="substring($input, string-length($input))"/>
+
+    <xsl:choose>
+      <!-- if empty input or last character is not in list -->
+      <xsl:when test="translate($last-char, $to-strip, '') = $last-char">
+        <!-- we're done - return input -->
+        <xsl:value-of select="$input"/>
+      </xsl:when>
+      <!-- if last character is in list -->
+      <xsl:otherwise>
+        <!-- drop it and strip remaining (leading) part -->
+        <xsl:call-template name="strip-trailing">
+          <xsl:with-param name="input"
+            select="substring($input, 1, string-length($input) - 1)"/>
+          <xsl:with-param name="to-strip" select="$to-strip"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
