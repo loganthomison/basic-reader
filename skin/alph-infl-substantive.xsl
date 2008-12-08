@@ -8,7 +8,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs"
     xmlns:exsl="http://exslt.org/common"
     xmlns:xlink="http://www.w3.org/1999/xlink">
-    <xsl:import href="beta-uni-util.xsl"/>    
+    <xsl:import href="beta-uni-util.xsl"/>
+    <xsl:import href="uni2ascii.xsl"/>
     <!--
         This stylesheet groups the data on 3 attributes for the rows, 
         and groups on 3 attributes for the columns.
@@ -44,6 +45,8 @@
     <!-- by default greek vowel length is stripped but this can be overridden -->
     <xsl:param name="strip_greek_vowel_length" select="true()"/>
     
+    <!-- transliterate unicode in the ending tables before matching? -->
+    <xsl:param name="translit_ending_table_match" select="false()"/>
     <!-- by default this stylesheet applies to nouns, but may also be
          used for adjectives or other parts of speech -->
     <xsl:param name="match_pofs" select="'noun'"/>
@@ -308,11 +311,20 @@
                             <xsl:for-each select="$cellgroup">
                                 <xsl:variable name="stripped-ending">
                                     <xsl:choose>
+                                        <!-- if requested, transliterate the ending in the table for matching -->
+                                        <xsl:when test="$translit_ending_table_match">
+                                            <xsl:call-template name="uni-to-ascii">
+                                                <xsl:with-param name="input" select="."/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <!-- if we're not transliterating, we may need to   
+                                             strip greek vowels -->
                                         <xsl:when test="$strip_greek_vowel_length = true()">
                                             <xsl:call-template name="uni-strip-length">
                                                 <xsl:with-param name="input" select="."/>
                                             </xsl:call-template>                              
                                         </xsl:when>
+                                        <!-- otherwise use the ending as-is -->
                                         <xsl:otherwise>
                                             <xsl:value-of select="."/>
                                         </xsl:otherwise>
