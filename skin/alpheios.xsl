@@ -271,6 +271,18 @@
               </div>
             </xsl:if>
 
+            <!-- process dual case list -->
+            <xsl:if test="count($inflections[num = 'dual']/case)">
+              <div class="alph-infl">
+                <xsl:text>Dual: </xsl:text>
+                <xsl:for-each select="$inflections[num = 'dual']/case">
+                  <xsl:sort select="./@order" data-type="number"
+                    order="descending"/>
+                  <xsl:apply-templates select="."/>
+                </xsl:for-each>
+              </div>
+            </xsl:if>
+            
             <!-- process plural case list -->
             <xsl:if test="count($inflections[num = 'plural']/case)">
               <div class="alph-infl">
@@ -282,7 +294,7 @@
                 </xsl:for-each>
               </div>
             </xsl:if>
-
+            
             <!-- process other case list -->
             <xsl:if test="count($inflections[count(current()/num)=0]/case)">
               <div class="alph-infl">
