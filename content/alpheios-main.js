@@ -856,13 +856,18 @@ Alph.main =
         }
         else
         {
-            // remove the popoup and stylesheets 
-            // from the prior language, if any
-            Alph.xlate.removePopup(bro);
+            var old_lang_tool = this.getLanguageTool();
             
+            // set the new language but hold onto a copy of the old language
+            // tool for use in clearing out the browser
             this.get_state_obj(bro).set_var("current_language",a_lang);
             
             var lang_tool = this.getLanguageTool();
+            
+            // remove the popoup and stylesheets 
+            // from the prior language, if any
+            Alph.xlate.removePopup(bro,old_lang_tool);
+            
             
             // update the popup trigger if necessary
             this.setXlateTrigger(bro,lang_tool.getpopuptrigger());

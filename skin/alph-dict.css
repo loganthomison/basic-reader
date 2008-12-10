@@ -1,3 +1,5 @@
+@import url(chrome://alpheios/skin/alpheios.css);
+
 body {
     background: white;
 }
@@ -8,11 +10,21 @@ body {
     background: white;
 }
 
-.alph-attr,.alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs,.alph-close,.alph-tense,.alph-voice,.alph-pers {
+#alph-window * {
     background: white;
 }
 
-/** hide some things in dictionary view **/
+/** hide some things in default dictionary view **/
 .alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error  {
     display: none;
+}
+/** in the full dictionary display hide everything except the dictionary blocs**/
+#alph-window.full-dict-display * {
+    display: none;
+
+}
+
+#alph-window.full-dict-display div.alph-dict-block {
+    display: block;
+    border-bottom: 1px dotted black;
 }

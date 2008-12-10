@@ -939,17 +939,23 @@ Alph.xlate = {
      * Remove the alph-window element and related css from the
      * browser content document
      * @param a_bro the browser 
+     * @param a_lang_tool the LanguageTool which last populated the alpheios
+     *                    elements in the browser (optional - if not supplied
+     *                    the current tool will be used)
      */
-     removePopup: function(a_bro)
+     removePopup: function(a_bro,a_lang_tool)
      {
         var last_doc = this.getLastDoc();
         // remove the main alpheios stylesheet
         Alph.$("#alpheios-css",last_doc).remove();
-        // remove the language specific stylesheet
-        var lang_tool = Alph.main.getLanguageTool();
-        if (lang_tool)
+        
+        if (typeof a_lang_tool == "undefined")
+        {
+            a_lang_tool = Alph.main.getLanguageTool();
+        }
+        if (a_lang_tool)
         {   
-            lang_tool.removeStyleSheet(last_doc);
+            a_lang_tool.removeStyleSheet(last_doc);
         }
         // remove the alpheios window element
         Alph.$("#alph-window",last_doc).remove();
@@ -959,9 +965,9 @@ Alph.xlate = {
             function() {
                 var doc = Alph.$(this).get(0).contentDocument;
                 Alph.$("#alph-window",doc).html("");
-                if (lang_tool)
+                if (a_lang_tool)
                 {
-                    lang_tool.removeStyleSheet(doc);
+                    a_lang_tool.removeStyleSheet(doc);
                 }
             }
         );

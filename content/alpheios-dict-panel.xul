@@ -42,10 +42,10 @@
                     <label id="alph-dict-label" 
                            value="&alpheios-dict-toolbar-label;"/>
                 </toolbaritem>
-                      <browser 
+                <browser 
                     id="alph-dict-body"
                     flex="1"
-                    src="chrome://alpheios/content/alph-dict.html" 
+                    src="chrome://alpheios/content/html/alph-panel.html" 
                     class="alph-lexicon-output"/>
             </alpheiosPanel>
     </hbox>  

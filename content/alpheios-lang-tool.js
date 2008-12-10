@@ -863,7 +863,192 @@ Alph.LanguageTool.prototype.getIndexFile = function(a_docid)
     return "chrome://" + chromepkg + "/content/index_files/" + a_docid;
 };
 
+/**
+ * Method which applies language-specific post-processing to the 
+ * inflection table display
+ * @param {Element} a_tbl the inflection table DOM element
+ */
 Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
 {
   // default does nothing   
+};
+
+/**
+ * Returns a callback to the current dictionary for the language
+ * which can be used to populate a display with HTML including a full 
+ * definition for a lemma or list of lemmas. The HTML produced by the lookup
+ * method should include a separate div for each lemma, with an attribute named
+ * 'key' set to the name of the lemma.
+ * @return {function} a function which accepts the following parameters:
+ *                      {String} a_dict_name dictionary_name,
+ *                      {Array}  a_lemmas list of lemmas
+ *                      {function} a_success callback function for successful lookup
+ *                      {function} a_error callback function for error
+ * @return {Object} null if no default dictionary is defined for the language 
+ */
+Alph.LanguageTool.prototype.get_dictionary_callback = function()
+{
+    var lang_obj = this;
+    // if no default dictionary is defined for the language, return null
+    var default_dict = 
+        Alph.util.getPref("dictionaries.default",this.source_language);
+    if (! default_dict)
+    {
+        return null;
+    }
+    
+    // if we have a specific method defined for producing
+    // the dictionary urls for this dictionary, then use it
+    // otherwise use the default method
+    var dict_method = 
+        Alph.util.getPref(
+        "methods.dictionary." + default_dict,
+        this.source_language);
+    if (typeof dict_method == "undefined")
+    {       
+        dict_method = 
+            Alph.util.getPrefOrDefault(
+                "methods.dictionary.default",
+                this.source_language);
+    }
+    var dict_callback = 
+        function(a_lemmas,a_success,a_error)
+        { 
+            lang_obj[dict_method](default_dict,a_lemmas,a_success,a_error);
+        };
+   
+    return dict_callback;
+}
+
+/**
+ * Default dictionary lookup method to call a webservice. 
+ * The url for the webservice is expected to be defined in the language-specific
+ * preference setting: url.dictionary.<dict_name> and the name of a url parameter
+ * to set to the lemma in url.dictionary.dict_name.lemma_param. If the setting
+ * methods.dictionary.default.multiple_lemmas_allowed is true, then a single 
+ * request  will be issued for all lemmas, otherwise, separate requests for 
+ * each lemma. 
+ * @param {String} a_dict_name the name of the dictionary
+ * @param {Array} a_lemmas the list of lemmas to be looked up
+ * @param {function} a_success callback to be executed upon successful lookup
+ * @param {function} a_error callback to be executed upon error
+ */
+Alph.LanguageTool.prototype.default_dictionary_lookup=
+    function(a_dict_name,a_lemmas,a_success,a_error)
+{
+    var lang_obj = this;
+    // pickup the base url, and the name of the lemma parameter from
+    // preferences
+    var dict_url = 
+        Alph.util.getPref(
+            "url.dictionary."+a_dict_name,
+            this.source_language);
+    var lemma_param = 
+        Alph.util.getPref(
+            "url.dictionary."+a_dict_name+".lemma_param",
+            this.source_language);
+    var multiple_lemmas_allowed =     
+        Alph.util.getPrefOrDefault(
+            "methods.dictionary.default.multiple_lemmas_allowed",
+            this.source_language);
+    Alph.util.log("Using Dictionary " + a_dict_name + " at " + dict_url);            
+    if (dict_url && lemma_param)
+    {
+        var lemma_params = '';
+
+        // if the default method supports multiple lemmas in a single request
+        // accumulate the lemma parameters and issue one request
+        if (multiple_lemmas_allowed)
+        {
+            a_lemmas.forEach(
+                function(a_lemma,a_i)
+                {
+                    // TODO - create a util function for populating components of
+                    // a url - whether to use ; or ? as separator should be config setting
+                    lemma_params = lemma_params
+                                    + '?'
+                                    + lemma_param
+                                    + '='
+                                    + encodeURIComponent(a_lemma);
+                }
+            );
+            var lemma_url = dict_url + lemma_params;
+            Alph.util.log("Calling dictionary at " + lemma_url);
+            lang_obj.do_default_dictionary_lookup(
+                lemma_url, 
+                a_success, 
+                a_error);
+        }
+        // if the default method doesn't support multiple lemmas in 
+        // a single request issue a separate request per lemma
+        else
+        {
+
+            a_lemmas.forEach(
+                function(a_lemma,a_i)
+                {
+                    // TODO - create a util function for populating components of
+                    // a url - whether to use ; or ? as separator should be config setting
+                    lemma_params = '?'
+                                    + lemma_param
+                                    + '='
+                                    + encodeURIComponent(a_lemma);
+                    var lemma_url = dict_url + lemma_params;
+                    Alph.util.log("Calling dictionary at " + lemma_url);
+                    lang_obj.do_default_dictionary_lookup(
+                        lemma_url, 
+                        a_success, 
+                        a_error);
+                }
+                
+            );
+
+        }
+    }
+};
+
+/**
+ * Helper method which calls the dictionary webservice
+ * @param {String} a_url the url to GET
+ * @param {function} a_callback callback upon successful lookup
+ * @param {function} a_error callback upon error
+ */
+Alph.LanguageTool.prototype.do_default_dictionary_lookup = 
+    function(a_url,a_success,a_error)
+{
+    Alph.$.ajax(
+        {
+            type: "GET",
+            url: a_url,
+            dataType: 'html', 
+            error: function(req,textStatus,errorThrown)
+            {
+                a_error(textStatus||errorThrown);
+                
+            },
+            success: function(data, textStatus) 
+            {    
+                var lemma_html;
+                // TODO This is a hack. We should really create a DOM from
+                // the response and use that to extract the body contents
+                // but for some reason I can't get that to work with jQuery.
+                // For now, just using string matching to pull whatever is in
+                // the body out, or if no body tags are present, use the 
+                // string as is.
+                var body_start = data.match(/(<body\s*(.*?)>)/i);
+                var body_end =data.match(/<\/body>/i);
+                var lemma_html;
+                if (body_start && body_end)
+                {
+                    var body_tag_length = body_start[1].length;
+                    lemma_html = data.substring(body_start.index+body_tag_length+1,body_end.index);
+                }
+                else
+                {
+                    lemma_html = data;
+                }
+                a_success(lemma_html);
+            } 
+        }   
+    );    
 };
