@@ -17,6 +17,10 @@
         <command id="alpheios-dict-toggle-cmd" 
              oncommand="Alph.main.toggle_panel(event,'alph-dict-panel');"
              observes="alph-dict-status" />
+        <command 
+            id="alpheios-dict-switch-cmd" 
+            oncommand="Alph.Dict.switch_dictionary(event);"
+            observes="alpheios-enabled-notifier"/>
     </commandset>
              
     <!-- overlay the tools menu -->

@@ -19,12 +19,24 @@ body {
     display: none;
 }
 /** in the full dictionary display hide everything except the dictionary blocs**/
-#alph-window.full-dict-display * {
+#alph-window.full-dict-display > * {
     display: none;
-
 }
 
 #alph-window.full-dict-display div.alph-dict-block {
     display: block;
     border-bottom: 1px dotted black;
+    margin-bottom: 1.5em;
+    padding-bottom: .5em;
+}
+
+#alph-window.full-dict-display div.loading {
+    display: block;
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background: transparent url(loading.gif) no-repeat;
+    cursor: progress;
+    white-space: nowrap;
 }

@@ -398,7 +398,7 @@
                     select="$row2count*$row3count"/>
                     <th colspan="{$colspan}">
                         <span class="header-text"><xsl:value-of select="."/></span>
-                        <xsl:apply-templates select="."/>                       
+                        <xsl:apply-templates select="."/>
                     </th>
             </xsl:for-each>            
         </tr>
@@ -455,13 +455,19 @@
     </xsl:template>
     
     <!-- template to produce data for stem header row -->
-    <xsl:template name="stem-data" match="order-item[@attname='decl']">        
+    <xsl:template name="stem-data" match="order-item[@attname='decl']">
+        <xsl:call-template name="add-footnote">
+            <xsl:with-param name="item" select="."/>
+        </xsl:call-template>                                
         <br/>
         <xsl:variable name="thisdecl" select="text()"/>
         <xsl:apply-templates select="/infl-data/stem-table/stem[@decl=$thisdecl]"/>
+    </xsl:template>
+
+    <xsl:template name="no-sub" match="order-item">
         <xsl:call-template name="add-footnote">
             <xsl:with-param name="item" select="."/>
-        </xsl:call-template>                
+        </xsl:call-template>        
     </xsl:template>
     
     <xsl:template match="stem">
@@ -480,11 +486,6 @@
         <li id="{@id}" class="{@type}"><span class="stem-class-desc"><xsl:apply-templates select="reflink"/></span></li>        
     </xsl:template>
     
-    <xsl:template name="no-sub" match="order-item">
-        <xsl:call-template name="add-footnote">
-            <xsl:with-param name="item" select="."/>
-        </xsl:call-template>        
-    </xsl:template>
     
     <!-- template to produce colgroups for the table columns -->
     <xsl:template name="colgroups">

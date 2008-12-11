@@ -77,6 +77,16 @@ Alph.main =
     panels: { },
 
     /**
+     * holds the Event types
+     */
+    events: 
+        {
+            SHOW_TRANS: 100,
+            HIDE_POPUP: 200,
+            REMOVE_POPUP: 300,
+        },
+        
+    /**
      * flag to indicate if the languages were successfully set
      */
     has_languages: false,
@@ -886,19 +896,24 @@ Alph.main =
     
     /**
      * Get the Alph.LanguageTool instance for the current language.
+     * @param {Browser} a_bro the browser from which to retrieve the language tool
+     *                        (if not supplied, the current browser is used) 
      * @return the Alph.LanguageTool instance for the current language
      *         or undefined if the language isn't set or the extension 
      *         isn't enabled
      * @type Alph.LanguageTool
      */
-    getLanguageTool: function()
+    getLanguageTool: function(a_bro)
     {
-        var bro = this.getCurrentBrowser();
+        if (typeof a_bro == "undefined")
+        {
+            a_bro = this.getCurrentBrowser();
+        }
         var lang_tool;
-        if (this.is_enabled(bro))
+        if (this.is_enabled(a_bro))
         {
             lang_tool = 
-                Alph.Languages.get_lang_tool(this.get_state_obj(bro).get_var("current_language"));
+                Alph.Languages.get_lang_tool(this.get_state_obj(a_bro).get_var("current_language"));
         }
         return lang_tool;
     },
@@ -1020,7 +1035,7 @@ Alph.main =
                         Alph.xlate.showTranslation(data,target,doc);
                     }
                 );
-                Alph.main.broadcast_ui_event();
+                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
             },
             function(a_msg)
             {   
@@ -1031,7 +1046,7 @@ Alph.main =
                         Alph.xlate.translationError(a_msg,doc);
                     }
                 );
-                Alph.main.broadcast_ui_event();
+                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
             }
         );
     },
@@ -1113,9 +1128,10 @@ Alph.main =
     
     /** 
      * Broadcast a UI event to the panels
+     * @param a_event_type the type of event (per Alph.main.events)
      * TODO replace this with the Observes JS Module when FF3 is min supported
      */
-    broadcast_ui_event: function()
+    broadcast_ui_event: function(a_event)
     {
         var bro = this.getCurrentBrowser();
         // Update the panels
@@ -1127,7 +1143,7 @@ Alph.main =
                 {
                     var panel_obj = Alph.main.panels[panel_id];
                     Alph.util.log("Observing ui event for panel " + panel_id); 
-                    panel_obj.observe_ui_event(bro);    
+                    panel_obj.observe_ui_event(bro,a_event);    
                 } 
                 catch (e)
                 {   

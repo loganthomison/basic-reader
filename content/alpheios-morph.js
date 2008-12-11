@@ -96,9 +96,10 @@ Alph.Morph.prototype.reset_contents = function(a_panel_state)
  * Stores the contents of the alph-window div and the css stylesheet 
  * links for the current browser to the panel state object.
  * @param {Browser} a_bro the current browser
+ * @param a_event_type the event type
  */
 
-Alph.Morph.prototype.observe_ui_event = function(a_bro)
+Alph.Morph.prototype.observe_ui_event = function(a_bro,a_event_type)
 {
     // store the current contents of the morph window in this browser's panel state
     var panel_state = this.get_browser_state(a_bro);

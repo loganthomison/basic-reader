@@ -38,6 +38,7 @@ Alph.Panel = function(a_panel)
     this.section_parent = Alph.$(this.panel_elem).parents(".alph-panel-section");
     this.notifier = Alph.$(this.panel_elem).attr("notifier");
     this.panel_window = null;
+    this.current_browser = null;
     
 };
 
@@ -123,10 +124,21 @@ Alph.Panel.prototype.reset_to_default = function()
 Alph.Panel.prototype.reset_state = function(a_bro)
 {
 
+    var old_browser = this.current_browser;
+    
+    // keep a reference to the current browser for the panel
+    // so that when we reset to a new state, we can access
+    // the prior browser state easily
+    this.current_browser = a_bro;
+    
     var panel_state = this.get_browser_state(a_bro);
-
+    var old_state;
+    if (typeof old_browser != "undefined")
+    {
+        old_state = this.get_browser_state(old_browser);
+    }
     // update the panel contents for the current browser
-    this.reset_contents(panel_state);
+    this.reset_contents(panel_state,old_state);
          
     var status;
     // just auto hide everything if alpheios is disabled
@@ -165,6 +177,9 @@ Alph.Panel.prototype.update_status = function(a_status)
     // state get the correct value from the state object
     var bro = Alph.main.getCurrentBrowser();
     var panel_state = this.get_browser_state(bro);
+    
+    var old_status = panel_state.status;
+    
     panel_state.status = a_status;
 
     // uncollapse parent box and parent's sibling splitter
@@ -285,6 +300,12 @@ Alph.Panel.prototype.update_status = function(a_status)
         }
     }
     
+    // if the panel status changed, call observe_ui_event to make sure the 
+    // panel contents are up to date
+    if (old_status != a_status)
+    {
+        this.observe_ui_event(bro);
+    }
 };
 
 /**
@@ -313,6 +334,7 @@ Alph.Panel.prototype.detach = function()
         alert("Detach not yet supported for this panel.");
         return;
     }
+     
     try {
         this.panel_window = 
             Alph.xlate.openSecondaryWindow(
@@ -323,6 +345,7 @@ Alph.Panel.prototype.detach = function()
     {
         Alph.util.log("Error detaching panel: " + a_e);
     }
+  
     this.update_status(Alph.Panel.STATUS_SHOW);
 };
 
@@ -343,6 +366,19 @@ Alph.Panel.prototype.restore = function()
     
     var panel_state = this.get_browser_state(Alph.main.getCurrentBrowser());
     this.update_status(panel_state.status);
+}
+
+/**
+ * Update a browser in the detached panel window with the current 
+ * state of that browser the real (attached) panel
+ * @param {Object} a_panel_state the panel state object
+ * @param {String} a_browser_id the id of the browser to update
+ * @param {String} a_browser_index the index of the browser to update
+ */
+Alph.Panel.prototype.update_panel_window = 
+    function(a_panel_state,a_browser_id,a_browser_index)
+{
+    // default does nothing - override for panel-specific behavior
 }
 
 /**
@@ -406,8 +442,9 @@ Alph.Panel.prototype.cleanup = function()
  * Method which can be used to reset the contents for the panel
  * when the panel state changes 
  * @param {Object} a_panel_state the current panel state object
+ * @param {Object} the prior state object
  */
-Alph.Panel.prototype.reset_contents = function(a_panel_state)
+Alph.Panel.prototype.reset_contents = function(a_panel_state,a_old_state)
 {
     // default does nothing  - override in panel-specific implementations
 };
@@ -418,8 +455,9 @@ Alph.Panel.prototype.reset_contents = function(a_panel_state)
  * TODO - ultimately this should be redone using an Observer service -
  * may make sense to wait until we can use a JS module for this (with FF3)
  * @param {Browser} a_bro the current browser
+ * @param a_event_type the event type (one of @link Alph.main.events)
  */
-Alph.Panel.prototype.observe_ui_event = function(a_bro)
+Alph.Panel.prototype.observe_ui_event = function(a_bro,a_event_type)
 {
     // default does nothing - override in panel-specific implementations
 };

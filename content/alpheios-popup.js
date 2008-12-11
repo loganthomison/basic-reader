@@ -583,7 +583,7 @@ Alph.xlate = {
                         Alph.xlate.showTranslation(data,a_alphtarget,doc);
                     }
                 );
-                Alph.main.broadcast_ui_event();
+                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
 
             },
             function(a_msg)
@@ -597,7 +597,7 @@ Alph.xlate = {
                         Alph.xlate.translationError(a_msg,doc);
                     }
                 );
-                Alph.main.broadcast_ui_event();
+                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
             }
         );
     },
@@ -629,7 +629,7 @@ Alph.xlate = {
             alph_state.set_var("lastSelection",null);
         
         }
-        Alph.main.broadcast_ui_event();
+        Alph.main.broadcast_ui_event(Alph.main.events.HIDE_POPUP);
         // keep the last element in the state, so that we can find
         // the popup (and stylesheets) again
     },
@@ -971,7 +971,7 @@ Alph.xlate = {
                 }
             }
         );
-        Alph.main.broadcast_ui_event();
+        Alph.main.broadcast_ui_event(Alph.main.events.REMOVE_POPUP);
 
      },
      

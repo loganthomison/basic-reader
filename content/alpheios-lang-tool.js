@@ -775,11 +775,21 @@ Alph.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
  * Adds the language specific stylesheet to the window
  * content document, to apply to the display of the popup
  * @param {Document} a_doc the window content document
+ * @param {String} a_name name of the stylesheet 
+ *                        (optional - if not specified package
+ *                        name will be used)
  */
-Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
+Alph.LanguageTool.prototype.addStyleSheet = function(a_doc,a_name)
 {
     var chromepkg = this.getchromepkg();
-    var chromecss = "chrome://" + chromepkg + "/skin/" + chromepkg + ".css"
+    var chromecss = "chrome://" + chromepkg + "/skin/";
+    if (typeof a_name == "undefined")
+    {
+        a_name = chromepkg;
+    }
+    chromecss = chromecss + a_name + ".css"
+    
+    Alph.util.log("adding stylesheet: " + chromecss);
     // only add the stylesheet if it's not already there
     if (Alph.$("link[href='"+ chromecss + "']",a_doc).length == 0)
     {
@@ -788,7 +798,7 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
         css.setAttribute("rel", "stylesheet");
         css.setAttribute("type", "text/css");
         css.setAttribute("href", chromecss);
-        css.setAttribute("id", chromepkg + "-css");
+        css.setAttribute("id", a_name + "-css");
         Alph.$("head",a_doc).append(css);
     }
 };
@@ -796,12 +806,21 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc)
 /**
  * Removes the language specific stylesheet 
  *  from the window content document.
- *  @param {Document} a_doc the window content document
+ * @param {Document} a_doc the window content document
+ * @param {String} a_name name of the stylesheet 
+ *                       (optional - if not specified package
+ *                       name will be used)
  */
-Alph.LanguageTool.prototype.removeStyleSheet = function(a_doc)
+Alph.LanguageTool.prototype.removeStyleSheet = function(a_doc,a_name)
 {
-    var css_id = this.getchromepkg() + "-css";
-    Alph.$("#"+css_id,a_doc).remove();
+    var chromepkg = this.getchromepkg();
+    var chromecss = "chrome://" + chromepkg + "/skin/";
+    if (typeof a_name == "undefined")
+    {
+        a_name = chromepkg;
+    }
+    chromecss = chromecss + a_name + ".css"
+    Alph.$("link[href='"+chromecss + "']",a_doc).remove();
 };
 
 /**
@@ -878,12 +897,13 @@ Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
  * which can be used to populate a display with HTML including a full 
  * definition for a lemma or list of lemmas. The HTML produced by the lookup
  * method should include a separate div for each lemma, with an attribute named
- * 'key' set to the name of the lemma.
+ * 'lemma' set to the name of the lemma.
  * @return {function} a function which accepts the following parameters:
  *                      {String} a_dict_name dictionary_name,
  *                      {Array}  a_lemmas list of lemmas
  *                      {function} a_success callback function for successful lookup
  *                      {function} a_error callback function for error
+ *                      {function} a_complete callback function upon completion
  * @return {Object} null if no default dictionary is defined for the language 
  */
 Alph.LanguageTool.prototype.get_dictionary_callback = function()
@@ -912,9 +932,9 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
                 this.source_language);
     }
     var dict_callback = 
-        function(a_lemmas,a_success,a_error)
+        function(a_lemmas,a_success,a_error,a_complete)
         { 
-            lang_obj[dict_method](default_dict,a_lemmas,a_success,a_error);
+            lang_obj[dict_method](default_dict,a_lemmas,a_success,a_error,a_complete);
         };
    
     return dict_callback;
@@ -932,9 +952,10 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
  * @param {Array} a_lemmas the list of lemmas to be looked up
  * @param {function} a_success callback to be executed upon successful lookup
  * @param {function} a_error callback to be executed upon error
+ * @param {function} a_complete callback to be executed upon completion
  */
 Alph.LanguageTool.prototype.default_dictionary_lookup=
-    function(a_dict_name,a_lemmas,a_success,a_error)
+    function(a_dict_name,a_lemmas,a_success,a_error,a_complete)
 {
     var lang_obj = this;
     // pickup the base url, and the name of the lemma parameter from
@@ -975,15 +996,18 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
             var lemma_url = dict_url + lemma_params;
             Alph.util.log("Calling dictionary at " + lemma_url);
             lang_obj.do_default_dictionary_lookup(
+                a_dict_name,
                 lemma_url, 
                 a_success, 
-                a_error);
+                a_error,
+                a_complete);
         }
         // if the default method doesn't support multiple lemmas in 
         // a single request issue a separate request per lemma
         else
         {
 
+            var num_lemmas = a_lemmas.length;
             a_lemmas.forEach(
                 function(a_lemma,a_i)
                 {
@@ -995,10 +1019,25 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                                     + encodeURIComponent(a_lemma);
                     var lemma_url = dict_url + lemma_params;
                     Alph.util.log("Calling dictionary at " + lemma_url);
-                    lang_obj.do_default_dictionary_lookup(
-                        lemma_url, 
-                        a_success, 
-                        a_error);
+                    if (a_i < num_lemmas -1)
+                    {
+                        lang_obj.do_default_dictionary_lookup(
+                            a_dict_name,
+                            lemma_url, 
+                            a_success, 
+                            a_error,
+                            function(){});
+                    }
+                    else
+                    {
+                           lang_obj.do_default_dictionary_lookup(
+                            a_dict_name,
+                            lemma_url, 
+                            a_success, 
+                            a_error,
+                            a_complete); // only call the real completion 
+                                         // callback for the last lemma
+                    }
                 }
                 
             );
@@ -1009,12 +1048,14 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
 
 /**
  * Helper method which calls the dictionary webservice
+ * @param {String} a_dict_name the dictionary name
  * @param {String} a_url the url to GET
  * @param {function} a_callback callback upon successful lookup
  * @param {function} a_error callback upon error
+ * @param {function} a_complete callback upon completion
  */
 Alph.LanguageTool.prototype.do_default_dictionary_lookup = 
-    function(a_url,a_success,a_error)
+    function(a_dict_name,a_url,a_success,a_error,a_complete)
 {
     Alph.$.ajax(
         {
@@ -1023,7 +1064,7 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
             dataType: 'html', 
             error: function(req,textStatus,errorThrown)
             {
-                a_error(textStatus||errorThrown);
+                a_error(textStatus||errorThrown,a_dict_name);
                 
             },
             success: function(data, textStatus) 
@@ -1047,8 +1088,9 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
                 {
                     lemma_html = data;
                 }
-                a_success(lemma_html);
-            } 
+                a_success(lemma_html,a_dict_name);
+            },
+            complete: a_complete
         }   
     );    
 };

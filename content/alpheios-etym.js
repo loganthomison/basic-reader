@@ -177,13 +177,27 @@ Alph.Etymology.prototype.get_detach_chrome = function()
  * Stores the contents of the alph-window div
  * and document css to the panel state object.
  * @param {Browser} a_bro the current browser
+ * @param a_event_type the event type
  */
-Alph.Etymology.prototype.observe_ui_event = function(a_bro)
+Alph.Etymology.prototype.observe_ui_event = function(a_bro,a_event_type)
 {
     // store the current contents of the morph window in this browser's panel state
     var panel_state = this.get_browser_state(a_bro);
     var data = this.get_etym_data();
     var panel_obj = this;
+    
+    // don't do anything more if the panel isn't visible
+    // or if the event isn't showing a new translation
+    // or completing removing the popup
+
+    if (panel_state.status != Alph.Panel.STATUS_SHOW
+        || ( a_event_type != Alph.main.events.SHOW_TRANS
+             && a_event_type != Alph.main.events.REMOVE_POPUP
+            ))
+
+    {
+        return;
+    }
      
     Alph.$("browser",this.panel_elem).each( 
         function(i) 
