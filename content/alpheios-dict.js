@@ -347,11 +347,12 @@ Alph.Dict.prototype.display_dictionary = function(
         // add the correct dictionary stylesheet if we haven't already
         a_lang_tool.addStyleSheet(a_doc,'alpheios-dict-' + a_dict_name);    
         
+        // add an alph-dict-block around the response
+        a_html = '<div class="alph-dict-block">' + a_html + '</div>';
+        
+        Alph.util.log("appending " + a_html);
         Alph.$(alph_window).append(a_html);
-        // add the alph-dict-block class to each distinct lemma 
-        // or error block identified in the supplied output 
-        Alph.$("div[lemma]",alph_window).addClass('alph-dict-block');
-        Alph.$(".error",alph_window).addClass('alph-dict-block');
+        
         // the class default-dict-display shows just the short definition elements
         // from the morphology ouput
         // the class full-dict-display hides the short definition elements and
@@ -374,7 +375,7 @@ Alph.Dict.prototype.display_dictionary = function(
         // it's not entirely clear what we should do if
         // the user switched tabs or otherwise reset the state
         // while we were waiting for the results
-        alert("Interrupted dictionary requested returned: " + a_html);
+        //alert("Interrupted dictionary requested returned: " + a_html);
         Alph.util.log("State reset while waiting for dictionary");
     }
     

@@ -994,7 +994,31 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
     var multiple_lemmas_allowed =     
         Alph.util.getPrefOrDefault(
             "methods.dictionary.default.multiple_lemmas_allowed",
+            this.source_language);        
+    var convert_method =
+        Alph.util.getPref(
+            "url.dictionary."+a_dict_name+".convert_method",
             this.source_language);
+            
+    var post_method =
+        Alph.util.getPref(
+            "url.dictionary."+a_dict_name+".post_method",
+            this.source_language);
+    var on_success;            
+    if (post_method != null)
+    {
+        on_success = function(a_html,a_dict_name)
+        {
+            Alph.util.log("calling " + post_method);
+            a_html = lang_obj[post_method](a_html);
+            a_success(a_html,a_dict_name);
+        }
+    }
+    else
+    {
+        on_success = a_success;
+    }
+    
     Alph.util.log("Using Dictionary " + a_dict_name + " at " + dict_url);            
     if (dict_url && lemma_param)
     {
@@ -1009,8 +1033,12 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                 {
                     // TODO - create a util function for populating components of
                     // a url - whether to use ; or ? as separator should be config setting
+                    if (convert_method != null)
+                    {
+                        a_lemma = Alph.convert[convert_method](a_lemma);
+                    }
                     lemma_params = lemma_params
-                                    + '?'
+                                    + '&'
                                     + lemma_param
                                     + '='
                                     + encodeURIComponent(a_lemma);
@@ -1021,7 +1049,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
             lang_obj.do_default_dictionary_lookup(
                 a_dict_name,
                 lemma_url, 
-                a_success, 
+                on_success, 
                 a_error,
                 a_complete);
         }
@@ -1036,7 +1064,11 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                 {
                     // TODO - create a util function for populating components of
                     // a url - whether to use ; or ? as separator should be config setting
-                    lemma_params = '?'
+                    if (convert_method != null)
+                    {
+                        a_lemma = Alph.convert[convert_method](a_lemma);
+                    }
+                    lemma_params = '&'
                                     + lemma_param
                                     + '='
                                     + encodeURIComponent(a_lemma);
@@ -1047,7 +1079,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                         lang_obj.do_default_dictionary_lookup(
                             a_dict_name,
                             lemma_url, 
-                            a_success, 
+                            on_success, 
                             a_error,
                             function(){});
                     }
@@ -1056,7 +1088,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                            lang_obj.do_default_dictionary_lookup(
                             a_dict_name,
                             lemma_url, 
-                            a_success, 
+                            on_success, 
                             a_error,
                             a_complete); // only call the real completion 
                                          // callback for the last lemma
