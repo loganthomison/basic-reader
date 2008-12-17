@@ -10,7 +10,10 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />
 
- <stringbundleset id="alpheios-prefs-stringbundleset"/>
+ <stringbundleset id="alpheios-prefs-stringbundleset">
+      <stringbundle id="alpheios-prefs-strings" 
+                      src="chrome://alpheios/locale/alpheios-prefs.properties"/>
+ </stringbundleset>
   
 <prefpane id="alpheios-prefs-system" 
           label="&alpheios.prefs.system;" 

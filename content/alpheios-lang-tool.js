@@ -893,6 +893,29 @@ Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
 };
 
 /**
+ * Get the name of the current dictionary
+ * @return the name of the dictionary or null if none defined
+ * @type String
+ */
+Alph.LanguageTool.prototype.getDictionary = function()
+{
+    // if no default dictionary is defined for the language, return null
+    var default_dict = 
+        Alph.util.getPref("dictionaries.default",this.source_language);
+    return default_dict || null;
+}
+
+/**
+ * Set the name of the default dictionary
+ * @param {String} the dictionary name (must be listed in 
+ *                  extensions.alpheios.greek.dictionaries)                  
+ */
+Alph.LanguageTool.prototype.setDictionary = function(a_dict_name)
+{
+    Alph.util.setPref("dictionaries.default",a_dict_name,this.source_language);
+}
+
+/**
  * Returns a callback to the current dictionary for the language
  * which can be used to populate a display with HTML including a full 
  * definition for a lemma or list of lemmas. The HTML produced by the lookup
@@ -909,10 +932,10 @@ Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
 Alph.LanguageTool.prototype.get_dictionary_callback = function()
 {
     var lang_obj = this;
+    
     // if no default dictionary is defined for the language, return null
-    var default_dict = 
-        Alph.util.getPref("dictionaries.default",this.source_language);
-    if (! default_dict)
+    var default_dict = this.getDictionary();
+    if (default_dict == null)
     {
         return null;
     }
@@ -1062,6 +1085,8 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
             type: "GET",
             url: a_url,
             dataType: 'html', 
+            timeout: Alph.util.getPref("methods.dictionary.default",
+                                        this.source_language),
             error: function(req,textStatus,errorThrown)
             {
                 a_error(textStatus||errorThrown,a_dict_name);

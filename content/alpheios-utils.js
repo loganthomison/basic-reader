@@ -47,6 +47,8 @@ if (typeof Alph == "undefined") {
  */
 Alph.util = {
 
+    XUL_NS: 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+    
     /**
      * Initializes the Alph.util class, by setting up the member
      * variables which hold references to various XPCOM components/services.
@@ -429,5 +431,24 @@ Alph.util = {
                 
         }
         return this.extension_base_paths[a_ext_pkg].clone();
-    },    
+    },
+    
+    makeXUL: function(a_tag,a_id,a_keys,a_values)
+    {
+        var xul = document.createElementNS(this.XUL_NS,a_tag);
+        xul.setAttribute('id',a_id);
+        a_keys.forEach(
+            function(a_key,a_i)
+            {
+                xul.setAttribute(a_key,a_values[a_i]);        
+            }
+        );
+        return xul;
+    },
+    
+    makePref: function(a_id,a_name,a_type)
+    {
+        return this.makeXUL(
+            'preference',a_id,['name','type'],[a_name,a_type]);  
+    }
 };

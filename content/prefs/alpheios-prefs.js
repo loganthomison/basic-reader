@@ -27,7 +27,15 @@
  * @singleton
  */
 Alph.prefs = {
-    
+
+    init: function()
+    {
+        this._PREFS = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService)
+                      .getBranch("extensions.alpheios."),
+        this._PREFS.QueryInterface(Components.interfaces.nsIPrefBranch2);
+    },
+ 
     /**
      * Initializes the panel preferences on the window preferences pane
      * - copies the main panel preferences grid to the language-specific
@@ -52,6 +60,7 @@ Alph.prefs = {
                 // prefs for this language just continue to the next language
                 if (typeof use_defs_cbx != "undefined")
                 {                
+                
                     // clone the default panel preferences grid
                     // repurpose the cloned copy for this language
                     var grid = Alph.$("grid#alpheios-panel-prefs-default").clone();
@@ -101,11 +110,11 @@ Alph.prefs = {
                             {
                                 this.setAttribute("disabled",true);
                             }
-        
+                        
                             
                         }
                     );
-            
+                    
                     // add a handler to the override checkbox
                     Alph.$(use_defs_cbx).click(
                         function()
@@ -174,6 +183,10 @@ Alph.prefs = {
         }
     },
     
+    /**
+     * Restore the default panel settings for a language
+     * @param {String} a_lang the language
+     */
     restore_panel_defaults: function(a_lang)
     {
             var grid_id = "#alpheios-panel-prefs";
@@ -211,5 +224,170 @@ Alph.prefs = {
                 
             );
         
+    },
+    
+    /**
+     * Initialize the dictionary preferences screen
+     * populates the language-specific tabs in the Dictionary
+     * preferences pane with the default dictionary preference 
+     * elements for the language. 
+     */
+    init_dict_prefs: function()
+    {
+        var strings = document.getElementById("alpheios-prefs-strings");
+
+        var prefs = Alph.$("#alpheios-prefs-dictionaries preferences").get(0);
+        
+        // iterate through the languages which have containers for the
+        // dictionary preferences defined
+        Alph.$("[id^=dicts-prefs-language-details-]").each(
+        
+            function() {
+                
+                var dict_parent = this;
+                var lang = this.id.match(/dicts-prefs-language-details-(.+)$/)[1];
+                if (lang != null && typeof lang != "undefined")
+                {
+                    var lang_strings = document.getElementById("alpheios-prefs-strings-"+lang);
+                    
+                    // add preference for default dictionary for this language
+                    prefs.appendChild(
+                        Alph.util.makePref(
+                            'pref-' + lang + '-dict-default',
+                            'extensions.alpheios.' + lang + '.dictionaries.default',
+                             'string')
+                    );
+                    
+                    // add radio group to set default dictionary for this language
+                    var rgroup = Alph.util.makeXUL(
+                        'radiogroup',
+                        'alph-dict-select-'+lang,
+                        ['preference'],['pref-' + lang + '-dict-default']
+                    );  
+                    rgroup.appendChild(
+                        Alph.util.makeXUL(
+                            'caption',
+                            '',
+                            ['label'],
+                            [strings.getString('dict.default')]
+                        )
+                    );
+                    rgroup.appendChild(
+                        Alph.util.makeXUL(                
+                            'radio',
+                            'alph-dict-select-none-' + lang,
+                            ['label','value'],
+                            [strings.getString('dict.none'),'']
+                        )
+                    );
+                    dict_parent.appendChild(rgroup);                                                            
+                    
+                    var dictionary_list = 
+                        Alph.prefs._PREFS.getCharPref(lang + '.dictionaries'); 
+                    
+                    // iterate through the supported dictionaries for this language
+                    // adding the preferences and radio elements for this dictionary
+                    dictionary_list.split(/,/).forEach(
+                        function(a_dict)
+                        {
+                            var dict_name = 
+                                lang_strings.getString('dict.' + a_dict);
+                            
+                            rgroup.appendChild(
+                                Alph.util.makeXUL(                
+                                    'radio',
+                                    'alph-dict-select-' + lang + '-' + a_dict,
+                                    ['label','value'],
+                                    [dict_name,a_dict]
+                                )
+                            );
+                                                    
+                            // if the dictionary uses the default method, add a groupbox
+                            // with textboxes to set the url and lemma parameter for this
+                            // dictionary
+                            var dict_method;
+                            try 
+                            { 
+                                dict_method = Alph.prefs._PREFS.getCharPref(
+                                    lang + '.methods.dictionary.'+a_dict);
+                            }
+                            catch(e) {}
+                            if (dict_method == null || 
+                                dict_method == "methods.dictionary.default")
+                            {
+                                var ctl_id = lang+'-dict-'+a_dict+'-url';
+                                var pref_id = 'pref-' + ctl_id;
+                                
+                                // add the preferences for url and lemma
+                                prefs.appendChild(
+                                    Alph.util.makePref(
+                                        pref_id,
+                                        'extensions.alpheios.' + lang + '.url.dictionary.' + a_dict,
+                                        'string')
+                                );
+                                prefs.appendChild(
+                                    Alph.util.makePref(
+                                        pref_id + '.lemma_param',
+                                        'extensions.alpheios.'+ lang+ '.url.dictionary.'+ a_dict+ '.lemma_param',
+                                        'string')
+                                );
+
+                                var groupbox = Alph.util.makeXUL(
+                                    'groupbox','alph-dict-settings-'+a_dict,[],[]);
+                                groupbox.appendChild(
+                                    Alph.util.makeXUL(
+                                        'caption',
+                                        '',
+                                        ['label'],[dict_name]
+                                    )
+                                );
+                                var hbox =
+                                    Alph.util.makeXUL('hbox','',[],[]);
+                                hbox.appendChild(
+                                    Alph.util.makeXUL(
+                                        'label',
+                                        '',
+                                        ['control','value'],
+                                        [ctl_id,strings.getString('dict.url')]
+                                    )
+                                );
+                                hbox.appendChild(
+                                    Alph.util.makeXUL(
+                                        'textbox',
+                                        ctl_id,
+                                        ['preference'],
+                                        [pref_id]
+                                    )
+                                );
+                                 var hbox_lemma =
+                                    Alph.util.makeXUL('hbox','',[],[]);
+                                hbox_lemma.appendChild(
+                                    Alph.util.makeXUL(
+                                        'label',
+                                        '',
+                                        ['control','value'],
+                                        [ctl_id+'.lemma_param',
+                                         strings.getString('dict.url.lemma_param')]
+                                    )
+                                );
+                                hbox_lemma.appendChild(
+                                    Alph.util.makeXUL(
+                                        'textbox',
+                                        ctl_id +'.lemma_param',
+                                        ['preference'],
+                                        [pref_id+'.lemma_param']
+                                    )
+                                );
+                                groupbox.appendChild(hbox);
+                                groupbox.appendChild(hbox_lemma);
+                                dict_parent.appendChild(groupbox);                                
+                            }        
+                        }
+                    ); // end iteration through dictionary list
+                }      
+            }
+        );  // end iteration through languages
     }
 };
+
+Alph.prefs.init();

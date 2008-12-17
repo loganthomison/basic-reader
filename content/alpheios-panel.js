@@ -133,7 +133,7 @@ Alph.Panel.prototype.reset_state = function(a_bro)
     
     var panel_state = this.get_browser_state(a_bro);
     var old_state;
-    if (typeof old_browser != "undefined")
+    if (old_browser != null)
     {
         old_state = this.get_browser_state(old_browser);
     }

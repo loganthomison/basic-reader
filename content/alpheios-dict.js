@@ -199,7 +199,6 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
     Alph.$(".loading",doc).remove();
     Alph.$(".alph-dict-block",doc).remove();
 
-    
     var panel_state = this.get_browser_state(a_bro);
 
     // pull the new lemmas out of the alph-window lexicon element
@@ -230,7 +229,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
             // remove the dictionary name from the state
             if (panel_state.dicts[bro_id] != null)
             {
-                language_tool.removeStyleSheet(a_doc,
+                language_tool.removeStyleSheet(doc,
                     'alpheios-dict-' + panel_state.dicts[bro_id]);
                 panel_state.dicts[bro_id] = null;
             }
@@ -253,6 +252,13 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
             var request = { pending: true };
             try
             {
+                // if we still have a request pending, flag
+                // it as interrupted
+                if (panel_state.last_request != null && 
+                    panel_state.last_request.pending)
+                {
+                        panel_state.last_request.interrupted = true;
+                }
                 panel_state.last_request = request;
                 dictionary_callback(
                     lemmas,
@@ -263,8 +269,11 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
                     },
                     function(a_error,a_dict_name)
                     {
+                        var err_str = '<div class="error">' +
+                                      a_error +
+                                      '</div>';
                         panel_obj.display_dictionary(
-                            language_tool,a_bro,doc,a_error,lemmas,a_dict_name,request);
+                            language_tool,a_bro,doc,err_str,lemmas,a_dict_name,request);
                     },
                     function ()
                     {
@@ -339,10 +348,10 @@ Alph.Dict.prototype.display_dictionary = function(
         a_lang_tool.addStyleSheet(a_doc,'alpheios-dict-' + a_dict_name);    
         
         Alph.$(alph_window).append(a_html);
-        // add the alph-dict-block class to each distinct lemma block 
-        // identified in the supplied output 
+        // add the alph-dict-block class to each distinct lemma 
+        // or error block identified in the supplied output 
         Alph.$("div[lemma]",alph_window).addClass('alph-dict-block');
-        
+        Alph.$(".error",alph_window).addClass('alph-dict-block');
         // the class default-dict-display shows just the short definition elements
         // from the morphology ouput
         // the class full-dict-display hides the short definition elements and
@@ -365,7 +374,7 @@ Alph.Dict.prototype.display_dictionary = function(
         // it's not entirely clear what we should do if
         // the user switched tabs or otherwise reset the state
         // while we were waiting for the results
-
+        alert("Interrupted dictionary requested returned: " + a_html);
         Alph.util.log("State reset while waiting for dictionary");
     }
     
@@ -450,5 +459,30 @@ Alph.Dict.prototype.get_detach_chrome = function()
 
 Alph.Dict.switch_dictionary = function(a_event)
 {
-    // TODO eventually support switching between multiple dictionaries
+    var menuitem = a_event.explicitOriginalTarget;
+    try
+    {
+        var dict_name = menuitem.getAttribute('id')
+                                .match(/^alpheios-dict-(.+)$/)[1];
+        if (dict_name == null || dict_name == 'none')
+        {
+            dict_name = '';
+        }
+        Alph.main.getLanguageTool().setDictionary(dict_name);                                                
+    }
+    catch(a_e)
+    {
+        Alph.util.log("Error switching dictionary: " + a_e);
+    }
+}
+
+Alph.Dict.update_dict_menu = function(a_menu)
+{
+    var dict_name = Alph.main.getLanguageTool().getDictionary();
+    if (dict_name == null)
+    {
+        dict_name = 'none';
+        
+    }
+    Alph.$('menuitem#alpheios-dict-'+dict_name,a_menu).attr('checked','true');    
 }

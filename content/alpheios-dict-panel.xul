@@ -51,6 +51,21 @@
                     flex="1"
                     src="chrome://alpheios/content/html/alph-panel.html" 
                     class="alph-lexicon-output"/>
+                
+                <menu id="alpheios-dict-switch-menu"
+                     label="&alpheios.panel.dict.menu;"
+                     observes="alpheios-enabled-status">
+                    <menupopup
+                        id = "alph-dict-menu-popup" 
+                        onpopupshowing="Alph.Dict.update_dict_menu(this)">       
+                       <menuitem id="alpheios-dict-none" 
+                          label="&alpheios.panel.dict.none;"
+                          name="alpheios-dict-current"
+                          command="alpheios-dict-switch-cmd"
+                          type="radio"
+                          class="menuitem-iconic"/>
+                    </menupopup>
+                </menu>
             </alpheiosPanel>
     </hbox>  
 </overlay>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<!-- Alpheios Panel Preferences Overlay -->
+<overlay id="alpheios-panel-prefs"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <prefwindow id="alpheios-prefs">    
+
+        <prefpane id="alpheios-prefs-dictionaries" 
+              label="&alpheios.prefs.dictionaries;" 
+              image="chrome://alpheios/skin/prefs/text-x-generic.png"
+              onpaneload="Alph.prefs.init_dict_prefs();">
+            <preferences>
+                <preference id="pref-default-timeout"
+                            name="extensions.alpheios.methods.dictionary.default.timeout"
+                            type="int"/>
+                <preference id="pref-default-multiple"
+                            name="extensions.alpheios.methods.dictionary.default.multiple_lemmas_allowed"
+                            type="bool"/>
+            </preferences>
+            <tabbox id="dict-prefs">
+                <tabs id="dicts-prefs-language-tabs"/>
+                <tabpanels id="dicts-prefs-language-details"/>
+            </tabbox>
+        </prefpane>
+    </prefwindow>
+</overlay>
