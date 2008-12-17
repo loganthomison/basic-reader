@@ -1074,7 +1074,7 @@ Alph.main =
         var lang_tool = Alph.main.getLanguageTool();
         var bro = this.getCurrentBrowser();
         
-        // check the language-specific notifiers
+        // check the language-specific feature notifiers
         Alph.$("broadcaster.alpheios-language-notifier").each(
             function()
             {
@@ -1089,6 +1089,27 @@ Alph.main =
                 Alph.$(this).attr("disabled",disabled);
             }
         );        
+        
+        var current_language = this.get_state_obj().get_var("current_language");
+        // check the language item-disabled notifiers
+        Alph.$("broadcaster.alpheios-language-disabled-notifier").each(
+            function()
+            {
+                var id = Alph.$(this).attr("id");
+                var lang = id.match(/alph-lang-(\w+)/)[1];
+                var lang_is_current = false;
+                if (lang != null && lang == current_language)
+                {
+                    lang_is_current = true;
+                }
+                Alph.$(this).attr("disabled",! lang_is_current);
+                // only set hidden if the hidden attribute was already set
+                if (Alph.$(this).attr("hidden") != null)
+                {
+                    Alph.$(this).attr("hidden",! lang_is_current);
+                }
+            }
+        );    
         
         // check the extension-status specific notifiers
         Alph.$("broadcaster.alpheios-enabled-notifier").each(
