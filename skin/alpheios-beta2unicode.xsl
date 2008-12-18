@@ -22,15 +22,17 @@
  -->
 
   <xsl:output method="text"/>
-  <xsl:include href="uni2betacode.xsl"/>
+  <xsl:include href="beta2unicode.xsl"/>
 
   <xsl:param name="input"/>
-  <xsl:param name="upper" select="false()"/>
+  <xsl:param name="precomposed" select="true()"/>
+  <xsl:param name="partial" select="false()"/>
 
   <xsl:template match="/">
-    <xsl:call-template name="uni-to-beta">
+    <xsl:call-template name="beta-to-uni">
       <xsl:with-param name="input" select="$input"/>
-      <xsl:with-param name="upper" select="$upper"/>
+      <xsl:with-param name="precomposed" select="$precomposed"/>
+      <xsl:with-param name="partial" select="$partial"/>
     </xsl:call-template>
   </xsl:template>
 
