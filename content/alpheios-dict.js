@@ -123,7 +123,9 @@ Alph.Dict.prototype.reset_contents = function(a_panel_state,a_old_state)
  */
 Alph.Dict.prototype.show = function()
 {
-    var panel_obj = this;
+    var panel_obj = this; 
+    // update the browse command for the current dictionary
+    Alph.Dict.update_dict_browse_cmd();
     
     // we need to update the contents of the panel window here
     // to make sure the window contains the latest contents from the
@@ -246,7 +248,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
             Alph.$(alph_window).append(
                     "<div id='alph-dict-loading' class='loading'>"
                     + Alph.$("#alpheios-strings").get(0)
-                          .getFormattedString("alph-loading-dictionary",[lemmas.join(', ')])
+                          .getFormattedString("alph-searching-dictionary",[lemmas.join(', ')])
                     + "</div>");
         
             var request = { pending: true };
@@ -458,7 +460,13 @@ Alph.Dict.prototype.get_detach_chrome = function()
     return 'chrome://alpheios/content/alpheios-dict-window.xul';   
 };
 
-Alph.Dict.switch_dictionary = function(a_event)
+/**
+ * Switch the current dictionary
+ * (static method as it's invoked from the panel menu)
+ * @param {Event} a_ the event which triggered the request
+ * @param {String} a_panel_id the id of the originating panel
+ */
+Alph.Dict.switch_dictionary = function(a_event,a_panel_id)
 {
     var menuitem = a_event.explicitOriginalTarget;
     try
@@ -469,14 +477,24 @@ Alph.Dict.switch_dictionary = function(a_event)
         {
             dict_name = '';
         }
-        Alph.main.getLanguageTool().setDictionary(dict_name);                                                
+        Alph.main.getLanguageTool().setDictionary(dict_name);
+        Alph.Dict.update_dict_browse_cmd();
+        Alph.main.panels[a_panel_id]
+            .observe_ui_event(
+                Alph.main.getCurrentBrowser(),
+                Alph.main.events.SHOW_TRANS);
     }
     catch(a_e)
     {
         Alph.util.log("Error switching dictionary: " + a_e);
     }
+    
 }
 
+/**
+ * Update the dictionary menu for the current dictionary
+ * @param {a_menu}
+ */
 Alph.Dict.update_dict_menu = function(a_menu)
 {
     var dict_name = Alph.main.getLanguageTool().getDictionary();
@@ -486,4 +504,46 @@ Alph.Dict.update_dict_menu = function(a_menu)
         
     }
     Alph.$('menuitem#alpheios-dict-'+dict_name,a_menu).attr('checked','true');    
+};
+
+/**
+ * Update the dictionary browse command for the current dictionary
+ */
+Alph.Dict.update_dict_browse_cmd = function()
+{
+    // update the browse command for the current dictionary
+    if (Alph.main.getLanguageTool().getDictionaryBrowseUrl() == null)
+    {
+        Alph.$("#alpheios-dict-browse-cmd").attr("disabled",true);
+    }
+    else
+    {
+        Alph.$("#alpheios-dict-browse-cmd").attr("disabled",false);
+    }
+}
+
+/**
+ * Browse the current dictionary
+ * @param {Event} a_ the event which triggered the request
+ * @param {String} a_panel_id the id of the originating panel
+ */
+Alph.Dict.browse_dictionary = function(a_event,a_panel_id)
+{
+    
+    var browse_url = Alph.main.getLanguageTool().getDictionaryBrowseUrl();
+    if (browse_url != null)
+    {
+        Alph.xlate.openSecondaryWindow(
+            Alph.$("#alpheios-strings").get(0)
+                          .getString("alph-dictionary-window"),
+            browse_url,
+            {  chrome: "no",
+               dialog: "no",
+               resizable: "yes",
+               width: "800",
+               height: "600",
+               scrollbars: "yes"
+            }
+        );
+    }
 }

@@ -11,7 +11,7 @@
     width: 50%;
 }
 
-#alpheios-morph-inflection {
+#alpheios-morph-inflection, #alpheios-dict-browse {
     text-decoration: underline;
     color: blue;
 }

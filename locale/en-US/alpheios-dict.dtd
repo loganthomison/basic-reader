@@ -3,3 +3,4 @@
 <!ENTITY alpheios-dict-toolbar-label "Alpheios: Full Definition">
 <!ENTITY alpheios.panel.dict.menu "Dictionaries...">
 <!ENTITY alpheios.panel.dict.none "None (Short Definitions Only)">
+<!ENTITY alpheios.panel.dict.browse "Browse Dictionary">

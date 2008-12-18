@@ -19,8 +19,12 @@
              observes="alph-dict-status" />
         <command 
             id="alpheios-dict-switch-cmd" 
-            oncommand="Alph.Dict.switch_dictionary(event);"
-            observes="alpheios-enabled-notifier"/>
+            oncommand="Alph.Dict.switch_dictionary(event,'alph-dict-panel');"
+            observes="alpheios-dict-status"/>
+        <command 
+            id="alpheios-dict-browse-cmd" 
+            oncommand="Alph.Dict.browse_dictionary(event,'alph-dict-panel');"
+            observes="alpheios-dict-status"/>
     </commandset>
              
     <!-- overlay the tools menu -->
@@ -46,6 +50,12 @@
                     <label id="alph-dict-label" 
                            value="&alpheios-dict-toolbar-label;"/>
                 </toolbaritem>
+                <toolbarbutton id="alpheios-dict-browse" 
+                          label="&alpheios.panel.dict.browse;"
+                          tooltiptext="&alpheios.panel.dict.browse;"
+                          command="alpheios-dict-browse-cmd"
+                          type="button"
+                          class="menuitem-iconic"/>
                 <browser 
                     id="alph-dict-body"
                     flex="1"

@@ -916,6 +916,26 @@ Alph.LanguageTool.prototype.setDictionary = function(a_dict_name)
 }
 
 /**
+ * Get the browse url of the current dictionary
+ * @return the browse url of the dictionary or null if none defined
+ * @type String
+ */
+Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
+{
+    var browse_url = null;
+    var default_dict = 
+        this.getDictionary();
+    if (default_dict)
+    {
+        browse_url = 
+            Alph.util.getPref(
+                "dictionary." + default_dict + ".browse.url",
+                this.source_language);                                
+    }
+    return browse_url;
+}
+
+/**
  * Returns a callback to the current dictionary for the language
  * which can be used to populate a display with HTML including a full 
  * definition for a lemma or list of lemmas. The HTML produced by the lookup
@@ -981,36 +1001,35 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
     function(a_dict_name,a_lemmas,a_success,a_error,a_complete)
 {
     var lang_obj = this;
-    // pickup the base url, and the name of the lemma parameter from
-    // preferences
+    // pickup the url specific preferences
+    var base = "dictionary." + a_dict_name + ".search."; 
     var dict_url = 
         Alph.util.getPref(
-            "url.dictionary."+a_dict_name,
+            base + "url",
             this.source_language);
     var lemma_param = 
         Alph.util.getPref(
-            "url.dictionary."+a_dict_name+".lemma_param",
+            base + "lemma_param",
             this.source_language);
     var multiple_lemmas_allowed =     
         Alph.util.getPrefOrDefault(
-            "methods.dictionary.default.multiple_lemmas_allowed",
+            base + "multiple_lemmas",
             this.source_language);        
     var convert_method =
         Alph.util.getPref(
-            "url.dictionary."+a_dict_name+".convert_method",
+            base + "convert_method",
             this.source_language);
-            
-    var post_method =
+    var xform_method =
         Alph.util.getPref(
-            "url.dictionary."+a_dict_name+".post_method",
+            base + "transform_method",
             this.source_language);
     var on_success;            
-    if (post_method != null)
+    if (xform_method != null)
     {
         on_success = function(a_html,a_dict_name)
         {
-            Alph.util.log("calling " + post_method);
-            a_html = lang_obj[post_method](a_html);
+            Alph.util.log("calling " + xform_method);
+            a_html = lang_obj[xform_method](a_html);
             a_success(a_html,a_dict_name);
         }
     }
@@ -1117,7 +1136,7 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
             type: "GET",
             url: a_url,
             dataType: 'html', 
-            timeout: Alph.util.getPref("methods.dictionary.default",
+            timeout: Alph.util.getPref("methods.dictionary.default.timeout",
                                         this.source_language),
             error: function(req,textStatus,errorThrown)
             {
