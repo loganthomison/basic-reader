@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-    Stylesheet for transforming lexicon output to HTML
+  Copyright 2008 Cantus Foundation
+  http://alpheios.net
+ 
+  This file is part of Alpheios.
+ 
+  Alpheios is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+ 
+  Alpheios is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  Stylesheet for transforming lexicon output to HTML
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -105,7 +125,7 @@
   <xsl:template match="dict">
     <xsl:element name="div">
       <xsl:attribute name="class">alph-dict</xsl:attribute>
-      <xsl:attribute name="key">
+      <xsl:attribute name="lemma-key">
         <xsl:call-template name="convert-text">
           <xsl:with-param name="item" select="hdwd"/>
           <xsl:with-param name="strip-diacritics" select="true()"/>
