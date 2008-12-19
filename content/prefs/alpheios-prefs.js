@@ -238,10 +238,13 @@ Alph.prefs = {
 
         var prefs = Alph.$("#alpheios-prefs-dictionaries preferences").get(0);
         
+        var BY_ID = '.id_url';
         var BROWSE = '.browse_url';
         var LEMMA = '.lemma_param';
+        var LEMMA_ID = '.lemma_id_param';
         var MULTI = '.multiple_lemmas';
-        
+        var MULTI_ID = '.multiple_lemma_ids';
+
         // iterate through the languages which have containers for the
         // dictionary preferences defined
         Alph.$("[id^=dicts-prefs-language-details-]").each(
@@ -331,7 +334,13 @@ Alph.prefs = {
                                 prefs.appendChild(
                                     Alph.util.makePref(
                                         pref_id,
-                                        pref_base_s + '.url',
+                                        pref_base_s + '.lemma_url',
+                                        'string')
+                                );
+                                prefs.appendChild(
+                                    Alph.util.makePref(
+                                        pref_id + BY_ID,
+                                        pref_base_s + BY_ID,
                                         'string')
                                 );
                                 prefs.appendChild(
@@ -340,13 +349,27 @@ Alph.prefs = {
                                         pref_base_s + LEMMA,
                                         'string')
                                 );
+                               prefs.appendChild(
+                                    Alph.util.makePref(
+                                        pref_id + LEMMA_ID,
+                                        pref_base_s + LEMMA_ID,
+                                        'string')
+                                );
+
                                 prefs.appendChild(
                                     Alph.util.makePref(
                                         pref_id + MULTI,
                                         pref_base_s + MULTI,
                                         'bool')
                                 );
-                                        
+                        
+                                prefs.appendChild(
+                                    Alph.util.makePref(
+                                        pref_id + MULTI_ID,
+                                        pref_base_s + MULTI_ID,
+                                        'bool')
+                                );
+                        
                                 prefs.appendChild(
                                     Alph.util.makePref(
                                         pref_id + BROWSE,
@@ -417,6 +440,64 @@ Alph.prefs = {
                                          strings.getString('dict.url' + MULTI)]
                                     )
                                 );
+                                
+                                // add the lemma id url prefs
+                                var hbox_id =
+                                    Alph.util.makeXUL('hbox','',[],[]);
+                                hbox_id.appendChild(
+                                    Alph.util.makeXUL(
+                                        'label',
+                                        '',
+                                        ['control','value'],
+                                        [ctl_id+BY_ID,
+                                        strings.getString('dict.url'+BY_ID)]
+                                    )
+                                );
+                                hbox_id.appendChild(
+                                    Alph.util.makeXUL(
+                                        'textbox',
+                                        ctl_id+BY_ID,
+                                        ['preference'],
+                                        [pref_id+BY_ID]
+                                    )
+                                );
+                                 var hbox_lemma_id =
+                                    Alph.util.makeXUL('hbox','',[],[]);
+                                hbox_lemma_id.appendChild(
+                                    Alph.util.makeXUL(
+                                        'label',
+                                        '',
+                                        ['control','value'],
+                                        [ctl_id+LEMMA_ID,
+                                         strings.getString('dict.url' + LEMMA_ID)]
+                                    )
+                                );
+                                hbox_lemma_id.appendChild(
+                                    Alph.util.makeXUL(
+                                        'textbox',
+                                        ctl_id + LEMMA_ID,
+                                        ['preference'],
+                                        [pref_id+LEMMA_ID]
+                                    )
+                                );
+                                hbox_lemma_id.appendChild(
+                                    Alph.util.makeXUL(
+                                        'checkbox',
+                                        ctl_id + MULTI_ID,
+                                        ['preference'],
+                                        [pref_id+MULTI_ID]
+                                    )
+                                );
+                                hbox_lemma_id.appendChild(
+                                    Alph.util.makeXUL(
+                                        'label',
+                                        '',
+                                        ['control','value'],
+                                        [ctl_id + MULTI_ID,
+                                         strings.getString('dict.url' + MULTI_ID)]
+                                    )
+                                );
+                                
                                 var hbox_browse =
                                     Alph.util.makeXUL('hbox','',[],[]);
                                 hbox_browse.appendChild(
@@ -437,6 +518,8 @@ Alph.prefs = {
                                 );
                                 groupbox.appendChild(hbox);
                                 groupbox.appendChild(hbox_lemma);
+                                groupbox.appendChild(hbox_id);
+                                groupbox.appendChild(hbox_lemma_id);
                                 groupbox.appendChild(hbox_browse);
                                 dict_parent.appendChild(groupbox);                                
                             }        

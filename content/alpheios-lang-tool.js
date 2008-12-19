@@ -1005,15 +1005,27 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
     var base = "dictionary." + a_dict_name + ".search."; 
     var dict_url = 
         Alph.util.getPref(
-            base + "url",
+            base + "lemma_url",
+            this.source_language);
+    var by_id_url = 
+        Alph.util.getPref(
+            base + "id_url",
             this.source_language);
     var lemma_param = 
         Alph.util.getPref(
             base + "lemma_param",
             this.source_language);
+    var lemma_id_param = 
+        Alph.util.getPref(
+            base + "lemma_id_param",
+            this.source_language);
     var multiple_lemmas_allowed =     
         Alph.util.getPrefOrDefault(
             base + "multiple_lemmas",
+            this.source_language);
+    var multiple_ids_allowed =     
+        Alph.util.getPrefOrDefault(
+            base + "multiple_lemma_ids",
             this.source_language);        
     var convert_method =
         Alph.util.getPref(
@@ -1038,32 +1050,63 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
         on_success = a_success;
     }
     
+    var num_with_ids = 0;
+    var num_with_lemmas= 0;
+    Alph.$.map(a_lemmas,
+        function(n){
+            if (n[0] != null)
+            { num_with_ids++ }
+            if (n[1] != null)
+            { num_with_lemmas++ }
+        });
+     
     Alph.util.log("Using Dictionary " + a_dict_name + " at " + dict_url);            
     if (dict_url && lemma_param)
     {
         var lemma_params = '';
 
+        var multi_by_id = 
+            by_id_url != null && 
+            multiple_ids_allowed &&
+            num_with_ids == a_lemmas.length;
         // if the default method supports multiple lemmas in a single request
         // accumulate the lemma parameters and issue one request
-        if (multiple_lemmas_allowed)
+        // issue a single request for multiple lemmas to the lemma id url
+        if ((multiple_lemmas_allowed && num_with_lemmas == a_lemmas.length) || 
+            multi_by_id)
         {
             a_lemmas.forEach(
                 function(a_lemma,a_i)
                 {
+                    var lemma_id = a_lemma[0];
+                    var lemma_str = a_lemma[1];
+                    
                     // TODO - create a util function for populating components of
                     // a url - whether to use ; or ? as separator should be config setting
                     if (convert_method != null)
                     {
-                        a_lemma = Alph.convert[convert_method](a_lemma);
+                        lemma_str = Alph.convert[convert_method](lemma_str);
                     }
-                    lemma_params = lemma_params
-                                    + '&'
-                                    + lemma_param
-                                    + '='
-                                    + encodeURIComponent(a_lemma);
+                    if (multi_by_id)
+                    {
+                        lemma_params = lemma_params
+                                        + '&'
+                                        + lemma_id_param
+                                        + '='
+                                        + encodeURIComponent(lemma_id);
+                    }
+                    else 
+                    {
+                        lemma_params = lemma_params
+                                        + '&'
+                                        + lemma_param
+                                        + '='
+                                        + encodeURIComponent(lemma_str);
+                    }
                 }
             );
-            var lemma_url = dict_url + lemma_params;
+            var lemma_url = multi_by_id ? by_id_url : dict_url; 
+            lemma_url = lemma_url + lemma_params;
             Alph.util.log("Calling dictionary at " + lemma_url);
             lang_obj.do_default_dictionary_lookup(
                 a_dict_name,
@@ -1081,17 +1124,31 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
             a_lemmas.forEach(
                 function(a_lemma,a_i)
                 {
+                    var lemma_id = a_lemma[0];
+                    var lemma_str = a_lemma[1];
+
                     // TODO - create a util function for populating components of
                     // a url - whether to use ; or ? as separator should be config setting
                     if (convert_method != null)
                     {
-                        a_lemma = Alph.convert[convert_method](a_lemma);
+                        lemma_str = Alph.convert[convert_method](lemma_str);
                     }
-                    lemma_params = '&'
-                                    + lemma_param
-                                    + '='
-                                    + encodeURIComponent(a_lemma);
-                    var lemma_url = dict_url + lemma_params;
+                    var by_id = by_id_url != null && lemma_id != null; 
+                    if ( by_id)
+                    {
+                        lemma_params = '&'
+                                        + lemma_id_param
+                                        + '='
+                                        + encodeURIComponent(lemma_id);
+                    }
+                    else if (lemma_str != null)
+                    {
+                        lemma_params = '&'
+                                        + lemma_param
+                                        + '='
+                                        + encodeURIComponent(lemma_str);
+                    }
+                    var lemma_url = (by_id ? by_id_url : dict_url) + lemma_params;
                     Alph.util.log("Calling dictionary at " + lemma_url);
                     if (a_i < num_lemmas -1)
                     {

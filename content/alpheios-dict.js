@@ -208,10 +208,11 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
     Alph.$(".alph-dict",alph_window).each(
         function()
         {
-            var lemma = this.getAttribute("key");
-            if (lemma)
+            var lemma = this.getAttribute("lemma-key");
+            var lemma_id = this.getAttribute("lemma-id");
+            if (lemma || lemma_id)
             {
-                lemmas.push(lemma);                
+                lemmas.push([lemma_id,lemma]);                
             }
         }
     );
@@ -248,7 +249,8 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
             Alph.$(alph_window).append(
                     "<div id='alph-dict-loading' class='loading'>"
                     + Alph.$("#alpheios-strings").get(0)
-                          .getFormattedString("alph-searching-dictionary",[lemmas.join(', ')])
+                          .getFormattedString("alph-searching-dictionary",
+                            [Alph.$.map(lemmas,function(a){return a[1]}).join(', ')])
                     + "</div>");
         
             var request = { pending: true };
