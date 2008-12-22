@@ -128,7 +128,6 @@
       <xsl:attribute name="lemma-key">
         <xsl:call-template name="convert-text">
           <xsl:with-param name="item" select="hdwd"/>
-          <xsl:with-param name="strip-diacritics" select="true()"/>
         </xsl:call-template>
       </xsl:attribute>
 
@@ -469,7 +468,6 @@
   <xsl:template name="convert-text">
     <xsl:param name="item"/>
     <xsl:param name="partial" select="false()"/>
-    <xsl:param name="strip-diacritics" select="false()"/>
     <xsl:param name="strip-sense" select="false()"/>
 
     <xsl:variable name="text">
@@ -485,31 +483,17 @@
           </xsl:variable>
 
           <!-- get text in Unicode -->
-          <xsl:variable name="text">
-            <xsl:choose>
-              <!-- if betacode -->
-              <xsl:when test="$isbeta > 0">
-                <!-- convert it to unicode -->
-                <xsl:call-template name="beta-to-uni">
-                  <xsl:with-param name="input" select="$item"/>
-                  <xsl:with-param name="partial" select="$partial"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$item"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-
-          <!-- strip length diacritics if requested -->
           <xsl:choose>
-            <xsl:when test="$strip-diacritics">
-              <xsl:call-template name="uni-strip-length">
-                <xsl:with-param name="input" select="$text"/>
+            <!-- if betacode -->
+            <xsl:when test="$isbeta > 0">
+              <!-- convert it to unicode -->
+              <xsl:call-template name="beta-to-uni">
+                <xsl:with-param name="input" select="$item"/>
+                <xsl:with-param name="partial" select="$partial"/>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$text"/>
+              <xsl:value-of select="$item"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>

@@ -320,8 +320,10 @@
                                         <!-- if we're not transliterating, we may need to   
                                              strip greek vowels -->
                                         <xsl:when test="$strip_greek_vowel_length = true()">
-                                            <xsl:call-template name="uni-strip-length">
+                                            <xsl:call-template name="uni-strip">
                                                 <xsl:with-param name="input" select="."/>
+                                                <xsl:with-param name="strip-vowels" select="true()"/>
+                                                <xsl:with-param name="strip-caps" select="false()"/>
                                             </xsl:call-template>                              
                                         </xsl:when>
                                         <!-- otherwise use the ending as-is -->
