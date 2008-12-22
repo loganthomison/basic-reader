@@ -121,10 +121,19 @@ Alph.infl = {
             return;
         }
 
-        var pofs_set = [];
-        for (var pofs in link_target.suffixes)
+        var pofs_from;
+        if (typeof link_target.suffixes != 'undefined')
         {
-            if (link_target.suffixes[pofs].length > 0 || pofs == link_target.showpofs)
+            pofs_from = 'suffixes';
+        }
+        else
+        {
+            pofs_from = 'entries';
+        }
+        var pofs_set = [];
+        for (var pofs in link_target[pofs_from])
+        {
+            if (link_target[pofs_from][pofs].length > 0 || pofs == link_target.showpofs)
             {
                 pofs_set.push(pofs);
                 
@@ -132,32 +141,6 @@ Alph.infl = {
         }
         
         
-        var suffix_map = {};
-        if (typeof link_target.suffixes[link_target.showpofs] != "undefined")
-        {
-            var suffix_list = jQuery.map(link_target.suffixes[link_target.showpofs],function(n){
-                if ($(n).length == 0)
-                {
-                    return;
-                }
-                var ending = $(n).text();
-                if (ending == '') {
-                    ending = '&lt;none&gt;'
-                }
-                // remove duplicates from the list of suffixes
-                // for some reason the jQuery.unique function doesn't work
-                if (suffix_map[ending]) 
-                {
-                    return;
-                }
-                else 
-                {
-                    suffix_map[ending] = true;
-                    return ending;
-                } 
-            });
-            link_target.suffix_list = suffix_list.join(',');
-        }
         document.getElementById("alph-infl-browser")
             .addEventListener(
                 "DOMContentLoaded",
@@ -218,7 +201,6 @@ Alph.infl = {
         var topdoc = window.content.document || window.document;
         var showpofs = a_link_target.showpofs;
         this.init_table(a_tbl);        
-        var suffix_list = 'Inflection endings: ' + a_link_target.suffix_list;
 
         // show the links to the other possible orders
         if (a_link_target.order)
@@ -274,9 +256,7 @@ Alph.infl = {
         window.opener.Alph.util.log("Endings Processed: " + (end-start));
         start=end;
         
-        if ( a_link_target.suffixes[showpofs] != null 
-             && a_link_target.suffixes[showpofs].length > 0 
-             && ! a_link_target.suppress_match) {
+        if (  ! a_link_target.suppress_match) {
             var col_parents = [];
             
             $("span.ending",a_tbl).each(
@@ -285,7 +265,9 @@ Alph.infl = {
                     if (  
                         (a_link_target.xslt_params && 
                             ($(this).hasClass("selected") || $(this).hasClass("matched"))) || 
-                        (typeof a_link_target.xslt_params == "undefined" && 
+                        (typeof a_link_target.xslt_params == "undefined" &&
+                             a_link_target.suffixes[showpofs] != null &&
+                             a_link_target.suffixes[showpofs].length > 0 && 
                             Alph.infl.is_ending_match(a_link_target.suffixes[showpofs],this,a_link_target.lang_tool) )
                        )
                     {
@@ -377,7 +359,7 @@ Alph.infl = {
         window.opener.Alph.util.log("Handlers Added: " + (end-start));
         start=end;
         
-        var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props);
+        var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props,a_link_target);
         this.enable_expand_cols(collapsed,str_props,a_tbl);
         
         var start = (new Date()).getTime();
@@ -705,8 +687,15 @@ Alph.infl = {
                a_doc.createElementNS("http://www.w3.org/1999/xhtml",
                                     "option");
                 link.setAttribute("value",a_pofs_set[i]);
-                link.innerHTML = a_str_props.getFormattedString(
-                    "alph-infl-link-"+linktype, [linkname]);
+                try 
+                {
+                    link.innerHTML = a_str_props.getFormattedString(
+                        "alph-infl-link-"+linktype, [linkname]);
+                }
+                catch(e)
+                {
+                    link.innerHTML = linkname;
+                }
             if (a_pofs_set[i] == a_showpofs)
             {
                 link.setAttribute("selected",true);

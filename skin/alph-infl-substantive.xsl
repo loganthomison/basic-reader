@@ -50,6 +50,12 @@
     <!-- by default this stylesheet applies to nouns, but may also be
          used for adjectives or other parts of speech -->
     <xsl:param name="match_pofs" select="'noun'"/>
+    
+    <!-- Flag to request that endings be deduped according to a specific
+         set of attributes. The only supported value currently is 'case-num-gend'
+    -->
+    <xsl:param name="dedupe_by" select="''"/>
+    
     <!--xsl:param name="form" select="'Μοῦσα'"/-->
     
     <!-- debug -->
@@ -280,7 +286,7 @@
                             <xsl:call-template name="check_infl_sets">
                                 <xsl:with-param name="current_data" select="$celldata" />
                             </xsl:call-template>
-                        </xsl:variable>                                            
+                        </xsl:variable>
                         <xsl:call-template name="ending-cell">
                             <xsl:with-param name="infl-endings" select="$celldata"/>
                             <xsl:with-param name="selected" select="$selected"/>
@@ -299,7 +305,7 @@
                 <xsl:for-each select="$ending_types">
                     <xsl:sort 
                         select="/infl-data/order-table/order-item[@attname=$group6 
-                        and text()=current()]/@order"/>                            
+                        and text()=current()]/@order"/>
                     <xsl:if test="generate-id(.) = generate-id($ending_types[.=current()])">
                         <xsl:variable name="lasttype" select="."/>
                         <td class="ending-group {$lasttype}"> <!-- start new cell -->
@@ -364,15 +370,24 @@
                                 <xsl:variable name="notfirst">
                                     <xsl:if test="position() &gt; 1">notfirst</xsl:if>
                                 </xsl:variable>
-                                <span class="ending {@type} {$selected_class} {$notfirst}" stem-class="{@stem-class}">
-                                    <xsl:value-of select="."/>
-                                </span>
-                                <xsl:call-template name="add-dialect">
-                                    <xsl:with-param name="item" select="."/>
-                                </xsl:call-template>                        
-                                <xsl:call-template name="add-footnote">
-                                    <xsl:with-param name="item" select="."/>
-                                </xsl:call-template>
+                                <xsl:variable name="this_case" select="../@case"/>
+                                <xsl:variable name="this_num" select="../@num"/>
+                                <xsl:variable name="this_gend" select="../@gend"/>
+                                <xsl:variable name='duplicate'>
+                                    <xsl:if test="$dedupe_by='case-num-gend'
+                                            and ../preceding-sibling::infl-ending-set[@case=$this_case and 
+                                            @gend = $this_gend and @num = $this_num]/infl-ending/text() = .">duplicate</xsl:if>
+                                </xsl:variable>                                        
+                                    <span class="ending {@type} {$selected_class} {$notfirst} {$duplicate}" 
+                                        stem-class="{@stem-class}">
+                                        <xsl:value-of select="."/>
+                                    </span>
+                                    <xsl:call-template name="add-dialect">
+                                        <xsl:with-param name="item" select="."/>
+                                    </xsl:call-template>                        
+                                    <xsl:call-template name="add-footnote">
+                                        <xsl:with-param name="item" select="."/>
+                                    </xsl:call-template>
                             </xsl:for-each>
                         </td>                                   
                     </xsl:if>
@@ -565,8 +580,10 @@
               <xsl:variable name="ending_match">
                   <xsl:choose>
                       <xsl:when test="$strip_greek_vowel_length = true()">
-                          <xsl:call-template name="uni-strip-length">
+                          <xsl:call-template name="uni-strip">
                               <xsl:with-param name="input" select="span[@class='alph-term']/span[@class='alph-suff']"/>
+                              <xsl:with-param name="strip-vowels" select="true()"/>
+                              <xsl:with-param name="strip-caps" select="false()"/>
                           </xsl:call-template>                              
                       </xsl:when>
                       <xsl:otherwise>
