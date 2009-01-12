@@ -1189,6 +1189,19 @@ Alph.main =
         }
         
         var bro = Alph.main.getCurrentBrowser();
+        
+        // add a metadata element to the page so that it can check
+        // if Alpheios is installed, and if so, get the version information
+        // TODO add version information for the main Alpheios reader as well as any
+        // language extensions, pulled from the install.rdf datasource
+        // see chrome://mozapps/extensions/extensions.js for sample code
+        if (Alph.$("meta#_alpheios-installed-version",bro.contentDocument).length == 0)
+        {
+            Alph.$("head",bro.contentDocument)
+                .append('<meta id="_alpheios-installed-version" ' +
+                    'name="_alpheios-installed-version" ' +
+                    'content="xxxx"></meta>');
+        }
 
         // Temporary hack to enable pedagogical-reader specific functionality
         // for the prototype. Eventually this will be handled completely differently.

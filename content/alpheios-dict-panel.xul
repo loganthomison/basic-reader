@@ -62,11 +62,12 @@
                     src="chrome://alpheios/content/html/alph-panel.html" 
                     class="alph-lexicon-output"/>
                 
-                <menu id="alpheios-dict-switch-menu"
+                <toolbarbutton id="alpheios-dict-switch-menu"
                      label="&alpheios.panel.dict.menu;"
-                     observes="alpheios-enabled-status">
+                     observes="alpheios-enabled-status"
+                     type="menu">
                     <menupopup
-                        id = "alph-dict-menu-popup" 
+                        id = "alph-dict-menu-popup"
                         onpopupshowing="Alph.Dict.update_dict_menu(this)">       
                        <menuitem id="alpheios-dict-none" 
                           label="&alpheios.panel.dict.none;"
@@ -75,7 +76,7 @@
                           type="radio"
                           class="menuitem-iconic"/>
                     </menupopup>
-                </menu>
+                </toolbarbutton>
             </alpheiosPanel>
     </hbox>  
 </overlay>

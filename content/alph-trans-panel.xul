@@ -15,7 +15,8 @@
                      disabled="true" 
                      class="alpheios-pedagogical-notifier" />
         <broadcaster id="alph-trans-inter-trans-status"
-                     disabled="true" />
+                     disabled="true"
+                     hidden="true"/>
     </broadcasterset>
 
     <!-- overlay the main command set -->
@@ -116,18 +117,16 @@
                     
                 </tabpanels>
             </tabbox>
-                <menuitem id="alpheios-trans-opt-inter-src" 
+                <toolbarbutton id="alpheios-trans-opt-inter-src" 
                           label="&alpheios.panel.trans.opt.inter.src;"  
-                          command="alpheios-trans-toggle-inter-src-cmd"
                           hidden="true"
-                          type="checkbox"
-                          class="menuitem-iconic"/>
-                <menuitem id="alpheios-trans-opt-inter-trans" 
+                          type="checkbox"/>
+                <toolbaritem
+                    observes="alph-trans-inter-trans-status">
+                    <checkbox id="alpheios-trans-opt-inter-trans" 
                           label="&alpheios.panel.trans.opt.inter.trans;"  
-                          command="alpheios-trans-toggle-inter-trans-cmd"
-                          observes="alph-trans-inter-trans-status"
-                          type="checkbox"
-                          class="menuitem-iconic"/>
+                          command="alpheios-trans-toggle-inter-trans-cmd"/>
+                </toolbaritem>
         </alpheiosPanel>
     </vbox>
 </overlay>
