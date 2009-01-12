@@ -60,10 +60,31 @@ Alph.pproto = {
             function(e) { Alph.pproto.toggle_alignment(e,this,a_type) }
         );
         
-        // cancel mousemove over next/previous links - to kill the Alpheios popup
-        // TODO - need to do this more general for ped reader interface elements
-        Alph.$("#alph-proto-nextprev",a_doc).mousemove( function() { return false; } );
-                  
+        // add a checkbox to control the interlinear translation in the source
+        // text display
+        Alph.$("#alph-text-links",a_doc).append(
+            '<div id="alpheios-enable-interlinear">' +
+            '<input type="checkbox" id="alpheios-interlinear-toggle"/>' +
+            '<span>' +
+            document.getElementById("alpheios-strings")
+                        .getString("alph-enable-interlinear") +
+            '</span>'
+        );
+        // update the checked state of the interlinear toggle in the source text
+        // document with the state of real control from the XUL
+        Alph.$("#alpheios-interlinear-toggle",a_doc).attr("checked",
+            Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == "true" ? true : null);
+            
+        Alph.$("#alpheios-interlinear-toggle",a_doc).click(
+            function(e)
+            {
+                // keep the state of the XUL control and the document
+                // control in sync
+                var checked = Alph.$(this).attr('checked');
+                Alph.$("#alpheios-trans-opt-inter-src").attr('checked',checked);
+                Alph.Translation.toggle_interlinear('src',e);
+            }
+        );
     },
     
     /**
@@ -106,11 +127,11 @@ Alph.pproto = {
             // TODO we shouldn't assume that if interlinear is available one way
             // it is also available the other way 
             Alph.util.log("Disable interlinear");
-            Alph.$("#alpheios-trans-opt-inter-menu").attr("disabled",true);
+            Alph.$("#alph-trans-inter-trans-status").attr("disabled",true);
         }
         else
         {
-            Alph.$("#alpheios-trans-opt-inter-menu").attr("disabled",false);
+            Alph.$("#alph-trans-inter-trans-status").attr("disabled",false);
         }
     },
     
@@ -187,12 +208,34 @@ Alph.pproto = {
                 Alph.$("div.alph-word-wrap", this).each(
                     function(a_i)
                     {
-                        accum_width = accum_width + Alph.$(this).outerWidth(true);
+                        var trans_width = 0;
+                        Alph.$(this).children('.alph-proto-iltrans').each(
+                            function()
+                            {
+                                trans_width = trans_width + Alph.$(this).outerWidth(true);
+                            }
+                        );
+                        var src_width = 0;
+                        Alph.$(this).children('.alph-proto-word').each(
+                            function()
+                            {
+                                src_width = src_width + Alph.$(this).outerWidth(true);
+                            }
+                        );
+
+                        // set the width of the containing block to the larger of the width
+                        // of the source word or of the interlinear translation
+                        // explicit width on the floated block is necessary to prevent
+                        // the browser from making it wider than it needs to be
+                        var max_width = src_width > trans_width ? src_width : trans_width;
+                        
+                        Alph.$(this).css("width",max_width);
+                        accum_width = accum_width + max_width;
                         
                         if (accum_width > (p_width - 50)) {
                             
                             Alph.$(this).before("<br class='alph-proto-spacer' clear='all'/>");
-                            accum_width = Alph.$(this).outerWidth(true);
+                            accum_width = max_width;
                         }
     
                     }

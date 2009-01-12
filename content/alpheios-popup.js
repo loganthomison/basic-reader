@@ -116,6 +116,15 @@ Alph.xlate = {
             return Alph.xlate.hidePopup();
         }
 
+        // disable the translate function if and the mouse is over an 
+        // element in a section of the page we've been told to ignore
+        // (e.g. web site interface text as opposed to source text)
+        if ( Alph.$(a_e.explicitOriginalTarget).hasClass('alpheios-ignore') ||
+             Alph.$(a_e.explicitOriginalTarget).parents('.alpheios-ignore').length > 0)
+        {
+            return Alph.xlate.hidePopup();
+        }
+
         /* The rangeParent is going to be a #text node.
          * Get the parentNode of the text node for use in traversing
          * for the context if the node contains only a single word.

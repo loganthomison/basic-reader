@@ -1267,10 +1267,20 @@ Alph.main =
                 if (ped_site == null)
                 {
                     Alph.$(this).attr("disabled",false)
+                    // only set hidden if the hidden attribute was already set
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden", false);
+                    }
                 }
                 else
                 {
                     Alph.$(this).attr("disabled",true);
+                    // only set hidden if the hidden attribute was already set
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden", true);
+                    }
                 }
             }
             

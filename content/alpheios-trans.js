@@ -70,8 +70,8 @@ Alph.Translation.prototype.show = function()
         // TODO - this should observe the pedagogical-reader-notifier broadcaster
         // but it isn't -- maybe because it's defined in a custom element. Need
         // too fix this.
-        Alph.$("#alpheios-trans-opt-inter-menu")
-            .attr("disabled",true);
+        //Alph.$("#alpheios-trans-opt-inter-menu")
+        //    .attr("disabled",true);
     }
     else
     {

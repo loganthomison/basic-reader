@@ -15,8 +15,7 @@
                      disabled="true" 
                      class="alpheios-pedagogical-notifier" />
         <broadcaster id="alph-trans-inter-trans-status"
-                     disabled="true" 
-                     class="alpheios-pedagogical-notifier" />
+                     disabled="true" />
     </broadcasterset>
 
     <!-- overlay the main command set -->
@@ -32,7 +31,8 @@
          <command 
             id="alpheios-trans-toggle-inter-trans-cmd" 
             oncommand="Alph.Translation.toggle_interlinear('trans',event);"
-            observes="alph-trans-inter-trans-status"/>
+            observes="alph-trans-inter-trans-status"
+            disabled="true"/>
     </commandset>    
     
     <popupset id="mainPopupSet">
@@ -46,7 +46,7 @@
     </popupset>
     
     <!-- overlay the tools menu -->
-    <menupopup id="alpheios-tools-popup">
+    <menupopup id="alpheios-view-popup">
         <menuitem
             id="alpheios-trans-button"
             type="checkbox"
@@ -116,24 +116,18 @@
                     
                 </tabpanels>
             </tabbox>
-               <menu id="alpheios-trans-opt-inter-menu"
-                     label="&alpheios.panel.trans.opt.inter;"
-                     observes="alpheios-pedagogical-status">
-                   <menupopup>
-                       <menuitem id="alpheios-trans-opt-inter-src" 
+                <menuitem id="alpheios-trans-opt-inter-src" 
                           label="&alpheios.panel.trans.opt.inter.src;"  
                           command="alpheios-trans-toggle-inter-src-cmd"
-                          disabled="true"
+                          hidden="true"
                           type="checkbox"
                           class="menuitem-iconic"/>
-                       <menuitem id="alpheios-trans-opt-inter-trans" 
+                <menuitem id="alpheios-trans-opt-inter-trans" 
                           label="&alpheios.panel.trans.opt.inter.trans;"  
                           command="alpheios-trans-toggle-inter-trans-cmd"
-                          disabled="true"
+                          observes="alph-trans-inter-trans-status"
                           type="checkbox"
                           class="menuitem-iconic"/>
-                   </menupopup>
-              </menu>
         </alpheiosPanel>
     </vbox>
 </overlay>

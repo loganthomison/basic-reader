@@ -25,7 +25,7 @@
     </commandset>
              
     <!-- overlay the tools menu -->
-    <menupopup id="alpheios-tools-popup">
+    <menupopup id="alpheios-view-popup">
         <menuitem
             id="alpheios-etym-toggle"
             type="checkbox"

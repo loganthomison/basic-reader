@@ -1,3 +1,10 @@
+#alpheios-mainmenu-button {
+   list-style-image: url("chrome://alpheios/skin/alpheios.png");
+}
+
+.alpheios-logo {
+   margin-left: 4px;
+}
 
 toolbarbutton.alph-close-button {
     -moz-appearance: none;
