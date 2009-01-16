@@ -261,7 +261,7 @@ Alph.prefs = {
                     prefs.appendChild(
                         Alph.util.makePref(
                             'pref-' + lang + '-dict-default',
-                            'extensions.alpheios.' + lang + '.dictionaries.default',
+                            'extensions.alpheios.' + lang + '.dictionaries.full.default',
                              'string')
                     );
                     
@@ -290,7 +290,7 @@ Alph.prefs = {
                     dict_parent.appendChild(rgroup);                                                            
                     
                     var dictionary_list = 
-                        Alph.prefs._PREFS.getCharPref(lang + '.dictionaries'); 
+                        Alph.prefs._PREFS.getCharPref(lang + '.dictionaries.full'); 
                     
                     // iterate through the supported dictionaries for this language
                     // adding the preferences and radio elements for this dictionary

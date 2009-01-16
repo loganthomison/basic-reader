@@ -117,6 +117,16 @@ Alph.util = {
         {
             a_name = a_lang + '.' + a_name;
         }
+        // try to determine if this is a language-specific setting
+        else
+        {
+            var first_branch = a_name.match(/^(.*?)\./);
+            if (first_branch != null && 
+                Alph.Languages.has_lang(first_branch[1]))
+            {
+                a_lang = first_branch[1];
+            }
+        }
         if (a_name.search(/popuptrigger$/) != -1)
         {
             // iterate through the open browsers
@@ -133,7 +143,11 @@ Alph.util = {
                 }
             }
         }     
-            
+        if (typeof a_lang != 'undefined')
+        {
+            Alph.Languages.get_lang_tool(a_lang).observe_pref_change(a_name,a_value);
+
+        }
     },
 
     /**

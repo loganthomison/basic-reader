@@ -901,18 +901,18 @@ Alph.LanguageTool.prototype.getDictionary = function()
 {
     // if no default dictionary is defined for the language, return null
     var default_dict = 
-        Alph.util.getPref("dictionaries.default",this.source_language);
+        Alph.util.getPref("dictionaries.full.default",this.source_language);
     return default_dict || null;
 }
 
 /**
  * Set the name of the default dictionary
  * @param {String} the dictionary name (must be listed in 
- *                  extensions.alpheios.greek.dictionaries)                  
+ *                  extensions.alpheios.greek.dictionaries.full)                  
  */
 Alph.LanguageTool.prototype.setDictionary = function(a_dict_name)
 {
-    Alph.util.setPref("dictionaries.default",a_dict_name,this.source_language);
+    Alph.util.setPref("dictionaries.full.default",a_dict_name,this.source_language);
 }
 
 /**
@@ -1080,6 +1080,16 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                 {
                     var lemma_id = a_lemma[0];
                     var lemma_str = a_lemma[1];
+
+                    // add lexicon params
+                    if (a_i == 0)
+                    {
+                       lemma_params = lemma_params
+                                       + '&lg='
+                                       + encodeURIComponent(a_lemma[2])
+                                       + '&lx='
+                                       + encodeURIComponent(a_lemma[3]);
+                    }
                     
                     // TODO - create a util function for populating components of
                     // a url - whether to use ; or ? as separator should be config setting
@@ -1148,6 +1158,11 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                                         + '='
                                         + encodeURIComponent(lemma_str);
                     }
+                    lemma_params = lemma_params
+                                   + '&lg='
+                                   + encodeURIComponent(a_lemma[2])
+                                   + '&lx='
+                                   + encodeURIComponent(a_lemma[3]);
                     var lemma_url = (by_id ? by_id_url : dict_url) + lemma_params;
                     Alph.util.log("Calling dictionary at " + lemma_url);
                     if (a_i < num_lemmas -1)
@@ -1227,3 +1242,14 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
         }   
     );    
 };
+
+/**
+ * language-specific method to handle runtime changes to language-specific
+ * preferences
+ * @param {String} a_name the name of the preference which changed
+ * @param {Object} a_value the new value of the preference 
+ */
+Alph.LanguageTool.prototype.observe_pref_change(a_name,a_value)
+{
+    // default does nothing
+}
