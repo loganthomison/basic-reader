@@ -25,5 +25,5 @@ pref("extensions.alpheios.panels.alph-tree-panel.pedagogical",0);
 pref("extensions.alpheios.panels.alph-tree-panel.basic",0);
 pref("extensions.alpheios.panels.alph-etym-panel.pedagogical",0);
 pref("extensions.alpheios.panels.alph-etym-panel.basic",0);
-pref("extensions.alpheios.methods.dictionary.default",'default_dictionary_lookup');
-pref("extensions.alpheios.methods.dictionary.default.timeout",5000);
+pref("extensions.alpheios.methods.dictionary.full.default",'default_dictionary_lookup');
+pref("extensions.alpheios.methods.dictionary.full.default.timeout",5000);

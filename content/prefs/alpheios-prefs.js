@@ -257,7 +257,7 @@ Alph.prefs = {
                 {
                     var lang_strings = document.getElementById("alpheios-prefs-strings-"+lang);
                     
-                    // add preference for default dictionary for this language
+                    // add preference for default full and short dictionary for this language
                     prefs.appendChild(
                         Alph.util.makePref(
                             'pref-' + lang + '-dict-default',
@@ -316,18 +316,18 @@ Alph.prefs = {
                             try 
                             { 
                                 dict_method = Alph.prefs._PREFS.getCharPref(
-                                    lang + '.methods.dictionary.'+a_dict);
+                                    lang + '.methods.dictionary.full.'+a_dict);
                             }
                             catch(e) {}
                             if (dict_method == null || 
-                                dict_method == "methods.dictionary.default")
+                                dict_method == "methods.dictionary.full.default")
                             {
                                 var ctl_id = lang+'-dict-'+a_dict+'-url';
                                 var pref_id = 'pref-' + ctl_id;
                                 
                                 var pref_base = 'extensions.alpheios.' 
                                                 + lang
-                                                + '.dictionary.' 
+                                                + '.dictionary.full.' 
                                                 + a_dict;
                                 var pref_base_s = pref_base + '.search';
                                 // add the preferences for url and lemma

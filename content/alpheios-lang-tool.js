@@ -929,7 +929,7 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
     {
         browse_url = 
             Alph.util.getPref(
-                "dictionary." + default_dict + ".browse.url",
+                "dictionary.full." + default_dict + ".browse.url",
                 this.source_language);                                
     }
     return browse_url;
@@ -965,13 +965,13 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
     // otherwise use the default method
     var dict_method = 
         Alph.util.getPref(
-        "methods.dictionary." + default_dict,
+        "methods.dictionary.full." + default_dict,
         this.source_language);
     if (typeof dict_method == "undefined")
     {       
         dict_method = 
             Alph.util.getPrefOrDefault(
-                "methods.dictionary.default",
+                "methods.dictionary.full.default",
                 this.source_language);
     }
     var dict_callback = 
@@ -986,9 +986,9 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
 /**
  * Default dictionary lookup method to call a webservice. 
  * The url for the webservice is expected to be defined in the language-specific
- * preference setting: url.dictionary.<dict_name> and the name of a url parameter
- * to set to the lemma in url.dictionary.dict_name.lemma_param. If the setting
- * methods.dictionary.default.multiple_lemmas_allowed is true, then a single 
+ * preference setting: url.dictionary.full.<dict_name> and the name of a url parameter
+ * to set to the lemma in url.dictionary.full.dict_name.lemma_param. If the setting
+ * methods.dictionary.full.default.multiple_lemmas_allowed is true, then a single 
  * request  will be issued for all lemmas, otherwise, separate requests for 
  * each lemma. 
  * @param {String} a_dict_name the name of the dictionary
@@ -1002,7 +1002,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
 {
     var lang_obj = this;
     // pickup the url specific preferences
-    var base = "dictionary." + a_dict_name + ".search."; 
+    var base = "dictionary.full." + a_dict_name + ".search."; 
     var dict_url = 
         Alph.util.getPref(
             base + "lemma_url",
@@ -1060,15 +1060,19 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
             { num_with_lemmas++ }
         });
      
-    Alph.util.log("Using Dictionary " + a_dict_name + " at " + dict_url);            
+    Alph.util.log("Using Dictionary " + a_dict_name);            
     if (dict_url && lemma_param)
     {
         var lemma_params = '';
 
-        var multi_by_id = 
+        var multi_by_id = false;
+        if (
             by_id_url != null && 
             multiple_ids_allowed &&
-            num_with_ids == a_lemmas.length;
+            num_with_ids == a_lemmas.length)
+        {
+            multi_by_id = true;
+        }
         // if the default method supports multiple lemmas in a single request
         // accumulate the lemma parameters and issue one request
         // issue a single request for multiple lemmas to the lemma id url
@@ -1084,11 +1088,17 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                     // add lexicon params
                     if (a_i == 0)
                     {
+                       if (a_dict_name != a_lemma[3])
+                       {
+                            Alph.util.log("Short and full definitions from different sources");
+                            lemma_id = lang_obj.get_lemma_id(lemma_str);
+                            
+                       }
                        lemma_params = lemma_params
                                        + '&lg='
                                        + encodeURIComponent(a_lemma[2])
                                        + '&lx='
-                                       + encodeURIComponent(a_lemma[3]);
+                                       + encodeURIComponent(a_dict_name);
                     }
                     
                     // TODO - create a util function for populating components of
@@ -1097,6 +1107,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                     {
                         lemma_str = Alph.convert[convert_method](lemma_str);
                     }
+                    // TODO - handle failed id lookups  
                     if (multi_by_id)
                     {
                         lemma_params = lemma_params
@@ -1136,7 +1147,12 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                 {
                     var lemma_id = a_lemma[0];
                     var lemma_str = a_lemma[1];
-
+                    if (a_dict_name != a_lemma[3])
+                    {
+                        Alph.util.log("Short and full definitions from different sources");
+                        lemma_id = lang_obj.get_lemma_id(lemma_str);
+                            
+                    }
                     // TODO - create a util function for populating components of
                     // a url - whether to use ; or ? as separator should be config setting
                     if (convert_method != null)
@@ -1162,7 +1178,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup=
                                    + '&lg='
                                    + encodeURIComponent(a_lemma[2])
                                    + '&lx='
-                                   + encodeURIComponent(a_lemma[3]);
+                                   + encodeURIComponent(a_dict_name);
                     var lemma_url = (by_id ? by_id_url : dict_url) + lemma_params;
                     Alph.util.log("Calling dictionary at " + lemma_url);
                     if (a_i < num_lemmas -1)
@@ -1208,7 +1224,7 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
             type: "GET",
             url: a_url,
             dataType: 'html', 
-            timeout: Alph.util.getPref("methods.dictionary.default.timeout",
+            timeout: Alph.util.getPref("methods.dictionary.full.default.timeout",
                                         this.source_language),
             error: function(req,textStatus,errorThrown)
             {
@@ -1249,7 +1265,18 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
  * @param {String} a_name the name of the preference which changed
  * @param {Object} a_value the new value of the preference 
  */
-Alph.LanguageTool.prototype.observe_pref_change(a_name,a_value)
+Alph.LanguageTool.prototype.observe_pref_change = function(a_name,a_value)
 {
     // default does nothing
+}
+
+/**
+ * Get the unique id for a lemma from a dictionary index file
+ * @param {String} a_lemma_key the lemma key
+ * @return {String} the lemma id (or null if not found)
+ */
+Alph.LanguageTool.prototype.get_lemma_id = function(a_lemma_key)
+{
+    //default returns null
+    return null;
 }
