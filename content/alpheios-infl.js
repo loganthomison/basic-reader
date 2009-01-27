@@ -342,7 +342,7 @@ Alph.infl = {
         }
         
         // add a click handler to the footnotes
-        $(".footnote",a_tbl).click(function(e){return Alph.infl.show_footnote(e,this)});
+        $(".footnote",topdoc).click(function(e){return Alph.infl.show_footnote(e,this)});
 
         // add a click handler to the reference links
         $(".alph-reflink",a_tbl).click(function(e){return Alph.infl.follow_reflink(e,this,a_link_target.lang_tool)});
