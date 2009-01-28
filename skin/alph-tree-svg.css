@@ -14,6 +14,11 @@ g text.error {
     fill: black;
 }
 
+g text.line-label {
+    font-size:15px;
+    fill: black;
+}
+
 /* color text according to part of speech:
 POS          color       alternate?
 adjective    blue

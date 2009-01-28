@@ -227,19 +227,28 @@ function position(a_containerNode,
 {
     var isEmpty = false;
     var childrenWidth = 0;
-    var childrenLabels = Array();
+    var children = Array();
     var nodeLabel;
     var nodeLabelWidth;
     var nodeBranch;
+    var lineLabel;
     var maxX = 0;
     var maxY = 0;
 
     //get and handle children ============================
     for (var i = 0; i < a_containerNode.childNodes.length; i++)
     {
-        if (a_containerNode.childNodes.item(i).nodeName == 'text')
+        var node = a_containerNode.childNodes.item(i);
+        var nodeName = node.nodeName;
+
+        if ((nodeName == "text") &&
+            (node.getAttribute("class") == "line-label"))
         {
-            nodeLabel = a_containerNode.childNodes.item(i);
+            lineLabel = node;
+        }
+        else if (nodeName == "text")
+        {
+            nodeLabel = node;
 
             //determine the width of the label
             if (!nodeLabel.firstChild ||
@@ -259,21 +268,21 @@ function position(a_containerNode,
                 nodeLabelWidth = a_parentWidth;
         }
         //connecting branch
-        else if (a_containerNode.childNodes.item(i).nodeName == "line")
+        else if (nodeName == "line")
         {
-            nodeBranch = a_containerNode.childNodes.item(i);
+            nodeBranch = node;
         }
         //children nodes
-        else if (a_containerNode.childNodes.item(i).nodeName == "g")
+        else if (nodeName == "g")
         {
             var returned =
-                  position(a_containerNode.childNodes.item(i),
+                  position(node,
                            false,
                            a_shiftLeft + childrenWidth,
                            a_shiftTop + (isEmpty ? branchHeight :
                                                    branchHeight + fontSize),
                            nodeLabelWidth);
-            childrenLabels.push(returned[0]);
+            children.push(returned[0]);
             childrenWidth += returned[1];
 
             // update size
@@ -293,13 +302,13 @@ function position(a_containerNode,
     //position label
     var thisY = a_shiftTop;
     var thisX;
-    if (childrenLabels.length)
+    if (children.length)
     {
         var firstChild =
-                parseFloat(childrenLabels[0].label.getAttribute('x'));
+                parseFloat(children[0].nodeLabel.getAttribute('x'));
         var lastChild =
-                parseFloat(childrenLabels[childrenLabels.length-1].
-                                label.
+                parseFloat(children[children.length-1].
+                                nodeLabel.
                                 getAttribute('x'));
         thisX = (firstChild + lastChild)/2;
     }
@@ -307,16 +316,25 @@ function position(a_containerNode,
         thisX = a_shiftLeft + childrenWidth/2;
     nodeLabel.setAttribute('y', thisY + 'px');
     nodeLabel.setAttribute('x', thisX + 'px');
+    thisY += (isEmpty ? -fontSize : branchPaddingTop);
 
     //connect branches from child labels to parent label
-    for (var i = 0; i < childrenLabels.length; i++)
+    //and position line labels
+    for (var i = 0; i < children.length; i++)
     {
-        childrenLabels[i].branch.setAttribute('x1', thisX + 'px');
-        childrenLabels[i].branch.setAttribute(
-                            'y1',
-                            (thisY +
-                             (isEmpty ? -fontSize : branchPaddingTop)) +
-                            'px');
+        // set this end of line
+        var node = children[i].branch;
+        node.setAttribute('x1', thisX + 'px');
+        node.setAttribute('y1', thisY + 'px');
+
+        // position label
+        var label = children[i].lineLabel;
+        var width = label.getComputedTextLength() + wordSpacing;
+        var midX = (thisX + parseFloat(node.getAttribute('x2'))) / 2;
+        midX += ((midX <= thisX) ? -width/2 : width/2);
+        var midY = (thisY + parseFloat(node.getAttribute('y2'))) / 2;
+        label.setAttribute('x', midX + 'px');
+        label.setAttribute('y', midY + 'px');
     }
 
     // update size
@@ -341,5 +359,8 @@ function position(a_containerNode,
         }
     }
 
-    return Array({label:nodeLabel, branch:nodeBranch}, childrenWidth, maxX, maxY);
+    return Array({nodeLabel:nodeLabel, lineLabel:lineLabel, branch:nodeBranch},
+                 childrenWidth,
+                 maxX,
+                 maxY);
 }
