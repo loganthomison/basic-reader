@@ -93,4 +93,48 @@
         <li id="{@id}" class="{@type}"><span class="stem-class-desc"><xsl:apply-templates select="reflink"/></span></li>        
     </xsl:template>
     
+    <xsl:template name="infl-set-context">
+        <xsl:param name="infl_set"/>
+        <!--
+        <xsl:if test="$infl_set/@decl">
+            <xsl:value-of select="concat('decl:',$infl_set/@decl)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@conj">
+            <xsl:value-of select="concat('conj:',$infl_set/@conj)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        -->
+        <xsl:if test="$infl_set/@pers">
+            <xsl:value-of select="concat('pers:',$infl_set/@pers)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@gend">
+            <xsl:value-of select="concat('gend:',$infl_set/@gend)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@num">
+            <xsl:value-of select="concat('num:',$infl_set/@num)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@case">
+            <xsl:value-of select="concat('case:',$infl_set/@case)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@voice">
+            <xsl:value-of select="concat('voice:',$infl_set/@voice)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@tense">
+            <xsl:value-of select="concat('tense:',$infl_set/@tense)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@mood">
+            <xsl:value-of select="concat('mood:',$infl_set/@mood)"/>
+            <xsl:text>-</xsl:text>
+        </xsl:if>
+        <xsl:if test="$infl_set/@hdwd">
+            <xsl:value-of select="concat('hdwd:',$infl_set/@hdwd)"/>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>

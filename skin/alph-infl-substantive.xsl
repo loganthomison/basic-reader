@@ -57,6 +57,11 @@
     -->
     <xsl:param name="dedupe_by" select="''"/>
     
+    <!-- Flag to request that only the endings which match the form exactly be
+         included in the table
+    -->
+    <xsl:param name="show_only_matches" select="false()"/>
+    
     <!--xsl:param name="form" select="'Μοῦσα'"/-->
     
     <!-- debug -->
@@ -205,14 +210,21 @@
                                         <xsl:with-param name="match_pofs" select="$match_pofs"/>
                                         <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                
                                     </xsl:call-template>
-                                </xsl:variable>                                
+                                </xsl:variable>                     
+                                <xsl:variable name="context">
+                                    <xsl:call-template name="infl-set-context">
+                                        <xsl:with-param name="infl_set" select="current()"/>
+                                    </xsl:call-template>
+                                </xsl:variable>                                                                
                                 <xsl:call-template name="ending-cell">
-                                    <xsl:with-param name="infl-endings" select="infl-ending"/>
+                                    <xsl:with-param name="infl-endings" select="infl-endings"/>
                                     <xsl:with-param name="selected_endings" select="$selected_endings"/>
                                     <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
                                     <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                                     <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                                     <xsl:with-param name="selected" select="$selected"/>
+                                    <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
+                                    <xsl:with-param name="context" select="$context"/>
                                 </xsl:call-template>                                    
                             </xsl:for-each>
                         </tr>
@@ -298,6 +310,11 @@
                                 <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                             </xsl:call-template>
                         </xsl:variable>
+                        <xsl:variable name="context">
+                            <xsl:call-template name="infl-set-context">
+                                <xsl:with-param name="infl_set" select="$celldata"/>
+                            </xsl:call-template>
+                        </xsl:variable>                                
                         <xsl:call-template name="ending-cell">
                             <xsl:with-param name="infl-endings" select="$celldata"/>
                             <xsl:with-param name="selected" select="$selected"/>
@@ -305,6 +322,8 @@
                             <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
                             <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                             <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
+                            <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
+                            <xsl:with-param name="context" select="$context"/>
                         </xsl:call-template>
                     <!--/xsl:otherwise>
                 </xsl:choose-->

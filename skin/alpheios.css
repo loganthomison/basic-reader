@@ -52,6 +52,15 @@
     font-style: normal;
 }
 
+#alph-text.learner .alph-pofs, 
+#alph-text.learner .alph-decl, 
+#alph-text.learner .alph-pofs, 
+#alph-text.learner .alph-mean,
+#alph-text.learner .alph-infl-set {
+    display: none;
+}
+
+
 .alph-word {
     border-top: 1px dotted black;
     padding-top: 10px;
@@ -167,4 +176,14 @@
     background: transparent url(loading.gif) no-repeat;
     cursor: progress;
     color: gray;
+}
+
+.alph-query-element {
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+.alph-query-infl a {
+    color: blue;
+    text-decoration: none;
 }

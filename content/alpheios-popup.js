@@ -268,9 +268,11 @@ Alph.xlate = {
         Alph.$("#alph-text",a_topdoc).remove();
         var alphtext_node = 
             window.content.document.importNode(wordHTML.getElementById("alph-text"),true);
+        
         Alph.main.getLanguageTool().postTransform(alphtext_node);
         Alph.$("#alph-window",a_topdoc).append(alphtext_node);
-
+        Alph.interactive.addQueryElements(a_topdoc);
+        
         // add language-specific click handler, if any
         Alph.main.getLanguageTool().contextHandler(a_topdoc);
         
@@ -1016,4 +1018,5 @@ Alph.xlate = {
         }
         return lastdoc;
      }
+     
 };

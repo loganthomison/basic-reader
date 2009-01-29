@@ -241,23 +241,26 @@ Alph.infl = {
         }
         catch(a_e)
         {
-            Alph.util.log("No title string defined for " + showpofs);
+            window.opener.Alph.util.log("No title string defined for " + showpofs);
         }
         $("#alph-inflect-title",topdoc).html(title);
         
-        // add a link to the index
-        $("body",topdoc).prepend(
-            "<div id='alph-infl-index-link'>"
-            + str_props.getString("alph-infl-index-link") 
-            + '</div>');
-            
-        $("#alph-infl-index-link",topdoc).click(
-            function(e)
-            {
-                a_link_target.lang_tool.
-                        handleInflections(e,$(this),null);
-            }
-        );
+        // add a link to the index (but not if in query mode)
+        if (! a_link_target.query_mode )
+        {
+            $("body",topdoc).prepend(
+                "<div id='alph-infl-index-link'>"
+                + str_props.getString("alph-infl-index-link") 
+                + '</div>');
+                
+            $("#alph-infl-index-link",topdoc).click(
+                function(e)
+                {
+                    a_link_target.lang_tool.
+                            handleInflections(e,$(this),null);
+                }
+            );
+        }
         var start = (new Date()).getTime();
         
         // replace the table header text
@@ -335,14 +338,40 @@ Alph.infl = {
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted
         
-        // add the inflection links for the other parts of speech 
-        this.add_infl_links(a_pofs_set,showpofs,topdoc,str_props);
+        // add the inflection links for the other parts of speech
+        // but don't do it if we're in query mode, when we only want to
+        // show the most relevant table
+        if (! a_link_target.query_mode)
+        {
+            this.add_infl_links(a_pofs_set,showpofs,topdoc,str_props);
         
-        // add the auxiliary inflection links
-        this.add_infl_links(a_link_target.links,showpofs,topdoc,str_props);
+            // add the auxiliary inflection links
+            this.add_infl_links(a_link_target.links,showpofs,topdoc,str_props);
+        }
 
         // TODO - dedupe all the inflection links? See congestaque
         
+        // add the query mode links
+        if (a_link_target.query_mode)
+        {
+            $('.ending',a_tbl).addClass('query');
+            $('.ending',a_tbl).click(
+                function()
+                {
+                    var correct = 
+                        window.opener.Alph.interactive.checkInflection(
+                            this,a_link_target);
+                    if (correct)
+                    {
+                        window.close();
+                    }
+                    else
+                    {
+                        window.focus();
+                    }
+                }
+            )
+        }
         // if we have any additional inflection links, show them
         if ($("select#infl-links-select option",topdoc).length > 1)
         {

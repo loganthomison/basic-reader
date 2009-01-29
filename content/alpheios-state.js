@@ -42,7 +42,8 @@ Alph.State = function()
         lastElem: [null,false],
         lastSelection: [null,false],
         lastWord: [null,false],
-        word: [null,false] // TODO - these last two should be merged?
+        word: [null,false], // TODO - these last two should be merged?,
+        level: 'reader'
     };
     
     for (var name in this._defaults)

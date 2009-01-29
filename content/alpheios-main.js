@@ -85,7 +85,16 @@ Alph.main =
             HIDE_POPUP: 200,
             REMOVE_POPUP: 300,
         },
-        
+
+    /**
+     * holds the levels
+     */
+    levels: 
+    {
+        LEARNER: 'learner',
+        READER: 'reader',
+    },
+    
     /**
      * flag to indicate if the languages were successfully set
      */
@@ -1203,17 +1212,28 @@ Alph.main =
                     'content="xxxx"></meta>');
         }
 
-        // Temporary hack to enable pedagogical-reader specific functionality
-        // for the prototype. Eventually this will be handled completely differently.
-        // We will probably want to enable functionality sets for specific
-        // sites (defined by the user or by us). May want to consider nsIPermissions 
-        // manager to handle site-specfic permissions.
-        var ped_site = 
-            bro.currentURI.spec
-            .match(Alph.util.getPref("ped-prototype-match"));
+        var ped_site;
+        ped_site = Alph.$("meta#alpheios-pedagogical-text",bro.contentDocument).length;
 
+        // backwards compatability with older prototype which doesn't have
+        // the required pedagogical text metadata element
+        if (ped_site == 0)
+        {
+            ped_site = bro.currentURI.spec
+                          .match(Alph.util.getPref("ped-prototype-match"));
+        }
+
+        if (ped_site == null) 
+        {
+            this.get_state_obj(bro)
+                .set_var("level",Alph.main.levels.READER);
+        }
+        
         if (ped_site != null)
         { 
+            this.get_state_obj(bro)
+                .set_var("level",
+                    Alph.$("meta#alpheios-level-selected",bro.contentDocument).attr("content"));
             var ped_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
             var cur_lang = this.get_state_obj(bro).get_var("current_language");
             

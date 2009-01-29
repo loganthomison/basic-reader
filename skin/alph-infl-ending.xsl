@@ -14,9 +14,12 @@
         <xsl:param name="translit_ending_table_match" />
         <xsl:param name="strip_greek_vowel_length" />
         <xsl:param name="dedupe_by"/>
-        <xsl:param name="exact_match_only"/>
+        <xsl:param name="show_only_matches"/>
+        <xsl:param name="context"/>
         
         <xsl:variable name="ending_types" select="//order-item[@attname='type']"/>
+        <xsl:variable name="infl_set" select="$infl-endings/../infl-set"/>
+                
         <!-- group by type -->
         <xsl:for-each select="$ending_types">
             <xsl:sort 
@@ -84,8 +87,8 @@
                             </xsl:choose>                                                                                
                         </xsl:variable>
                         <xsl:choose>
-                            <xsl:when test="$exact_match_only and $selected_class != 'selected'">
-                                <span class="skipendng">&#160;</span>                                
+                            <xsl:when test="$show_only_matches and $selected_class=''">
+                                <span class="skipending">&#160;</span>                                
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:variable name="notfirst">
@@ -100,7 +103,8 @@
                                         @gend = $this_gend and @num = $this_num]/infl-ending/text() = .">duplicate</xsl:if>
                                 </xsl:variable>                                        
                                 <span class="ending {@type} {$selected_class} {$notfirst} {$duplicate}" 
-                                    stem-class="{@stem-class}">
+                                    stem-class="{@stem-class}"
+                                    context="{translate($context,' ','_')}">
                                     <xsl:value-of select="."/>
                                 </span>
                                 <xsl:call-template name="add-dialect">

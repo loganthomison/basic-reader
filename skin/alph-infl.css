@@ -265,3 +265,17 @@ th.reloading {
 .footnote-text ul, .footnote-text li {
     text-align: left;
 }
+
+span.highlight-ending.query,span.highlight-ending.matched.query {
+    background-color: transparent;
+    color: blue;
+    font-weight: bold;
+    font-size: 1.25em;
+    cursor: pointer;
+}
+
+span.highlight-ending.query.incorrect,span.highlight-ending.matched.query.incorrect {
+    text-decoration: line-through;
+    color: black;
+    font-weight: normal;
+}

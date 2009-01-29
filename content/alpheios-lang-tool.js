@@ -75,6 +75,20 @@ Alph.LanguageTool = function(a_language,a_properties)
                     }
                 }
                 return grammarlinklist;
+            },
+        pofs: 
+            function()
+            {
+                var pofs = Alph.util.getPrefOrDefault("partsofspeech",a_language);
+                if (pofs)
+                {
+                    return pofs.split(/,/);
+                }
+                else
+                {
+                    return [];
+                }
+                
             }
     };
 
@@ -591,7 +605,7 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 {
     var myobj=this;
     var links = this.getgrammarlinks();
-    Alph.$("#alph-text",a_doc).bind(
+    Alph.$(".alph-entry",a_doc).bind(
         "click", 
         function(a_e)
         {
@@ -602,7 +616,7 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
             var ro = o_e.rangeOffset;
             var range = document.createRange();
             range.selectNode(rp);
-
+            
             // get class and context from containing span
             var attrs = range.startContainer.attributes;
             var rngClass = null;
@@ -711,7 +725,11 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     
     // give the inflections window a reference to this language tool
     params.lang_tool = this;
-    
+            
+    if (params.query_mode)
+    {
+        params.xslt_params.show_only_matches = true;
+    }
     Alph.util.log("Handling inflections for " + params.showpofs);
     
     // send the word endings to the declension table
@@ -1268,7 +1286,7 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
 Alph.LanguageTool.prototype.observe_pref_change = function(a_name,a_value)
 {
     // default does nothing
-}
+};
 
 /**
  * Get the unique id for a lemma from a dictionary index file
@@ -1279,4 +1297,5 @@ Alph.LanguageTool.prototype.get_lemma_id = function(a_lemma_key)
 {
     //default returns null
     return null;
-}
+};
+
