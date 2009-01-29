@@ -199,6 +199,8 @@ Alph.infl = {
     showCols: function(a_tbl,a_link_target, a_pofs_set) {
         
         var topdoc = window.content.document || window.document;
+        
+        
         var showpofs = a_link_target.showpofs;
         this.init_table(a_tbl);        
 
@@ -223,6 +225,26 @@ Alph.infl = {
         
         var str_props = document.getElementById("alph-infl-strings");
     
+        // populate the title of the declension table
+        var title = '';
+        try
+        {
+            if (typeof a_link_target.title == 'undefined')
+            {
+                title = str_props.getString('alph-infl-title-'+showpofs);
+            }
+            else
+            {   
+                title = str_props.getString(a_link_target.title);
+            }
+        
+        }
+        catch(a_e)
+        {
+            Alph.util.log("No title string defined for " + showpofs);
+        }
+        $("#alph-inflect-title",topdoc).html(title);
+        
         // add a link to the index
         $("body",topdoc).prepend(
             "<div id='alph-infl-index-link'>"
