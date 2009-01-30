@@ -268,6 +268,7 @@ Alph.interactive = {
                 a_params.query_parent).css('display','block');
             Alph.$('.alph-pofs .alph-attr',a_params.query_parent)
                     .css('display','inline');
+            Alph.$('.alph-entry *',a_params.query_parent).show();
             Alph.$('.alph-query-infl',a_params.query_parent.nextSibling).css('display','none');
             
             return true;
