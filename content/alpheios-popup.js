@@ -271,7 +271,6 @@ Alph.xlate = {
         
         Alph.main.getLanguageTool().postTransform(alphtext_node);
         Alph.$("#alph-window",a_topdoc).append(alphtext_node);
-        Alph.interactive.addQueryElements(a_topdoc);
         
         // add language-specific click handler, if any
         Alph.main.getLanguageTool().contextHandler(a_topdoc);
@@ -594,6 +593,7 @@ Alph.xlate = {
                         Alph.xlate.showTranslation(data,a_alphtarget,doc);
                     }
                 );
+                Alph.interactive.openQueryDisplay(topdoc);
                 Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
 
             },

@@ -41,108 +41,62 @@ Alph.interactive = {
     },
     
     /**
-      * adds the query elements to the popup
+      * Opens a new window with the query display 
       * @param {Document} a_topdoc the contentDocument which contains the popup
       */
-     addQueryElements: function(a_topdoc)
+     openQueryDisplay: function(a_topdoc)
      {
         if (! this.enabled())
         {
             // don't do anything if the interactive features aren't enabled
             return;
         }
-        // add a class to the text node to indicate the user's Alpheios level
-        Alph.$("#alph-text",a_topdoc).addClass(Alph.main.get_state_obj().get_var("level"));
-
+        
         var lang_tool = Alph.main.getLanguageTool();
-        var str = Alph.$("#alpheios-strings").get(0); 
-        var pofs_list = lang_tool.getpofs();
+        var str = Alph.$("#alpheios-strings").get(0)
         
-        
-        var select_pofs = "<select class='alph-query-pofs'>";
-        select_pofs = 
-            select_pofs + 
-            '<option value="">' +
-            str.getString("alph-query-pofs") +
-            '</option>';
-            
-        pofs_list.forEach(
-            function(a)
-            {
-                select_pofs = select_pofs 
-                    + "<option value='"
-                    + a
-                    + "'>"
-                    + a
-                    + "</option>";
-            }
-        );
-        select_pofs = select_pofs + '</select>';
-        var select_infl = 
-            '<div class="alph-query-infl" style="display:none;">'+ 
-            '<a href="#alph-query-infl">' +
-            str.getString("alph-query-infl") +
-            '</a></div>';
-            
-        var query = 
-            '<div class="alph-query-element">' + 
-            select_pofs +
-            select_infl +
-            '</div>';
-        
-        Alph.$(".alph-entry",a_topdoc).after(query);
-        Alph.$(".alph-query-pofs",a_topdoc).change(
-            function(e)
-            {
-                Alph.interactive.checkPofsSelect(this);                
-            }
-        );
-        Alph.$(".alph-query-infl",a_topdoc).click(
-            function(e)
-            {
-                Alph.interactive.handleInflClick(e,this,lang_tool);
-            }
-        );
+        var params =
+        {
+            type: 'full_query',
+            lang_tool: lang_tool,
+            main_str: str,
+            source_node: Alph.$(".alph-word",a_topdoc).get(0),
+            transform: Alph.xlate.transform,
 
+        }
+
+        var sentence = 
+            Alph.$.map(
+                Alph.$('.alph-proto-word',a_topdoc),
+                function(a) { return Alph.$(a).text() })
+            .join(' ');
+        Alph.util.log("Sentence: " + sentence);
+
+        params.sentence = sentence;
+        
+        Alph.util.log("Sentence: " + params.sentence);
+
+        params.target= new Alph.SourceSelection();
+        params.target.setWord(sentence);
+        params.target.setWordStart(0);
+        params.target.setWordEnd(sentence.length -1);
+        params.target.setContext(sentence);
+        params.target.setContextPos(0);
+        lang_tool.handleConversion(params.target);
+
+        Alph.util.log("Target: " + params.target.getWord());
+        
+        var query_win = 
+          Alph.xlate.openSecondaryWindow(
+          "alph-query-window",
+          "chrome://alpheios/content/query/alpheios-query.xul",
+          null,
+          params
+        );
+        // hide the popup
+        Alph.$("#alph-window",a_topdoc).css("display","none");
      },
      
-     /**
-      * checks whether the part of speech selection is correct
-      * @param {HTMLSelect} a_select the containing Select element
-      */
-     checkPofsSelect: function(a_select)
-     {
-        var selected_value = a_select.options[a_select.selectedIndex].value;
-        var query_parent = Alph.$(a_select).parent('.alph-query-element').get(0); 
-        var pofs_set = Alph.$('.alph-pofs',query_parent.previousSibling);
-        
-        for (var i=0; i<pofs_set.length; i++)
-        {
-            if (Alph.$(pofs_set[i]).attr('context') == selected_value)
-            {
-                
-                alert(Alph.$("#alpheios-strings").get(0).getString("alph-query-correct"));
-                // if they the get the part of speech right, show it 
- 
-                Alph.$('.alph-pofs',query_parent.previousSibling).css('display','inline');
-                // still hide any attributes of the part of speech (to be populated through 
-                // interaction with the inflection tables) 
-                Alph.$('.alph-pofs .alph-attr',query_parent.previousSibling)
-                    .css('display','none');
-                Alph.$(a_select).hide();
-                // show the inflection query element
-                Alph.$('.alph-query-infl',query_parent).css('display','block');
-                break;
-            }
-            else
-            {
-                alert(Alph.$("#alpheios-strings").get(0).getString("alph-query-incorrect"));
-                // remove the incorrect answer from the list of options
-                Alph.$(a_select.options[a_select.selectedIndex]).remove();
-                // TODO - need to check and handle scenario when only correct answer is left
-            }
-        }
-     },
      
      /**
       * Responds to a click on the link to identify the inflection. Opens the inflection
@@ -210,17 +164,17 @@ Alph.interactive = {
             infl_set_contexts: context_list,   
             query_parent: query_parent.previousSibling
         };
-        a_lang_tool.handleInflections(a_event,text_node,infl_params);
+        //a_lang_tool.handleInflections(a_event,text_node,infl_params);
      },
      
-     /**
-      * Check whehter a selected inflection is correct
-      * @param {Element} a_ending the HTML element containing the inflected form or ending
-      * @param {Object} a_params the params object that was passed to the inflection table
-      *                          window (which contains all the context for the window)
-      * @return true if the selection was correct, otherwise false
-      * @type boolean
-      */
+    /**
+     * Check whehter a selected inflection is correct
+     * @param {Element} a_ending the HTML element containing the inflected form or ending
+     * @param {Object} a_params the params object that was passed to the inflection table
+     *                          window (which contains all the context for the window)
+     * @return true if the selection was correct, otherwise false
+     * @type boolean
+     */
      checkInflection: function(a_ending,a_params)
      {
         // iterate through valid contexts for the source term,
