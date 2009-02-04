@@ -105,9 +105,20 @@
     <!-- skip the enclosing html and body tags -->
     <xsl:param name="fragment" />
         
-    <xsl:template match="/">
+    <xsl:template match="/infl-data">
+        <xsl:variable name="table-notes">
+            <xsl:if test="@footnote">
+                <div id="table-notes">
+                <xsl:call-template name="add-footnote">
+                    <xsl:with-param name="item" select="."/>
+                </xsl:call-template>
+                </div>
+            </xsl:if>    
+        </xsl:variable>
+        
         <xsl:choose>
             <xsl:when test="$fragment">
+                <xsl:copy-of select="$table-notes"/>
                 <xsl:call-template name="infltable">
                     <xsl:with-param name="endings" select="//infl-ending-set"/>
                 </xsl:call-template>
@@ -119,6 +130,7 @@
                         <link rel="stylesheet" type="text/css" href="chrome://alpheios/skin/alph-infl-{$match_pofs}.css"/>
                     </head>
                     <body>
+                        <xsl:copy-of select="$table-notes"/>
                         <xsl:call-template name="infltable">
                             <xsl:with-param name="endings" select="//infl-ending-set"/>
                         </xsl:call-template>                     
@@ -356,7 +368,7 @@
                     </th>
             </xsl:for-each>            
         </tr>
-        <tr id="headerrow2">
+        <tr id="headerrow2" class="expand-ctl">
             <th colspan="2" class="always-visible">
                 <span class="header-text"><xsl:value-of select="$group5"/></span>
                 <xsl:call-template name="stem-header">

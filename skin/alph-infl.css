@@ -6,6 +6,10 @@ body, th, td {
     font-size: 90%;
 }
 
+#alph-inflect-title {
+    text-align: center; 
+}
+
 .title {
     font-weight: bold;
     text-align: center;

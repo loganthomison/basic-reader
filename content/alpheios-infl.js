@@ -152,6 +152,15 @@ Alph.infl = {
                         var infl_html = Alph.infl.transform(link_target);
                         var infl_node = 
                             this.contentDocument.importNode(infl_html.getElementById("alph-infl-table"),true);
+                        var title_notes = infl_html.getElementById("table-notes");
+
+                        if (title_notes)
+                        {
+                        
+                            title_notes = 
+                                this.contentDocument.importNode(title_notes,true);
+                            $("#alph-inflect-title",this.contentDocument).append($(title_notes).contents());
+                        }
                         $("body",this.contentDocument).append(infl_node)
                         
                     }
@@ -166,11 +175,20 @@ Alph.infl = {
         
         
         var base_pofs = (link_target.showpofs.split(/_/))[0];
+
+        // first check the window parameters for the url to the base
+        // html document
+        var url = link_target.html_url;
         
-        var url =
-            'chrome://' +
-            link_target.lang_tool.getchromepkg() + 
-            '/content/inflections/alph-infl-' + base_pofs + '.html';
+        // if not supplied in the link parameters, use the default file
+        // named per part of speech
+        if (typeof url == "undefined")
+        {
+            url =
+                'chrome://' +
+                link_target.lang_tool.getchromepkg() + 
+                '/content/inflections/alph-infl-' + base_pofs + '.html';
+        }
         $(infl_browser).attr("src",url);        
     },
     
@@ -243,7 +261,7 @@ Alph.infl = {
         {
             window.opener.Alph.util.log("No title string defined for " + showpofs);
         }
-        $("#alph-inflect-title",topdoc).html(title);
+        $("#alph-inflect-title span.title",topdoc).html(title);
         
         // add a link to the index (but not if in query mode)
         if (! a_link_target.query_mode )
@@ -758,36 +776,46 @@ Alph.infl = {
     
     /**
      * Adds toggle and click handler to columns which are collapsed
-     * @param {Array} a_collapsed arry of the collapsed columns
+     * @param {Array} a_collapsed array of the indexes of the collapsed columns
      * @param {Properties} a_str_props string properties for the display
      * @param {Element} the inflection table element 
      */
     enable_expand_cols: function(a_collapsed,a_str_props,a_tbl)
     {
-            
+        if (typeof a_collapsed == "undefined")
+        {
+            // just return if we don't have any collapsed cells
+            return;
+        }
         var expand = a_str_props.getString("alph-infl-expand");
         var expand_tip = a_str_props.getString("alph-infl-expand-tooltip");
+
+        // iterate through the table header cells of the row
+        // which should contain the expand control, adding a toggle
+        // to expand the column group if any of the columns under 
+        // in the table header group have their indexes flagged 
+        // as containing collapsed endings
+       $("tr.expand-ctl th", a_tbl).each(
+           function()
+           {
+                var colspan = $(this).attr("colspan") || 1;
+                var startIndex = this.realIndex;
+                var endIndex = startIndex + colspan - 1;
                 
-        var collapse_index = {};
-        
-        if (typeof a_collapsed != "undefined")
-        {
-            // for each collapsed ending, make sure a toggle
-            // to expand the column is added to the column header
-            for (var i=0; i<a_collapsed.length; i++)
-            {
-                var th = $(a_collapsed[i]).get(0);
-                var index = th.realIndex;
-                // only do this once per column index
-                if (typeof collapse_index[index] == "undefined")
+                var collapsed_children = 
+                    $.grep(a_collapsed, 
+                        function(a, i)
+                        {
+                            return (a >= startIndex && a <= endIndex);
+                        });
+                if (collapsed_children.length > 0)
                 {
-                    $("tr#headerrow2 th[realIndex='" + index + "']",a_tbl)
-                        .append("<div class='endings-toggle'>" + expand + "</div>")
-                        .click( function(e) { Alph.infl.expand_column(e,this,a_tbl) });
-                    collapse_index[index] = 1;    
-                }                
+                    $(this).append("<div class='endings-toggle'>" + expand + "</div>")
+                          .click( function(e) { Alph.infl.expand_column(e,this,a_tbl) });
+                }
             }
-        }        
+       
+       );        
     },
 
     /**
