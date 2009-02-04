@@ -4,11 +4,18 @@ body {
 
 .alph-query-pofs {
     float: left;
+    width: 20%;
 }
 
 .alph-query-defs {
     float: left;
     margin-left: 1em;
+    width: 30%;
+}
+
+.alph-query-defs select {
+    width: 100%;
+    overflow: scroll;
 }
 
 .alph-query-header {
