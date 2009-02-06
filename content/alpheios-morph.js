@@ -2,9 +2,9 @@
  * @fileoverview This file contains the Alph.Morph derivation of the Alph.Panel class. 
  * Representation of the morphology panel.
  * 
- * @version $Id: alpheios-morph.js 798 2008-06-20 20:42:04Z BridgetAlmas $
+ * @version $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.

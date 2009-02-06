@@ -1,8 +1,8 @@
-/*
+/**
  * Javascript functions for Tei Formatted Grammar Documents
- * $Id: alpheios-tei-grammar.js 806 2008-06-23 19:21:22Z BridgetAlmas $
+ * $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.

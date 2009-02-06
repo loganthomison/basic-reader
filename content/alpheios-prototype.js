@@ -1,9 +1,9 @@
 /**
  * @fileoverview This file contains temporary code to handle various aspects
  * of the pedagogical reader prototype
- * @version $Id: alpheios-prototype.js 907 2008-09-25 18:20:42Z BridgetAlmas $
+ * @version $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.

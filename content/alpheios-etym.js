@@ -2,9 +2,9 @@
  * @fileoverview This file contains the Alph.Etymology derivation of the Alph.Panel class. 
  * Representation of the Etymology panel.
  * 
- * @version $Id: alpheios-etym.js 798 2008-06-20 20:42:04Z BridgetAlmas $
+ * @version $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.

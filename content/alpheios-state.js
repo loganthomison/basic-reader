@@ -2,9 +2,9 @@
  * @fileoverview This file contains the definition of the prototype for an 
  * Alpheios state object. (Alph.State);
 
- * @version $Id: alpheios-state.js 846 2008-07-18 13:13:32Z BridgetAlmas $
+ * @version $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  *  
  * This file is part of Alpheios.

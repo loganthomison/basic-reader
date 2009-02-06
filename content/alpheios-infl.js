@@ -2,7 +2,7 @@
  * @fileoverview Handler for the Alpheios Inflection Table window
  * @version $Id $
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.

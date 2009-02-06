@@ -1,9 +1,9 @@
 /**
  * @fileoverview linking utility functions are encaspulated in the Alph.linking object
  * namespace. 
- * @version $Id: alpheios-linking.js 703 2008-06-04 22:43:02Z MichaelGursky $
+ * @version $Id$
  *   
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.

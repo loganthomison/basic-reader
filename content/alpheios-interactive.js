@@ -2,7 +2,7 @@
  * @fileoverview This file contains the Alph.interact class with 
  * interactive interface functionality
  * 
- * @version $Id: alpheios-interactive.js 1315 2009-01-12 18:16:37Z BridgetAlmas $
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net

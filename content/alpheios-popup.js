@@ -4,7 +4,7 @@
  * 
  * @version $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
  * Based upon PeraPera-Kun
