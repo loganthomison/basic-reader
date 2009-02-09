@@ -227,7 +227,7 @@
                     <xsl:variable name="selected" 
                         select="$selected_endings
                             [
-                              (div[@class='alph-dict']/span[@class='alph-conj']/@context = current()/../@conj)
+                              (div[@class='alph-dict']//span[@class='alph-conj']/@context = current()/../@conj)
                               and
                               (div[@class='alph-infl-set']/
                               div[

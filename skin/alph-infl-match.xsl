@@ -10,7 +10,7 @@
         <xsl:param name="strip_greek_vowel_length"/>
         <xsl:variable name="matches">
             <xsl:for-each select="$selected_endings//div[@class='alph-infl-set' and 
-                ../div[@class='alph-dict']/span[(@class='alph-pofs') and (@context = $match_pofs)]]
+                ../div[@class='alph-dict']//span[(@class='alph-pofs') and (@context = $match_pofs)]]
                 ">                    
                 <xsl:variable name="ending_match">
                     <xsl:choose>

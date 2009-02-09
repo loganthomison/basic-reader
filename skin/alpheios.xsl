@@ -144,32 +144,35 @@
       </xsl:call-template>
 
       <!-- Note:  Only one of case, gender, or kind can appear, depending on part of speech,
-            therefore we can pass all through a single parameter -->
-      <xsl:call-template name="part-of-speech">
-        <xsl:with-param name="attr" select="case|gend|kind"/>
-        <xsl:with-param name="pofs" select="pofs"/>
-      </xsl:call-template>
-      <xsl:call-template name="item-plus-text-plus-context">
-        <xsl:with-param name="item" select="decl"/>
-        <xsl:with-param name="suffix" select="' declension'"/>
-      </xsl:call-template>
-      <xsl:call-template name="item-plus-text-plus-context">
-        <xsl:with-param name="item" select="conj"/>
-        <xsl:with-param name="suffix" select="' conjugation'"/>
-      </xsl:call-template>
-      <xsl:call-template name="parenthesize">
-        <xsl:with-param name="items" select="age|area|geo|freq"/>
-        <xsl:with-param name="span-name">attrlist</xsl:with-param>
-        <xsl:with-param name="span-context"/>
-      </xsl:call-template>
-      <xsl:call-template name="item-plus-text">
-        <xsl:with-param name="item" select="src"/>
-        <xsl:with-param name="prefix" select="'['"/>
-        <xsl:with-param name="suffix" select="']'"/>
-      </xsl:call-template>
-      <xsl:call-template name="item-plus-text">
-        <xsl:with-param name="item" select="note"/>
-      </xsl:call-template>
+      therefore we can pass all through a single parameter -->
+      <xsl:element name="div">
+          <xsl:attribute name="class">alph-morph</xsl:attribute>
+          <xsl:call-template name="part-of-speech">
+            <xsl:with-param name="attr" select="case|gend|kind"/>
+            <xsl:with-param name="pofs" select="pofs"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="decl"/>
+            <xsl:with-param name="suffix" select="' declension'"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="conj"/>
+            <xsl:with-param name="suffix" select="' conjugation'"/>
+          </xsl:call-template>
+          <xsl:call-template name="parenthesize">
+            <xsl:with-param name="items" select="age|area|geo|freq"/>
+            <xsl:with-param name="span-name">attrlist</xsl:with-param>
+            <xsl:with-param name="span-context"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text">
+            <xsl:with-param name="item" select="src"/>
+            <xsl:with-param name="prefix" select="'['"/>
+            <xsl:with-param name="suffix" select="']'"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text">
+            <xsl:with-param name="item" select="note"/>
+          </xsl:call-template>
+      </xsl:element>
     </xsl:element>
   </xsl:template>
 
@@ -372,7 +375,7 @@
         <xsl:with-param name="partial" select="count(suff) > 0"/>
       </xsl:call-template>
       <xsl:if test="suff">
-        <xsl:text>&#8226;</xsl:text>
+        <xsl:text>-</xsl:text>
       </xsl:if>
       <span class="alph-suff">
         <xsl:call-template name="convert-text">

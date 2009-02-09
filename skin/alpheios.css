@@ -78,6 +78,19 @@
     font-weight: bold;
 }
 
+div.alph-morph {
+    display: inline;
+    font-size: 85%;
+}
+
+.alph-morph:before,.alph-infl:before {
+    content: '( ';
+}
+
+.alph-morph:after,.alph-infl:after {
+    content: ')';
+}
+
 .alph-mean {
     font-style: italic;
     margin-left: 1em;
@@ -110,10 +123,12 @@
 
 .alph-term {
     margin-left: 1em;
+    font-weight: bold;
 }
 
 .alph-infl {
     margin-left: 2em;
+    font-size: 85%;    
 }
 
 #alph-close {
