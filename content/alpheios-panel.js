@@ -628,6 +628,24 @@ Alph.Panel.prototype.get_current_language = function(a_panel_bro)
 }
 
 /**
+ * Check to see if the panel is currently visible and inline
+ * @param {Browser} a_bro the current browser
+ * @return true or false
+ * @type Boolean
+ */
+Alph.Panel.prototype.is_visible_inline = function(a_bro)
+{
+    var is_visible = false;
+    var panel_state = this.get_browser_state(a_bro);
+    if (Alph.util.getPref('panels.inline.'+this.panel_id)
+            && panel_state.status == Alph.Panel.STATUS_SHOW)
+    {
+        is_visible = true;
+    }
+    return is_visible;
+};
+
+/**
  * Execute a language specific command for a panel
  * @param {Event} a_event the event which initiated the command
  * @param {String} a_panel_id the panel id
@@ -678,3 +696,4 @@ Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
         Alph.main.execute_lang_command(a_event);
     }
 };
+

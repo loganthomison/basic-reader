@@ -280,19 +280,21 @@ Alph.xlate = {
         Alph.main.getLanguageTool().contextHandler(a_topdoc);
         
         // add language-specific dictionary link, if any
-        Alph.$("#alph-text",a_topdoc).append(
-            Alph.main.getLanguageTool().getDictionaryLink()
-        );
-        // TODO the dictionary handler should be dinfed in Alph.Dict
-        // rather than here. also doesn't work from a detached window yet.
-        Alph.$('#alph-text .alph-dict-link',a_topdoc).click(
-            function(a_event)
-            {
-                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
-                Alph.main.panels['alph-dict-panel'].open();    
-            }
-        );
-        
+        if (! Alph.main.panels['alph-dict-panel'].is_visible_inline(Alph.main.getCurrentBrowser()))
+        {
+            Alph.$("#alph-text",a_topdoc).append(
+                Alph.main.getLanguageTool().getDictionaryLink()
+            );
+            // TODO the dictionary handler should be dinfed in Alph.Dict
+            // rather than here. also doesn't work from a detached window yet.
+            Alph.$('#alph-text .alph-dict-link',a_topdoc).click(
+                function(a_event)
+                {
+                    Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
+                    Alph.main.panels['alph-dict-panel'].open();    
+                }
+            );
+        }
         // re-highlight the translated range in the source document
         var rp = a_alphtarget.getRangeParent()
         if (rp)
