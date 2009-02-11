@@ -464,7 +464,7 @@ Alph.Panel.prototype.toggle = function()
     var panel_state = this.get_browser_state(bro);
     
     if (panel_state.status == Alph.Panel.STATUS_SHOW || 
-        (panel_state.status == Alph.Panel.DETACHED && 
+        (panel_state.status == Alph.Panel.STATUS_DETACHED && 
             this.panel_window != null && ! this.panel_window.closed)
         )
     {
