@@ -66,13 +66,6 @@ Alph.Panel.STATUS_HIDE = 0;
 Alph.Panel.STATUS_AUTOHIDE = 3;
 
 /**
- * Public static class variable for panel status meaning the panel is detached
- * @public
- * @type int
- */ 
-Alph.Panel.STATUS_DETACHED = 4;
-
-/**
  * Intialization method which can be used for panel-specific initialization 
  * code.
  * @private
@@ -107,27 +100,15 @@ Alph.Panel.prototype.reset_to_default = function()
         status = Alph.util.getPref(status_pref,lang);
     }
     
-    if (typeof status != "undefined")    
+    if (typeof status != "undefined" && status == Alph.Panel.STATUS_SHOW)
     {
-        if (status == Alph.Panel.STATUS_SHOW ||
-                // if the panel is supposed to be detached and already is,
-                // just call show to update the contents
-                (status == Alph.Panel.STATUS_DETACHED && 
-                    this.panel_window != null && ! this.panel_window.closed
-                 )
-            )
-        {
-            this.update_status(this.show());
-        }
-        else if (status == Alph.Panel.STATUS_DETACHED)
-        {
-            this.detach();
-        }
-        return;
+        this.open();
     }
-    
-    // default status for all panels is hidden
-    this.update_status(this.hide());
+    else
+    {
+        // default status for all panels is hidden
+        this.update_status(this.hide());
+    }
 }
 
 /**
@@ -368,7 +349,7 @@ Alph.Panel.prototype.detach = function()
         Alph.util.log("Error detaching panel: " + a_e);
     }
   
-    this.update_status(Alph.Panel.STATUS_DETACHED);
+    this.update_status(Alph.Panel.STATUS_SHOW);
 };
 
 /**
@@ -463,10 +444,7 @@ Alph.Panel.prototype.toggle = function()
     var bro = Alph.main.getCurrentBrowser();
     var panel_state = this.get_browser_state(bro);
     
-    if (panel_state.status == Alph.Panel.STATUS_SHOW || 
-        (panel_state.status == Alph.Panel.STATUS_DETACHED && 
-            this.panel_window != null && ! this.panel_window.closed)
-        )
+    if (panel_state.status == Alph.Panel.STATUS_SHOW)
     {
         this.update_status(this.hide());
     }

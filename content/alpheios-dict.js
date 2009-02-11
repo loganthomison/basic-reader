@@ -144,9 +144,8 @@ Alph.Dict.prototype.show = function()
             }
         );
         
-        // return the detached status if the panel window is present
+        // focus the panel window if present
         this.panel_window.focus();
-        return Alph.Panel.STATUS_DETACHED;
     }
     return Alph.Panel.STATUS_SHOW;
 };
@@ -170,11 +169,10 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
     // the dictionary lookup only if one or more
     // of the following conditions is met:
     // - panel is being detached for the first time
-    // - panel is visible or detached, AND we're showing or removing the popup 
+    // - panel is visible, AND we're showing or removing the popup 
     var do_lookup = 
        ( a_event_type == Alph.main.events.SHOW_DICT ||
-         ( (panel_state.status == Alph.Panel.STATUS_SHOW 
-              || panel_state.status == Alph.Panel.STATUS_DETACHED) &&
+         ( panel_state.status == Alph.Panel.STATUS_SHOW && 
             (a_event_type == Alph.main.events.SHOW_TRANS
               || a_event_type == Alph.main.events.REMOVE_POPUP) 
           ) 
@@ -316,13 +314,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
     panel_state.css[bro_id] =
         Alph.$("link[rel=stylesheet]",doc).clone();
 
-    // don't update the panel window at this time if we're just
-    // showing the dictionary window, because it might not be fully
-    // initialized yet
-    if (a_event_type != Alph.main.events.SHOW_DICT)
-    {
-        this.update_panel_window(panel_state,bro_id);
-    }
+    this.update_panel_window(panel_state,bro_id);
 };
 
 /**
@@ -423,12 +415,15 @@ Alph.Dict.prototype.update_panel_window =
             this.panel_window
                 .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
                 .get(0);
-        var pw_doc = pw_bro.contentDocument;
-        this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
-                                    css: a_panel_state.css[a_browser_id],
-                                    dict: a_panel_state.dicts[a_browser_id]
-                                  }
-                          );
+        if (pw_bro)
+        {
+            var pw_doc = pw_bro.contentDocument;
+            this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
+                                        css: a_panel_state.css[a_browser_id],
+                                        dict: a_panel_state.dicts[a_browser_id]
+                                      }
+                              );
+        }
     }
 };
 

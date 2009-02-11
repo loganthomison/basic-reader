@@ -12,6 +12,18 @@
             <preference id="pref-panels-sticky"
                         name="extensions.alpheios.panels.sticky"
                         type="bool"/>
+            <preference id="pref-panel-morph-inline"
+                        name="extensions.alpheios.panels.inline.alph-morph-panel"
+                        type="bool"/>
+            <preference id="pref-panel-dict-inline"
+                        name="extensions.alpheios.panels.inline.alph-dict-panel"
+                        type="bool"/>
+            <preference id="pref-panel-trans-inline"
+                        name="extensions.alpheios.panels.inline.alph-trans-panel"
+                        type="bool"/>
+            <preference id="pref-panel-tree-inline"
+                        name="extensions.alpheios.panels.inline.alph-tree-panel"
+                        type="bool"/>
             <preference id="pref-panel-morph-ped" 
                         name="extensions.alpheios.panels.alph-morph-panel.pedagogical" 
                         type="int"/>
@@ -36,12 +48,6 @@
             <preference id="pref-panel-tree-basic" 
                         name="extensions.alpheios.panels.alph-tree-panel.basic" 
                         type="int"/>
-            <preference id="pref-panel-etym-ped" 
-                        name="extensions.alpheios.panels.alph-etym-panel.pedagogical" 
-                        type="int"/>
-            <preference id="pref-panel-etym-basic" 
-                        name="extensions.alpheios.panels.alph-etym-panel.basic" 
-                        type="int"/>
         </preferences>
     </prefpane>
     
@@ -64,6 +70,47 @@
                                 label="&alpheios.prefs.panels.restore.defaults;"/>
                         </hbox>
                         <groupbox>
+                            <caption label="&alpheios.prefs.panels.inline;"/>
+                            <grid id="alpheios-panel-prefs-inline">
+                                <columns>
+                                    <column flex="2"/>
+                                    <column flex="1"/>
+                                </columns>
+                                <rows>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.morph;"/>
+                                         <checkbox 
+                                            id="morph-inline" 
+                                            preference="pref-panel-morph-inline"
+                                            preference-editable="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.dict;"/>
+                                        <checkbox 
+                                            id="dict-inline" 
+                                            preference="pref-panel-dict-inline"
+                                            preference-editable="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.trans;"/>
+                                        <checkbox 
+                                            id="trans-inline" 
+                                            preference="pref-panel-trans-inline"
+                                            preference-editable="false"
+                                            disabled="true"/>
+                                    </row>
+                                    <row>
+                                        <label value="&alpheios.prefs.panel.tree;"/>
+                                        <checkbox 
+                                            id="tree-inline" 
+                                            preference="pref-panel-tree-inline"
+                                            preference-editable="true"/>
+                                    </row>
+                                </rows>
+                            </grid>
+                        </groupbox>
+                        <groupbox>
+                            <caption label="&alpheios.prefs.panels.default.caption;"/>
                             <grid id="alpheios-panel-prefs-default">
                                 <columns>
                                     <column flex="2"/>
@@ -127,19 +174,6 @@
                                         <checkbox 
                                             id="tree-ped" 
                                             preference="pref-panel-tree-ped"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
-                                            preference-editable="true"/>
-                                    </row>
-                                    <row>
-                                        <label value="&alpheios.prefs.panel.etym;"/>
-                                        <checkbox 
-                                            id="etym-basic" 
-                                            preference="pref-panel-etym-basic"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
-                                            preference-editable="true"/>
-                                        <checkbox 
-                                            id="etym-ped" 
-                                            preference="pref-panel-etym-ped"
                                             onsynctopreference="return Alph.prefs.update_panel_pref(this);"
                                             preference-editable="true"/>
                                     </row>

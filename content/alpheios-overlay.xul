@@ -238,21 +238,25 @@
     <vbox id="appcontent">
         <splitter id="alph-bottom-panel-splitter" collapsed="true" 
                   class="alph-panel-splitter alph-panel-section-splitter"/>     
-        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">
+        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">    
+            <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
+                <splitter class="alph-panel-splitter" collapsed="true"/>
+                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
+                      collapsed="true"/>
+            </hbox>
+            <splitter collapsed="true" 
+                      class="alph-panel-splitter alph-panel-section-splitter"/>
             <hbox id="alph-lex-tools" class="alph-panel-section" collapsed="true"
                   flex="1" persist="height">
                 <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-dict-box" class="alph-panel" flex="1" 
-                    collapsed="true" persist="height"/>
+                <hbox id="alph-morph-box" class="alph-panel" flex="1" 
+                      persist="height" collapsed="true"/>
                 <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
-                    collapsed="true"/>
+                <hbox id="alph-dict-box" class="alph-panel" flex="1" 
+                      collapsed="true" persist="height"/>
             </hbox>
-           <splitter class="alph-panel-section-splitter" collapsed="true"/>
-           <hbox id="alph-morph-box" class="alph-panel" flex="0" collapsed="true"/>
-        </vbox>
+        </vbox>    
     </vbox>
-    
     <tabbrowser id="content">
         <splitter collapsed="true" 
                   class="alph-panel-splitter alph-panel-section-splitter"/>     

@@ -30,4 +30,5 @@
 <!ENTITY alpheios.prefs.panel.etym "Etymology/Cognates Panel">
 <!ENTITY alpheios.prefs.dictionaries "Dictionaries">
 <!ENTITY alpheios.prefs.toolbar.lookup "Enable Toolbar Lookup">
-
+<!ENTITY alpheios.prefs.panels.inline "Inline Panels">
+<!ENTITY alpheios.prefs.panels.default.caption "Panels Open By Default">

@@ -68,7 +68,6 @@ Alph.Morph.prototype.show = function()
     if (this.panel_window != null)
     {
         this.panel_window.focus();
-        return Alph.Panel.STATUS_DETACHED;
     }
     return Alph.Panel.STATUS_SHOW;
 }
@@ -152,11 +151,14 @@ Alph.Morph.prototype.update_panel_window =
             this.panel_window
                 .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
                 .get(0);
-        var pw_doc = pw_bro.contentDocument;
-        this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
-                                    css: a_panel_state.css[a_browser_id],
-                                  }
-                          );
+        if (pw_bro)
+        {
+            var pw_doc = pw_bro.contentDocument;
+            this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
+                                        css: a_panel_state.css[a_browser_id],
+                                      }
+                              );
+        }
     }
 };
 

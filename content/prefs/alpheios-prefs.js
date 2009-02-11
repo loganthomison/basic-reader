@@ -135,22 +135,19 @@ Alph.prefs = {
      * the values of these preferences are not simple booleans, need
      * to return the correct Alph.Panel static variable for the state
      * @param {XULElement} a_cbx the XUL Checkbox element for the panel preference
-     * @return Alph.Panel.STATUS_SHOW if the checkbox is checked otherwise
-     *         Alph.Panel.STATUS_HIDE
+     * @return one of Alph.Panel.STATUS_SHOW or Alph.Panel.STATUS_HIDE
      * @type int
      */
     update_panel_pref: function(a_cbx)
     {
         if (a_cbx.checked)
         {
-            return Alph.Panel.STATUS_SHOW;
+            return Alph.Panel.STATUS_SHOW;      
         }
         else 
         {
             return Alph.Panel.STATUS_HIDE;
-        }
-
-                  
+        }         
     },
     
     /**
