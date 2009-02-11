@@ -201,3 +201,11 @@ div.alph-morph {
     color: blue;
     text-decoration: none;
 }
+
+.alph-dict-link {
+   color: blue;
+   cursor: pointer;
+   text-decoration: underline;
+   font-size: 90%;
+   text-align: right;
+}

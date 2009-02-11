@@ -19,52 +19,41 @@
              observes="alph-morph-status" />
         <command
             id="alpheios-morph-inflect-cmd" 
-            oncommand="Alph.main.execute_lang_command(event);" 
+            oncommand="Alph.Panel.execute_lang_command(event,'alph-morph-panel');" 
             observes="alpheios-inflect"/>
     </commandset>
              
-    <!-- overlay the tools menu -->
-    <menupopup id="alpheios-view-popup">
-        <menuitem
+    <menuitem
             id="alpheios-morph-button"
             type="checkbox"
             label="&alpheios-tools-morph-label;"
             command="alpheios-morph-toggle-cmd"
             tooltiptext="&alpheios-tools-morph-tooltip;"
             class="menuitem-iconic" />
-    </menupopup>
-
-    <!-- overlay the bottom panel -->
     <hbox id="alph-morph-box">
-            <alpheiosPanel 
-                flex="1" 
-                id="alph-morph-panel" 
-                notifier="alph-morph-status"
-                paneltype="Morph"
-                panelorient="horizontal">
-                <toolbaritem id="alpheios-morph-panel-label">
-                    <label id="alph-morph-label" 
-                           value="&alpheios-morph-toolbar-label;"/>
-                </toolbaritem>
-                <toolbaritem id="alpheios-lookup-text-tbitem">
-                    <textbox id="alpheios-lookup-text"
-                        command="alpheios-lookup-cmd"
-                        onkeypress="Alph.main.do_tb_lookup(event)"
-                        tooltiptext="&alpheios-morph-lookup-tooltip;"/>
-                </toolbaritem>
-                <toolbarbutton 
-                    id="alpheios-morph-inflection" 
-                    class="toolbarbutton-class"
-                    label="&alpheios-tools-inflect-label;" 
-                    tooltiptext="&alpheios-tools-inflect-label;"
-                    type="button"
-                    command="alpheios-morph-inflect-cmd"/>
-                <browser
-                    id="alph-morph-body"
-                    flex="1"
-                    type="content"
-                    src="chrome://alpheios/content/alph-morph.html"
-                    class="alph-lexicon-output"/>
-            </alpheiosPanel>
-    </hbox>  
+        <alpheiosPanel 
+            flex="1" 
+            id="alph-morph-panel" 
+            notifier="alph-morph-status"
+            paneltype="Morph"
+            panelorient="horizontal">
+            <toolbaritem id="alpheios-morph-panel-label">
+                <label id="alph-morph-label" 
+                       value="&alpheios-morph-toolbar-label;"/>
+            </toolbaritem>
+            <toolbarbutton 
+                id="alpheios-morph-inflection" 
+                class="toolbarbutton-class"
+                label="&alpheios-tools-inflect-label;" 
+                tooltiptext="&alpheios-tools-inflect-label;"
+                type="button"
+                command="alpheios-morph-inflect-cmd"/>
+            <browser
+                id="alph-morph-body"
+                flex="1"
+                type="content"
+                src="chrome://alpheios/content/alph-morph.html"
+                class="alph-lexicon-output"/>
+        </alpheiosPanel>
+    </hbox>
 </overlay>

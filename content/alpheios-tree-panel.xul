@@ -20,20 +20,21 @@
 
     <commandset id="mainCommandSet">
         <command id="alpheios-tree-toggle-cmd" 
-             oncommand="Alph.main.toggle_panel(event,'alph-tree-panel');"
+             oncommand="document.getElementById('alph-tree-panel').toggle();"
              observes="alph-tree-status" />
     </commandset>
              
-    <!-- overlay the tools menu -->
-    <menupopup id="alpheios-tools-popup">
-        <menuitem
+    <!-- overlay the alpheios toolbar-->
+      <toolbar id="alpheios-toolbar"> 
+        <toolbarbutton
             id="alpheios-tree-toggle"
             type="checkbox"
             label="&alpheios-tools-tree-label;"
+            insertafter="alpheios-trans-button"
             command="alpheios-tree-toggle-cmd"
             tooltiptext="&alpheios-tools-tree-tooltip;"
             class="menuitem-iconic" />
-    </menupopup>
+      </toolbar>
 
     <!-- overlay the bottom panel -->
     <hbox id="alph-tree-box">

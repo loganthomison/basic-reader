@@ -15,7 +15,7 @@
 
     <commandset id="mainCommandSet">
         <command id="alpheios-dict-toggle-cmd" 
-             oncommand="Alph.main.toggle_panel(event,'alph-dict-panel');"
+             oncommand="document.getElementById('alph-dict-panel').toggle();"
              observes="alph-dict-status" />
         <command 
             id="alpheios-dict-switch-cmd" 

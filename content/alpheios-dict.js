@@ -127,12 +127,13 @@ Alph.Dict.prototype.show = function()
     // update the browse command for the current dictionary
     Alph.Dict.update_dict_browse_cmd();
 
+    var bro = Alph.main.getCurrentBrowser();
+    
     // we need to update the contents of the panel window here
     // to make sure the window contains the latest contents from the
     // real panel. The window calls the show method upon load.
     if (this.panel_window != null)
     {
-        var bro = Alph.main.getCurrentBrowser();
         var panel_state = this.get_browser_state(bro);
         // update each of the browsers in the panel window
         Alph.$("#" + this.panel_id + " browser").each(
@@ -142,6 +143,10 @@ Alph.Dict.prototype.show = function()
                 panel_obj.update_panel_window(panel_state,bro_id,a_i);
             }
         );
+        
+        // return the detached status if the panel window is present
+        this.panel_window.focus();
+        return Alph.Panel.STATUS_DETACHED;
     }
     return Alph.Panel.STATUS_SHOW;
 };
@@ -161,17 +166,24 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
     var panel_state = this.get_browser_state(a_bro);
 
 
-    // don't do anything more if the panel isn't visible
-    // or if the event isn't showing a new translation
-    // or completing removing the popup
-
-    if (panel_state.status != Alph.Panel.STATUS_SHOW
-        || ( a_event_type != Alph.main.events.SHOW_TRANS
-             && a_event_type != Alph.main.events.REMOVE_POPUP
-            ))
+    // proceed with observing the event and doing the 
+    // the dictionary lookup only if one or more
+    // of the following conditions is met:
+    // - panel is being detached for the first time
+    // - panel is visible or detached, AND we're showing or removing the popup 
+    var do_lookup = 
+       ( a_event_type == Alph.main.events.SHOW_DICT ||
+         ( (panel_state.status == Alph.Panel.STATUS_SHOW 
+              || panel_state.status == Alph.Panel.STATUS_DETACHED) &&
+            (a_event_type == Alph.main.events.SHOW_TRANS
+              || a_event_type == Alph.main.events.REMOVE_POPUP) 
+          ) 
+       );
+    if (! do_lookup )
     {
         return;
     }
+    
     var language_tool = Alph.main.getLanguageTool(a_bro);
     // we should always have a language_tool here, but
     // if not just do nothing and return quietly
@@ -304,7 +316,13 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
     panel_state.css[bro_id] =
         Alph.$("link[rel=stylesheet]",doc).clone();
 
-    this.update_panel_window(panel_state,bro_id);
+    // don't update the panel window at this time if we're just
+    // showing the dictionary window, because it might not be fully
+    // initialized yet
+    if (a_event_type != Alph.main.events.SHOW_DICT)
+    {
+        this.update_panel_window(panel_state,bro_id);
+    }
 };
 
 /**
@@ -356,7 +374,6 @@ Alph.Dict.prototype.display_dictionary = function(
         // add an alph-dict-block around the response
         a_html = '<div class="alph-dict-block">' + a_html + '</div>';
 
-        Alph.util.log("appending " + a_html);
         Alph.$(alph_window).append(a_html);
 
         // the class default-dict-display shows just the short definition elements
@@ -400,7 +417,7 @@ Alph.Dict.prototype.display_dictionary = function(
 Alph.Dict.prototype.update_panel_window =
     function(a_panel_state,a_browser_id,a_browser_index)
 {
-    if (this.panel_window != null)
+    if (this.panel_window != null && ! this.panel_window.closed)
     {
         var pw_bro =
             this.panel_window

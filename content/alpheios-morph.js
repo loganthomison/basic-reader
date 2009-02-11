@@ -50,11 +50,28 @@ Alph.Morph.prototype.init = function(a_panel_state)
 {
     Alph.util.log("morph panel init");
     // initialize the contents array
-    a_panel_state.contents = [];
-    a_panel_state.css = [];
+    a_panel_state.contents = {};
+    a_panel_state.css = {};
     this.reset_contents(a_panel_state);
 };
 
+/**
+ * Morph panel specific implementation of
+ * {@link Alph.Panel#show}
+ * @return the new panel status
+ * @type int
+ */
+Alph.Morph.prototype.show = function()
+{
+    var panel_obj = this;
+
+    if (this.panel_window != null)
+    {
+        this.panel_window.focus();
+        return Alph.Panel.STATUS_DETACHED;
+    }
+    return Alph.Panel.STATUS_SHOW;
+}
 
 /**
  * Morph panel specific implementation of 
@@ -65,29 +82,82 @@ Alph.Morph.prototype.init = function(a_panel_state)
  */
 Alph.Morph.prototype.reset_contents = function(a_panel_state)
 {
-    Alph.$("browser",this.panel_elem).each( 
-        function(i) 
+    var panel_obj = this;
+    Alph.$("browser",this.panel_elem).each(
+        function()
         {
-            var morph_doc = this.contentDocument;
-            if (a_panel_state.contents.length < i + 1 )
+            var doc = this.contentDocument;
+            var id = this.id;
+            var doc_state =
+                panel_obj.init_document(
+                    doc,
+                    { contents: a_panel_state.contents[id],
+                      css: a_panel_state.css[id],
+                    });
+            // store the current contents/css to the state object,
+            // if this browser's state hasn't been initialized yet
+            if (typeof a_panel_state.contents[id] == "undefined")
             {
-                // if we haven't the initialized the contents of this browser for
-                // the panel, get a new div for it and a copy of the default stylesheet links
-                var main_div = 
-                    morph_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
-                main_div.setAttribute("id", "alph-window");
-                a_panel_state.contents[i] = main_div;
-                a_panel_state.css[i] = Alph.$("link[rel=stylesheet]",morph_doc).clone();
+                a_panel_state.contents[id] = Alph.$(doc_state.contents).clone();
+                a_panel_state.css[id] = Alph.$(doc_state.css).clone();
             }
-            Alph.util.log("Found in morph panel: " + Alph.$("#alph-window",morph_doc).length);
-            Alph.$("#alph-window",morph_doc).remove();
-            Alph.$("body",morph_doc).append(a_panel_state.contents[i]);
-            Alph.$("link[rel=stylesheet]",morph_doc).remove();
-            Alph.$("head",morph_doc).append(a_panel_state.css[i]);
-            
-            Alph.util.log("Replaced in morph panel: " + Alph.$("#alph-window",morph_doc).length); 
+            panel_obj.update_panel_window(a_panel_state,id);
         }
-    );
+    );    
+};
+
+/**
+ * Intialize the content document of a panel browser element
+ * @param {Document} a_doc the content document
+ * @param {Object} a_doc_state the state object for this browser. If not supplied
+ *                 a new state object will be created
+ * @return {Object} the state object for this browser
+ */
+Alph.Morph.prototype.init_document = function(a_doc,a_doc_state)
+{
+    // if we haven't the initialized the contents of this browser for
+    // the panel, get a new div for it and a copy of the default stylesheet links
+    if (typeof a_doc_state.contents == "undefined")
+    {
+        // if we haven't the initialized the contents of this browser for
+        // the panel, get a new div for it and a copy of the default stylesheet links
+        var main_div = 
+            a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
+        main_div.setAttribute("id", "alph-window");
+        a_doc_state.contents = main_div;
+        a_doc_state.css = Alph.$("link[rel=stylesheet]",a_doc).clone();
+    }
+    Alph.$("#alph-window",a_doc).remove();
+    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone());
+    Alph.$("link[rel=stylesheet]",a_doc).remove();
+    Alph.$("head",a_doc).append(Alph.$(a_doc_state.css).clone());
+    return a_doc_state;
+}
+
+/**
+ * Morph panel specific implementation of
+ * {@link Alph.Panel#update_panel_window}
+ * Update a browser in the detached panel window with the current
+ * state of that browser the real (attached) panel
+ * @param {Object} a_panel_state the panel state object
+ * @param {String} a_browser_id the id of the browser to update
+ * @param {String} a_browser_index the index of the browser to update
+ */
+Alph.Morph.prototype.update_panel_window =
+    function(a_panel_state,a_browser_id,a_browser_index)
+{
+    if (this.panel_window != null && ! this.panel_window.closed)
+    {
+        var pw_bro =
+            this.panel_window
+                .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
+                .get(0);
+        var pw_doc = pw_bro.contentDocument;
+        this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
+                                    css: a_panel_state.css[a_browser_id],
+                                  }
+                          );
+    }
 };
 
 /**
@@ -101,6 +171,11 @@ Alph.Morph.prototype.reset_contents = function(a_panel_state)
 
 Alph.Morph.prototype.observe_ui_event = function(a_bro,a_event_type)
 {
+    if (typeof a_event_type == "undefined")
+    {
+        return;
+    }
+    var panel_obj = this;
     // store the current contents of the morph window in this browser's panel state
     var panel_state = this.get_browser_state(a_bro);
      
@@ -108,9 +183,44 @@ Alph.Morph.prototype.observe_ui_event = function(a_bro,a_event_type)
         function(i) 
         {
             var morph_doc = this.contentDocument;
-            panel_state.contents[i] = Alph.$("#alph-window",morph_doc).get(0);
-            panel_state.css[i] = Alph.$("link[rel=stylesheet]",morph_doc).clone();
- 
+            panel_state.contents[this.id] = Alph.$("#alph-window",morph_doc).get(0);
+            panel_state.css[this.id] = Alph.$("link[rel=stylesheet]",morph_doc).clone();
+            panel_obj.update_panel_window(panel_state,this.id);
         }
     );
+    
+}
+
+/**
+ * Morph panel specific implementation of
+ * {@link Alph.Panel#get_detach_chrome}
+ * @return the chrome url as a string
+ * @type String
+ */
+Alph.Morph.prototype.get_detach_chrome = function()
+{
+    return 'chrome://alpheios/content/alpheios-morph-window.xul';
+};
+
+
+/**
+ * Morph panel specific implementation of
+ * {@link Alph.Panel#get_current_language}
+ * @param {Browser} a_panel_bro the panel browser we want the language for 
+ * @return the language used to create the contents of the supplied panel browser 
+ * @type String
+ */
+Alph.Morph.prototype.get_current_language = function(a_panel_bro)
+{
+    var pw_doc = a_panel_bro.contentDocument;
+    var lang = null;
+    if (this.panel_window != null)
+    {
+        lang = this.panel_window.Alph.$("#alph-text",pw_doc).attr('alph-lang');
+    }
+    else 
+    {
+        lang = Alph.$("#alph-text",pw_doc).attr('alph-lang');
+    }
+    return lang;
 }

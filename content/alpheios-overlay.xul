@@ -7,9 +7,9 @@
 <?xml-stylesheet href="chrome://alpheios/skin/alph-toolbar.css"?>
 <?xml-stylesheet href="chrome://alpheios/skin/alpheios-os.css"?>
 
-<?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-dict-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alph-trans-panel.xul"?>
+<?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-tree-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-etym-panel.xul"?>
 
@@ -50,6 +50,8 @@
                      class="alpheios-basic-notifier"
                      disabled="false"
                      hidden="false"/>
+        <broadcaster id="alpheios-lookup-enabled"
+                     hidden="true"/>
     </broadcasterset>
         
 	<commandset id="mainCommandSet">
@@ -59,7 +61,8 @@
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value,true);"
                  observes="alpheios-basic-status"/>
-        <command id="alpheios-lookup-cmd" oncommand="Alph.main.do_tb_lookup();"/>
+        <command id="alpheios-lookup-cmd" 
+                 oncommand="Alph.main.do_tb_lookup();"/>
         <command 
             id="alpheios-inflect-cmd" 
             oncommand="Alph.main.execute_lang_command(event);" 
@@ -142,127 +145,111 @@
                  mode="text" 
                  persist="collapsed,hidden" 
                  toolbarname="&alpheios-toolbar-name;"
-                 align="center"
-                 defaultset="alpheios-mainmenu-button,alpheios-lang-button,alpheios-view-button,alpheios-tools-button,alpheios-options-button,alpheios-help-button,alpheios-toolbar-spring,alpheios-toolbar-status"/>
+                 align="center">
+            <toolbarbutton
+                id="alpheios-mainmenu-button"
+                class="toolbarbutton-class"
+                label="&alpheios.menu;"
+                type="menu">
+                <menupopup
+                    id="alpheios-main-menu">
+                    <menuitem
+                        id="alpheios-toggle-mm" 
+                        label="&alpheios.inline.enable.tm;"
+                        command="alpheios-toggle-cmd"/>
+                    <menuitem
+                        id="alpheios-options-button"
+                        label="&alpheios.menu.options;"
+                        tooltiptext="&alpheios.menu.options.tooltip;"
+                        command="alpheios-options-cmd"/>
+                    <menuitem
+                        id="alpheios-about-mm"
+                        label="&alpheios.menu.about;"
+                        tooltiptext="&alpheios.menu.about.tooltip;"
+                        command="alpheios-about-cmd"/>
+                    <menuitem
+                        id="alpheios-feedback-mm"
+                        label="&alpheios.menu.feedback;"
+                        tooltiptext="&alpheios.menu.feedback.tooltip;"
+                        command="alpheios-feedback-cmd"/>
+                    <menuitem
+                        id="alpheios-site-mm"
+                        label="&alpheios.menu.site;"
+                        tooltiptext="&alpheios.menu.site.tooltip;"
+                        command="alpheios-site-cmd"/>
+                </menupopup>
+            </toolbarbutton>               
+            <toolbarbutton
+                id="alpheios-lang-button"
+                class="toolbarbutton-class"
+                label="&alpheios.menu.lang;"
+                insertafter="alpheios-toggle-mm"
+                command="alpheios-lang-cmd"
+                tooltiptext="&alpheios.menu.lang.tooltip;"
+                type="menu">
+                <menupopup 
+                    id="alpheios-lang-popup-mm" 
+                    onpopupshowing="Alph.main.update_main_menu_languages()"/>
+            </toolbarbutton>
+            <toolbarbutton
+                id="alpheios-tools-button"
+                class="toolbarbutton-class"
+                label="&alpheios-tools-label;"
+                command="alpheios-tools-cmd"
+                tooltiptext="&alpheios-tools-tooltip;"
+                type="menu">
+                <menupopup
+                    id="alpheios-tools-popup"
+                    onpopupshowing="Alph.main.update_tools_menu();">
+                    <menuitem
+                        id="alpheios-inflection-button"
+                        label="&alpheios-tools-inflect-label;"
+                        command="alpheios-inflect-cmd"
+                        tooltiptext="&alpheios-tools-inflect-tooltip;"
+                        class="menuitem-iconic" />
+                    <menuitem
+                        id="alpheios-grammar-button"
+                        label="&alpheios-tools-grammar-label;"
+                        command="alpheios-grammar-cmd"
+                        tooltiptext="&alpheios-tools-grammar-tooltip;"
+                        class="menuitem-iconic" />
+                </menupopup>
+            </toolbarbutton>
+            <toolbaritem id="alpheios-lookup-text-tbitem">
+                <textbox id="alpheios-lookup-text"
+                    command="alpheios-lookup-cmd"
+                    onkeypress="Alph.main.do_tb_lookup(event);"
+                    observes="alpheios-lookup-enabled"
+                    tooltiptext="&alpheios-morph-lookup-tooltip;"/>
+            </toolbaritem>
+            <toolbarbutton
+                id="alpheios-help-button"
+                label="&alpheios.help;"
+                tooltiptext="&alpheios.help.tooltip;"
+                command="alpheios-help-cmd"/>
+            <toolbarspring id="alpheios-toolbar-spring"/>
+            <toolbaritem id="alpheios-toolbar-status">
+                <label id="alpheios-toolbar-status-text"
+                       value="&alpheios-tools-status-disabled;"/>
+            </toolbaritem>
+        </toolbar>
     </toolbox>
 
-    <toolbarpalette id="BrowserToolbarPalette">
-        <toolbarbutton
-            id="alpheios-mainmenu-button"
-            class="toolbarbutton-class"
-            label="&alpheios.menu;"
-            type="menu">
-            <menupopup
-                id="alpheios-main-menu">
-                <menuitem
-                    id="alpheios-toggle-mm" 
-                    label="&alpheios.inline.enable.tm;"
-                    command="alpheios-toggle-cmd"/>
-                <menuitem
-                    id="alpheios-about-mm"
-                    label="&alpheios.menu.about;"
-                    tooltiptext="&alpheios.menu.about.tooltip;"
-                    command="alpheios-about-cmd"/>
-                <menuitem
-                    id="alpheios-feedback-mm"
-                    label="&alpheios.menu.feedback;"
-                    tooltiptext="&alpheios.menu.feedback.tooltip;"
-                    command="alpheios-feedback-cmd"/>
-                <menuitem
-                    id="alpheios-site-mm"
-                    label="&alpheios.menu.site;"
-                    tooltiptext="&alpheios.menu.site.tooltip;"
-                    command="alpheios-site-cmd"/>
-            </menupopup>
-        </toolbarbutton>               
-        <toolbarbutton
-            id="alpheios-lang-button"
-            class="toolbarbutton-class"
-            label="&alpheios.menu.lang;"
-            insertafter="alpheios-toggle-mm"
-            command="alpheios-lang-cmd"
-            tooltiptext="&alpheios.menu.lang.tooltip;"
-            type="menu">
-            <menupopup 
-                id="alpheios-lang-popup-mm" 
-                onpopupshowing="Alph.main.update_main_menu_languages()"/>
-        </toolbarbutton>
-        <toolbarbutton
-            id="alpheios-view-button"
-            class="toolbarbutton-class"
-            label="&alpheios-view-label;"
-            command="alpheios-view-cmd"
-            tooltiptext="&alpheios-view-tooltip;"
-            type="menu">
-            <menupopup
-                id="alpheios-view-popup"
-                onpopupshowing="Alph.main.update_tools_menu();"/>
-        </toolbarbutton>
-        <toolbarbutton
-            id="alpheios-tools-button"
-            class="toolbarbutton-class"
-            label="&alpheios-tools-label;"
-            command="alpheios-tools-cmd"
-            tooltiptext="&alpheios-tools-tooltip;"
-            type="menu">
-            <menupopup
-                id="alpheios-tools-popup"
-                onpopupshowing="Alph.main.update_tools_menu();">
-                <menuitem
-                    id="alpheios-inflection-button"
-                    label="&alpheios-tools-inflect-label;"
-                    command="alpheios-inflect-cmd"
-                    tooltiptext="&alpheios-tools-inflect-tooltip;"
-                    class="menuitem-iconic" />
-                <menuitem
-                    id="alpheios-grammar-button"
-                    label="&alpheios-tools-grammar-label;"
-                    command="alpheios-grammar-cmd"
-                    tooltiptext="&alpheios-tools-grammar-tooltip;"
-                    class="menuitem-iconic" />
-            </menupopup>
-        </toolbarbutton>
-        <toolbarbutton
-            id="alpheios-options-button"
-            label="&alpheios.menu.options;"
-            tooltiptext="&alpheios.menu.options.tooltip;"
-            command="alpheios-options-cmd"/>
-        <toolbarbutton
-            id="alpheios-help-button"
-            label="&alpheios.help;"
-            tooltiptext="&alpheios.help.tooltip;"
-            command="alpheios-help-cmd"/>
-        <toolbarspring id="alpheios-toolbar-spring"/>
-        <toolbaritem id="alpheios-toolbar-status">
-            <label id="alpheios-toolbar-status-text"
-                   value="&alpheios-tools-status-disabled;"/>
-        </toolbaritem>
-    </toolbarpalette>
-    
     <vbox id="appcontent">
         <splitter id="alph-bottom-panel-splitter" collapsed="true" 
                   class="alph-panel-splitter alph-panel-section-splitter"/>     
         <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">
-            
-            <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
-                <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
-                      collapsed="true"/>
-                <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-etym-box" class="alph-panel" flex="1" persist="height" 
-                      collapsed="true"/>
-            </hbox>
-            <splitter collapsed="true" 
-                      class="alph-panel-splitter alph-panel-section-splitter"/>
             <hbox id="alph-lex-tools" class="alph-panel-section" collapsed="true"
                   flex="1" persist="height">
                 <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-morph-box" class="alph-panel" flex="1" 
-                      persist="height" collapsed="true"/>
-                <splitter class="alph-panel-splitter" collapsed="true"/>
                 <hbox id="alph-dict-box" class="alph-panel" flex="1" 
-                      collapsed="true" persist="height"/>
+                    collapsed="true" persist="height"/>
+                <splitter class="alph-panel-splitter" collapsed="true"/>
+                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
+                    collapsed="true"/>
             </hbox>
+           <splitter class="alph-panel-section-splitter" collapsed="true"/>
+           <hbox id="alph-morph-box" class="alph-panel" flex="0" collapsed="true"/>
         </vbox>
     </vbox>
     

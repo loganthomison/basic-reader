@@ -111,7 +111,7 @@ Alph.Tree.prototype.show = function()
                 try
                 {
                     var sentenceId = "#" + Alph.$(this).attr("id");
-                    var aldtXML = Alph.$(sentenceId, treebankDoc).get(0);
+                    var aldtXML = Alph.$(sentenceId,treebankDoc).get(0);
                     var xmlSerializer = new XMLSerializer();
                     var svgXML;
 
@@ -174,10 +174,11 @@ Alph.Tree.prototype.show = function()
         Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone());
         Alph.$("#dependency-tree", window_doc).attr("width",Alph.$(panel_tree).attr("width"));
         Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
-
+        // return the detached status if the panel window is present
+        return Alph.Panel.STATUS_DETACHED;
     }
-    
     return Alph.Panel.STATUS_SHOW;
+    
 };
 
 /**

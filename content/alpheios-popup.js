@@ -271,9 +271,26 @@ Alph.xlate = {
         
         Alph.main.getLanguageTool().postTransform(alphtext_node);
         Alph.$("#alph-window",a_topdoc).append(alphtext_node);
-        
+
+        // add the key to the language tool to the element
+        Alph.$("#alph-text",a_topdoc).attr('alph-lang',
+            Alph.main.getLanguageTool().source_language);
+            
         // add language-specific click handler, if any
         Alph.main.getLanguageTool().contextHandler(a_topdoc);
+        
+        // add language-specific dictionary link, if any
+        Alph.$("#alph-text",a_topdoc).append(
+            Alph.main.getLanguageTool().getDictionaryLink()
+        );
+        // TODO the dictionary handler should be dinfed in Alph.Dict
+        // rather than here. also doesn't work from a detached window yet.
+        Alph.$('#alph-text .alph-dict-link',a_topdoc).click(
+            function(a_event)
+            {
+                Alph.main.panels['alph-dict-panel'].open();    
+            }
+        );
         
         // re-highlight the translated range in the source document
         var rp = a_alphtarget.getRangeParent()

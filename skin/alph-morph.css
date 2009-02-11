@@ -8,11 +8,12 @@ body {
     background: white;
 }
 
+/**
+ * Hide the grammar links for now -- don't work in the panel window
+ */
 .alph-attr,.alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs,.alph-close,.alph-tense,.alph-voice,.alph-pers {
     background: white;
+    color: black;
+    cursor: normal;
 }
 
-/** hide meanings in morph view **/
-.alph-mean {
-    display: none;
-}

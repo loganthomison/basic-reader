@@ -143,6 +143,10 @@ Alph.util = {
                 }
             }
         }     
+        else if (a_name.search(/toolbar.lookup$/) != -1)
+        {
+            Alph.main.enable_tb_lookup();
+        }
         if (typeof a_lang != 'undefined')
         {
             Alph.Languages.get_lang_tool(a_lang).observe_pref_change(a_name,a_value);

@@ -66,6 +66,13 @@ Alph.Panel.STATUS_HIDE = 0;
 Alph.Panel.STATUS_AUTOHIDE = 3;
 
 /**
+ * Public static class variable for panel status meaning the panel is detached
+ * @public
+ * @type int
+ */ 
+Alph.Panel.STATUS_DETACHED = 4;
+
+/**
  * Intialization method which can be used for panel-specific initialization 
  * code.
  * @private
@@ -100,15 +107,27 @@ Alph.Panel.prototype.reset_to_default = function()
         status = Alph.util.getPref(status_pref,lang);
     }
     
-    if (typeof status != "undefined" && status == Alph.Panel.STATUS_SHOW)
+    if (typeof status != "undefined")    
     {
-        return this.show();
+        if (status == Alph.Panel.STATUS_SHOW ||
+                // if the panel is supposed to be detached and already is,
+                // just call show to update the contents
+                (status == Alph.Panel.STATUS_DETACHED && 
+                    this.panel_window != null && ! this.panel_window.closed
+                 )
+            )
+        {
+            this.update_status(this.show());
+        }
+        else if (status == Alph.Panel.STATUS_DETACHED)
+        {
+            this.detach();
+        }
+        return;
     }
-    else 
-    {
-        // default status for all panels is hidden
-        return this.hide();
-    }
+    
+    // default status for all panels is hidden
+    this.update_status(this.hide());
 }
 
 /**
@@ -140,17 +159,16 @@ Alph.Panel.prototype.reset_state = function(a_bro)
     // update the panel contents for the current browser
     this.reset_contents(panel_state,old_state);
          
-    var status;
     // just auto hide everything if alpheios is disabled
     if ( ! Alph.main.is_enabled(a_bro))
     {
-        status = this.hide(true);
+        this.update_status(this.hide(true));
     }
     else
     {
-        status = this.reset_to_default(a_bro);
+        this.reset_to_default(a_bro);
     }
-    this.update_status(status);
+    
 };
 
 /**
@@ -211,7 +229,7 @@ Alph.Panel.prototype.update_status = function(a_status)
                         }
                     );
             }
-        ); 
+        );
     
     }
     else
@@ -258,8 +276,7 @@ Alph.Panel.prototype.update_status = function(a_status)
             }
         ); 
              
-        
-        if (a_status == Alph.Panel.STATUS_HIDE)
+        if (a_status == Alph.Panel.STATUS_HIDE || a_status == Alph.Panel.STATUS_AUTOHIDE)
         {
             // update the state of the checkbox only if we're hiding the panel
             // rather than detaching it (in which case we have STATUS_SHOW)
@@ -272,6 +289,11 @@ Alph.Panel.prototype.update_status = function(a_status)
                 // TODO - need to figure out how we want to handle detached panels
                 // across multiple tabs
             }
+        }
+        else
+        {
+            Alph.$(notifier).attr("checked", "true");
+
         }
     }
     
@@ -346,7 +368,7 @@ Alph.Panel.prototype.detach = function()
         Alph.util.log("Error detaching panel: " + a_e);
     }
   
-    this.update_status(Alph.Panel.STATUS_SHOW);
+    this.update_status(Alph.Panel.STATUS_DETACHED);
 };
 
 /**
@@ -398,6 +420,10 @@ Alph.Panel.prototype.hide = function(a_autoflag)
     // panel cleanup code.
     // a_autoflag can be used to distinguish between
     // when the user hides the panel vs. when the app does
+    if (this.panel_window != null && this.panel_window.closed)
+    {
+        this.panel_window = null
+    }
     if (a_autoflag != null && a_autoflag)
     {
         return Alph.Panel.STATUS_AUTOHIDE;
@@ -410,6 +436,24 @@ Alph.Panel.prototype.hide = function(a_autoflag)
 };
 
 /**
+ * Open the panel or panel window
+ */
+Alph.Panel.prototype.open = function()
+{    
+    if (Alph.util.getPref('panels.inline.'+this.panel_id)
+        || (this.panel_window != null && ! this.panel_window.closed))
+    {
+        this.update_status(this.show());
+    }
+    else
+    {
+        // the handlers for the detached window
+        // will call show() to update the panel status 
+        this.detach();
+    }
+}
+
+/**
  * Toggle the state of the panel (hide if shown, and vice-versa)
  * @return the new panel status
  * @type int
@@ -419,13 +463,16 @@ Alph.Panel.prototype.toggle = function()
     var bro = Alph.main.getCurrentBrowser();
     var panel_state = this.get_browser_state(bro);
     
-    if (panel_state.status == Alph.Panel.STATUS_SHOW)
+    if (panel_state.status == Alph.Panel.STATUS_SHOW || 
+        (panel_state.status == Alph.Panel.DETACHED && 
+            this.panel_window != null && ! this.panel_window.closed)
+        )
     {
         this.update_status(this.hide());
     }
     else
-    { 
-        this.update_status(this.show());
+    {
+        this.open();
     }
 };
 
@@ -589,3 +636,67 @@ Alph.Panel.prototype.toggle_section_splitter = function(a_splitter,a_open_panel)
            Alph.$(a_splitter).attr("collapsed",true);
     }
 }
+
+/**
+ * Get the language that was used to populate the supplied 
+ * browser in the panel. Implementation is panel specific
+ * @param {Browser} a_panel_bro the panel browser we want the language for
+ * @return the language used to populate a_panel_bro (or null if not known)
+ * @type String
+ */
+Alph.Panel.prototype.get_current_language = function(a_panel_bro)
+{
+    return null;
+}
+
+/**
+ * Execute a language specific command for a panel
+ * @param {Event} a_event the event which initiated the command
+ * @param {String} a_panel_id the panel id
+ */
+Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
+{
+    var panel_obj;
+    if (typeof Alph.main == "undefined")
+    {
+        panel_obj = window.opener.Alph.main.panels[a_panel_id];
+    }   
+    else
+    {
+        panel_obj = Alph.main.panels[a_panel_id];    
+    }
+    
+    // if the panel is detached, need to jump through some hoops
+    // to get the correct language tool from the opener window
+    if (panel_obj.panel_window != null && ! panel_obj.panel_window.closed)
+    {
+        Alph.$("browser",panel_obj.panel_elem).each(
+            function()
+            {
+                var pw_bro =
+                    panel_obj.panel_window
+                        .Alph.$("#" + a_panel_id + " browser#"+this.id)
+                        .get(0);
+                // figuring out how to get the language from the panel
+                // is panel-specific
+                var lang = panel_obj.get_current_language(pw_bro);
+                if (lang)
+                {
+                    var lang_tool = 
+                        window.opener.Alph.Languages.get_lang_tool(lang);
+                    var cmd_id = a_event.target.getAttribute("id");
+                    if (lang_tool && lang_tool.getCmd(cmd_id))
+                    {
+                        lang_tool[(lang_tool.getCmd(cmd_id))](a_event);
+                    }
+                }
+            }
+        );
+    }
+    // otherwise we can just pass it to the Alph.main_execute_lang_command function
+    // to handle
+    else
+    {
+        Alph.main.execute_lang_command(a_event);
+    }
+};

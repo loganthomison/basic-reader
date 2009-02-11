@@ -933,6 +933,7 @@ Alph.LanguageTool.prototype.setDictionary = function(a_dict_name)
     Alph.util.setPref("dictionaries.full.default",a_dict_name,this.source_language);
 }
 
+ 
 /**
  * Get the browse url of the current dictionary
  * @return the browse url of the dictionary or null if none defined
@@ -951,6 +952,37 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
                 this.source_language);                                
     }
     return browse_url;
+}
+
+/**
+ * Get html for a link to the current dictionary
+ * @return html to add to an element to produce a link to the dictionary
+ * @type String
+ */
+Alph.LanguageTool.prototype.getDictionaryLink = function()
+{
+    var dict_link = "";
+    var dict_name = this.getDictionary();
+    if (dict_name)
+    {
+        try
+        {
+            var dict_name_str = this.get_string("dict."+dict_name);
+            var dict_link_text = 
+                Alph.$("#alpheios-strings").get(0)
+                    .getFormattedString('alph-dictionary-link',[dict_name_str]);
+            dict_link = 
+                '<div class="alph-dict-link">' +
+                dict_link_text
+                '</div>'
+    
+        }
+        catch(a_e)
+        {
+            Alph.util.log(a_e);
+        }
+    }
+    return dict_link || "";
 }
 
 /**
@@ -1299,3 +1331,35 @@ Alph.LanguageTool.prototype.get_lemma_id = function(a_lemma_key)
     return null;
 };
 
+/**
+ * Get a language-specific string property
+ * @param {String} a_name the name of the property
+ * @param {Array} a_replace Optional list of replacement strings
+ * @return the requested string (or empty string if not found)
+ * @type String
+ */
+Alph.LanguageTool.prototype.get_string = function(a_name,a_replace)
+{
+
+    var str = "";
+    var str_props = Alph.$("#alpheios-strings-"+this.source_language).get(0);
+    if (str_props != null)
+    {
+        try
+        {
+            if (typeof a_replace == "undefined")
+            {
+                str = str_props.getString(a_name);
+            }
+            else
+            {
+                str = str_props.getFormattedString(a_name,a_replace);
+            }
+        }
+        catch(a_e)
+        {
+            Alph.util.log("Error retrieving " + a_name + ":" + a_e);
+        }
+    }
+    return str || "";
+}

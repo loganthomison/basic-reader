@@ -84,6 +84,7 @@ Alph.main =
             SHOW_TRANS: 100,
             HIDE_POPUP: 200,
             REMOVE_POPUP: 300,
+            SHOW_DICT: 400,
         },
 
     /**
@@ -157,7 +158,8 @@ Alph.main =
                 .addEventListener("select", Alph.main.onTabSelect, false);
         gBrowser.mTabContainer
                 .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);
-                
+        
+        Alph.main.enable_tb_lookup(); 
         Alph.main.has_languages = Alph.main.set_languages();
     },
 
@@ -1005,7 +1007,7 @@ Alph.main =
      */
     do_tb_lookup: function(a_event)
     {
-        if (a_event.keyCode != 13)
+        if (typeof a_event != "undefined" && a_event.keyCode != 13)
         {
             return;
         }
@@ -1031,6 +1033,7 @@ Alph.main =
         target.setContextPos(0);
         
         this.getLanguageTool().handleConversion(target);
+        Alph.main.panels['alph-morph-panel'].open();
         
         this.getLanguageTool().lexiconLookup(
             target,
@@ -1128,10 +1131,18 @@ Alph.main =
                 if (Alph.main.is_enabled(bro))
                 {
                     Alph.$(this).attr("disabled",false);
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden",false);
+                    }
                 }
                 else
                 {
                     Alph.$(this).attr("disabled",true);
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden",true);
+                    }
                 }
             }
         );          
@@ -1406,6 +1417,21 @@ Alph.main =
             this.get_state_obj(a_bro).get_var("toggled_by") == Alph.State.USER_ACTION;
         return by_user;
          
+    },
+   
+    /**
+     * enable or disable the toolbar lookup box per the preference
+     */
+    enable_tb_lookup: function()
+    {
+        if (Alph.util.getPref("toolbar.lookup"))
+        {
+            Alph.$("#alpheios-lookup-enabled").attr("hidden",false);
+        }
+        else
+        {
+            Alph.$("#alpheios-lookup-enabled").attr("hidden",true);
+        }
     }
 };
 
