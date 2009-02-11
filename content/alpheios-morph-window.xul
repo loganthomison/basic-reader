@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://alpheios/content/bindings.css"?>
+
+ 
+<!DOCTYPE window [
+<!ENTITY % alphDTD SYSTEM "chrome://alpheios/locale/alpheios.dtd" >
+%alphDTD;
+]>
+<?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
+
+<window id="alph-morph-window" title="&alpheios-tools-morph-label;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        windowtype="alph-window"
+        onload="window.opener.Alph.main.broadcast_ui_event(window.opener.Alph.main.events.SHOW_TRANS)"
+        onunload="window.opener.Alph.main.panels['alph-morph-panel']
+                    .update_status(
+                        window.opener.Alph.main.panels['alph-morph-panel'].hide()
+                    );">;
+    <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6.min.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
+
+    <commandset id="mainCommandSet"/>
+    
+    <hbox id="alph-morph-box" class="alph-panel" flex="1" persist="height" collapsed="false"/>
+         
+</window>

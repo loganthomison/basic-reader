@@ -1,5 +1,5 @@
 pref("extensions.alpheios.debug", false);
-pref("extensions.alpheios.toolbar.lookup",true);
+pref("extensions.alpheios.toolbar.lookup",false);
 pref("extensions.alpheios.default_language","");
 pref("extensions.alpheios.mhttpd.port",8200); 
 pref("extensions.alpheios.popuptrigger",'mousemove');
