@@ -12,9 +12,8 @@
     <xsl:import href="alph-infl-extras.xsl"/>    
     <!--
         This stylesheet groups the data on 3 attributes for the rows, 
-        and groups on 1 attribute for the columns.
-        Grouping attributes are supplied as parameters.
-        Grouping parameters are required.
+        and groups on 1 variable attribute plus the type for the columns.
+        The variable grouping attribute is supplied as a parameter.
         A optional ending parameter can be used to identify the ending
         to be indicated as 'selected' in the HTML table.     
     -->
@@ -150,6 +149,7 @@
             <!-- write the colgroup elements -->
             <xsl:call-template name="colgroups">
                 <xsl:with-param name="headerrow1" select="//order-item[@attname=$group4]"/>
+                <xsl:with-param name="headerrow2" select="//order-item[@attname='type']"/>
             </xsl:call-template>        
             <!-- write the column header rows -->
             <xsl:call-template name="headers">
@@ -354,19 +354,25 @@
     <xsl:template name="colgroups">
         <xsl:param name="headerrow1"/>
         <xsl:param name="headerrow2"/>
-        <xsl:param name="headerrow3"/>
+        <xsl:variable name="row2count" select="count($headerrow2)"/>
         <colgroup class="leftheader">
             <col realIndex="0"/>
             <col realIndex="1"/>
         </colgroup>
-        <colgroup>
         <xsl:for-each select="$headerrow1">
-            <xsl:variable name="row1pos" select="position()-1"/>
-            <xsl:variable name="index" 
-                select="($row1pos) + position() + 1"/>
-            <col class="header3col" realIndex="{$index}"/> 
-        </xsl:for-each>
-        </colgroup>
+            <xsl:variable name="row1pos" select="position()-1"/>            
+            <colgroup class="header1">              
+                <xsl:for-each select="$headerrow2">
+                    <xsl:variable name="row2pos" select="position()-1"/>
+                    <xsl:variable name="index" 
+                            select="($row1pos *  $row2count) + 
+                            position() + 1"/>
+                        <col class="header2col" realIndex="{$index}" 
+                            row1pos="{$row1pos}"
+                            row2pos="{$row2pos}"/>
+                </xsl:for-each>
+            </colgroup>
+        </xsl:for-each>               
     </xsl:template>
     
     <xsl:template name="headerrow">
