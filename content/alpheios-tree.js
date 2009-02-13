@@ -174,7 +174,9 @@ Alph.Tree.prototype.show = function()
         Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone());
         Alph.$("#dependency-tree", window_doc).attr("width",Alph.$(panel_tree).attr("width"));
         Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
+        this.panel_window.focus();
     }
+    
     return Alph.Panel.STATUS_SHOW;
     
 };
