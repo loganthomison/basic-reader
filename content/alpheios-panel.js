@@ -403,7 +403,7 @@ Alph.Panel.prototype.hide = function(a_autoflag)
     // when the user hides the panel vs. when the app does
     if (this.panel_window != null && this.panel_window.closed)
     {
-        this.panel_window = null
+        this.panel_window = null;    
     }
     if (a_autoflag != null && a_autoflag)
     {
@@ -481,8 +481,9 @@ Alph.Panel.prototype.reset_contents = function(a_panel_state,a_old_state)
  * may make sense to wait until we can use a JS module for this (with FF3)
  * @param {Browser} a_bro the current browser
  * @param a_event_type the event type (one of @link Alph.main.events)
+ * @param a_event_data optional event data object
  */
-Alph.Panel.prototype.observe_ui_event = function(a_bro,a_event_type)
+Alph.Panel.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
 {
     // default does nothing - override in panel-specific implementations
 };
@@ -644,6 +645,42 @@ Alph.Panel.prototype.is_visible_inline = function(a_bro)
     }
     return is_visible;
 };
+
+/**
+ * Get the current document shown in the panel
+ * @return the array of content document of the currently visible panel
+ * @type Array{Document}
+ */
+Alph.Panel.prototype.get_current_doc = function(a_bro)
+{
+    var panel_obj = this;
+    var panel_state = this.get_browser_state(a_bro);
+    var docs = [];
+    if (panel_state.status == Alph.Panel.STATUS_SHOW)
+    {
+        Alph.$("browser",panel_obj.panel_elem).each(
+            function()
+            {
+                if (panel_obj.panel_window != null && ! panel_obj.panel_window.closed)
+                {
+                    var pw_bro =
+                        panel_obj.panel_window
+                            .Alph.$("#" + panel_obj.panel_id + " browser#"+this.id)
+                            .get(0);
+                    if (pw_bro)
+                    {
+                        docs.push(pw_bro.contentDocument);
+                    }
+                }
+                else
+                {
+                    docs.push(this.contentDocument);
+                }
+            }
+        );
+    }
+    return docs;
+}
 
 /**
  * Execute a language specific command for a panel

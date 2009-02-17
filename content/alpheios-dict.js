@@ -157,24 +157,45 @@ Alph.Dict.prototype.show = function()
  * links for the current browser to the panel state object.
  * @param {Browser} a_bro the current browser
  * @param a_event_type the event type
+ * @param a_event_data optional event data object
  */
-
-Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type)
+Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
 {
     var panel_obj = this;
     var panel_state = this.get_browser_state(a_bro);
 
+    // handle change to the dictionary preferences
+    var new_dict = false;
+    if (a_event_type == Alph.main.events.UPDATE_PREF &&
+        a_event_data.name.indexOf('dictionaries.full.default') != -1)
+    {
+        
+        new_dict = true;
+        // close/hide the panel if it's open and we're switching
+        // to no full defs
+        if (a_event_data.value == null || a_event_data.value == '')
+        {
+            this.update_status(this.hide());
+            return;
+        }
+        // otherwise make sure the browse command is updated
+        else
+        {
+            Alph.Dict.update_dict_browse_cmd();    
+        }
+    }
 
     // proceed with observing the event and doing the 
     // the dictionary lookup only if one or more
     // of the following conditions is met:
     // - panel is being detached for the first time
-    // - panel is visible, AND we're showing or removing the popup 
+    // - panel is visible, AND we're showing or removing the popup, or updating the dictionary
     var do_lookup = 
        ( a_event_type == Alph.main.events.SHOW_DICT ||
          ( panel_state.status == Alph.Panel.STATUS_SHOW && 
             (a_event_type == Alph.main.events.SHOW_TRANS
-              || a_event_type == Alph.main.events.REMOVE_POPUP) 
+              || a_event_type == Alph.main.events.REMOVE_POPUP
+              || new_dict ) 
           ) 
        );
     if (! do_lookup )
@@ -493,12 +514,10 @@ Alph.Dict.switch_dictionary = function(a_event,a_panel_id)
         {
             dict_name = '';
         }
-        Alph.main.getLanguageTool().setDictionary(dict_name);
-        Alph.Dict.update_dict_browse_cmd();
-        Alph.main.panels[a_panel_id]
-            .observe_ui_event(
-                Alph.main.getCurrentBrowser(),
-                Alph.main.events.SHOW_TRANS);
+        // calling setDictionary updates the preference
+        // which results in a PREF_CHANGE event being broadcast to the 
+        // panel and observed in observe_ui_event
+        Alph.main.getLanguageTool(a_bro).setDictionary(dict_name);            
     }
     catch(a_e)
     {

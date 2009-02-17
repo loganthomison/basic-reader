@@ -97,7 +97,7 @@ Alph.Morph.prototype.reset_contents = function(a_panel_state)
             // if this browser's state hasn't been initialized yet
             if (typeof a_panel_state.contents[id] == "undefined")
             {
-                a_panel_state.contents[id] = Alph.$(doc_state.contents).clone();
+                a_panel_state.contents[id] = Alph.$(doc_state.contents).clone(true);
                 a_panel_state.css[id] = Alph.$(doc_state.css).clone();
             }
             panel_obj.update_panel_window(a_panel_state,id);
@@ -127,7 +127,7 @@ Alph.Morph.prototype.init_document = function(a_doc,a_doc_state)
         a_doc_state.css = Alph.$("link[rel=stylesheet]",a_doc).clone();
     }
     Alph.$("#alph-window",a_doc).remove();
-    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone());
+    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone(true));
     Alph.$("link[rel=stylesheet]",a_doc).remove();
     Alph.$("head",a_doc).append(Alph.$(a_doc_state.css).clone());
     return a_doc_state;
@@ -173,7 +173,12 @@ Alph.Morph.prototype.update_panel_window =
 
 Alph.Morph.prototype.observe_ui_event = function(a_bro,a_event_type)
 {
-    if (typeof a_event_type == "undefined")
+    // only respond to events which affect the contents of the popup
+    if (typeof a_event_type == "undefined"
+        ||
+        (a_event_type != Alph.main.events.SHOW_TRANS && 
+         a_event_type != Alph.main.events.HIDE_POPUP &&
+         a_event_type != Alph.main.events.SHOW_POPUP))
     {
         return;
     }
@@ -185,7 +190,7 @@ Alph.Morph.prototype.observe_ui_event = function(a_bro,a_event_type)
         function(i) 
         {
             var morph_doc = this.contentDocument;
-            panel_state.contents[this.id] = Alph.$("#alph-window",morph_doc).get(0);
+            panel_state.contents[this.id] = Alph.$("#alph-window",morph_doc).clone(true);
             panel_state.css[this.id] = Alph.$("link[rel=stylesheet]",morph_doc).clone();
             panel_obj.update_panel_window(panel_state,this.id);
         }

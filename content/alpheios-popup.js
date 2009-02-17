@@ -937,6 +937,13 @@ Alph.xlate = {
             Alph.$("#alph-secondary-loading",topdoc).remove();
             
             // also check the morphology and dictionary windows
+            Alph.main.panels['alph-morph-panel'].get_current_doc().forEach
+            (
+                function(a_doc)
+                {
+                    Alph.$("#alph-secondary-loading",a_doc).remove();
+                }
+            );
             Alph.$(".alph-lexicon-output").each( 
                 function() {
                     var doc = Alph.$(this).get(0).contentDocument;

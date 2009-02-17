@@ -85,6 +85,7 @@ Alph.main =
             HIDE_POPUP: 200,
             REMOVE_POPUP: 300,
             SHOW_DICT: 400,
+            UPDATE_PREF: 500
         },
 
     /**
@@ -1170,9 +1171,10 @@ Alph.main =
     /** 
      * Broadcast a UI event to the panels
      * @param a_event_type the type of event (per Alph.main.events)
+     * @param a_event_data optional data object associated with the event
      * TODO replace this with the Observes JS Module when FF3 is min supported
      */
-    broadcast_ui_event: function(a_event)
+    broadcast_ui_event: function(a_event,a_event_data)
     {
         var bro = this.getCurrentBrowser();
         // Update the panels
@@ -1184,7 +1186,7 @@ Alph.main =
                 {
                     var panel_obj = Alph.main.panels[panel_id];
                     Alph.util.log("Observing ui event for panel " + panel_id); 
-                    panel_obj.observe_ui_event(bro,a_event);    
+                    panel_obj.observe_ui_event(bro,a_event,a_event_data);    
                 } 
                 catch (e)
                 {   

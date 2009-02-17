@@ -15,7 +15,7 @@ body {
 }
 
 /** hide some things in default dictionary view **/
-.alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error  {
+.alph-infl-set, #alph-text-loading, #alph-loading-error, .alph-unknown,.alph-error, .alph-dict-link  {
     display: none;
 }
 /** in the full dictionary display hide everything except the dictionary blocs**/

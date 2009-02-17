@@ -150,8 +150,11 @@ Alph.util = {
         if (typeof a_lang != 'undefined')
         {
             Alph.Languages.get_lang_tool(a_lang).observe_pref_change(a_name,a_value);
-
         }
+        Alph.main.broadcast_ui_event(
+            Alph.main.events.UPDATE_PREF,
+                { name: a_name,
+                  value: a_value });
     },
 
     /**
