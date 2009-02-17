@@ -10,7 +10,7 @@
         <broadcaster id="alph-trans-status"
                      disabled="true"
                      checked="false"
-                     class="alpheios-enabled-notifier" />
+                     class="alpheios-pedagogical-notifier" />
         <broadcaster id="alph-trans-inter-src-status"
                      disabled="true" 
                      class="alpheios-pedagogical-notifier" />
@@ -71,63 +71,21 @@
                 <label id="alpheios-trans-label" 
                        value="&alpheios.panel.trans.label;"/>
             </toolbaritem>
-            <tabbox flex="1">
-                <tabs flex="0" id="alph-trans-tabs">
-                    <tab id="alph-trans-tab-primary"
-                         label="&alpheios.panel.trans.tab.ped.primary;"
-                         observes="alpheios-pedagogical-status"/>
-                    <tab id="alph-trans-tab-external" 
-                         label="&alpheios.panel.trans.tab.external;" 
-                         selected="true"/>
-
-                </tabs>
-                <tabpanels flex="10">
-                    <tabpanel flex="1" id="alph-trans-panel-primary">
-                        <browser
-                            flex="1"
-                            type="content" 
-                            src="chrome://alpheios/content/html/alph-panel.html"/>            
-                    </tabpanel>
-                    <tabpanel flex="1" orient="vertical" id="alph-trans-panel-external">
-                         <textbox id="alph-trans-ext-urlbar" 
-                            type="autocomplete"
-                            tooltiptext="&alpheios.panel.trans.tab.external.url;"
-                            autocompletesearch="history"
-                            autocompletepopup="alph-trans-ext-auto-popup"
-                            minResultsForPopup="1"
-                            completeselectedindex="true"
-                            tabscrolling="true"
-                            showcommentcolumn="true"
-                            showimagecolumn="true"
-                            enablehistory="true"
-                            maxrows="6"
-                            newlines="stripsurroundingwhitespace"
-                            oninput=""
-                            ontextentered="Alph.Translation.loadUrl(param,this)"
-                            ontextreverted=""
-                            pageproxystate="invalid"
-                            onsearchbegin=""
-                            onsearchcomplete=""
-                            onfocus=""
-                            onblur=""/>
-                            <browser
-                                flex="1"
-                                type="content" 
-                                src="about:blank"/>
-                    </tabpanel>
-                    
-                </tabpanels>
-            </tabbox>
-                <toolbarbutton id="alpheios-trans-opt-inter-src" 
+            <browser
+                id="alph-trans-panel-primary"
+                flex="1"
+                type="content" 
+                src="chrome://alpheios/content/html/alph-panel.html"/>            
+            <toolbarbutton id="alpheios-trans-opt-inter-src" 
                           label="&alpheios.panel.trans.opt.inter.src;"  
                           hidden="true"
                           type="checkbox"/>
-                <toolbaritem
+            <toolbaritem
                     observes="alph-trans-inter-trans-status">
                     <checkbox id="alpheios-trans-opt-inter-trans" 
                           label="&alpheios.panel.trans.opt.inter.trans;"  
                           command="alpheios-trans-toggle-inter-trans-cmd"/>
-                </toolbaritem>
+            </toolbaritem>
         </alpheiosPanel>
     </vbox>
 </overlay>
