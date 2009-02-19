@@ -144,7 +144,7 @@ Alph.site = {
     {
         
         // don't add the toggle if we don't have an aligned translation to use
-        if (Alph.$("meta#alpheios-trans-url",a_doc).length == 0)
+        if (Alph.$("#alph-trans-url",a_doc).length == 0)
         {
             return;
         }
