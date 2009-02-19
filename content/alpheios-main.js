@@ -1159,7 +1159,16 @@ Alph.main =
     {
         
         var lang_tool = Alph.main.getLanguageTool();
-        var cmd_id = a_event.target.getAttribute("id");
+        
+        // we might have a custom event object, which contains
+        // the command id in a property
+        var cmd_id = 
+            a_event.target.getAttribute("id") ||
+            a_event.data.alpheios_cmd_id;
+        if (cmd_id == null || typeof cmd_id == 'undefined')
+        {
+            return;
+        }
         Alph.util.log("Executing " + cmd_id);
         if (lang_tool && lang_tool.getCmd(cmd_id))
         {
@@ -1201,7 +1210,7 @@ Alph.main =
      * Resets the state element for the current browser.
      */
     reset_state: function(a_event)
-    {
+    {        
         if (typeof a_event != "undefined")
         {
             // stop the propagation of the event so that it doesn't
@@ -1209,7 +1218,6 @@ Alph.main =
             // TODO - this isn't right .... shouldn't stop the prop of the dom content loaded event
             a_event.stopPropagation();    
         }
-        
         var bro = Alph.main.getCurrentBrowser();
         
         // add a metadata element to the page so that it can check
@@ -1282,10 +1290,14 @@ Alph.main =
         
         if (ped_site != null)
         {
-            // setup the prototype display
-            // this should only be called after Alpheios has been auto-toggled
-            // on because otherwise it gets done twice via the send call to reset_state
+            // these functions should only be called after Alpheios has been auto-toggled
+            // on because otherwise they gets done twice via the send call to reset_state
             // from Alph.main.onTabSelect
+
+            // inject the pedagogical site with the alpheios-specific elements
+            Alph.site.setup_page(bro.contentDocument);
+
+            // setup the prototype interlinear display
             Alph.pproto.setup_display(bro.contentDocument,
                 Alph.Translation.INTERLINEAR_TARGET_SRC);
         }
@@ -1434,6 +1446,41 @@ Alph.main =
         {
             Alph.$("#alpheios-lookup-enabled").attr("hidden",true);
         }
+    },
+    
+    /**
+     * open the about dialog
+     */
+    show_about: function()
+    {
+        window.openDialog(
+            'chrome://alpheios/content/about.xul', 
+            'alpheios-about-dialog', 
+            'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
+        );
+    },
+    
+    /**
+     * open the help window
+     */
+    show_help: function()
+    {
+        window.open(
+            'http://dev.alpheios.net:8008/site/content/alpheios-user-guide',
+            'alpheios-help'
+        );  
+    },
+    
+    /**
+     * open the options dialog
+     */
+    show_options: function()
+    {
+        window.openDialog(
+            'chrome://alpheios/content/alpheios-prefs.xul', 
+            'alpheios-options-dialog', 
+            'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
+        );
     }
 };
 

@@ -16,20 +16,32 @@
         <xsl:param name="dedupe_by"/>
         <xsl:param name="show_only_matches"/>
         <xsl:param name="context"/>
+        <xsl:param name="group_by"/>
         
-        <xsl:variable name="ending_types" select="//order-item[@attname='type']"/>
+        <xsl:variable name="group_att">
+            <xsl:choose>
+                <xsl:when test="$group_by">
+                    <xsl:value-of select="$group_by"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="'type'"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:variable name="ending_types" select="//order-item[@attname=$group_att]"/>
         <xsl:variable name="infl_set" select="$infl-endings/../infl-set"/>
                 
         <!-- group by type -->
         <xsl:for-each select="$ending_types">
             <xsl:sort 
-                select="/infl-data/order-table/order-item[@attname='type'
+                select="/infl-data/order-table/order-item[@attname=$group_att
                 and text()=current()]/@order"/>
             <xsl:if test="generate-id(.) = generate-id($ending_types[.=current()])">
                 <xsl:variable name="lasttype" select="."/>
                 <td class="ending-group {$lasttype}"> <!-- start new cell -->
                     <xsl:variable name="cellgroup" 
-                        select="$infl-endings/infl-ending/@*[local-name(.)='type' 
+                        select="$infl-endings/infl-ending/@*[local-name(.)=$group_att
                         and contains(concat(' ',(.),' '), concat(' ',$lasttype,' '))]/.."/>
                     <!-- print an empty cell if there are no endings of this type -->
                     <xsl:if test="count($cellgroup) = 0"><span class="emptycell">&#160;</span></xsl:if>
@@ -101,7 +113,7 @@
                                     <xsl:if test="$dedupe_by='case-num-gend'
                                         and ../preceding-sibling::infl-ending-set[@case=$this_case and 
                                         @gend = $this_gend and @num = $this_num]/infl-ending/text() = .">duplicate</xsl:if>
-                                </xsl:variable>                                        
+                                </xsl:variable>                                       
                                 <span class="ending {@type} {$selected_class} {$notfirst} {$duplicate}" 
                                     stem-class="{@stem-class}"
                                     context="{translate($context,' ','_')}">
