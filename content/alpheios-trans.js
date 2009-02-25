@@ -127,10 +127,13 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
     Alph.$("body",a_trans_doc).html(a_data);
 
     // setup the display
+    // prototype
     Alph.pproto.setup_display(a_trans_doc,'trans');
+    // site design revision
+    Alph.site.setup_page(a_trans_doc,'trans');
                     
-    // setup for interlinear
-    Alph.pproto.enable_interlinear(a_bro.contentDocument,a_trans_doc);
+    // setup for interlinear    
+    Alph.site.enable_interlinear(a_bro.contentDocument,a_trans_doc);
                     
     // toggle the state of the interlinear display
     // according to the selected state of the menu item
@@ -220,17 +223,28 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
 Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type)
 {
     
-    // the source text element uses the "ref" attribute to identify the
+    // the source text element uses the "nrefs" attribute to identify the
     // corresponding element(s) in the parallel aligned translation
-    if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC && Alph.$(a_elem).attr("ref"))
+    if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
     {
         var trans_doc = 
             Alph.$("browser",this.panel_elem).get(0).contentDocument;
-     
-        var ids = Alph.$(a_elem).attr("ref").split(/\s/);
-        for (var i=0; i<ids.length; i++) {
-            Alph.$('.alph-proto-word[id="' + ids[i] + '"]',trans_doc)
-                .toggleClass("alph-highlight-parallel");    
+
+        if (Alph.$(a_elem).attr("ref"))
+        {     
+            var ids = Alph.$(a_elem).attr("ref").split(/\s|,/);
+            for (var i=0; i<ids.length; i++) {
+                Alph.$('.alph-proto-word[id="' + ids[i] + '"]',trans_doc)
+                    .toggleClass("alph-highlight-parallel");    
+            }
+        }
+        else if (Alph.$(a_elem).attr("nrefs"))
+        {     
+            var ids = Alph.$(a_elem).attr("nrefs").split(/\s|,/);
+            for (var i=0; i<ids.length; i++) {
+                Alph.$('.alpheios-aligned-word[id="' + ids[i] + '"]',trans_doc)
+                    .toggleClass("alpheios-highlight-parallel");    
+            }
         }
     }
     // if the user is mousing over the the parallel aligned translation
@@ -245,11 +259,25 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type)
         Alph.$('.alph-proto-word[ref~="' + match_id + '"]',parent_doc).each(
             function()
             {
-                var ids = Alph.$(this).attr("ref").split(/\s/);
+                var ids = Alph.$(this).attr("ref").split(/\s|,/);
                 for (var i=0; i<ids.length; i++) {
                    if (ids[i] == match_id)
                    {
                         Alph.$(this).toggleClass("alph-highlight-parallel");
+                        break;
+                   }
+               }
+            }
+        );             
+
+        Alph.$('.alpheios-aligned-word[nrefs~="' + match_id + '"]',parent_doc).each(
+            function()
+            {
+                var ids = Alph.$(this).attr("nrefs").split(/\s|,/);
+                for (var i=0; i<ids.length; i++) {
+                   if (ids[i] == match_id)
+                   {
+                        Alph.$(this).toggleClass("alpheios-highlight-parallel");
                         break;
                    }
                }
@@ -294,10 +322,15 @@ Alph.Translation.toggle_interlinear = function(a_type,a_event)
         // make sure the interlinear translation has been added to the display
         Alph.pproto.add_interlinear(target_doc,src_doc);
         Alph.$(".alph-proto-iltrans",target_doc).css('display','block');
+
+        Alph.site.add_interlinear_text(target_doc,src_doc);
+        Alph.$(".alpheios-aligned-trans",target_doc).css('display','inline');
     } else {
         Alph.$(".alph-proto-iltrans",target_doc).css('display','none');
+        Alph.$(".alpheios-aligned-trans",target_doc).css('display','none');
     }
-    Alph.pproto.resize_interlinear(target_doc);  
+    Alph.pproto.resize_interlinear(target_doc);
+    Alph.site.resize_interlinear(target_doc);  
 };
 
 /**

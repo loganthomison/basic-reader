@@ -328,7 +328,7 @@ Alph.util = {
         // gather the list of possible paths to use under
         // the platform directory of the base path 
         // ... at a minimum the OS much match
-        var available_paths = { };
+        var available_paths = [];
         try 
         {
             if (base_file_dir.isDirectory() )
@@ -343,7 +343,7 @@ Alph.util = {
                     // for potential use
                     if (dir.isDirectory() && dir.path.indexOf(os) != -1)
                     {
-                           available_paths[dir.path] = dir;
+                           available_paths.push(dir);
                     }
                 }
             }
@@ -380,16 +380,25 @@ Alph.util = {
             // add the base_path on to the preferred path
             (preferred_path = 
                 base_file_dir.clone()).append(preferred_path_order[i])
-            for (var avail_path in available_paths)
+            for (var j=0; j< available_paths.length; j++)
             {
                 // check for full match on the requested path, 
                 // or else a path that begins with the requested path
-                if ( available_paths[avail_path].equals(preferred_path) ||
-                     avail_path.indexOf(preferred_path.path) == 0 )
+                var avail_path = available_paths[j].path;
+                var avail_path_obj = available_paths[j];
+                try {
+                    if ( avail_path_obj &&
+                         (avail_path_obj.equals(preferred_path) ||
+                         avail_path.indexOf(preferred_path.path) == 0) )
+                    {
+                        file = avail_path_obj;
+                        // stop at the first match
+                        break;
+                    }
+                }
+                catch(a_e)
                 {
-                    file = available_paths[avail_path];
-                    // stop at the first match
-                    break;
+                    Alph.util.log("Error checking path " + avail_path + ":",a_e);
                 }
             }
             i++;

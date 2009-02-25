@@ -1255,7 +1255,18 @@ Alph.main =
             this.get_state_obj(bro)
                 .set_var("level",
                     Alph.$("meta#alpheios-level-selected",bro.contentDocument).attr("content"));
-            var ped_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
+            
+            // retrieve the language from the html element of the content document
+            var ped_lang = bro.contentDocument.documentElement.getAttribute("xml:lang")
+                            || bro.contentDocument.documentElement.getAttribute("lang");
+            
+            // for backwards compatibility, 
+            // if the document itself doesn't specify the language, then check the 
+            // translation url div
+            if (ped_lang == null)
+            {
+                ped_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
+            }
             var cur_lang = this.get_state_obj(bro).get_var("current_language");
             
             // if we support this language automatically setup the extension for it
@@ -1295,7 +1306,8 @@ Alph.main =
             // from Alph.main.onTabSelect
 
             // inject the pedagogical site with the alpheios-specific elements
-            Alph.site.setup_page(bro.contentDocument);
+            Alph.site.setup_page(bro.contentDocument,
+                Alph.Translation.INTERLINEAR_TARGET_SRC);
 
             // setup the prototype interlinear display
             Alph.pproto.setup_display(bro.contentDocument,

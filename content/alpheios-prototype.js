@@ -59,6 +59,36 @@ Alph.pproto = {
         Alph.$(".alph-proto-word",a_doc).mouseout( 
             function(e) { Alph.pproto.toggle_alignment(e,this,a_type) }
         );
+        
+        // add a checkbox to control the interlinear translation in the source
+        // text display
+        if (Alph.$("#alpheios-enable-interlinear",a_doc).length == 0)
+        {
+            Alph.$("#alph-text-links",a_doc).append(
+                '<div id="alpheios-enable-interlinear">' +
+                '<input type="checkbox" id="alpheios-interlinear-toggle"/>' +
+                '<span>' +
+                document.getElementById("alpheios-strings")
+                            .getString("alph-enable-interlinear") +
+                '</span>' +
+                '</div>'
+            );
+            // update the checked state of the interlinear toggle in the source text
+            // document with the state of real control from the XUL
+            Alph.$("#alpheios-interlinear-toggle",a_doc).attr("checked",
+                Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == "true" ? true : null);
+                
+            Alph.$("#alpheios-interlinear-toggle",a_doc).click(
+                function(e)
+                {
+                    // keep the state of the XUL control and the document
+                    // control in sync
+                    var checked = Alph.$(this).attr('checked');
+                    Alph.$("#alpheios-trans-opt-inter-src").attr('checked',checked);
+                    Alph.Translation.toggle_interlinear('src',e);
+                }
+            );
+        }
     },
     
     /**
@@ -100,7 +130,7 @@ Alph.pproto = {
             // and parallel text, just disable the interlinear option and return
             // TODO we shouldn't assume that if interlinear is available one way
             // it is also available the other way 
-            Alph.util.log("Disable interlinear");
+            Alph.util.log("Disable interlinear prototype");
             Alph.$("#alph-trans-inter-trans-status").attr("disabled",true);
             Alph.$("#alph-trans-inter-trans-status").attr("hidden",true);
         }
