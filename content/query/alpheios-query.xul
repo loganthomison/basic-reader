@@ -6,7 +6,7 @@
 %queryDTD;
 ]>
 
-<dialog id="alpheiosQuery"
+<window id="alpheiosQuery"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         title="&alpheios.query.full.title;"
         buttons="accept" onload="Alph_Inter.load_query_window();" 
@@ -19,4 +19,4 @@
         <iframe id="alph-query-frame" 
                 src="chrome://alpheios/content/html/alph-panel.html" flex="1"/>
     </hbox>
-</dialog>
+</window>

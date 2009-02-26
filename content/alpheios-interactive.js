@@ -67,7 +67,7 @@ Alph.interactive = {
 
         var sentence = 
             Alph.$.map(
-                Alph.$('.alph-proto-word',a_topdoc),
+                Alph.$('.alpheios-aligned-word',a_topdoc),
                 function(a) { return Alph.$(a).text() })
             .join(' ');
         Alph.util.log("Sentence: " + sentence);
@@ -90,7 +90,15 @@ Alph.interactive = {
           Alph.xlate.openSecondaryWindow(
           "alph-query-window",
           "chrome://alpheios/content/query/alpheios-query.xul",
-          null,
+          {
+            chrome: "yes",
+            dialog: "no",
+            resizable: "yes",
+            width: "1024",
+            height: "800",
+            scrollbars: "yes"
+          },
+
           params
         );
         // hide the popup

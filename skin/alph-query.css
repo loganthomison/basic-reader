@@ -1,5 +1,12 @@
+#alph-query-frame {
+   background-color: white;
+}
+
 body {
     background-color: white;
+}
+
+.alph-query-element {
 }
 
 .alph-query-pofs {
@@ -20,6 +27,11 @@ body {
 
 .alph-query-header {
     font-weight: bold;
+}
+
+.alph-query-infl {
+    clear: both;
+    margin-top: 2em;
 }
 
 .answer {
