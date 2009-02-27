@@ -326,10 +326,10 @@ Alph_Inter =
                 var context = $.extend({},base_ctx);
                 context['alph-num'] = $('.alph-num',this).attr('context');
                 context['alph-gend'] = $('.alph-gend',this).attr('context');
-                context['alph-tense'] = $('.alph-tense',this).attr('context');
-                context['alph-voice'] = $('.alph-voice',this).attr('context');
+                context['alph-tense'] = $('.alph-tense',this).text();
+                context['alph-voice'] = $('.alph-voice',this).text();
                 context['alph-pers'] = $('.alph-pers',this).attr('context');
-         
+                context['alph-mood'] = $('.alph-mood',this).attr('context');
                 // one inflection set may contain many cases
                 var cases = $('.alph-case',this);
                 if (cases.length > 0)
