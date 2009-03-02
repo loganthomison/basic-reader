@@ -198,6 +198,13 @@ Alph.xlate = {
         // again differently after translation, if necessary
         alphtarget.setRangeParent(rp);
         
+        // do we have a treebank query for this word?
+        var treebank_url = Alph.$("#alpheios-treebank-url",doc).attr("content");
+        var treebank_ref = Alph.$(rp).parents().attr("tbref");
+        if (treebank_url && treebank_ref)
+        {
+            alphtarget.setTreebankQuery(treebank_url.replace(/WORD/,treebank_ref));
+        }
         // show output
         this.showPopup(a_e.target, a_e.screenX, a_e.screenY, alphtarget);
     },
@@ -207,9 +214,9 @@ Alph.xlate = {
      * Displays an error in the popup. Supplied as a callback argument
      * to the {@link Alph.LanguageTool#lexiconLookup} method. 
      * @param {String} a_msg the error message
-     * @param a_topdoc The Document or Node which holds the popup
+     * @param a_doc_array Array of Documents which holds the morphological details
      */
-    translationError: function (a_msg,a_topdoc)
+    translationError: function (a_msg,a_doc_array)
     {
         var err_msg =
             document
@@ -226,17 +233,26 @@ Alph.xlate = {
         //        document.getElementById("alpheios-strings")
         //                .getString("alph-error-mhttpd-notstarted");
         //}
-
-        Alph.$("#alph-text-loading",a_topdoc).remove();
         
-        // replace any earlier error
-        Alph.$("#alph-loading-error",a_topdoc).remove();
+        // the first document in the array is the main one
+        a_topdoc = a_doc_array[0];
 
-        Alph.$("#alph-text",a_topdoc).append(
-            '<div id="alph-loading-error">' +
-            err_msg +
-            '</div>'
-        );
+        a_doc_array.forEach(
+           function(a_doc)
+           {
+                Alph.$("#alph-text-loading",a_doc).remove();
+        
+                // replace any earlier error
+                Alph.$("#alph-loading-error",a_doc).remove();
+
+                Alph.$("#alph-text",a_doc).append(
+                    '<div id="alph-loading-error">' +
+                    err_msg +
+                    '</div>'
+                );
+           }
+       );
+       Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
     },
 
     /**
@@ -246,10 +262,14 @@ Alph.xlate = {
      * @param {String} a_xml the xml string containing the lexicon response
      * @param {Object} a_alphtarget the details on the target of the event which triggered the popup
      *                 (as returned by {@link Alph.LanguageTool#findSelection})
-     * @param a_topdoc the Document or Node which contains the popup  
+     * @param a_doc_arry the array of documents which contain the morphological text  
      */
-    showTranslation: function(a_xml,a_alphtarget,a_topdoc) {
+    showTranslation: function(a_xml,a_alphtarget,a_doc_array) {
         Alph.util.log("Query response:" + a_xml);
+        
+        // the first document in the array is the main one
+        a_topdoc = a_doc_array[0];
+        
         var wordHTML = Alph.xlate.transform(a_xml);
         // don't display an empty popup
         if (   (wordHTML == '')
@@ -258,43 +278,68 @@ Alph.xlate = {
                 && (Alph.$(".alph-error",wordHTML).size() == 0)))
         {
             Alph.util.log("No valid entries to display.");
-            return Alph.xlate.hidePopup(a_topdoc);
-
+            a_doc_array.forEach(
+                function(a_doc)
+                {
+                    Alph.xlate.hidePopup(a_doc);        
+                }
+            );            
         }
         
         // add a class to the first word in the response 
         Alph.$("div.alph-word:first",wordHTML).addClass("alph-word-first");
         
-        Alph.$("#alph-text",a_topdoc).remove();
+        a_doc_array.forEach(
+            function(a_doc)
+            {
+        
+                Alph.$("#alph-text",a_doc).remove();
+            }
+        );
+
         var alphtext_node = 
             window.content.document.importNode(wordHTML.getElementById("alph-text"),true);
         
-        Alph.main.getLanguageTool().postTransform(alphtext_node);
-        Alph.$("#alph-window",a_topdoc).append(alphtext_node);
-
-        // add the key to the language tool to the element
-        Alph.$("#alph-text",a_topdoc).attr('alph-lang',
-            Alph.main.getLanguageTool().source_language);
-            
-        // add language-specific click handler, if any
-        Alph.main.getLanguageTool().contextHandler(a_topdoc);
-        
-        // add language-specific dictionary link, if any
-        if (! Alph.main.panels['alph-dict-panel'].is_visible_inline(Alph.main.getCurrentBrowser()))
+        var disambiguate = false;
+        if (a_alphtarget.getTreebankQuery())
         {
-            Alph.$("#alph-text",a_topdoc).append(
-                Alph.main.getLanguageTool().getDictionaryLink()
-            );
-            // TODO the dictionary handler should be dinfed in Alph.Dict
-            // rather than here. also doesn't work from a detached window yet.
-            Alph.$('#alph-text .alph-dict-link',a_topdoc).click(
-                function(a_event)
-                {
-                    Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
-                    Alph.main.panels['alph-dict-panel'].open();    
-                }
-            );
+            disambiguate = true;
         }
+        Alph.main.getLanguageTool().postTransform(alphtext_node);
+        a_doc_array.forEach(
+            function(a_doc)
+            {
+                if (disambiguate)
+                {
+                    Alph.$("#alph-window",a_doc).addClass("alpheios-pending");
+                }
+                Alph.$("#alph-window",a_doc).append(Alph.$(alphtext_node).clone());
+                // add the key to the language tool to the element
+                Alph.$("#alph-text",a_doc).attr('alph-lang',
+                    Alph.main.getLanguageTool().source_language);
+                // add language-specific click handler, if any
+                Alph.main.getLanguageTool().contextHandler(a_doc);
+        
+                // add language-specific dictionary link, if any
+                if (! Alph.main.panels['alph-dict-panel'].
+                        is_visible_inline(Alph.main.getCurrentBrowser()))
+                {
+                    Alph.$("#alph-text",a_doc).append(
+                        Alph.main.getLanguageTool().getDictionaryLink()
+                    );
+                    // TODO the dictionary handler should be dinfed in Alph.Dict
+                    // rather than here. also doesn't work from a detached window yet.
+                    Alph.$('#alph-text .alph-dict-link',a_doc).click(
+                        function(a_event)
+                        {
+                            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
+                            Alph.main.panels['alph-dict-panel'].open();    
+                        }
+                    );
+                }                
+            }
+        );
+
         // re-highlight the translated range in the source document
         var rp = a_alphtarget.getRangeParent()
         if (rp)
@@ -314,6 +359,126 @@ Alph.xlate = {
         Alph.$("#alph-window-anchor",a_topdoc).focus();
         // TODO - we probably should reposition the popup now that we 
         // know it's final size
+        
+        // disambiguate if treebank is available
+        if (disambiguate)
+        {
+            Alph.util.log("Disamibugating ..." + a_alphtarget.getTreebankQuery());
+            // send asynchronous request to the lexicon service
+            Alph.$.ajax(
+                {
+                    type: "GET",
+                    url: a_alphtarget.getTreebankQuery(),
+                    timeout: Alph.util.getPref("url.treebank.timeout") || 5000,
+                    dataType: 'html',
+                    error: function(req,textStatus,errorThrown)
+                    {
+                        Alph.util.log("Error disambiguating morphology: " + textStatus||errorThrown);
+                    },
+                    success: function(data, textStatus) 
+                    {
+                    
+                        Alph.xlate.updateTranslation(data,a_alphtarget,a_doc_array);
+                        // TODO we should prevent the request from re-issuing
+                        // for each lexicon panel and instead update them in 
+                        // updateTranslation
+                    } 
+                }   
+            );
+        }
+        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+        Alph.interactive.openQueryDisplay(a_topdoc);
+    },  
+    /**
+     * Update the results of the lexicon lookup in the popup.
+     * @param {String} a_xml the xml string containing the lexicon response
+     * @param {Object} a_alphtarget the details on the target of the event which triggered the popup
+     *                 (as returned by {@link Alph.LanguageTool#findSelection})
+     * @param a_doc_array the array of Documents which contain the morphological text  
+     */
+     updateTranslation: function(a_xml,a_alphtarget,a_doc_array) {
+        Alph.util.log("Query response:" + a_xml);
+        
+        // the first document in the array is the main one
+        a_topdoc = a_doc_array[0];
+
+        var wordHTML = Alph.xlate.transform(a_xml);
+        // don't display an empty popup
+        if (   (wordHTML == '')
+            || (   (Alph.$(".alph-entry",wordHTML).size() == 0)
+                && (Alph.$(".alph-unknown",wordHTML).size() == 0)
+                && (Alph.$(".alph-error",wordHTML).size() == 0)))
+        {
+            Alph.util.log("No treebank entries to display.");
+        }
+        else
+        {
+            var new_text_node = 
+                    window.content.document.importNode(
+                    Alph.$("#alph-text",wordHTML).get(0),true);
+
+            Alph.main.getLanguageTool().postTransform(new_text_node);
+
+            var lemma = Alph.$(".alph-dict",new_text_node).attr("lemma-key");
+            var popup = Alph.$("#alph-text",a_topdoc);
+            
+            var entry = [];
+            if (lemma)
+            {
+                entry = Alph.$(".alph-dict[lemma-key="+lemma+"]",popup)
+                    .parent(".alph-entry");
+            }
+
+            if (entry.length == 1)
+            {
+                
+                var new_infl_node = 
+                    Alph.$(".alph-infl-set",new_text_node).get(0);
+
+                a_doc_array.forEach(
+                    function(a_doc)
+                    {
+                        var doc_entry = 
+                            Alph.$("#alph-text .alph-dict[lemma-key="+lemma+"]",a_doc)
+                            .parent(".alph-entry");
+
+                        Alph.$(".alph-infl-set",doc_entry).each(
+                            function(a_i)
+                            {
+                                if (a_i == 0)
+                                {   
+                                    Alph.$(this)
+                                        .after(Alph.$(new_infl_node).clone())
+                                        .remove();
+                                }
+                                else
+                                {
+                                    Alph.$(this).remove();
+                                }
+                            }
+                        );
+                        Alph.$(doc_entry).siblings(".alph-entry").remove();
+                        Alph.$(doc_entry).parent(".alph-word").siblings(".alph-word").remove();
+                        Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                    
+                    }
+                );
+                
+            }
+            else
+            {
+                Alph.$(".alph-word",new_text_node).get(0);
+                a_doc_array.forEach(
+                    function(a_doc)
+                    {
+                     
+                        Alph.$("#alph-text",a_doc).prepend(Alph.$(new_text_node).clone());
+                        Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                    }
+                );
+            }
+        }
+        Alph.$("#alph-window-anchor",a_topdoc).focus();
     },
         
     /**
@@ -592,6 +757,16 @@ Alph.xlate = {
         // other functions can access it
         alph_state.set_var("word",a_alphtarget.getWord());
 
+        var doc_array = [topdoc];
+        Alph.$(".alph-lexicon-output").each(
+            function() 
+            {
+                var doc = Alph.$(this).get(0).contentDocument
+                Alph.main.getLanguageTool().addStyleSheet(doc);
+                Alph.$("#alph-window",doc).css("display","block");
+                doc_array.push(doc);
+            }
+        );
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
         // the popup and any other lexicon 
@@ -603,32 +778,12 @@ Alph.xlate = {
             a_alphtarget,
             function(data)
             {
-                Alph.xlate.showTranslation(data,a_alphtarget,topdoc);
-                Alph.$(".alph-lexicon-output").each(
-                    function() 
-                    {
-                        var doc = Alph.$(this).get(0).contentDocument
-                        Alph.$("#alph-window",doc).css("display","block");
-                        Alph.main.getLanguageTool().addStyleSheet(doc);
-                        Alph.xlate.showTranslation(data,a_alphtarget,doc);
-                    }
-                );
-                Alph.interactive.openQueryDisplay(topdoc);
-                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+                Alph.xlate.showTranslation(data,a_alphtarget,doc_array);
 
             },
             function(a_msg)
             {   
-                Alph.xlate.translationError(a_msg,topdoc);
-                Alph.$(".alph-lexicon-output").each(
-                    function() 
-                    {
-                        var doc = Alph.$(this).get(0).contentDocument
-                        Alph.$("#alph-window",doc).css("display","block");
-                        Alph.xlate.translationError(a_msg,doc);
-                    }
-                );
-                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+                Alph.xlate.translationError(a_msg,doc_array);
             }
         );
     },

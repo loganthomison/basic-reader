@@ -123,6 +123,13 @@ Alph.SourceSelection.prototype.m_contextPos = 0;
 Alph.SourceSelection.prototype.m_rangeParent;
 
 /**
+ * treebankQueryUrl for the selection
+ * @private
+ * @type String
+ */
+Alph.SourceSelection.prototype.m_treebankQuery = null;
+
+/**
  * gets the selected 'word'
  * @return the word
  * @type String
@@ -186,6 +193,16 @@ Alph.SourceSelection.prototype.getRangeParent = function(a_parent)
 };
 
 /**
+ * get the treebankQuery for the selection
+ * @return the treebank query url
+ * @type String
+ */
+Alph.SourceSelection.prototype.getTreebankQuery = function()
+{
+    return this.m_treebankQuery;
+};
+
+/**
  * sets the selected 'word'
  * @param {String} a_word the word
  */
@@ -240,6 +257,15 @@ Alph.SourceSelection.prototype.setContextPos = function(a_pos)
 Alph.SourceSelection.prototype.setRangeParent = function(a_parent)
 {
     this.m_rangeParent = a_parent;
+};
+
+/**
+ * set the treebankQuery for the selection
+ * @param {String} a_url the treebank query url 
+ */
+Alph.SourceSelection.prototype.setTreebankQuery = function(a_url)
+{
+    this.m_treebankQuery = a_url;
 };
 
 /**

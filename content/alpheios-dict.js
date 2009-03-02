@@ -432,19 +432,26 @@ Alph.Dict.prototype.update_panel_window =
 {
     if (this.panel_window != null && ! this.panel_window.closed)
     {
-        var pw_bro =
-            this.panel_window
-                .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
-                .get(0);
-        if (pw_bro)
+        try
         {
-            var pw_doc = pw_bro.contentDocument;
-            this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
-                                        css: a_panel_state.css[a_browser_id],
-                                        dict: a_panel_state.dicts[a_browser_id]
-                                      }
-                              );
-        }
+            var pw_bro =
+                this.panel_window
+                    .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
+                    .get(0);
+            if (pw_bro)
+            {
+                var pw_doc = pw_bro.contentDocument;
+                this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
+                                            css: a_panel_state.css[a_browser_id],
+                                            dict: a_panel_state.dicts[a_browser_id]
+                                          }
+                                  );
+            }
+         } catch(a_e)
+         {
+            // if the window opens but isn't fully loaded yet, we may get
+            // an error trying to retrieve the browser document using the Alph.$ call
+         }
     }
 };
 

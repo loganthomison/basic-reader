@@ -51,6 +51,9 @@ Alph.interactive = {
             // don't do anything if the interactive features aren't enabled
             return;
         }
+
+        // hide the popup
+        Alph.$("#alph-window",a_topdoc).css("display","none");
         
         var lang_tool = Alph.main.getLanguageTool();
         var str = Alph.$("#alpheios-strings").get(0)
@@ -101,8 +104,6 @@ Alph.interactive = {
 
           params
         );
-        // hide the popup
-        Alph.$("#alph-window",a_topdoc).css("display","none");
      },
      
      

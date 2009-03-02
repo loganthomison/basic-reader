@@ -1035,31 +1035,26 @@ Alph.main =
         
         this.getLanguageTool().handleConversion(target);
         Alph.main.panels['alph-morph-panel'].open();
+        var doc_array = [];
+        Alph.$(".alph-lexicon-output").each(
+            function() 
+            {
+                var doc = Alph.$(this).get(0).contentDocument
+                Alph.main.getLanguageTool().addStyleSheet(doc);
+                Alph.$("#alph-window",doc).css("display","block");
+                doc_array.push(doc);
+            }
+        );
         
         this.getLanguageTool().lexiconLookup(
             target,
             function(data)
             {
-                Alph.$(".alph-lexicon-output").each(
-                    function() 
-                    {
-                        var doc = Alph.$(this).get(0).contentDocument
-                        Alph.$("#alph-window",doc).css("display","block");
-                        Alph.xlate.showTranslation(data,target,doc);
-                    }
-                );
-                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+                Alph.xlate.showTranslation(data,target,doc_array);
             },
             function(a_msg)
             {   
-                Alph.$(".alph-lexicon-output").each(
-                    function() 
-                    {
-                        var doc = Alph.$(this).get(0).contentDocument
-                        Alph.xlate.translationError(a_msg,doc);
-                    }
-                );
-                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+                Alph.xlate.translationError(a_msg,doc_array);
             }
         );
     },
