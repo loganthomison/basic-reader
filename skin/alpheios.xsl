@@ -318,10 +318,10 @@
             </xsl:if>
             
             <!-- process other case list -->
-            <xsl:if test="count($inflections[count(current()/num)=0]/case)">
+            <xsl:if test="count($inflections[not(num)]/case)">
               <div class="alph-infl">
                 <xsl:text>Case: </xsl:text>
-                <xsl:for-each select="$inflections[count(current()/num)=0]/case">
+                <xsl:for-each select="$inflections[not(num)]/case">
                   <xsl:sort select="./@order" data-type="number"
                     order="descending"/>
                   <xsl:apply-templates select="."/>

@@ -374,6 +374,12 @@ Alph.xlate = {
                     error: function(req,textStatus,errorThrown)
                     {
                         Alph.util.log("Error disambiguating morphology: " + textStatus||errorThrown);
+                        a_doc_array.forEach(
+                            function(a_doc)
+                            {
+                                Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                            }
+                        );
                     },
                     success: function(data, textStatus) 
                     {
@@ -403,12 +409,19 @@ Alph.xlate = {
         a_topdoc = a_doc_array[0];
 
         var wordHTML = Alph.xlate.transform(a_xml);
-        // don't display an empty popup
+        // just quietly display the morpheus output if the treebank query
+        // returned an error or without any data
         if (   (wordHTML == '')
             || (   (Alph.$(".alph-entry",wordHTML).size() == 0)
                 && (Alph.$(".alph-unknown",wordHTML).size() == 0)
                 && (Alph.$(".alph-error",wordHTML).size() == 0)))
         {
+            a_doc_array.forEach(
+                function(a_doc)
+                {
+                    Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                }
+            );
             Alph.util.log("No treebank entries to display.");
         }
         else
