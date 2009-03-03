@@ -53,113 +53,132 @@ Alph.Tree.prototype.show = function()
     var panel_obj = this;
     var bro = Alph.main.getCurrentBrowser();
     var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    
     // clear out the prior tree
     Alph.$("#dependency-tree", treeDoc).empty();
-    var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
-    if (sentence.length == 0)
+    
+    var svgDefault =  
+        '<svg xmlns="http://www.w3.org/2000/svg">' +
+        '<g><text class="error">' +
+        '<ERROR>' +
+        '</text></g>' +
+        '</svg>';
+        
+    var treebankUrl = 
+        Alph.$("#alpheios-treebank-diagram-url",bro.contentDocument).attr("content");
+
+    var sentence;
+    var word;
+    if (! treebankUrl)
+    {
+        panel_obj.parse_tree((new DOMParser()).parseFromString( 
+            svgDefault.replace(
+                /<ERROR>/,
+                Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
+            ), "text/xml"
+        ));
+    }
+    else if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
     {
         // Just add the default message to the display
-        var svgXML = (new DOMParser()).parseFromString(
-            '<svg xmlns="http://www.w3.org/2000/svg">' +
-            '<g><text class="error">' +
-            "No dependency tree information available for this text." +
-            "</text></g>" +
-            "</svg>",
-            "text/xml");
-        try 
-        {
-            Alph.$("#dependency-tree", treeDoc).
-                            append(svgXML.firstChild.childNodes);
-            svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
-            position(svgXML.getElementsByTagName('g').item(0),
-                true,
-                marginLeft,
-                marginTop + fontSize,
-                0);
-            svgXML.setAttribute("width", returned[2]);
-            svgXML.setAttribute("height", returned[3]);
-        }
-        catch(e)
-        {
-            Alph.util.log(e);
-        }
+        panel_obj.parse_tree((new DOMParser()).parseFromString( 
+            svgDefault.replace(
+                /<ERROR>/,
+                Alph.$("#alpheios-strings").get(0).getString("alph-info-tree-select")
+            ), "text/xml"
+        ));
     }
     else
     {
-        var treebankDoc = document.implementation.createDocument("", "", null);
-        treebankDoc.async = false;
-        treebankDoc.load("chrome://alpheios-greek/content/testtree.xml");
-
-        var xsltProc = new XSLTProcessor();
-        try
+        try 
         {
-            var xsltDoc = document.implementation.createDocument("", "", null);
-            xsltDoc.async = false;
-            xsltDoc.load("chrome://alpheios/skin/aldt2svg.xsl");
-            xsltProc.importStylesheet(xsltDoc);
-        }
-        catch (e)
-        {
-            Alph.util.log(e);
-        }
-
-        
-        Alph.$(sentence).each
-        (
-            function(a_i)
+            var last_elem = Alph.main.get_state_obj(bro).get_var("lastElem");
+            var tbref = Alph.$(last_elem).attr("tbref");
+            // if the selected element doesn't have a tbref attribute, 
+            // look for the first parent element that does
+            if (! tbref)
             {
-                try
-                {
-                    var sentenceId = "#" + Alph.$(this).attr("id");
-                    var aldtXML = Alph.$(sentenceId,treebankDoc).get(0);
-                    var xmlSerializer = new XMLSerializer();
-                    var svgXML;
-
-                    // if no treebank data found, use error message
-                    if (aldtXML == null)
-                    {
-                        svgXML = (new DOMParser()).parseFromString(
-                            '<svg xmlns="http://www.w3.org/2000/svg">' +
-                              '<g><text class="error">' +
-                                "No dependency tree information available for this text." +
-                              "</text></g>" +
-                            "</svg>",
-                            "text/xml");
-                    }
-                    // if treebank data found, transform it to SVG
-                    else
-                    {
-//                      Alph.util.log("ALDT: " +
-//                                    xmlSerializer.serializeToString(aldtXML));
-                        svgXML = xsltProc.transformToDocument(aldtXML);
-                    }
-
-                    // insert new SVG in tree, then retrieve it
-                    // (text width computation doesn't work without
-                    // this before calling position())
-                    Alph.$("#dependency-tree", treeDoc).
-                            append(svgXML.firstChild.childNodes);
-                    svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
-
-//                  Alph.util.log("SVG before: " +
-//                                xmlSerializer.serializeToString(svgXML));
-                    var returned =
-                            position(svgXML.getElementsByTagName('g').item(0),
-                                     true,
-                                     marginLeft,
-                                     marginTop + fontSize,
-                                     0);
-                    svgXML.setAttribute("width", returned[2]);
-                    svgXML.setAttribute("height", returned[3]);
-                    Alph.util.log("SVG: " +
-                                  xmlSerializer.serializeToString(svgXML));
-                }
-                catch (e)
-                {
-                    Alph.util.log(e);
-                }
+                tbref = Alph.$(last_elem).attr("tbref");
             }
-        );
+            var parts = tbref.split(/-/);
+            sentence = parts[0];
+            word = parts[1];
+        }
+        catch(a_e)
+        {
+            Alph.util.log("Error identifying sentence and id: " + a_e);
+        }
+    
+        //var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
+        //var sentence  = Alph.$(".l",bro.contentDocument);
+        if (! sentence )
+        {
+            // Just add the default message to the display
+            panel_obj.parse_tree((new DOMParser()).parseFromString( 
+                svgDefault.replace(
+                    /<ERROR>/,
+                    Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
+                ), "text/xml"
+            ));
+        }
+        else
+        {
+                
+            treebankUrl = treebankUrl.replace(/SENTENCE/, sentence);
+            treebankUrl = treebankUrl.replace(/WORD/, word);
+            Alph.$.ajax(
+                {
+                    type: "GET",
+                    url: treebankUrl,
+                    timeout: Alph.util.getPref("url.treebank.timeout") || 5000,
+                    dataType: 'xml',
+                    error: function(req,textStatus,errorThrown)
+                    {
+                        var data = (new DOMParser()).parseFromString( 
+                            svgDefault.replace(
+                            /<ERROR>/,
+                            Alph.$("#alpheios-strings")
+                                .get(0).getString("alph-error-tree-notree")
+                            ), "text/xml"
+                        );
+                        Alph.util.log("Error retrieving treebank diagram: "
+                            + textStatus ||errorThrown);
+                        panel_obj.parse_tree(data);
+                    },
+                    success: function(data, textStatus) 
+                    {
+                        panel_obj.parse_tree(data);
+                    }
+                }
+            );
+        }
+    }  
+    return Alph.Panel.STATUS_SHOW;
+    
+};
+
+Alph.Tree.prototype.parse_tree = function(a_svgXML)
+{
+    var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    try 
+    {
+        Alph.$("#dependency-tree", treeDoc).
+            append(a_svgXML.firstChild.childNodes);
+        var svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
+        var returned = position(svgXML.getElementsByTagName('g').item(0),
+            true,
+            marginLeft,
+            marginTop + fontSize,
+            0);
+        svgXML.setAttribute("width", returned[2]);
+        svgXML.setAttribute("height", returned[3]);
+        //Alph.util.log("SVG: " +
+        //    xmlSerializer.serializeToString(svgXML));
+         
+    }
+    catch(e)
+    {
+        Alph.util.log(e);
     }
     
     // make sure to update the detached window document too...
@@ -176,10 +195,8 @@ Alph.Tree.prototype.show = function()
         Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
         this.panel_window.focus();
     }
-    
-    return Alph.Panel.STATUS_SHOW;
-    
-};
+
+}
 
 /**
  * Tree panel specific implementation of

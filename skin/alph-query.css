@@ -30,8 +30,8 @@ body {
 }
 
 .alph-query-infl {
-    clear: both;
-    margin-top: 2em;
+    float: left;
+    width: 40%;
 }
 
 .answer {

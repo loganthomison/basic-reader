@@ -22,16 +22,18 @@
         <command id="alpheios-tree-toggle-cmd" 
              oncommand="document.getElementById('alph-tree-panel').toggle();"
              observes="alph-tree-status" />
+        <command id="alpheios-tree-open-cmd" 
+             oncommand="Alph.main.panels['alph-tree-panel'].open();"
+             observes="alph-tree-status" />
     </commandset>
              
     <!-- overlay the alpheios toolbar-->
       <toolbar id="alpheios-toolbar"> 
         <toolbarbutton
             id="alpheios-tree-toggle"
-            type="checkbox"
             label="&alpheios-tools-tree-label;"
             insertafter="alpheios-trans-button"
-            command="alpheios-tree-toggle-cmd"
+            command="alpheios-tree-open-cmd"
             tooltiptext="&alpheios-tools-tree-tooltip;"
             class="menuitem-iconic" />
       </toolbar>

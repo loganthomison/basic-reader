@@ -30,6 +30,16 @@ Alph.interactive = {
 
 
     /**
+     * Check to see if the query window is currently visible
+     */
+    query_visible: function(a_bro)
+    {
+        var query_win =
+            Alph.main.get_state_obj(a_bro).get_var("windows")['alph-query-window'];
+        return (query_win != null && ! query_win.closed);
+    },
+    
+    /**
      * Check to see if interactive features are enabled
      * @return true if the current level is Alph.main.levels.LEARNER, otherwise false
      * @type boolean

@@ -103,6 +103,7 @@ Alph_Inter =
             '    <div class="alph-query-header">' +
                this.main_str.getString("alph-query-infl") +
             '    </div>\n' +
+            '    <div class="answer"/>' +
             '  </div>\n' +
             '</div>';
         $("#alph-panel-body-template",query_doc).after(query_html);
@@ -387,7 +388,7 @@ Alph_Inter =
         // need to handle the case where more the one possible answer exists
         // for other uses
         Alph_Inter.query_template.make_infl_query(
-                $(".alph-query-infl",parent_doc),
+                $(".alph-query-element",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
                    attributes: context_list[0]

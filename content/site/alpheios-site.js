@@ -93,8 +93,8 @@ Alph.site = {
         );
         Alph.$(".alpheios-toolbar-tree",toolbars).bind(
             'click',
-            {alpheios_panel_id: 'alph-tree-panel'},
-            this.toggle_panel_handler
+            {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
+            this.do_command_handler
         );
         Alph.$(".alpheios-toolbar-options",toolbars).bind(
             'click',
