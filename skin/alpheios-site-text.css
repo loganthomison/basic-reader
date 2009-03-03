@@ -67,3 +67,18 @@
     background-color: white !important;
     font-size: small;
 }
+
+.linenum {
+    float: right;
+    vertical-align: top;
+    margin-right: 1em;
+    font-size: small;
+}
+
+.para {
+    margin-top: 1em;
+}
+
+.milestone.line {
+    margin-top: 1em;
+}
