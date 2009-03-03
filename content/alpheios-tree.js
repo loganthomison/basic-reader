@@ -98,7 +98,7 @@ Alph.Tree.prototype.show = function()
             // look for the first parent element that does
             if (! tbref)
             {
-                tbref = Alph.$(last_elem).attr("tbref");
+                tbref = Alph.$(last_elem).parents('[tbref]').attr("tbref");
             }
             var parts = tbref.split(/-/);
             sentence = parts[0];
