@@ -162,6 +162,9 @@ Alph.interactive = {
         // event handler so 'this' is the element that was clicked on or selected
         var selection = this;
         
+        // make each word in the alignment only selectable once
+        Alph.$(selection).unbind('click',Alph.interactive.checkAlignedSelect);
+        
         var params = a_event.data;
         
         var selected_id = Alph.$(selection).attr("id");
