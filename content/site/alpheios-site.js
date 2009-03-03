@@ -50,22 +50,26 @@ Alph.site = {
             Alph.$("head",a_doc).append(css);
         }
         
+        // unless interactivity is enabled,
         // add the mouseover handlers for the parallel alignment
-        Alph.$(".alpheios-aligned-word",a_doc).mouseover(  
-            function(e) { Alph.site.toggle_alignment(e,this,a_type)}
-        );
-        
-        Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
-            function(e) { Alph.site.toggle_alignment(e,this,a_type) }
-        );
-        
-
-        
-        if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
+        // and the interlinear alignment toggle
+        if (! Alph.interactive.enabled())
         {
-            this.enable_toolbar(a_doc);
-            this.add_interlinear_toggle(a_doc);
+            Alph.$(".alpheios-aligned-word",a_doc).mouseover(  
+                function(e) { Alph.site.toggle_alignment(e,this,a_type,true)}
+            );
+            
+            Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
+                function(e) { Alph.site.toggle_alignment(e,this,a_type,false) }
+            );
+            if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
+            {
+                this.add_interlinear_toggle(a_doc);
+            }
         }
+        this.enable_toolbar(a_doc);
+        
+        
     },
     
     /**
@@ -304,16 +308,25 @@ Alph.site = {
      * @param {String} type of target text 
      *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
      *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
+     * @param {Boolean} a_on is the element toggling on (true) or off (false)
      */
-    toggle_alignment: function(a_event,a_elem,a_type)
+    toggle_alignment: function(a_event,a_elem,a_type,a_on)
     {
         // toggle the selector class for the source text
-        Alph.$(a_elem).toggleClass('alpheios-highlight-source');
+        if (a_on)
+        {
+            Alph.$(a_elem).addClass('alpheios-highlight-source');    
+        }
+        else
+        {
+            Alph.$(a_elem).removeClass('alpheios-highlight-source');
+        }
+        
         
         // toggle the selection of the parallel aligned text
         try {
             var panel_obj = Alph.main.panels['alph-trans-panel'];
-            panel_obj.toggle_parallel_alignment(a_elem,a_type);
+            panel_obj.toggle_parallel_alignment(a_elem,a_type,a_on);
         }
         catch(a_e)
         {

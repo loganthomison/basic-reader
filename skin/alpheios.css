@@ -61,6 +61,44 @@
     white-space: nowrap;
 }
 
+#alph-window.alpheios-inline-query * {
+    display: none;
+}
+
+#alph-window.alpheios-inline-query #alph-text {
+   display: block;
+}
+
+#alph-window.alpheios-inline-query #alph-text #alph-inline-query-instruct {
+    display: block; 
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#alph-window.alpheios-inline-query #alph-text #alph-inline-query-instruct span {
+    display: inline;
+}
+
+#alph-window.alpheios-inline-query #alph-text .alph-align-answer {
+    display: block;
+}
+
+#alph-window.alpheios-inline-query #alph-text .alph-align-answer span {
+    display: inline;
+}
+
+.alph-align-answer span {
+    padding-right: .5em;
+}
+
+.alph-inline-query-heading {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.alph-inline-query-word {
+    font-weight: bold;
+}
+
 /* XML Markup */
 #alph-text {
     font-size: 1em;

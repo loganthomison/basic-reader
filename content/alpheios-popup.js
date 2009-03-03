@@ -393,7 +393,7 @@ Alph.xlate = {
             );
         }
         Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
-        Alph.interactive.openQueryDisplay(a_topdoc);
+        Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
     },  
     /**
      * Update the results of the lexicon lookup in the popup.
@@ -546,9 +546,6 @@ Alph.xlate = {
             
             Alph.$("body",topdoc).append(popup);
         
-            // add the element to the alpheios state object in the browser,
-            // so that it can be accessed to remove the popup later
-            alph_state.set_var("lastElem",a_elem);
             
             // add a close link if the popup is activated by a double-click
             // instead of mouseover
@@ -567,13 +564,17 @@ Alph.xlate = {
                     }
                 );
             }
-            
+                
             var anchor = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                                  "a");
             anchor.setAttribute("name","alph-window-anchor");
             anchor.setAttribute("id","alph-window-anchor");
             popup.appendChild(anchor);
         }
+
+        // add the element to the alpheios state object in the browser,
+        // so that it can be accessed to remove the popup later
+        alph_state.set_var("lastElem",a_elem);
 
         popup.style.width = "auto";
         popup.style.height = "auto";

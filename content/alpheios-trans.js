@@ -219,72 +219,64 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
  * @param {String} a_type type of text being toggled 
  *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
  *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
+ * @param {Boolean} a_on is the text toggled on or off (true for on, false for off)
  */
-Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type)
+Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_on)
 {
     
-    // the source text element uses the "nrefs" attribute to identify the
-    // corresponding element(s) in the parallel aligned translation
+    var parallel_doc;
     if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
     {
-        var trans_doc = 
+        parallel_doc = 
             Alph.$("browser",this.panel_elem).get(0).contentDocument;
-
-        if (Alph.$(a_elem).attr("ref"))
-        {     
-            var ids = Alph.$(a_elem).attr("ref").split(/\s|,/);
-            for (var i=0; i<ids.length; i++) {
-                Alph.$('.alph-proto-word[id="' + ids[i] + '"]',trans_doc)
-                    .toggleClass("alph-highlight-parallel");    
-            }
+    }
+    else
+    {
+        parallel_doc = Alph.main.getCurrentBrowser().contentDocument;
+    }
+    // the original prototype text element used the "ref" attribute to identify the
+    // corresponding element(s) in the parallel aligned translation
+    if (Alph.$(a_elem).attr("ref"))
+    {     
+        var ids = Alph.$(a_elem).attr("ref").split(/\s|,/);
+        for (var i=0; i<ids.length; i++) {
+            Alph.$('.alph-proto-word[id="' + ids[i] + '"]',parallel_doc)
+                .toggleClass("alph-highlight-parallel");    
         }
-        else if (Alph.$(a_elem).attr("nrefs"))
-        {     
-            var ids = Alph.$(a_elem).attr("nrefs").split(/\s|,/);
-            for (var i=0; i<ids.length; i++) {
-                Alph.$('.alpheios-aligned-word[id="' + ids[i] + '"]',trans_doc)
-                    .toggleClass("alpheios-highlight-parallel");    
+    }
+    // the source text element uses the "nrefs" attribute to identify the
+    // corresponding element(s) in the parallel aligned translation
+    else if (Alph.$(a_elem).attr("nrefs"))
+    {     
+        var ids = Alph.$(a_elem).attr("nrefs").split(/\s|,/);
+        for (var i=0; i<ids.length; i++) {
+            if (a_on)
+            {
+                Alph.$('.alpheios-aligned-word[id="' + ids[i] + '"]',parallel_doc)
+                    .addClass("alpheios-highlight-parallel");
+            }
+            else
+            {
+                Alph.$('.alpheios-aligned-word[id="' + ids[i] + '"]',parallel_doc)
+                    .removeClass("alpheios-highlight-parallel");
             }
         }
     }
-    // if the user is mousing over the the parallel aligned translation
-    // use the id attribute to find out which elements in the source
-    // text refer to the selected word
-    else if (a_type == Alph.Translation.INTERLINEAR_TARGET_TRANS
-             && Alph.$(a_elem).attr("id")) 
-    {
-        var parent_doc = Alph.main.getCurrentBrowser().contentDocument;
-        var match_id = Alph.$(a_elem).attr("id");
-        // find the aligned words in the parallel text
-        Alph.$('.alph-proto-word[ref~="' + match_id + '"]',parent_doc).each(
-            function()
-            {
-                var ids = Alph.$(this).attr("ref").split(/\s|,/);
-                for (var i=0; i<ids.length; i++) {
-                   if (ids[i] == match_id)
-                   {
-                        Alph.$(this).toggleClass("alph-highlight-parallel");
-                        break;
-                   }
-               }
-            }
-        );             
+};
 
-        Alph.$('.alpheios-aligned-word[nrefs~="' + match_id + '"]',parent_doc).each(
-            function()
-            {
-                var ids = Alph.$(this).attr("nrefs").split(/\s|,/);
-                for (var i=0; i<ids.length; i++) {
-                   if (ids[i] == match_id)
-                   {
-                        Alph.$(this).toggleClass("alpheios-highlight-parallel");
-                        break;
-                   }
-               }
-            }
-        );             
-
-    }  
+/** 
+ * Adds a click event handler on the words in the translation panel
+ * to allow for interactive matching of source words to aligned words
+ * @param {object} a_params parameters object to be assigned to the event.data
+ *                          object by the event handler 
+ */
+Alph.Translation.prototype.enable_interactive_query = function(a_params)
+{
+    var trans_doc = 
+            Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    Alph.$('.alpheios-aligned-word',trans_doc).unbind('click',Alph.interactive.checkAlignedSelect);
+    Alph.$('.alpheios-aligned-word',trans_doc)
+        .bind('click',a_params,Alph.interactive.checkAlignedSelect);            
 };
 
 /**

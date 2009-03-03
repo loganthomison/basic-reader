@@ -48,3 +48,22 @@
     margin-bottom: 2em;
 }
 
+.upLink {
+    display: none;
+
+}
+
+.alpheios-next-prev a {
+    padding-left: .25em;
+    padding-right: .25em;
+
+}
+
+.stdfooter hr {
+    display: none;
+}
+
+.rights_info {
+    background-color: white !important;
+    font-size: small;
+}

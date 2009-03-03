@@ -44,69 +44,171 @@ Alph.interactive = {
       * Opens a new window with the query display 
       * @param {Document} a_topdoc the contentDocument which contains the popup
       */
-     openQueryDisplay: function(a_topdoc)
+     openQueryDisplay: function(a_topdoc,a_target)
      {
         if (! this.enabled())
         {
             // don't do anything if the interactive features aren't enabled
             return;
         }
-
-        // hide the popup
-        Alph.$("#alph-window",a_topdoc).css("display","none");
         
         var lang_tool = Alph.main.getLanguageTool();
         var str = Alph.$("#alpheios-strings").get(0)
         
+        var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');
+        if (source_align)
+        {
+            source_align = source_align.split(/\s|,/);
+        }
         var params =
         {
-            type: 'full_query',
             lang_tool: lang_tool,
             main_str: str,
             source_node: Alph.$(".alph-word",a_topdoc).get(0),
+            source_align: source_align || [],
             transform: Alph.xlate.transform,
 
         }
+        // if the translation panel is open, offer interactive identification
+        // of definitions
+        if (Alph.main.panels['alph-trans-panel'].is_visible_inline())
+        {
+            var selected_word = Alph.$(".alph-word",a_topdoc).attr("context");
+            var src_lang = lang_tool.source_language; 
+            Alph.$("#alph-window",a_topdoc).addClass("alpheios-inline-query");
+            Alph.$("#alph-window #alph-text",a_topdoc).append(
+                '<div id="alph-inline-query-instruct">' +
+                '<span class="alph-inline-query-word ' + src_lang + '">' 
+                + selected_word + ': </span>' +
+                str.getString("alph-inline-query-instruct") +
+                '</div>' +
+                '<div id="alph-inline-query-correct">'+
+                '<span class="alph-inline-query-heading">' +
+                str.getString("alph-inline-query-correct") +
+                '</span>' +
+                '</div>' +
+                '<div id="alph-inline-query-incorrect">'+
+                '<span class="alph-inline-query-heading">' +
+                str.getString("alph-inline-query-incorrect") +
+                '</span>' +
+                '</div>'
+            );
 
-        var sentence = 
-            Alph.$.map(
-                Alph.$('.alpheios-aligned-word',a_topdoc),
-                function(a) { return Alph.$(a).text() })
-            .join(' ');
-        Alph.util.log("Sentence: " + sentence);
-
-        params.sentence = sentence;
-        
-        Alph.util.log("Sentence: " + params.sentence);
-
-        params.target= new Alph.SourceSelection();
-        params.target.setWord(sentence);
-        params.target.setWordStart(0);
-        params.target.setWordEnd(sentence.length -1);
-        params.target.setContext(sentence);
-        params.target.setContextPos(0);
-        lang_tool.handleConversion(params.target);
-
-        Alph.util.log("Target: " + params.target.getWord());
-        
-        var query_win = 
-          Alph.xlate.openSecondaryWindow(
-          "alph-query-window",
-          "chrome://alpheios/content/query/alpheios-query.xul",
-          {
-            chrome: "yes",
-            dialog: "no",
-            resizable: "yes",
-            width: "1024",
-            height: "800",
-            scrollbars: "yes"
-          },
-
-          params
-        );
+            params.type = 'infl_query';
+            params.aligned_ids = [];
+            params.aligned_defs = [];
+            Alph.main.panels['alph-trans-panel'].enable_interactive_query(params);
+            
+        }
+        else
+        {
+            // hide the popup
+            Alph.$("#alph-window",a_topdoc).css("display","none");
+            params.type = 'full_query';
+                
+            var sentence = 
+                Alph.$.map(
+                    Alph.$('.alpheios-aligned-word',a_topdoc),
+                    function(a) { return Alph.$(a).text() })
+                .join(' ');
+            Alph.util.log("Sentence: " + sentence);
+    
+            params.sentence = sentence;
+            
+            Alph.util.log("Sentence: " + params.sentence);
+    
+            params.target= new Alph.SourceSelection();
+            params.target.setWord(sentence);
+            params.target.setWordStart(0);
+            params.target.setWordEnd(sentence.length -1);
+            params.target.setContext(sentence);
+            params.target.setContextPos(0);
+            lang_tool.handleConversion(params.target);
+    
+            Alph.util.log("Target: " + params.target.getWord());
+            this.openQueryWindow(params);
+        }
      },
      
      
+     /**
+      * open the query window
+      */
+     openQueryWindow: function(a_params)
+     {
+        var features =
+            {
+                chrome: "yes",
+                dialog: "no",
+                resizable: "yes",
+                width: "1024",
+                height: "800",
+                scrollbars: "yes"
+            };
+        var query_win = 
+              Alph.xlate.openSecondaryWindow(
+              "alph-query-window",
+              "chrome://alpheios/content/query/alpheios-query.xul",
+              features,  
+              a_params
+            );
+     },
+     
+     /**
+      * Response to a click on an aligned word
+      */
+     checkAlignedSelect: function(a_event)
+     {
+        // event handler so 'this' is the element that was clicked on or selected
+        var selection = this;
+        
+        var params = a_event.data;
+        
+        var selected_id = Alph.$(selection).attr("id");
+        
+        var matched = false;
+        params.source_align.forEach(
+            function(a_id)
+            {
+                if (selected_id == a_id)
+                {
+                    params.aligned_ids.push(selected_id);
+                    params.aligned_defs.push(Alph.$(selection).text());
+                    matched = true;
+                }
+            }
+        );
+     
+        if (! matched)
+        {
+            //alert("Try again");
+        }
+        else if (params.aligned_ids.length < params.source_align.length)
+        {
+            //alert("Correct, but more selections are needed");
+        }
+        
+        if (params.aligned_ids.length == params.source_align.length)
+        {
+            Alph.$("#alph-window",a_topdoc).css("display","none");
+            Alph.interactive.openQueryWindow(params);
+        }
+        else
+        {
+            if (matched)
+            {
+                Alph.$("#alph-inline-query-correct",params.source_node.ownerDocument)
+                    .append('<span>' + Alph.$(selection).text() + '</span>')
+                    .addClass("alph-align-answer");
+            }
+            else
+            {
+                Alph.$("#alph-inline-query-incorrect",params.source_node.ownerDocument)
+                    .append('<span>' + Alph.$(selection).text() + '</span>')
+                    .addClass("alph-align-answer");
+            }
+        }
+     },
      /**
       * Responds to a click on the link to identify the inflection. Opens the inflection
       * table window in query mode.

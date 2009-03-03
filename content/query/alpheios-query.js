@@ -57,40 +57,89 @@ Alph_Inter =
           .loadSubScript(template_src,this.query_template);
 
         this.main_str = params.main_str;
+        this.load_query_head(params);
         
         if (params.type == 'full_query')
         {
-            this.load_full_query(params);
+            this.do_full_query(params);
+        }
+        else if (params.type == 'infl_query')
+        {
+            this.do_infl_query(params);
         }
      },
-     
-     
-     load_full_query: function(a_params)
+
+     load_query_head: function(a_params)
      {
         var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
 
         var lang_css_url =  
             "chrome://"
-                + a_params.lang_tool.getchromepkg()
-                + "/content/query/template.css";
+            + a_params.lang_tool.getchromepkg()
+            + "/content/query/template.css";
 
         $("head",query_doc).append(
             '<link type="text/css" rel="stylesheet" href="chrome://alpheios/skin/alpheios.css"/>' +
             '<link type="text/css" rel="stylesheet" href="chrome://alpheios/skin/alph-query.css"/>' +
             '<link type="text/css" rel="stylesheet" href="' + lang_css_url + '"/>'            
         );
+        
+        var src_context = $(a_params.source_node).attr('context');
+        var query_html = 
+            '<div class="alph-query-context">' + src_context + '</div>' +
+            '<div class="alph-query-element">' +
+            '  <div class="alph-query-pofs">\n' +
+            '    <div class="alph-query-header">' +
+                this.main_str.getString("alph-query-pofs") +
+            '    </div>\n' +
+            '  </div>\n' +
+            '  <div class="alph-query-defs" style="display:none;">' +
+            '    <div class="alph-query-header">' +
+               this.main_str.getString("alph-query-defs") +
+            '    </div>\n' +
+            '  </div>\n' +
+            '<div class="alph-query-infl" style="display:none;">' +
+            '    <div class="alph-query-header">' +
+               this.main_str.getString("alph-query-infl") +
+            '    </div>\n' +
+            '  </div>\n' +
+            '</div>';
+        $("#alph-panel-body-template",query_doc).after(query_html);
+        $("#alph-panel-body-template",query_doc).css('display','none');
+     },
+     
+     do_infl_query: function(a_params)
+     {
+
+        var query_doc = 
+            $("#alph-query-frame").get(0).contentDocument;
+
+        var valid_pofs = $('.alph-pofs',a_params.source_node).attr('context');
+        
+        $('.alph-query-pofs',query_doc)
+                    .append('<div class="answer">' + valid_pofs + '</div>');
+        
+        $('.alph-query-defs',query_doc)
+            .append('<div class="answer">' 
+                + a_params.aligned_defs.join(' ')
+                + '</div>').css('display','block');
+        
+        $('.alph-query-infl',query_doc).css('display','block');
+        
+        this.load_query_infl(a_params.source_node);        
+     },
+     
+     do_full_query: function(a_params)
+     {
+        var query_doc = 
+            $("#alph-query-frame").get(0).contentDocument;
 
         var pofs_list = a_params.lang_tool.getpofs();
         
         var valid_pofs = $('.alph-pofs',a_params.source_node).attr('context');
-
-        
+   
         var select_pofs =
-            "<div class='alph-query-pofs'>" + 
-            "<div class='alph-query-header'>" +
-            this.main_str.getString("alph-query-pofs") +
-            "</div>" +
             "<select class='alph-select-pofs'>" + 
             '<option value="">---</option>';
             
@@ -105,37 +154,8 @@ Alph_Inter =
                     + "</option>";
             }
         );
-        select_pofs = select_pofs + '</select></div>';
-        var select_defs = 
-            '<div class="alph-query-defs" style="display:none;">\n' +
-            "<div class='alph-query-header'>\n" +
-            this.main_str.getString('alph-query-defs') +
-            '</div>\n<div class="loading">' +
-            this.main_str.getString('alph-loading-misc') +
-            '</div>\n' +
-            '<select class="alph-defs-select">\n' +
-            '<option value="">---</option>\n' + 
-            '</select>\n</div>\n';
-
-        var select_infl = 
-            '<div class="alph-query-infl" style="display:none;">\n' +
-                "<div class='alph-query-header'>\n" +
-                this.main_str.getString('alph-query-infl') +
-                '</div>\n<div class="answer"/></div>\n';
-            
-        var src_context = $(a_params.source_node).attr('context');
-        var query = 
-            '<div class="alph-query-context">' + src_context + '</div>' +
-            '<div class="alph-query-element">' + 
-            select_pofs +
-            select_defs +
-            '<br clear="all"/>' + 
-            select_infl
-            '<br clear="all"/>'
-            '</div>';
-
-        $("#alph-panel-body-template",query_doc).after(query);
-        $("#alph-panel-body-template",query_doc).css('display','none');
+        select_pofs = select_pofs + '</select>';
+        $('.alph-query-pofs',query_doc).append(select_pofs);
         $(".alph-select-pofs",query_doc).change(
             function(e)
             {
@@ -143,7 +163,16 @@ Alph_Inter =
                 return true;
             }
         );
-       
+        
+        var select_defs = 
+            '<div class="loading">' +
+            this.main_str.getString('alph-loading-misc') +
+            '</div>\n' +
+            '<select class="alph-defs-select">\n' +
+            '<option value="">---</option>\n' + 
+            '</select>\n';
+
+        $('.alph-query-defs',query_doc).append(select_defs);       
         $(".alph-defs-select",query_doc).change(
             function(e)
             {
@@ -151,11 +180,8 @@ Alph_Inter =
                 return true;
             }
         );
-
         
-
         this.load_query_short_defs(a_params, valid_pofs);
-
     },
     
     /**
@@ -393,4 +419,4 @@ Alph_Inter =
             .text(a_answer_string);
      
     }
-};
+}
