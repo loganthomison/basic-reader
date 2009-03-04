@@ -203,7 +203,7 @@ Alph.interactive = {
         
         if (params.aligned_ids.length == params.source_align.length)
         {
-            Alph.$("#alph-window",a_topdoc).css("display","none");
+            Alph.$("#alph-window",params.source_node.ownerDocument).css("display","none");
             Alph.interactive.openQueryWindow(params);
         }
         else
