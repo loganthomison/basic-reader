@@ -28,6 +28,10 @@
     font-weight:bold;
 }
 
+.alpheios-aligned-word {
+    cursor: pointer;
+}
+
 .alpheios-aligned-trans {
     color: blue;
     font-size: 80%;
@@ -53,6 +57,9 @@
 
 }
 
+.alpheios-inline-query-select {
+    cursor: pointer;
+}
 .alpheios-next-prev a {
     padding-left: .25em;
     padding-right: .25em;

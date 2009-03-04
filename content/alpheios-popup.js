@@ -235,7 +235,7 @@ Alph.xlate = {
         //}
         
         // the first document in the array is the main one
-        a_topdoc = a_doc_array[0];
+        var a_topdoc = a_doc_array[0];
 
         a_doc_array.forEach(
            function(a_doc)
@@ -268,7 +268,7 @@ Alph.xlate = {
         Alph.util.log("Query response:" + a_xml);
         
         // the first document in the array is the main one
-        a_topdoc = a_doc_array[0];
+        var a_topdoc = a_doc_array[0];
         
         var wordHTML = Alph.xlate.transform(a_xml);
         // don't display an empty popup
@@ -406,7 +406,7 @@ Alph.xlate = {
         Alph.util.log("Query response:" + a_xml);
         
         // the first document in the array is the main one
-        a_topdoc = a_doc_array[0];
+        var a_topdoc = a_doc_array[0];
 
         var wordHTML = Alph.xlate.transform(a_xml);
         // just quietly display the morpheus output if the treebank query
@@ -480,12 +480,12 @@ Alph.xlate = {
             }
             else
             {
-                Alph.$(".alph-word",new_text_node).get(0);
                 a_doc_array.forEach(
                     function(a_doc)
-                    {
-                     
+                    {                     
                         Alph.$("#alph-text",a_doc).prepend(Alph.$(new_text_node).clone());
+                        Alph.$(".alph-word=first",a_doc).removeClass("alph-word-first");
+                        Alph.$("div.alph-word:first",a_doc).addClass("alph-word-first");
                         Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
                     }
                 );
