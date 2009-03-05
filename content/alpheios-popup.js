@@ -363,7 +363,7 @@ Alph.xlate = {
         // disambiguate if treebank is available
         if (disambiguate)
         {
-            Alph.util.log("Disamibugating ..." + a_alphtarget.getTreebankQuery());
+            Alph.util.log("Disambiguating ..." + a_alphtarget.getTreebankQuery());
             // send asynchronous request to the lexicon service
             Alph.$.ajax(
                 {
