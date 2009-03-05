@@ -296,6 +296,8 @@ Alph_Inter =
                     
                     // TODO - unique isn't working here
                     var unique_words = $.unique(words);
+                    unique_words.sort( Alph_Inter.sort_random ); 
+                       
                     unique_words.forEach(
                         function(a_word)
                         {
@@ -419,5 +421,13 @@ Alph_Inter =
         $(".alph-query-infl .answer",parent_doc)
             .text(a_answer_string);
      
+    },
+    
+    /**
+     * random array sort function
+     */
+    sort_random: function(a,b)
+    {
+        return (Math.round(Math.random())-0.5);
     }
 }
