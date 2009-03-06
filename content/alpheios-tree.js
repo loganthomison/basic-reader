@@ -178,6 +178,24 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         highlight(treeDoc, a_id);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+                
+        // jQuery doesn't seem to support retrieving svg nodes by class
+        // or attribute, so just get by tag name and retrieve the attribute
+        // directly using the javascript getAttribute function to filter for
+        // the nodes we want
+        Alph.$("text",treeDoc).each(
+            function()
+            {
+                if (this.getAttribute('class') == 'text-word')
+                {
+                    var tbrefid = this.getAttribute('tbref');
+                    Alph.$(this).hover(
+                        function() { highlight(this.ownerDocument,tbrefid) },
+                        function() { highlight(this.ownerDocument,null) }
+                    );
+                }
+            }
+        );
     }
     catch(e)
     {
@@ -193,7 +211,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
             this.panel_window.Alph.$("#" + this.panel_id + " browser").get(0).contentDocument;
         var panel_tree = Alph.$("#dependency-tree", treeDoc);
         Alph.$("#dependency-tree", window_doc).empty();
-        Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone());
+        Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone(true));
         Alph.$("#dependency-tree", window_doc).attr("width",Alph.$(panel_tree).attr("width"));
         Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
         this.panel_window.focus();
