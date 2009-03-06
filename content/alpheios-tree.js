@@ -67,6 +67,7 @@ Alph.Tree.prototype.show = function()
     var treebankUrl = 
         Alph.$("#alpheios-treebank-diagram-url",bro.contentDocument).attr("content");
 
+    var tbref;
     var sentence;
     var word;
     if (! treebankUrl)
@@ -93,7 +94,7 @@ Alph.Tree.prototype.show = function()
         try 
         {
             var last_elem = Alph.main.get_state_obj(bro).get_var("lastElem");
-            var tbref = Alph.$(last_elem).attr("tbref");
+            tbref = Alph.$(last_elem).attr("tbref");
             // if the selected element doesn't have a tbref attribute, 
             // look for the first parent element that does
             if (! tbref)
@@ -123,7 +124,6 @@ Alph.Tree.prototype.show = function()
         }
         else
         {
-                
             treebankUrl = treebankUrl.replace(/SENTENCE/, sentence);
             treebankUrl = treebankUrl.replace(/WORD/, word);
             Alph.$.ajax(
@@ -147,7 +147,7 @@ Alph.Tree.prototype.show = function()
                     },
                     success: function(data, textStatus) 
                     {
-                        panel_obj.parse_tree(data);
+                        panel_obj.parse_tree(data, tbref);
                     }
                 }
             );
@@ -157,7 +157,7 @@ Alph.Tree.prototype.show = function()
     
 };
 
-Alph.Tree.prototype.parse_tree = function(a_svgXML)
+Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
 {
     var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
     try 
@@ -172,9 +172,9 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML)
             0);
         svgXML.setAttribute("width", returned[2]);
         svgXML.setAttribute("height", returned[3]);
-        //Alph.util.log("SVG: " +
-        //    xmlSerializer.serializeToString(svgXML));
-         
+//      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+        highlight(treeDoc, a_id);
+//      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
     }
     catch(e)
     {
@@ -198,6 +198,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML)
 
 }
 
+
 /**
  * Tree panel specific implementation of
  * {@link Alph.Panel#get_detach_chrome}
@@ -207,6 +208,60 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML)
 Alph.Tree.prototype.get_detach_chrome = function()
 {
     return 'chrome://alpheios/content/alpheios-tree-window.xul';
+}
+
+//
+// Function to highlight a word in the tree
+// Parameters:
+//   a_doc       the tree
+//   a_id        id of word in tree
+//
+//  The word and its surrounding lines and nodes
+//  are left with normal coloring.  The remainder
+//  of the tree is grayed out.
+//
+//  If no id or a bad id is specified, the entire tree is
+//  ungrayed.
+//
+function highlight(a_doc, a_id)
+{
+    // find node of interest
+    var focusNode = Alph.$("#" + a_id, a_doc);
+
+    // if no id or bad id
+    if (focusNode.size() == 0)
+    {
+        // display everything normally
+        Alph.$("text", a_doc).attr("showme", "normal");
+        Alph.$("line", a_doc).attr("showme", "normal");
+        Alph.$("rect", a_doc).attr("showme", "normal");
+        return;
+    }
+
+    // gray everything out
+    Alph.$("text", a_doc).attr("showme", "grayed");
+    Alph.$("line", a_doc).attr("showme", "grayed");
+    Alph.$("rect", a_doc).attr("showme", "grayed");
+
+    // display this node and things connected to it with focus:
+    //   text node itself
+    //   rectangle around node
+    //   label on line to parent
+    //   line to parent
+    //   labels on lines to dependent words (children of sibling groups)
+    //   lines to dependent words
+    //   label on parent word
+    focusNode.attr("showme", "focus");
+    focusNode.prevAll("rect").attr("showme", "focus");
+    focusNode.nextAll("text").attr("showme", "focus");
+    focusNode.nextAll("line").attr("showme", "focus");
+    focusNode.nextAll("g").children("text").
+              next("text").attr("showme", "focus");
+    focusNode.nextAll("g").children("line").attr("showme", "focus");
+    focusNode.nextAll("g").children("text").attr("showme", "focus");
+    focusNode.parent().parent().children("text").attr("showme", "focus");
+    focusNode.parent().parent().children("text").
+              next("text").attr("showme", "grayed");
 }
 
 /*
@@ -248,7 +303,9 @@ function position(a_containerNode,
     var children = Array();
     var nodeLabel;
     var nodeLabelWidth;
+    var textWidth;
     var nodeBranch;
+    var nodeBox;
     var lineLabel;
     var maxX = 0;
     var maxY = 0;
@@ -273,6 +330,7 @@ function position(a_containerNode,
                 !nodeLabel.firstChild.nodeValue ||
                 nodeLabel.firstChild.nodeValue.match(/^\s*$/))
             {
+                textWidth = 0;
                 nodeLabelWidth = wordSpacing;
                 isEmpty = true;
             }
@@ -280,6 +338,7 @@ function position(a_containerNode,
             {
                 nodeLabelWidth = wordSpacing +
                                  nodeLabel.getComputedTextLength();
+		textWidth = nodeLabelWidth;
                 isEmpty = false;
             }
             if (nodeLabelWidth < a_parentWidth)
@@ -289,6 +348,11 @@ function position(a_containerNode,
         else if (nodeName == "line")
         {
             nodeBranch = node;
+        }
+        // bounding rectangle
+        else if (nodeName == "rect")
+        {
+            nodeBox = node;
         }
         //children nodes
         else if (nodeName == "g")
@@ -334,6 +398,15 @@ function position(a_containerNode,
         thisX = a_shiftLeft + childrenWidth/2;
     nodeLabel.setAttribute('y', thisY + 'px');
     nodeLabel.setAttribute('x', thisX + 'px');
+
+    // position box around label
+    if (nodeBox)
+    {
+        nodeBox.setAttribute('x', (thisX - textWidth/2) + 'px');
+        nodeBox.setAttribute('y', (thisY - fontSize) + 'px');
+        nodeBox.setAttribute('width', textWidth + 'px');
+        nodeBox.setAttribute('height', (fontSize + branchPaddingTop) + 'px');
+    }
     thisY += (isEmpty ? -fontSize : branchPaddingTop);
 
     //connect branches from child labels to parent label
