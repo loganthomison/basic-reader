@@ -47,25 +47,25 @@ g text[pos=adverb] {
 g text[pos=article] {
     fill: skyblue;
 }
-g text[conjunction] {
+g text[pos=conjunction] {
     fill: deeppink;
 }
-g text[exclamation] {
+g text[pos=exclamation] {
     fill: gold;
 }
-g text[interjection] {
+g text[pos=interjection] {
     fill: gold;
 }
-g text[noun] {
+g text[pos=noun] {
     fill: black;
 }
-g text[preposition] {
+g text[pos=preposition] {
     fill: green;
 }
-g text[pronoun] {
+g text[pos=pronoun] {
     fill: purple;
 }
-g text[verb] {
+g text[pos=verb] {
     fill: red;
 }
 
