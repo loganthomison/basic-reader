@@ -14,8 +14,13 @@ g text.error {
     fill: black;
 }
 
-g text.line-label {
+g text.arc-label {
     font-size:15px;
+    fill: black;
+}
+
+g text.text-word {
+    text-anchor: start;
     fill: black;
 }
 
@@ -33,34 +38,34 @@ verb         red
 
 exclamation=interjection
 */
-g text.adjective {
+g text[pos=adjective] {
     fill: blue;
 }
-g text.adverb {
+g text[pos=adverb] {
     fill: darkorange;
 }
-g text.article {
+g text[pos=article] {
     fill: skyblue;
 }
-g text.conjunction {
+g text[conjunction] {
     fill: deeppink;
 }
-g text.exclamation {
+g text[exclamation] {
     fill: gold;
 }
-g text.interjection {
+g text[interjection] {
     fill: gold;
 }
-g text.noun {
+g text[noun] {
     fill: black;
 }
-g text.preposition {
+g text[preposition] {
     fill: green;
 }
-g text.pronoun {
+g text[pronoun] {
     fill: purple;
 }
-g text.verb {
+g text[verb] {
     fill: red;
 }
 

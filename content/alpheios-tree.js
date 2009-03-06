@@ -1,24 +1,24 @@
 /**
- * @fileoverview This file contains the Alph.Tree derivation of the Alph.Panel class. 
+ * @fileoverview This file contains the Alph.Tree derivation of the Alph.Panel class.
  * Representation of the Treeology panel.
- * 
+ *
  * @version $Id$
- * 
+ *
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
- * 
+ *
  * This file is part of Alpheios.
- * 
+ *
  * Alpheios is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Alpheios is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -53,18 +53,18 @@ Alph.Tree.prototype.show = function()
     var panel_obj = this;
     var bro = Alph.main.getCurrentBrowser();
     var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
-    
+
     // clear out the prior tree
     Alph.$("#dependency-tree", treeDoc).empty();
-    
-    var svgDefault =  
+
+    var svgDefault =
         '<svg xmlns="http://www.w3.org/2000/svg">' +
         '<g><text class="error">' +
         '<ERROR>' +
         '</text></g>' +
         '</svg>';
-        
-    var treebankUrl = 
+
+    var treebankUrl =
         Alph.$("#alpheios-treebank-diagram-url",bro.contentDocument).attr("content");
 
     var tbref;
@@ -72,7 +72,7 @@ Alph.Tree.prototype.show = function()
     var word;
     if (! treebankUrl)
     {
-        panel_obj.parse_tree((new DOMParser()).parseFromString( 
+        panel_obj.parse_tree((new DOMParser()).parseFromString(
             svgDefault.replace(
                 /<ERROR>/,
                 Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
@@ -82,7 +82,7 @@ Alph.Tree.prototype.show = function()
     else if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
     {
         // Just add the default message to the display
-        panel_obj.parse_tree((new DOMParser()).parseFromString( 
+        panel_obj.parse_tree((new DOMParser()).parseFromString(
             svgDefault.replace(
                 /<ERROR>/,
                 Alph.$("#alpheios-strings").get(0).getString("alph-info-tree-select")
@@ -91,11 +91,11 @@ Alph.Tree.prototype.show = function()
     }
     else
     {
-        try 
+        try
         {
             var last_elem = Alph.main.get_state_obj(bro).get_var("lastElem");
             tbref = Alph.$(last_elem).attr("tbref");
-            // if the selected element doesn't have a tbref attribute, 
+            // if the selected element doesn't have a tbref attribute,
             // look for the first parent element that does
             if (! tbref)
             {
@@ -109,13 +109,13 @@ Alph.Tree.prototype.show = function()
         {
             Alph.util.log("Error identifying sentence and id: " + a_e);
         }
-    
+
         //var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
         //var sentence  = Alph.$(".l",bro.contentDocument);
         if (! sentence )
         {
             // Just add the default message to the display
-            panel_obj.parse_tree((new DOMParser()).parseFromString( 
+            panel_obj.parse_tree((new DOMParser()).parseFromString(
                 svgDefault.replace(
                     /<ERROR>/,
                     Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
@@ -134,7 +134,7 @@ Alph.Tree.prototype.show = function()
                     dataType: 'xml',
                     error: function(req,textStatus,errorThrown)
                     {
-                        var data = (new DOMParser()).parseFromString( 
+                        var data = (new DOMParser()).parseFromString(
                             svgDefault.replace(
                             /<ERROR>/,
                             Alph.$("#alpheios-strings")
@@ -145,22 +145,25 @@ Alph.Tree.prototype.show = function()
                             + textStatus ||errorThrown);
                         panel_obj.parse_tree(data);
                     },
-                    success: function(data, textStatus) 
+                    success: function(data, textStatus)
                     {
                         panel_obj.parse_tree(data, tbref);
                     }
                 }
             );
         }
-    }  
+    }
     return Alph.Panel.STATUS_SHOW;
-    
+
 };
 
 Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
 {
+    var marginLeft = 10;
+    var marginTop = 0;
+    var fontSize = 20;
     var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
-    try 
+    try
     {
         Alph.$("#dependency-tree", treeDoc).
             append(a_svgXML.firstChild.childNodes);
@@ -169,9 +172,9 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
             true,
             marginLeft,
             marginTop + fontSize,
+            fontSize,
             0);
-        svgXML.setAttribute("width", returned[2]);
-        svgXML.setAttribute("height", returned[3]);
+        positionText(treeDoc, returned[2], returned[3], fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         highlight(treeDoc, a_id);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
@@ -180,13 +183,13 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
     {
         Alph.util.log(e);
     }
-    
+
     // make sure to update the detached window document too...
     // update the panel document whether or not the window is detached
     // because otherwise the screen doesn't seem to redraw right
     if (this.panel_window != null)
     {
-        var window_doc = 
+        var window_doc =
             this.panel_window.Alph.$("#" + this.panel_id + " browser").get(0).contentDocument;
         var panel_tree = Alph.$("#dependency-tree", treeDoc);
         Alph.$("#dependency-tree", window_doc).empty();
@@ -223,6 +226,13 @@ Alph.Tree.prototype.get_detach_chrome = function()
 //  If no id or a bad id is specified, the entire tree is
 //  ungrayed.
 //
+//  Note: jquery seems not to work well with selectors requiring
+//  testing of attribute values.  Hence, the expressions below
+//  are sometimes a bit contorted.  The assumption is made
+//  that the text element of class "node-label" immediately precedes the
+//  text element of class "arc-label", and that the top-level group of class
+//  "tree" immediately precedes the group of class "text".
+//
 function highlight(a_doc, a_id)
 {
     // find node of interest
@@ -238,30 +248,78 @@ function highlight(a_doc, a_id)
         return;
     }
 
-    // gray everything out
+    // gray everything out in tree (but not text words)
     Alph.$("text", a_doc).attr("showme", "grayed");
+    Alph.$("svg", a_doc).children("g").next().children("text").attr("showme", "normal")
     Alph.$("line", a_doc).attr("showme", "grayed");
     Alph.$("rect", a_doc).attr("showme", "grayed");
 
     // display this node and things connected to it with focus:
-    //   text node itself
+    //   text node itself and label on line to parent
     //   rectangle around node
-    //   label on line to parent
     //   line to parent
-    //   labels on lines to dependent words (children of sibling groups)
-    //   lines to dependent words
+    //   dependent words (children of sibling groups)
+    //   line to dependent words
     //   label on parent word
-    focusNode.attr("showme", "focus");
-    focusNode.prevAll("rect").attr("showme", "focus");
-    focusNode.nextAll("text").attr("showme", "focus");
-    focusNode.nextAll("line").attr("showme", "focus");
-    focusNode.nextAll("g").children("text").
-              next("text").attr("showme", "focus");
-    focusNode.nextAll("g").children("line").attr("showme", "focus");
-    focusNode.nextAll("g").children("text").attr("showme", "focus");
-    focusNode.parent().parent().children("text").attr("showme", "focus");
-    focusNode.parent().parent().children("text").
-              next("text").attr("showme", "grayed");
+    focusNode.children("text").attr("showme", "focus");
+    focusNode.children("rect").attr("showme", "focus");
+    focusNode.children("line").attr("showme", "focus");
+    focusNode.children("g").children("text").attr("showme", "focus");
+    focusNode.children("g").children("line").attr("showme", "focus");
+    focusNode.parent().children("text").get(0).setAttribute("showme", "focus");
+}
+
+
+function positionText(a_doc, a_width, a_height, a_fontSize)
+{
+    // if no words, just set width and height
+    var words = Alph.$("svg", a_doc).children("g").next().children("text");
+    if (words.size() == 0)
+    {
+        Alph.$("svg", a_doc).attr("width", a_width);
+        Alph.$("svg", a_doc).attr("height", a_height);
+        return;
+    }
+
+    // 300 = minimum width allowed for text to avoid excessive wrapping
+    var width = (a_width > 300) ? a_width : 300;
+    var padding = a_fontSize / 4;
+    var x = padding;
+    var y = a_height + a_fontSize + padding; 
+
+    // for each word
+    for (var i = 0; i < words.size(); ++i)
+    {
+        var word = words.get(i);
+
+        // if word goes past end of line
+        var wlen = word.getComputedTextLength() + padding;
+        if (x + wlen > width)
+        {
+            // if not first word in line, wrap
+            if (x > padding)
+            {
+                x = padding;
+                y += a_fontSize + padding;
+            }
+            // if first word, widen line
+            else
+            {
+                width = x + wlen;
+            }
+        }
+
+        // position word
+        word.setAttribute('x', x + 'px');
+        word.setAttribute('y', y + 'px');
+
+        // advance in line
+        x += wlen;
+    }
+
+    // set width and height
+    Alph.$("svg", a_doc).attr("width", width);
+    Alph.$("svg", a_doc).attr("height", y + padding);
 }
 
 /*
@@ -283,21 +341,20 @@ function highlight(a_doc, a_id)
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-var fontSize = 20;
-var wordSpacing = 20; //wordSpacing/2 == text padding
-var marginLeft = 10;
-var marginTop = 0;
-var branchHeight = fontSize * 3;
-var branchPaddingTop = fontSize/4;
-var branchPaddingBottom = 0;
-
 //position the nodes in a tree structure
 function position(a_containerNode,
                   a_isRoot,
                   a_shiftLeft,
                   a_shiftTop,
+                  a_fontSize,
                   a_parentWidth)
 {
+    // constants
+    var wordSpacing = 20; //wordSpacing/2 == text padding
+    var branchHeight = a_fontSize * 3;
+    var branchPaddingTop = a_fontSize/4;
+    var branchPaddingBottom = 0;
+
     var isEmpty = false;
     var childrenWidth = 0;
     var children = Array();
@@ -317,7 +374,7 @@ function position(a_containerNode,
         var nodeName = node.nodeName;
 
         if ((nodeName == "text") &&
-            (node.getAttribute("class") == "line-label"))
+            (node.getAttribute("class") == "arc-label"))
         {
             lineLabel = node;
         }
@@ -338,7 +395,7 @@ function position(a_containerNode,
             {
                 nodeLabelWidth = wordSpacing +
                                  nodeLabel.getComputedTextLength();
-		textWidth = nodeLabelWidth;
+                textWidth = nodeLabelWidth;
                 isEmpty = false;
             }
             if (nodeLabelWidth < a_parentWidth)
@@ -362,7 +419,8 @@ function position(a_containerNode,
                            false,
                            a_shiftLeft + childrenWidth,
                            a_shiftTop + (isEmpty ? branchHeight :
-                                                   branchHeight + fontSize),
+                                                   branchHeight + a_fontSize),
+                           a_fontSize,
                            nodeLabelWidth);
             children.push(returned[0]);
             childrenWidth += returned[1];
@@ -403,11 +461,11 @@ function position(a_containerNode,
     if (nodeBox)
     {
         nodeBox.setAttribute('x', (thisX - textWidth/2) + 'px');
-        nodeBox.setAttribute('y', (thisY - fontSize) + 'px');
+        nodeBox.setAttribute('y', (thisY - a_fontSize) + 'px');
         nodeBox.setAttribute('width', textWidth + 'px');
-        nodeBox.setAttribute('height', (fontSize + branchPaddingTop) + 'px');
+        nodeBox.setAttribute('height', (a_fontSize + branchPaddingTop) + 'px');
     }
-    thisY += (isEmpty ? -fontSize : branchPaddingTop);
+    thisY += (isEmpty ? -a_fontSize : branchPaddingTop);
 
     //connect branches from child labels to parent label
     //and position line labels
@@ -432,7 +490,7 @@ function position(a_containerNode,
     thisX += nodeLabelWidth/2;
     if (thisX > maxX)
         maxX = thisX;
-    thisY += (isEmpty ? 0: fontSize);
+    thisY += (isEmpty ? 0: a_fontSize);
     if (thisY > maxY)
         maxY = thisY;
 
@@ -445,7 +503,7 @@ function position(a_containerNode,
             nodeBranch.setAttribute(
                             'y2',
                             (parseFloat(nodeLabel.getAttribute('y')) -
-                             fontSize - branchPaddingBottom) +
+                             a_fontSize - branchPaddingBottom) +
                             'px');
         }
     }
