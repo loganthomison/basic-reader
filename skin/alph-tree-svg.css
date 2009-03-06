@@ -67,3 +67,15 @@ g text.verb {
 g line {
     stroke:black;
 }
+
+g text[showme="grayed"] {
+    fill: darkgray;
+}
+
+g line[showme="grayed"] {
+    stroke: darkgray;
+}
+
+g rect[showme="focus"] {
+    fill: yellow;
+}
