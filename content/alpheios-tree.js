@@ -178,20 +178,21 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         highlight(treeDoc, a_id);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
-                
+
+        
         // jQuery doesn't seem to support retrieving svg nodes by class
         // or attribute, so just get by tag name and retrieve the attribute
         // directly using the javascript getAttribute function to filter for
         // the nodes we want
+                
         Alph.$("text",treeDoc).each(
             function()
             {
                 if (this.getAttribute('class') == 'text-word')
                 {
                     var tbrefid = this.getAttribute('tbref');
-                    Alph.$(this).hover(
-                        function() { highlight(this.ownerDocument,tbrefid) },
-                        function() { highlight(this.ownerDocument,null) }
+                    Alph.$(this).bind('mouseenter',
+                        function() { highlight(this.ownerDocument,tbrefid) }
                     );
                 }
             }
