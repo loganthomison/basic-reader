@@ -179,7 +179,6 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         highlight(treeDoc, a_id);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
-        
         // jQuery doesn't seem to support retrieving svg nodes by class
         // or attribute, so just get by tag name and retrieve the attribute
         // directly using the javascript getAttribute function to filter for
@@ -193,6 +192,17 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
                     var tbrefid = this.getAttribute('tbref');
                     Alph.$(this).bind('mouseenter',
                         function() { highlight(this.ownerDocument,tbrefid) }
+                    );
+                }
+            }
+        );
+        Alph.$("g",treeDoc).each(
+            function()
+            {
+                if (this.getAttribute('class') == 'text')
+                {
+                    Alph.$(this).bind('mouseleave',
+                        function() { highlight(this.ownerDocument,null) }
                     );
                 }
             }
@@ -289,6 +299,21 @@ function highlight(a_doc, a_id)
 }
 
 
+//
+// Function to position text words in tree
+// Parameters:
+//   a_doc       the tree
+//   a_width     width of tree
+//   a_height    height of tree
+//   a_fontSize  size of font to use for text
+//
+// The text words are placed underneath the tree itself, wrapping
+// at the width of the tree (except if the tree is narrow, wrapping
+// at 300 pixels).
+//
+// The height and width including the text are set as the values for
+// the parent svg element.
+//
 function positionText(a_doc, a_width, a_height, a_fontSize)
 {
     // if no words, just set width and height
@@ -303,8 +328,8 @@ function positionText(a_doc, a_width, a_height, a_fontSize)
     // 300 = minimum width allowed for text to avoid excessive wrapping
     var width = (a_width > 300) ? a_width : 300;
     var padding = a_fontSize / 4;
-    var x = padding;
-    var y = a_height + a_fontSize + padding; 
+    var x = 0;
+    var y = a_height + a_fontSize + padding;
 
     // for each word
     for (var i = 0; i < words.size(); ++i)
@@ -312,13 +337,13 @@ function positionText(a_doc, a_width, a_height, a_fontSize)
         var word = words.get(i);
 
         // if word goes past end of line
-        var wlen = word.getComputedTextLength() + padding;
+        var wlen = word.getComputedTextLength();
         if (x + wlen > width)
         {
             // if not first word in line, wrap
-            if (x > padding)
+            if (x > 0)
             {
-                x = padding;
+                x = 0;
                 y += a_fontSize + padding;
             }
             // if first word, widen line
