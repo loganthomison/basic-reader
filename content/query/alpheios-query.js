@@ -91,12 +91,12 @@ Alph_Inter =
             '<div class="alph-query-element">' +
             '  <div class="alph-query-pofs">\n' +
             '    <div class="alph-query-header">' +
-                this.main_str.getString("alph-query-pofs") +
+                this.main_str.getFormattedString("alph-query-pofs",[src_context]) +
             '    </div>\n' +
             '  </div>\n' +
             '  <div class="alph-query-defs" style="display:none;">' +
             '    <div class="alph-query-header">' +
-               this.main_str.getString("alph-query-defs") +
+               this.main_str.getFormattedString("alph-query-defs",[src_context]) +
             '    </div>\n' +
             '  </div>\n' +
             '<div class="alph-query-infl" style="display:none;">' +

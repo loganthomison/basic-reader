@@ -11,13 +11,13 @@ body {
 
 .alph-query-pofs {
     float: left;
-    width: 20%;
+    font-size: 110%;
 }
 
 .alph-query-defs {
     float: left;
-    margin-left: 1em;
-    width: 30%;
+    margin-left: 2em;
+    font-size: 110%;
 }
 
 .alph-query-defs select {
@@ -31,7 +31,8 @@ body {
 
 .alph-query-infl {
     float: left;
-    width: 40%;
+    font-size: 110%;
+    margin-left: 2em;
 }
 
 .answer {
@@ -39,7 +40,9 @@ body {
 }
 
 .alph-query-context {
-    font-size: 110%;
-    text-decoration: underline;
-    text-align: center;
+    font-size: 150%;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 1em;
+    margin-bottom: 2em;
 }
