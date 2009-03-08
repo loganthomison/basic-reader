@@ -168,12 +168,14 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         Alph.$("#dependency-tree", treeDoc).
             append(a_svgXML.firstChild.childNodes);
         var svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
-        var returned = position(svgXML.getElementsByTagName('g').item(0),
-            true,
-            marginLeft,
-            marginTop + fontSize,
-            fontSize,
-            0);
+        var returned =
+                position(
+                    Alph.$(svgXML).children('g:first').children('g').get(0),
+                    true,
+                    marginLeft,
+                    marginTop + fontSize,
+                    fontSize,
+                    0);
         positionText(treeDoc, returned[2], returned[3], fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         highlight(treeDoc, a_id);
@@ -183,26 +185,48 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         // or attribute, so just get by tag name and retrieve the attribute
         // directly using the javascript getAttribute function to filter for
         // the nodes we want
-                
+
+        // for each text element
         Alph.$("text",treeDoc).each(
             function()
             {
-                if (this.getAttribute('class') == 'text-word')
+                var thisNode = Alph.$(this);
+
+                // if this is a text word
+                if (thisNode.attr('class') == 'text-word')
                 {
-                    var tbrefid = this.getAttribute('tbref');
-                    Alph.$(this).bind('mouseenter',
-                        function() { highlight(this.ownerDocument,tbrefid) }
+                    // turn on highlighting for the word
+                    var tbrefid = thisNode.attr('tbref');
+                    thisNode.bind(
+                        'mouseenter',
+                        function() { highlight(this.ownerDocument, tbrefid) }
+                    );
+                }
+                // if this is a label
+                else if (thisNode.attr('class') == 'node-label')
+                {
+                    // highlight the word while hovering
+                    var id = thisNode.parent().attr('id');
+                    thisNode.hover(
+                        function() { highlight(this.ownerDocument, id) },
+                        function() { highlight(this.ownerDocument, null) }
                     );
                 }
             }
         );
+        // for each group
         Alph.$("g",treeDoc).each(
             function()
             {
-                if (this.getAttribute('class') == 'text')
+                var thisNode = Alph.$(this);
+
+                // if this is container of text words
+                if (thisNode.attr('class') == 'text')
                 {
-                    Alph.$(this).bind('mouseleave',
-                        function() { highlight(this.ownerDocument,null) }
+                    // turn off highlighting when we leave
+                    thisNode.bind(
+                        'mouseleave',
+                        function() { highlight(this.ownerDocument, null) }
                     );
                 }
             }
@@ -293,11 +317,45 @@ function highlight(a_doc, a_id)
     focusNode.children("text").attr("showme", "focus");
     focusNode.children("rect").attr("showme", "focus");
     focusNode.children("line").attr("showme", "focus");
-    focusNode.children("g").children("text").attr("showme", "focus");
-    focusNode.children("g").children("line").attr("showme", "focus");
-    focusNode.parent().children("text").get(0).setAttribute("showme", "focus");
+    focusNode.children("g").children("text").attr("showme", "focus-child");
+    focusNode.children("g").children("rect").attr("showme", "focus-child");
+    focusNode.children("g").children("line").attr("showme", "focus-child");
+    if (focusNode.parent().children("text").size() > 0)
+    {
+        focusNode.parent().children("text:first").attr("showme", "focus-parent");
+        focusNode.parent().children("rect").attr("showme", "focus-parent");
+    }
+
+    // set highlights on text words below tree
+    highlightTextWord(a_doc, a_id, "focus");
+    highlightTextWord(a_doc, focusNode.parent().attr("id"), "focus-parent");
+    focusNode.children("g").each(
+        function()
+        {
+            highlightTextWord(a_doc, Alph.$(this).attr("id"), "focus-child");
+        }
+    );
 }
 
+//
+// Function to highlight a text word below tree
+// Parameters:
+//   a_doc       the tree
+//   a_id        id of word (tbref attribute on text word)
+//   a_focus     value to set focus to
+//
+function highlightTextWord(a_doc, a_id, a_focus)
+{
+    Alph.$("rect", a_doc).each(
+        function()
+        {
+            if (Alph.$(this).attr('tbref') == a_id)
+            {
+                Alph.$(this).attr("showme", a_focus);
+            }
+        }
+    );
+}
 
 //
 // Function to position text words in tree
@@ -318,6 +376,7 @@ function positionText(a_doc, a_width, a_height, a_fontSize)
 {
     // if no words, just set width and height
     var words = Alph.$("svg", a_doc).children("g").next().children("text");
+    var rects = Alph.$("svg", a_doc).children("g").next().children("rect");
     if (words.size() == 0)
     {
         Alph.$("svg", a_doc).attr("width", a_width);
@@ -328,13 +387,15 @@ function positionText(a_doc, a_width, a_height, a_fontSize)
     // 300 = minimum width allowed for text to avoid excessive wrapping
     var width = (a_width > 300) ? a_width : 300;
     var padding = a_fontSize / 4;
+    var lineHeight = a_fontSize + padding;
     var x = 0;
-    var y = a_height + a_fontSize + padding;
+    var y = a_height + lineHeight;
 
     // for each word
     for (var i = 0; i < words.size(); ++i)
     {
         var word = words.get(i);
+        var rect = rects.get(i);
 
         // if word goes past end of line
         var wlen = word.getComputedTextLength();
@@ -344,7 +405,7 @@ function positionText(a_doc, a_width, a_height, a_fontSize)
             if (x > 0)
             {
                 x = 0;
-                y += a_fontSize + padding;
+                y += lineHeight;
             }
             // if first word, widen line
             else
@@ -353,9 +414,13 @@ function positionText(a_doc, a_width, a_height, a_fontSize)
             }
         }
 
-        // position word
+        // position word and bounding rectangle
         word.setAttribute('x', x + 'px');
         word.setAttribute('y', y + 'px');
+        rect.setAttribute('x', x + 'px');
+        rect.setAttribute('y', (y - lineHeight + padding) + 'px');
+        rect.setAttribute('width', wlen + 'px');
+        rect.setAttribute('height', lineHeight + 'px');
 
         // advance in line
         x += wlen;
