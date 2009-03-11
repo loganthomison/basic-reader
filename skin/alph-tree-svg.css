@@ -84,9 +84,12 @@ g line[showme="grayed"] {
 g rect[showme="focus"] {
     fill: yellow;
 }
-g rect[showme="focus-child"] {
+g rect[showme="focus-descendant"] {
     fill: #E0FFE0;
 }
+g rect[showme="focus-child"] {
+    fill: #C0FFC0;
+}
 g rect[showme="focus-parent"] {
-    fill: #FFE0E0;
+    fill: #FFC0C0;
 }
