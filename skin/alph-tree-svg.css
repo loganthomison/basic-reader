@@ -1,27 +1,56 @@
+/* style for tree diagrams */
+
 svg {
-    overflow:scroll;
+    overflow: scroll;
 }
 
+/* normal text attributes */
 g text {
-    text-anchor:middle;
-    font-family:Times, Arial, Helvetica, Serif;
-    font-size:20px;
+    font-family: Times, Arial, Helvetica, Serif;
+    font-size: 20px;
     stroke: none;
     fill: dimgray;
 }
 
 g text.error {
-    fill: black;
-}
-
-g text.arc-label {
-    font-size:15px;
-    fill: black;
-}
-
-g text.text-word {
     text-anchor: start;
     fill: black;
+}
+
+g text.node-label {
+    text-anchor: middle;
+}
+    
+g text.arc-label {
+    font-size: 15px;
+    fill: black;
+}
+
+g.text text {
+    text-anchor: start;
+    fill: black;
+}
+
+g.key text {
+    text-anchor: start;
+    font-size: 15px;
+    fill: black;
+}
+
+/* normal line attributes */
+g line {
+    stroke: black;
+}
+
+/* normal rect attributes */
+g rect {
+    stroke-width: 0;
+    fill: none;
+}
+
+g.key > rect {
+    stroke-width: 1;
+    stroke: black;
 }
 
 /* color text according to part of speech:
@@ -69,18 +98,18 @@ g text[pos=verb] {
     fill: red;
 }
 
-g line {
-    stroke:black;
-}
-
-g text[showme="grayed"] {
+/* how to gray out tree */
+g.tree text[showme="grayed"] {
     fill: darkgray;
 }
-
 g line[showme="grayed"] {
     stroke: darkgray;
 }
+g rect[showme="grayed"] {
+    fill: none;
+}
 
+/* how to highlight focus word and its relatives */
 g rect[showme="focus"] {
     fill: yellow;
 }
@@ -93,3 +122,18 @@ g rect[showme="focus-child"] {
 g rect[showme="focus-parent"] {
     fill: #FFC0C0;
 }
+
+/* how to handle descendants in tree: */
+/* - to gray out, use this set of rules */
+/* - to highlight, comment out this set of rules */
+/*--- start descendant rules ---*/
+g.tree text[showme="focus-descendant"] {
+    fill: darkgray;
+}
+g.tree rect[showme="focus-descendant"] {
+    fill: none;
+}
+g.tree line[showme="focus-descendant"] {
+    stroke: darkgray;
+}
+/*--- end descendant rules ---*/

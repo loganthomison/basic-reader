@@ -184,15 +184,14 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         Alph.$("#dependency-tree", treeDoc).
             append(a_svgXML.firstChild.childNodes);
         var svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
-        var returned =
+        var treeSize =
                 this.position_tree(
                     Alph.$(svgXML).children("g:first").children("g:first"),
-                    fontSize);
-//      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
-        this.position_text(treeDoc, returned[0][0], returned[0][1], fontSize);
-        Alph.$(svgXML).children("g:first").children("g:first").
-             attr("transform",
-                  "translate(" + marginLeft + "," + marginTop + ")");
+                    fontSize)[0];
+        var keySize = this.position_key(treeDoc, fontSize);
+        var maxWidth = (treeSize[0] > keySize[0]) ? treeSize[0] : keySize[0];
+        var textSize = this.position_text(treeDoc, maxWidth, fontSize);
+        this.position_all(treeDoc, treeSize, textSize, keySize, fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         this.highlight_word(treeDoc, a_id);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
@@ -283,6 +282,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
 
 /**
  * Recursively position elements of (sub-)tree
+ *
  * @param a_container SVG group containing tree
  * @param {int} a_fontSize size of font in pixels
  * @return size of tree, center line of root element, and width of root node
@@ -301,7 +301,8 @@ Alph.Tree.prototype.position_tree = function(a_container, a_fontSize)
     // calculate size of tree
     var textHeight = (5 * a_fontSize) / 4;
     var childSeparation = a_fontSize;
-    var textWidth = textNode.get(0).getComputedTextLength() + a_fontSize;
+    var textWidth = textNode.get(0).getComputedTextLength();
+    textWidth += (textWidth > 0) ? a_fontSize : 0;
     var childStart = Array();
     var childCenter = Array();
     var childReturn = Array();
@@ -407,10 +408,20 @@ Alph.Tree.prototype.position_tree = function(a_container, a_fontSize)
         arc.setAttribute("x2", x2);
         arc.setAttribute("y2", y2);
         var label = arcLabelNodes.get(i + 1);
-        var width = (label.getComputedTextLength() + a_fontSize) / 2;
-        var xl = (2 * x2 + xCenter)/3 + ((x2 <= xCenter) ? -width : width);
-        if (xl + width > size[0])
-            size[0] = xl + width;
+        var width = label.getComputedTextLength();
+        var xl = (2 * x2 + xCenter)/3;
+        if (x2 <= xCenter)
+        {
+            xl -= (x2 == xCenter) ? 2 : 1;
+            label.setAttribute("text-anchor", "end");
+        }
+        else
+        {
+            xl += 1;
+            label.setAttribute("text-anchor", "start");
+            if (xl + width > size[0])
+                size[0] = xl + width;
+        }
         label.setAttribute("x", xl);
         label.setAttribute("y", (y1 + 2 * y2) / 3);
     }
@@ -427,7 +438,7 @@ Alph.Tree.prototype.position_tree = function(a_container, a_fontSize)
 };
 
 /**
- * Position text words in tree
+ * Position text words
  *
  * The text words are placed underneath the tree itself, wrapping
  * at the width of the tree (except if the tree is narrow, wrapping
@@ -438,27 +449,24 @@ Alph.Tree.prototype.position_tree = function(a_container, a_fontSize)
  *
  * @param a_doc the document
  * @param {int} a_width width of tree
- * @param {int} a_height height of tree
  * @param {int} a_fontSize size of font in pixels
+ * @return size of text
+ * @type Array
  */
 Alph.Tree.prototype.position_text =
-function(a_doc, a_width, a_height, a_fontSize)
+function(a_doc, a_width, a_fontSize)
 {
-    // if no words, just set width and height
+    // if no words, just return empty size
     var words = Alph.$("svg", a_doc).children("g").next().children("text");
     var rects = Alph.$("svg", a_doc).children("g").next().children("rect");
     if (words.size() == 0)
-    {
-        Alph.$("svg", a_doc).attr("width", a_width);
-        Alph.$("svg", a_doc).attr("height", a_height);
-        return;
-    }
+        return Array(0, 0);
 
     // 300 = minimum width allowed for text to avoid excessive wrapping
     var width = (a_width > 300) ? a_width : 300;
     var textHeight = (5 * a_fontSize) / 4;
     var x = 0;
-    var y = a_height + textHeight;
+    var y = textHeight;
 
     // for each word
     for (var i = 0; i < words.size(); ++i)
@@ -495,9 +503,134 @@ function(a_doc, a_width, a_height, a_fontSize)
         x += wlen;
     }
 
+    return Array(width, y + textHeight - a_fontSize);
+};
+
+/**
+ * Position key elements
+ *
+ * The keys and definitions are each arranged vertically.
+ * The definitions are placed to the right of the keys.
+ *
+ * @param a_doc the document
+ * @param {int} a_fontSize size of font in pixels
+ * @return size of key
+ * @type Array
+ */
+Alph.Tree.prototype.position_key = function(a_doc, a_fontSize)
+{
+    // find parts of key
+    var keyGrp;
+    var rects;
+    var texts;
+    var bound;
+    Alph.$("svg", a_doc).children("g").each(
+    function()
+    {
+        var thisNode = Alph.$(this);
+        if (thisNode.attr("class") == "key")
+        {
+            keyGrp = thisNode.children("g");;
+            rects = thisNode.children("g").children("rect");
+            texts = thisNode.children("g").children("text");
+            bound = thisNode.children("rect");
+        }
+    });
+
+    // find width of keys
+    var width = 0;
+    for (var i = 0; i < texts.size(); ++i)
+    {
+        var thisWidth = texts.get(i).getComputedTextLength();
+        if (thisWidth > width)
+            width = thisWidth;
+    }
+
+    // position entries
+    width += 2 * a_fontSize;
+    var y = 0;
+    var textHeight = (5 * a_fontSize) / 4;
+    for (var i = 0; i < texts.size(); ++i)
+    {
+        if (i < texts.size() - 1)
+        {
+            var thisRect = rects.get(i);
+            thisRect.setAttribute("x", 0);
+            thisRect.setAttribute("y", y);
+            thisRect.setAttribute("width", width);
+            thisRect.setAttribute("height", textHeight);
+        }
+
+        var thisText = texts.get(i);
+        var thisWidth = thisText.getComputedTextLength();
+        thisText.setAttribute("x", a_fontSize);
+        thisText.setAttribute("y", y + a_fontSize);
+        y += textHeight;
+    }
+    width += 2 * a_fontSize;
+    y += 2 * a_fontSize;
+
+    // position group and set bounding box
+    keyGrp.attr("transform",
+                "translate(" + a_fontSize + "," + a_fontSize + ")");
+    bound.attr("x", 0);
+    bound.attr("y", 0);
+    bound.attr("width", width);
+    bound.attr("height", y);
+
+    return Array(width, y);
+};
+
+/**
+ * Position pieces
+ *
+ * @param a_doc the document
+ * @param {Array} a_treeSize width and height of tree
+ * @param {Array} a_textSize width and height of text
+ * @param {Array} a_keySize width and height of key
+ * @param {int} a_fontSize size of font in pixels
+ */
+Alph.Tree.prototype.position_all =
+function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
+{
+    var x1 = Alph.$("svg g.text", a_doc);
+    var x2 = Alph.$("svg g.tree", a_doc);
+    var x3 = Alph.$("svg g.key", a_doc);
+    Alph.$("svg", a_doc).children("g").each(
+    function()
+    {
+        var thisNode = Alph.$(this);
+        if (thisNode.attr("class") == "text")
+        {
+            // position text at top left
+            thisNode.attr("transform", "translate(0)");
+        }
+        else if (thisNode.attr("class") == "tree")
+        {
+            // position tree below text
+            thisNode.attr(
+                "transform",
+                "translate(" + a_fontSize + "," + a_textSize[1] + ")");
+        }
+        else if (thisNode.attr("class") == "key")
+        {
+            // position key below tree, slightly indented
+            thisNode.attr(
+                "transform",
+                "translate(" + a_fontSize + "," +
+                               (a_textSize[1] + a_treeSize[1]) + ")");
+        }
+    });
+
     // set width and height
+    var width = a_textSize[0];
+    if (a_treeSize[0] > width)
+        width = a_treeSize[0];
+    if (a_fontSize + a_keySize[0] > width)
+        width = a_fontSize + a_keySize[0];
+    var height = a_textSize[1] + a_treeSize[1] + a_keySize[1];
     Alph.$("svg", a_doc).attr("width", width);
-    Alph.$("svg", a_doc).attr("height", y + (textHeight - a_fontSize));
+    Alph.$("svg", a_doc).attr("height", height);
 };
 
 /**
@@ -529,18 +662,36 @@ Alph.Tree.prototype.highlight_word = function(a_doc, a_id)
     // if no id or bad id
     if (focusNode.size() == 0)
     {
-        // display everything normally
-        Alph.$("text", a_doc).attr("showme", "normal");
-        Alph.$("line", a_doc).attr("showme", "normal");
-        Alph.$("rect", a_doc).attr("showme", "normal");
+        Alph.$("svg", a_doc).children("g").each(
+        function()
+        {
+            var thisNode = Alph.$(this);
+            if (thisNode.attr("class") != "key")
+            {
+                // display everything normally
+                thisNode.find("text").attr("showme", "normal");
+                thisNode.find("line").attr("showme", "normal");
+                thisNode.find("rect").attr("showme", "normal");
+            }
+        });
         return;
     }
 
-    // gray everything out in tree (but not text words)
-    Alph.$("text", a_doc).attr("showme", "grayed");
-    Alph.$("svg", a_doc).children("g").next().children("text").attr("showme", "normal")
-    Alph.$("line", a_doc).attr("showme", "grayed");
-    Alph.$("rect", a_doc).attr("showme", "grayed");
+    // gray everything out in tree
+    Alph.$("svg", a_doc).children("g").each(
+    function()
+    {
+        var thisNode = Alph.$(this);
+        if (thisNode.attr("class") == "tree")
+        {
+            thisNode.find("text").attr("showme", "grayed");
+        }
+        if (thisNode.attr("class") != "key")
+        {
+            thisNode.find("line").attr("showme", "grayed");
+            thisNode.find("rect").attr("showme", "grayed");
+        }
+    });
 
     // display this node and things connected to it with focus:
     //   text node itself and label on line to dependent words
@@ -562,11 +713,9 @@ Alph.Tree.prototype.highlight_word = function(a_doc, a_id)
             this.setAttribute("showme", "focus-descendant");
     });
     //   dependent words (immediate children)
-    //   line to dependent words
     //   (do this after descendants since these are subset of descendants)
     var children = focusNode.children("g");
     children.children("rect").attr("showme", "focus-child");
-    children.children("line").attr("showme", "focus-child");
     children.children("text").each(
     function()
     {
