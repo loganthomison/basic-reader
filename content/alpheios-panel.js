@@ -683,6 +683,34 @@ Alph.Panel.prototype.get_current_doc = function(a_bro)
 }
 
 /**
+ * Resize the panel window to the requested dimensions
+ * @param {int} a_width requested width
+ * @parma {int} a_height requested height
+ */
+Alph.Panel.prototype.resize_panel_window = function(a_width,a_height)
+{
+    // add a little bit to the width and height to account for title bar and leave a
+    // little room on the side
+    var width = a_width + 25; 
+    var height = a_height + 40;
+        
+    // make sure we don't resize the window to dimensions larger than the user's screen,
+    // leaving a little room around the edges
+    var max_width = this.panel_window.screen.availWidth - 10;
+    var max_height = this.panel_window.screen.availHeight - 10;
+    
+    if (width > max_width )
+    {
+        width = max_width;
+    }
+    if (height > max_height)
+    {
+        height = max_height;
+    }
+    this.panel_window.resizeTo(width,height);
+}
+
+/**
  * Execute a language specific command for a panel
  * @param {Event} a_event the event which initiated the command
  * @param {String} a_panel_id the panel id
@@ -733,4 +761,5 @@ Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
         Alph.main.execute_lang_command(a_event);
     }
 };
+
 

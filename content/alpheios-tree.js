@@ -275,6 +275,19 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone(true));
         Alph.$("#dependency-tree", window_doc).attr("width",Alph.$(panel_tree).attr("width"));
         Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
+        
+        // resize the panel window according to the dimensions of the svg diagram
+        try 
+        {
+            var w = parseInt(Alph.$(panel_tree).attr("width")); 
+            var h = parseInt(Alph.$(panel_tree).attr("height"));
+            this.resize_panel_window(w,h);
+        }
+        catch(a_e)
+        {
+            Alph.util.log("Error parsing window size: " + a_e);
+        }
+        
         this.panel_window.focus();
     }
 };
