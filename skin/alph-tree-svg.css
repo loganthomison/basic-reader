@@ -1,4 +1,8 @@
 /* style for tree diagrams */
+#tree-error {
+    font-size: 20px;
+    font-weight: bold;
+}
 
 svg {
     overflow: scroll;

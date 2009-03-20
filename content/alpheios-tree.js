@@ -65,15 +65,11 @@ Alph.Tree.prototype.show = function()
     var bro = Alph.main.getCurrentBrowser();
     var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
 
-    // clear out the prior tree
+    // clear out the prior tree and any error
+    Alph.$("#tree-error", treeDoc).empty();
     Alph.$("#dependency-tree", treeDoc).empty();
 
-    var svgDefault =
-        '<svg xmlns="http://www.w3.org/2000/svg">' +
-        '<g><g><text class="error">' +
-        '<ERROR>' +
-        '</text></g></g>' +
-        '</svg>';
+    var svgError = "";
 
     var treebankUrl =
         Alph.$("#alpheios-treebank-diagram-url",bro.contentDocument).attr("content");
@@ -83,22 +79,18 @@ Alph.Tree.prototype.show = function()
     var word;
     if (! treebankUrl)
     {
-        panel_obj.parse_tree((new DOMParser()).parseFromString(
-            svgDefault.replace(
-                /<ERROR>/,
+        Alph.$("#tree-error",treeDoc).html(
                 Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
-            ), "text/xml"
-        ));
+        );
+        this.update_panel_window({},'alph-tree-body');
     }
     else if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
     {
         // Just add the default message to the display
-        panel_obj.parse_tree((new DOMParser()).parseFromString(
-            svgDefault.replace(
-                /<ERROR>/,
+        Alph.$("#tree-error",treeDoc).html(
                 Alph.$("#alpheios-strings").get(0).getString("alph-info-tree-select")
-            ), "text/xml"
-        ));
+        );
+        this.update_panel_window({},'alph-tree-body');
     }
     else
     {
@@ -126,12 +118,10 @@ Alph.Tree.prototype.show = function()
         if (! sentence )
         {
             // Just add the default message to the display
-            panel_obj.parse_tree((new DOMParser()).parseFromString(
-                svgDefault.replace(
-                    /<ERROR>/,
+            Alph.$("#tree-error",treeDoc).html(
                     Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
-                ), "text/xml"
-            ));
+              );
+            this.update_panel_window({},'alph-tree-body');
         }
         else
         {
@@ -145,20 +135,18 @@ Alph.Tree.prototype.show = function()
                     dataType: 'xml',
                     error: function(req,textStatus,errorThrown)
                     {
-                        var data = (new DOMParser()).parseFromString(
-                            svgDefault.replace(
-                            /<ERROR>/,
+                        Alph.$("#tree-error",treeDoc).html(
                             Alph.$("#alpheios-strings")
                                 .get(0).getString("alph-error-tree-notree")
-                            ), "text/xml"
                         );
                         Alph.util.log("Error retrieving treebank diagram: "
                             + textStatus ||errorThrown);
-                        panel_obj.parse_tree(data);
+                        panel_obj.update_panel_window({},'alph-tree-body');
                     },
                     success: function(data, textStatus)
                     {
                         panel_obj.parse_tree(data, tbref);
+                        panel_obj.update_panel_window({},'alph-tree-body');
                     }
                 }
             );
@@ -194,7 +182,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         Alph.Tree.position_all(treeDoc, treeSize, textSize, keySize, fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         Alph.Tree.highlight_word(treeDoc, a_id);
-//      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+//        Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
         // or attribute, so just get by tag name and retrieve the attribute
@@ -208,10 +196,10 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
             var thisNode = Alph.$(this);
 
             // if this is a text word
-            if (thisNode.attr('class') == 'text-word')
+            if (this.getAttribute('class') == 'text-word')
             {
                 // turn on highlighting for the word
-                var tbrefid = thisNode.attr('tbref');
+                var tbrefid = this.getAttribute('tbref');
                 thisNode.bind(
                     'mouseenter',
                     function()
@@ -221,10 +209,10 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
                 );
             }
             // if this is a label
-            else if (thisNode.attr('class') == 'node-label')
+            else if (this.getAttribute('class') == 'node-label')
             {
                 // highlight the word while hovering
-                var id = thisNode.parent().attr('id');
+                var id = thisNode.parent().get(0).getAttribute('id');
                 thisNode.hover(
                     function()
                     {
@@ -244,7 +232,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
             var thisNode = Alph.$(this);
 
             // if this is container of text words
-            if (thisNode.attr('class') == 'text')
+            if (this.getAttribute('class') == 'text')
             {
                 // turn off highlighting when we leave
                 thisNode.bind(
@@ -262,35 +250,63 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         Alph.util.log(e);
     }
 
-    // make sure to update the detached window document too...
-    // update the panel document whether or not the window is detached
-    // because otherwise the screen doesn't seem to redraw right
-    if (this.panel_window != null)
-    {
-        var window_doc =
-            this.panel_window.Alph.$("#" + this.panel_id + " browser").get(0).contentDocument;
-        var panel_tree = Alph.$("#dependency-tree", treeDoc);
-        Alph.$("#dependency-tree", window_doc).empty();
-        Alph.$("#dependency-tree", window_doc).append(Alph.$(panel_tree).children().clone(true));
-        Alph.$("#dependency-tree", window_doc).attr("width",Alph.$(panel_tree).attr("width"));
-        Alph.$("#dependency-tree", window_doc).attr("height",Alph.$(panel_tree).attr("height"));
-        
-        // resize the panel window according to the dimensions of the svg diagram
-        try 
-        {
-            var w = parseInt(Alph.$(panel_tree).attr("width")); 
-            var h = parseInt(Alph.$(panel_tree).attr("height"));
-            this.resize_panel_window(w,h);
-        }
-        catch(a_e)
-        {
-            Alph.util.log("Error parsing window size: " + a_e);
-        }
-        
-        this.panel_window.focus();
-    }
+
 };
 
+/**
+ * Update a browser in the detached panel window with the current 
+ * state of that browser the real (attached) panel
+ * @param {Object} a_panel_state the panel state object
+ * @param {String} a_browser_id the id of the browser to update
+ * @param {String} a_browser_index the index of the browser to update
+ */
+Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_browser_index)
+{
+    // make sure to update the detached window document too...
+    if (this.panel_window != null && ! this.panel_window.closed)
+    {
+        var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+        try
+        {
+            var pw_bro =
+                this.panel_window
+                    .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
+                    .get(0);
+            if (pw_bro)
+            {
+                var window_doc = pw_bro.contentDocument;
+                var panel_tree = Alph.$("#dependency-tree", treeDoc).get(0);
+                var panel_error = Alph.$("#tree-error",treeDoc).html();
+                Alph.$("#tree-error",window_doc).html(panel_error);
+                Alph.$("#dependency-tree", window_doc).empty();
+                Alph.$("#dependency-tree", window_doc)
+                    .append(Alph.$(panel_tree).children().clone(true));
+                Alph.$("#dependency-tree", window_doc)
+                    .get(0).setAttribute("width",panel_tree.getAttribute("width"));
+                Alph.$("#dependency-tree", window_doc)
+                    .get(0).setAttribute("height",panel_tree.getAttribute("height"));
+            
+                // resize the panel window according to the dimensions of the svg diagram
+                try 
+                {
+                    var w = parseInt(panel_tree.getAttribute("width")); 
+                    var h = parseInt(panel_tree.getAttribute("height"));
+                    this.resize_panel_window(w,h);
+                }
+                catch(a_e)
+                {
+                    Alph.util.log("Error parsing window size: " + a_e);
+                }
+            
+                this.panel_window.focus();
+            }
+         } catch(a_e)
+         {
+            // if the window opens but isn't fully loaded yet, we may get
+            // an error trying to retrieve the browser document using the Alph.$ call
+         }
+    }
+};
 
 /**
  * Recursively position elements of (sub-)tree
@@ -438,13 +454,23 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
     }
 
     // position text and rectangle
-    textNode.attr("x", xCenter);
-    textNode.attr("y", a_fontSize);
-    rectNode.attr("x", xCenter - textWidth / 2);
-    rectNode.attr("y", 0);
-    rectNode.attr("width", textWidth);
-    rectNode.attr("height", textHeight);
-
+    textNode.each(
+        function()
+        {
+            this.setAttribute("y", a_fontSize);
+            this.setAttribute("x", xCenter);
+        }
+    );
+    rectNode.each(
+        function()
+        {
+            this.setAttribute("x", xCenter - textWidth / 2);
+            this.setAttribute("y", 0);
+            this.setAttribute("width", textWidth);
+            this.setAttribute("height", textHeight);
+        }
+    )
+    
     return Array(size, xCenter, textWidth);
 };
 
@@ -467,8 +493,8 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
 Alph.Tree.position_text = function(a_doc, a_width, a_fontSize)
 {
     // if no words, just return empty size
-    var words = Alph.$("svg", a_doc).children("g").next().children("text");
-    var rects = Alph.$("svg", a_doc).children("g").next().children("rect");
+    var words = Alph.$("#dependency-tree", a_doc).children("g").next().children("text");
+    var rects = Alph.$("#dependency-tree", a_doc).children("g").next().children("rect");
     if (words.size() == 0)
         return Array(0, 0);
 
@@ -534,11 +560,11 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
     var rects;
     var texts;
     var bound;
-    Alph.$("svg", a_doc).children("g").each(
+    Alph.$("#dependency-tree", a_doc).children("g").each(
     function()
     {
         var thisNode = Alph.$(this);
-        if (thisNode.attr("class") == "key")
+        if (this.getAttribute("class") == "key")
         {
             keyGrp = thisNode.children("g");;
             rects = thisNode.children("g").children("rect");
@@ -581,13 +607,25 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
     y += 2 * a_fontSize;
 
     // position group and set bounding box
-    keyGrp.attr("transform",
+    keyGrp.each(
+        function()
+        {
+            this.setAttribute("transform",
                 "translate(" + a_fontSize + "," + a_fontSize + ")");
-    bound.attr("x", 0);
-    bound.attr("y", 0);
-    bound.attr("width", width);
-    bound.attr("height", y);
-
+        }
+    );
+      
+    bound.each(
+        function()
+        {
+            this.setAttribute("x", 0);
+            this.setAttribute("y", 0);
+            this.setAttribute("width", width);
+            this.setAttribute("height", y);
+        
+        }
+    );
+    
     return Array(width, y);
 };
 
@@ -603,33 +641,33 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
 Alph.Tree.position_all =
 function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
 {
-    var x1 = Alph.$("svg g.text", a_doc);
-    var x2 = Alph.$("svg g.tree", a_doc);
-    var x3 = Alph.$("svg g.key", a_doc);
-    Alph.$("svg", a_doc).children("g").each(
+    var x1 = Alph.$("#dependency-tree g.text", a_doc);
+    var x2 = Alph.$("#dependency-tree g.tree", a_doc);
+    var x3 = Alph.$("#dependency-tree g.key", a_doc);
+    Alph.$("#dependency-tree", a_doc).children("g").each(
     function()
     {
         var thisNode = Alph.$(this);
-        if (thisNode.attr("class") == "text")
+        var thisClass = this.getAttribute("class");
+        var thisTransform = "";
+        if (thisClass == "text")
         {
             // position text at top left
-            thisNode.attr("transform", "translate(0)");
+            thisTransform = "translate(0)";
         }
-        else if (thisNode.attr("class") == "tree")
+        else if (thisClass == "tree")
         {
             // position tree below text
-            thisNode.attr(
-                "transform",
-                "translate(" + a_fontSize + "," + a_textSize[1] + ")");
+            thisTransform = "translate(" + a_fontSize + "," + a_textSize[1] + ")";
         }
-        else if (thisNode.attr("class") == "key")
+        else if (thisClass == "key")
         {
             // position key below tree, slightly indented
-            thisNode.attr(
-                "transform",
+            thisTransform = 
                 "translate(" + a_fontSize + "," +
-                               (a_textSize[1] + a_treeSize[1]) + ")");
+                               (a_textSize[1] + a_treeSize[1]) + ")";
         }
+        this.setAttribute("transform", thisTransform);
     });
 
     // set width and height
@@ -639,8 +677,8 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
     if (a_fontSize + a_keySize[0] > width)
         width = a_fontSize + a_keySize[0];
     var height = a_textSize[1] + a_treeSize[1] + a_keySize[1];
-    Alph.$("svg", a_doc).attr("width", width);
-    Alph.$("svg", a_doc).attr("height", height);
+    Alph.$("#dependency-tree", a_doc).get(0).setAttribute("width", width);
+    Alph.$("#dependency-tree", a_doc).get(0).setAttribute("height", height);
 };
 
 /**
@@ -672,34 +710,66 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     // if no id or bad id
     if (focusNode.size() == 0)
     {
-        Alph.$("svg", a_doc).children("g").each(
+        Alph.$("#dependency-tree", a_doc).children("g").each(
         function()
         {
             var thisNode = Alph.$(this);
-            if (thisNode.attr("class") != "key")
+            if (this.getAttribute("class") != "key")
             {
                 // display everything normally
-                thisNode.find("text").attr("showme", "normal");
-                thisNode.find("line").attr("showme", "normal");
-                thisNode.find("rect").attr("showme", "normal");
+                thisNode.find("text").each(
+                    function()
+                    {
+                        this.setAttribute("showme", "normal");
+                    }
+                );
+                thisNode.find("line").each(
+                    function()
+                    {
+                        this.setAttribute("showme", "normal");      
+                    }
+                );
+                thisNode.find("rect").each(
+                    function()
+                    {
+                        this.setAttribute("showme", "normal");      
+                    }
+                );
             }
         });
         return;
     }
 
     // gray everything out in tree
-    Alph.$("svg", a_doc).children("g").each(
+    Alph.$("#dependency-tree", a_doc).children("g").each(
     function()
     {
         var thisNode = Alph.$(this);
-        if (thisNode.attr("class") == "tree")
+        var thisClass = this.getAttribute("class");
+        if (thisClass == "tree")
         {
-            thisNode.find("text").attr("showme", "grayed");
+            thisNode.find("text").each(
+                function()
+                {
+                    this.setAttribute("showme", "grayed");      
+                }
+            );
         }
-        if (thisNode.attr("class") != "key")
+        if (thisClass != "key")
         {
-            thisNode.find("line").attr("showme", "grayed");
-            thisNode.find("rect").attr("showme", "grayed");
+            thisNode.find("line").each(
+                function()
+                {
+                    this.setAttribute("showme", "grayed");        
+                }
+            );
+            
+            thisNode.find("rect").each(
+                function()
+                {
+                    this.setAttribute("showme", "grayed");      
+                }
+            );
         }
     });
 
@@ -707,15 +777,44 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     //   text node itself and label on line to dependent words
     //   rectangle around node
     //   lines to dependent words
-    focusNode.children("text").attr("showme", "focus-child");
-    focusNode.children("text:first").attr("showme", "focus");
-    focusNode.children("rect").attr("showme", "focus");
-    focusNode.children("line").attr("showme", "focus-child");
+    focusNode.children("text").each(
+        function()
+        {
+            this.setAttribute("showme", "focus-child");      
+        }
+    );
+    focusNode.children("text:first").each(
+        function()
+        {
+            this.setAttribute("showme", "focus");      
+        }
+    );
+    focusNode.children("rect").each(
+        function()
+        {
+            this.setAttribute("showme", "focus");     
+        }
+    );
+    focusNode.children("line").each(
+        function()
+        {
+            this.setAttribute("showme", "focus");     
+        }
+    );
     //   descendant words at all levels
     //   line to descendant words
     var descendants = focusNode.find("g");
-    descendants.children("rect").attr("showme", "focus-descendant");
-    descendants.children("line").attr("showme", "focus-descendant");
+    descendants.children("rect").each(
+        function(){
+            this.setAttribute("showme", "focus-descendant");
+        }
+    );
+    descendants.children("line").each(
+        function()
+        {
+            this.setAttribute("showme", "focus-descendant");          
+        }
+    )
     descendants.children("text").each(
     function()
     {
@@ -725,7 +824,12 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     //   dependent words (immediate children)
     //   (do this after descendants since these are subset of descendants)
     var children = focusNode.children("g");
-    children.children("rect").attr("showme", "focus-child");
+    children.children("rect").each(
+        function()
+        {
+            this.setAttribute("showme", "focus-child");
+        }
+    );
     children.children("text").each(
     function()
     {
@@ -734,11 +838,20 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     });
     //   label on parent word
     //   line and label from parent word
-    if (focusNode.parent().attr("class") == "tree-node")
+    var parent_node = focusNode.parent("[class=tree-node]"); 
+    if (parent_node.length > 0)
     {
-        focusNode.parent().children("text:first").attr("showme", "focus-parent");
-        focusNode.parent().children("rect").attr("showme", "focus-parent");
-        focusNode.parent().children().each(
+        parent_node.children("text:first").each(
+            function()
+            {
+                this.setAttribute("showme", "focus-parent");        
+            }
+        );
+            
+        parent_node.children("rect").each(
+            function() { this.setAttribute("showme", "focus-parent"); }
+        );
+        parent_node.children().each(
         function()
         {
             if (this.getAttribute("idref") == a_id)
@@ -749,20 +862,20 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     // set highlights on text words below tree
     Alph.Tree.highlight_text_word(a_doc, a_id, "focus");
     Alph.Tree.highlight_text_word(a_doc,
-                                  focusNode.parent().attr("id"),
+                                  focusNode.parent().get(0).getAttribute("id"),
                                   "focus-parent");
     descendants.each(
     function()
     {
         Alph.Tree.highlight_text_word(a_doc,
-                                      Alph.$(this).attr("id"),
+                                      this.getAttribute("id"),
                                       "focus-descendant");
     });
     children.each(
     function()
     {
         Alph.Tree.highlight_text_word(a_doc,
-                                      Alph.$(this).attr("id"),
+                                      this.getAttribute("id"),
                                       "focus-child");
     });
 };
@@ -778,9 +891,9 @@ Alph.Tree.highlight_text_word = function(a_doc, a_id, a_focus)
     Alph.$("rect", a_doc).each(
     function()
     {
-        if (Alph.$(this).attr('tbref') == a_id)
+        if (this.getAttribute('tbref') == a_id)
         {
-            Alph.$(this).attr("showme", a_focus);
+            this.setAttribute("showme", a_focus);
         }
     });
 };
