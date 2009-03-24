@@ -798,7 +798,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     focusNode.children("line").each(
         function()
         {
-            this.setAttribute("showme", "focus");     
+            this.setAttribute("showme", "focus-child");     
         }
     );
     //   descendant words at all levels
@@ -838,20 +838,19 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     });
     //   label on parent word
     //   line and label from parent word
-    var parent_node = focusNode.parent("[class=tree-node]"); 
-    if (parent_node.length > 0)
+     if (focusNode.parent().get(0).getAttribute("class") == "tree-node")
     {
-        parent_node.children("text:first").each(
+        focusNode.parent().children("text:first").each(
             function()
             {
                 this.setAttribute("showme", "focus-parent");        
             }
         );
             
-        parent_node.children("rect").each(
+        focusNode.parent().children("rect").each(
             function() { this.setAttribute("showme", "focus-parent"); }
         );
-        parent_node.children().each(
+        focusNode.parent().children().each(
         function()
         {
             if (this.getAttribute("idref") == a_id)
