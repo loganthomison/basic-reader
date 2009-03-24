@@ -90,15 +90,24 @@ Alph.xlate = {
         var rp = a_e.rangeParent;
         var ro = a_e.rangeOffset;
 
+        // Check to see if the user has selected text from within an SVG diagram
+        var is_svg_text = (
+            rp instanceof SVGElement &&
+            rp.tagName == 'text' && 
+            rp.firstChild && 
+            rp.firstChild.nodeType == 3
+        );
         // if no data, nothing to do
-        if (typeof rp == "undefined" || rp == null || ! rp.data)
+        if (typeof rp == "undefined" || rp == null || 
+            (! rp.data && ! is_svg_text))
         {
             return;
         }
 
         /*
-         * This is code from peraperakun. It checks to make sure the target
-         * of the event is either a text node (nodeType of 3) or an element in a form.
+         * This is code originates from peraperakun. It checks to make sure the target
+         * of the event is either an SVG text node, a regular text node (nodeType of 3) 
+         * or an element in a form.
          * This prevents the popup from displaying when the mouse moves over whitespace
          * in the enclosing element.
          * The explicitOriginalTarget property of the event is a mozilla-specific
@@ -112,6 +121,7 @@ Alph.xlate = {
          * so this should be limited to use of the mousemove trigger.  
          */
         if ( Alph.main.getXlateTrigger() == 'mousemove' &&
+             ! is_svg_text &&
              (a_e.explicitOriginalTarget.nodeType != 3) && !("form" in a_e.target)) {
             return Alph.xlate.hidePopup();
         }
@@ -133,7 +143,21 @@ Alph.xlate = {
 
         var range = document.createRange();
         range.selectNode(rp);
-        var rngstr = range.toString();
+        var rngstr;
+        // when the selected element is an svg text element, retrieve the text from
+        // the child textNode directly rather than from the range parent.
+        // But when the trigger is dbleclick, the range parent text node is empty
+        // so the text must be retrieved from the explicitOriginalTarget instead.  
+        if (is_svg_text)
+        {
+            rngstr = rp.firstChild.nodeValue || 
+                (a_e.explicitOriginalTarget.firstChild ? 
+                    a_e.explicitOriginalTarget.firstChild.nodeValue : ""); 
+        }
+        else
+        {
+            rngstr = range.toString();
+        }
         /* detachs the range from the parent document so that DOM no longer tracks it */
         range.detach();
 
@@ -184,15 +208,19 @@ Alph.xlate = {
         alph_state.set_var("lastWord",alphtarget.getWord());
         alph_state.set_var("lastSelection", alphtarget);
 
-        // Add the range back to the document highlighted as the selected range
-        var doc = rp.ownerDocument;
-        var r = doc.createRange();
-        r.setStart(rp, alphtarget.getWordStart());
-        r.setEnd(rp, alphtarget.getWordEnd());
-        var sel = doc.defaultView.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(r);
-
+        // This code fails for an svg element; For now just skip it
+        // but we should eventually also highlight the selection within the svg  
+        if (! is_svg_text)
+        {
+            // Add the range back to the document highlighted as the selected range
+            var doc = rp.ownerDocument;
+            var r = doc.createRange();
+            r.setStart(rp, alphtarget.getWordStart());
+            r.setEnd(rp, alphtarget.getWordEnd());
+            var sel = doc.defaultView.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(r);
+        }
         // add the range parent object to the target
         // so that the user's selection can be highlighted
         // again differently after translation, if necessary
@@ -340,9 +368,13 @@ Alph.xlate = {
             }
         );
 
-        // re-highlight the translated range in the source document
+
         var rp = a_alphtarget.getRangeParent()
-        if (rp)
+        
+        // re-highlight the translated range in the source document
+        // This code fails for an svg element; For now just skip it
+        // but we should eventually also highlight the selection within the svg  
+        if (rp && ! rp instanceof SVGElement) 
         {
             var doc = rp.ownerDocument;
             var r = doc.createRange();
