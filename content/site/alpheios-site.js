@@ -36,19 +36,6 @@ Alph.site = {
      */
     setup_page: function(a_doc,a_type)
     {
-        // add the pedagogical text stylesheet
-        var ped_text_css = "chrome://alpheios/skin/alpheios-site-text.css";
-        // only add the stylesheet if it's not already there
-        if (Alph.$("link[href='"+ ped_text_css + "']",a_doc).length == 0)
-        {
-            var css = document.createElementNS(
-                "http://www.w3.org/1999/xhtml","link");
-            css.setAttribute("rel", "stylesheet");
-            css.setAttribute("type", "text/css");
-            css.setAttribute("href", ped_text_css);
-            css.setAttribute("id", "alpheios-site-text-css");
-            Alph.$("head",a_doc).append(css);
-        }
         
         // unless interactivity is enabled,
         // add the mouseover handlers for the parallel alignment
@@ -208,7 +195,8 @@ Alph.site = {
             if (Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == 'true')
             {
                 Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",true);
-                Alph.$(".alpheios-interlinear-toggle",a_doc).click();
+                Alph.site.handle_interlinear_toggle(null,
+                    Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
             }
             
         }
@@ -216,24 +204,39 @@ Alph.site = {
 
     /**
      * Toggle the interlinear display
+     * @param {Event} a_event the triggering event
+     * @param {Object} a_toggle (Optional)
      */
-    handle_interlinear_toggle: function(a_event)
+    handle_interlinear_toggle: function(a_event,a_toggle)
     {                      
-        var toggle_elem = this;
-        var checked = Alph.$(this).attr('checked');
+        var toggle_elem;
+        var checked;
+        
+        // if called directly, assume we want to show the interlinear text
+        if (a_event == null)
+        {
+            toggle_elem = a_toggle;
+            checked = true;
+        }
+        else
+        {
+            toggle_elem = this;
+            checked = Alph.$(this).attr('checked');
+        }
+        
         
         // keep the state of the XUL control and the document
         // control in sync
         Alph.$("#alpheios-trans-opt-inter-src").attr('checked',
             checked ? 'true' : 'false');
                
-        var trans_url = Alph.$("#alph-trans-url",this.ownerDocument).attr("url");
-        var words = Alph.$(".alpheios-word-wrap",this.ownerDocument).get();
+        var trans_url = Alph.$("#alph-trans-url",toggle_elem.ownerDocument).attr("url");
+        var words = Alph.$(".alpheios-word-wrap",toggle_elem.ownerDocument).get();
         if (checked)
         {
             var loading_msg = 
                 Alph.$("#alpheios-strings").get(0).getString("alph-loading-interlinear");
-            Alph.$(this)
+            Alph.$(toggle_elem)
                 .after('<div id="alpheios-loading-interlinear">' + loading_msg + '</div>');
                 
             // Reload the interlinear translation document rather than just retrieving
