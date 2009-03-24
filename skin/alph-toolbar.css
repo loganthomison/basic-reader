@@ -42,3 +42,10 @@ toolbarbutton.alph-detach-button:hover:active {
     list-style-image: url("chrome://alpheios/skin/detachActive.png");
 }
 
+toolbaritem.alpheios-loading {
+    padding-left: 18px;
+    background-image: url(loading.gif);
+    background-repeat: no-repeat;
+    cursor: progress;
+}
+

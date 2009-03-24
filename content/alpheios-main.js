@@ -1308,10 +1308,6 @@ Alph.main =
             // inject the pedagogical site with the alpheios-specific elements
             Alph.site.setup_page(bro.contentDocument,
                 Alph.Translation.INTERLINEAR_TARGET_SRC);
-
-            // setup the prototype interlinear display
-            Alph.pproto.setup_display(bro.contentDocument,
-                Alph.Translation.INTERLINEAR_TARGET_SRC);
         }
                 
         // notify the pedagogical reader observers

@@ -62,6 +62,16 @@ Alph.site = {
             Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
                 function(e) { Alph.site.toggle_alignment(e,this,a_type,false) }
             );
+            
+            // wrap a div around each target word so that the aligned text can
+            // be floated under it
+            if (Alph.$(".alpheios-word-wrap",a_doc).length == 0)
+            {
+                Alph.$(".alpheios-aligned-word",a_doc)
+                    .wrap("<div class='alpheios-word-wrap'></div>");
+            }
+                
+
             if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
             {
                 this.add_interlinear_toggle(a_doc);
@@ -176,121 +186,99 @@ Alph.site = {
     {
         
         // don't add the toggle if we don't have an aligned translation to use
-        if (Alph.$("#alph-trans-url",a_doc).length == 0)
+        if ( (Alph.$("#alph-trans-url",a_doc).length == 0) ||  
+               Alph.$(".alpheios-aligned-word",a_doc).length == 0)
         {
             return;
         }
         
-        // add a checkbox to control the interlinear translation in the source
-        // text display, but make sure we only add it once
-        if (Alph.$(".alpheios-interlinear-toggle",a_doc).length == 0)
+        // add handlers to interlinear translation controls 
+        // in the source text display, but only do it if this feature
+        // is turned on
+        if ( Alph.util.getPref("features.alpheios-interlinear") )
         {
-            Alph.$(".alpheios-enable-interlinear",a_doc).append(
-                '<input type="checkbox" class="alpheios-interlinear-toggle"/>' +
-                '<span>' +
-                document.getElementById("alpheios-strings")
-                            .getString("alph-enable-interlinear") +
-                '</span>'
-            );
+            
+            var my_obj = this;
+
+            Alph.$(".alpheios-interlinear-toggle",a_doc)
+                .bind('click', Alph.site.handle_interlinear_toggle);        
+
             // update the checked state of the interlinear toggle in the source text
-            // document with the state of real control from the XUL
-            Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",
-                Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == "true" 
-                    ? true : null);
-                
-            Alph.$(".alpheios-interlinear-toggle",a_doc).click(
-                function(e)
-                {
-                    // keep the state of the XUL control and the document
-                    // control in sync
-                    var checked = Alph.$(this).attr('checked');
-                    Alph.$("#alpheios-trans-opt-inter-src").attr('checked',checked);
-                    Alph.Translation.toggle_interlinear('src',e);
-                }
-            );
+            // document with the state of the XUL control
+            if (Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == 'true')
+            {
+                Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",true);
+                Alph.$(".alpheios-interlinear-toggle",a_doc).click();
+            }
+            
         }
     },
-    
-    add_interlinear_text: function(a_target,a_source)
-    {
-        // only do this once per document
+
+    /**
+     * Toggle the interlinear display
+     */
+    handle_interlinear_toggle: function(a_event)
+    {                      
+        var toggle_elem = this;
+        var checked = Alph.$(this).attr('checked');
+        
+        // keep the state of the XUL control and the document
+        // control in sync
+        Alph.$("#alpheios-trans-opt-inter-src").attr('checked',
+            checked ? 'true' : 'false');
+               
+        var trans_url = Alph.$("#alph-trans-url",this.ownerDocument).attr("url");
+        var words = Alph.$(".alpheios-word-wrap",this.ownerDocument).get();
+        if (checked)
         {
-            if (Alph.$(".alpheios-aligned-trans",a_target).length > 0)
-            {
-                return;
-            }
-        }
-        
-        // wrap a div around each target word so that the aligned text can
-        // be floated under it
-        Alph.$(".alpheios-aligned-word",a_target)
-            .wrap("<div class='alpheios-word-wrap'></div>");
-            
-        Alph.$(".alpheios-word-wrap",a_target).parent().addClass("alpheios-word-block");
-            
-        // add the aligned text to each source word
-        var next_offset = 0;
-        Alph.$(".alpheios-aligned-word",a_target).each(
-            function()
-            {
-                var parent = Alph.$(this).parent(".alpheios-word-wrap");
-                if (Alph.$(parent).prev().length == 0)
-                {
-                    next_offset = 0;                    
-                }
+            var loading_msg = 
+                Alph.$("#alpheios-strings").get(0).getString("alph-loading-interlinear");
+            Alph.$(this)
+                .after('<div id="alpheios-loading-interlinear">' + loading_msg + '</div>');
                 
-                // reset the offset if this is the first word in a block
-                if (next_offset > 0)
+            // Reload the interlinear translation document rather than just retrieving
+            // it from the translation panel, because the translation panel may
+            // not be open. We may also eventually want to be able to use a different document 
+            // for the interlinear than the side by side alignment.
+            // using XMLHttpRequest directly here because the interlinear may be in the
+            // chrome, which jQuery doesn't support
+            var r = new XMLHttpRequest();
+            r.onreadystatechange = function()
+            {
+                if (r.readyState == 4 && r.responseText) 
                 {
-                    Alph.$(parent).css("padding-left",next_offset+"px");                    
-                }
-                var offset_left = 0;
-                var offset_top = Alph.$(this).height();
-                var target_width = Alph.$(this).width();
-                    
-                if (Alph.$(this).attr("nrefs"))
-                {
-                    
-                    var my_ids = Alph.$(this).attr("nrefs").split(/\s|,/);
-                    for (var i=0; i<my_ids.length; i++) {
-                       if (my_ids[i]) { 
-                           var elem = Alph.$(".alpheios-aligned-word[id='" 
-                            + my_ids[i] + "']",a_source);
-                           if (elem.length == 0) {
-                                continue;
-                           }
-                           var id_copy = Alph.$(Alph.$(elem)[0]).clone().appendTo(parent);
-                           Alph.$(id_copy).attr("id", "il-" + my_ids[i]);
-                           Alph.$(id_copy).addClass("alpheios-aligned-trans");
-                           Alph.$(id_copy).removeClass("alpheios-aligned-word");
-                           Alph.$(id_copy).css("top",offset_top); 
-                           Alph.$(id_copy).css("left",offset_left + next_offset);
-                           offset_left = offset_left + Alph.$(id_copy).width();                           
-                       }
+                    var src_doc; 
+                    try {
+                        src_doc = (new DOMParser()).parseFromString(
+                            r.responseText,
+                            "application/xhtml+xml");
+                        Alph.site.populate_interlinear(
+                            words,
+                            src_doc,
+                            function() {
+                                Alph.$("#alpheios-loading-interlinear",
+                                    toggle_elem.ownerDocument).remove();
+                            });
                     }
-                    // adjust the offset of the next element
-                    // by the amount the additional words exceeds the original width;
-                    var overage = offset_left - target_width;
-                    if (overage > 0)
+                    catch(a_e)
                     {
-                        next_offset = overage;
+                        Alph.$("#alpheios-loading-interlinear",
+                                    toggle_elem.ownerDocument).remove();
+                        Alph.util.log("Unable to parse translation: " + a_e);
                     }
-                    else
-                    {
-                        next_offset = 0;
-                    }
+                    
                 }
-                else
+                else 
                 {
-                    next_offset = 0;
+                    Alph.util.log("Loading translation...");
                 }
-
             }
-        );
-        
-        // resize the source display to account for the new elements
-        this.resize_interlinear(a_target);
+            r.open("GET", trans_url);
+            r.send(null);                                
+        } else {
+            Alph.site.hide_interlinear(words);
 
+        }
     },
 
     /**
@@ -303,9 +291,9 @@ Alph.site = {
     
     /**
      * toggle the state of the target and parallel aligned text
-     * @param {Event} the event which triggered the action
-     * @param {Element} the target element
-     * @param {String} type of target text 
+     * @param {Event} a_event the event which triggered the action
+     * @param {Element} a_elem the target element
+     * @param {String} a_type type of target text 
      *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
      *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
      * @param {Boolean} a_on is the element toggling on (true) or off (false)
@@ -334,32 +322,150 @@ Alph.site = {
         }
     },
     
-        /**
-     * Enable the interlinear alignment
-     * @param {Document} a_target the target document for the interlinear translation
-     * @param {Document} a_source the source of the interlinear translation
-     *                   
+    /**
+     * Retrieve the interlinear aligned translation and add it to the display
+     * @param {Array} a_words array of words within the document for which to 
+     *                        retrieve the interlinear display
+     * @param {Document} a_source the document containing the aligned translation
+     * @param {Function} a_end_callback Callback function to execute once request
+     *                                  is finished. 
      */
-    enable_interlinear: function(a_target,a_source)
+    populate_interlinear: function(a_words,a_source,a_end_callback)
     {    
-        if ( (Alph.$(".alpheios-aligned-word",a_target).length == 0 ||
-              Alph.$(".alpheios-aligned-word",a_source).length == 0)  && 
-             (Alph.$("p.alph-proto-sentence",a_target).length == 0 ||
-             Alph.$("p.alph-proto-sentence",a_source).length == 0 )
-            )
+        /*
+         * This code is a little convuluted.  We want to issue
+         * the request to retrieve and insert the interlinear translation
+         * in a background thread (launched by setTimeout()) so that the remainder
+         * of the javascript processing for the page can finish without waiting
+         * for this to complete.  Because the function called by setTimeout operates
+         * in a separate thread, it needs to be called from with a closure
+         * so that it still has access to the underlying objects.
+         */
+        var populate_thread = function()
         {
-            // If we don't have interlinear markup in both the source
-            // and parallel text, just disable the interlinear option and return
-            // TODO we shouldn't assume that if interlinear is available one way
-            // it is also available the other way 
-            Alph.util.log("Disable interlinear");
-            Alph.$("#alph-trans-inter-trans-status").attr("disabled",true);
-            Alph.$("#alph-trans-inter-trans-status").attr("hidden",true);
-        }
-        else
+            this.run = function(a_ms)
+            {
+                var _self = this;
+                setTimeout(_self.execute,a_ms);
+            };
+            
+            this.execute = function()
+            {
+                var next_offset = 0;
+        
+                var start = (new Date()).getTime();
+                Alph.util.log("Starting interlinear " + start);
+                // add the aligned text to each source word
+                a_words.forEach(
+                    function(parent)
+                    {
+                   
+                        if (Alph.$(parent).attr("aligned-offset"))
+                        {
+                            Alph.$(parent).css("padding-left",Alph.$(parent).attr("aligned-offset"));     
+                            Alph.$(".alpheios-aligned-trans",parent).css("display","block");
+                        }
+                        else
+                        {
+                            var a_elem = Alph.$(".alpheios-aligned-word",parent); 
+                            if (Alph.$(parent).prev().length == 0)
+                            {
+                                next_offset = 0;                    
+                            }
+                            
+                            // reset the offset if this is the first word in a block
+                            if (next_offset > 0)
+                            {
+                                Alph.$(parent).css("padding-left",next_offset+"px");                    
+                            }
+                            var offset_left = 0;
+                            var offset_top = Alph.$(a_elem).height()/2;
+                            var target_width = Alph.$(a_elem).width();
+                                
+                            if (Alph.$(a_elem).attr("nrefs"))
+                            {
+                                
+                                var my_ids = Alph.$(a_elem).attr("nrefs").split(/\s|,/);
+                                for (var i=0; i<my_ids.length; i++) {
+                                   if (my_ids[i]) { 
+                                       var elem = Alph.$(".alpheios-aligned-word[id='" 
+                                        + my_ids[i] + "']",a_source);
+                                       if (elem.length == 0) {
+                                            continue;
+                                       }
+                                       var id_copy = Alph.$(Alph.$(elem)[0]).clone().appendTo(parent);
+                                       Alph.$(id_copy).attr("id", "il-" + my_ids[i]);
+                                       Alph.$(id_copy).addClass("alpheios-aligned-trans").css("display","inline");
+                                       Alph.$(id_copy).removeClass("alpheios-aligned-word");
+                                       Alph.$(id_copy).css("top",offset_top); 
+                                       Alph.$(id_copy).css("left",offset_left + next_offset);
+                                       offset_left = offset_left + Alph.$(id_copy).width();                           
+                                   }
+                                }
+                                // adjust the offset of the next element
+                                // by the amount the additional words exceeds the original width;
+                                var overage = offset_left - target_width;
+                                if (overage > 0)
+                                {
+                                    next_offset = overage;
+                                }
+                                else
+                                {
+                                    next_offset = 0;
+                                }
+                            }
+                            else
+                            {
+                                next_offset = 0;
+                            }
+            
+                        }
+                    }
+                );
+                a_end_callback();
+                var end = (new Date()).getTime();
+                Alph.util.log("Total time to insert interlinear: " + (end-start));
+            };
+        };
+        var thread = new populate_thread();
+        thread.run(500);
+    },
+    
+    /**
+     * Toggle the display of the interlinear aligned translation.  
+     * @param {Array} a_words array of words within the document for which to 
+     *                        toggle interlinear display 
+     * @parma {Document} a_src_doc the source document containing the aligned translation
+     * @param {Boolen} a_on flag to indicate whether the translation is being toggled
+     *                      on (true) or off (false)                   
+     */
+    toggle_interlinear: function(a_words,a_src_doc,a_on)
+    {
+        if (a_checked)
         {
-            Alph.$("#alph-trans-inter-trans-status").attr("disabled",false);
-            Alph.$("#alph-trans-inter-trans-status").attr("hidden",false);
         }
+    },
+    
+    /**
+     * Remove the interlinear translation from teh display
+     * @param {Array} a_words array of words within the document for which to 
+     *                        remove the interlinear display 
+     */
+    hide_interlinear: function(a_words)
+    {
+        a_words.forEach(
+            function(parent)
+            {
+                // capture the offset for the parent word-wrap elements so we don't
+                // have to calculate it again
+                Alph.$(parent).attr("aligned-offset",Alph.$(parent).css("padding-left"));     
+                Alph.$(".alpheios-aligned-trans",parent).css("display","none");
+                // reset the padding offset to zero so that the display looks normal
+                // without the interlinear text
+                Alph.$(parent).css("padding-left",0);
+            }
+        );
     }
+    
+    
 };

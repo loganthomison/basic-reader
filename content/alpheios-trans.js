@@ -81,7 +81,9 @@ Alph.Translation.prototype.show = function()
                 }
                 else 
                 {
-                    Alph.Translation.handle_error("error",trans_doc);
+                    Alph.Translation.handle_error(
+                        Alph.$("#alpheios-strings").get(0).getString("alph-loading-misc")
+                        ,trans_doc);
                 }
             }
             r.open("GET", trans_url);
@@ -127,21 +129,25 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
     Alph.$("body",a_trans_doc).html(a_data);
 
     // setup the display
-    // prototype
-    Alph.pproto.setup_display(a_trans_doc,'trans');
-    // site design revision
     Alph.site.setup_page(a_trans_doc,'trans');
-                    
-    // setup for interlinear    
-    Alph.site.enable_interlinear(a_bro.contentDocument,a_trans_doc);
-                    
-    // toggle the state of the interlinear display
-    // according to the selected state of the menu item
-    Alph.Translation
-        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_SRC);
-    Alph.Translation
-        .toggle_interlinear(Alph.Translation.INTERLINEAR_TARGET_TRANS);
-                    
+                        
+    var disable_interlinear = true;
+    if ( (Alph.$(".alpheios-aligned-word",a_trans_doc).length > 0) &&
+          Alph.util.getPref("features.alpheios-interlinear") )
+    {
+        disable_interlinear = false;
+        
+    }
+    Alph.$("#alph-trans-inter-trans-status").attr("disabled",disable_interlinear);
+    Alph.$("#alph-trans-inter-trans-status").attr("hidden",disable_interlinear);
+    // populate the interlinear display if it's checked and enabled
+    if ( ! disable_interlinear &&
+        (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
+       )
+    {
+        Alph.Translation.show_interlinear();
+    }
+                       
 }
 
 /**
@@ -171,6 +177,52 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
         Alph.Translation.loadUrl(null,url_bar);
     }
     **/
+};
+
+/**
+ * Static helper method to toggle the display state of the interlinear
+ * alignment in the source text.  This method is invoked by the command 
+ * which responds to selection of the Interlinear Translation item in the
+ * Options menu 
+ * @param {Event} a_event the Event which initiated the action (may be null)
+ */
+Alph.Translation.toggle_interlinear = function(a_event)
+{
+
+    var panel = Alph.$("#alph-trans-panel");
+
+    if (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
+    {
+        Alph.Translation.show_interlinear();
+    } else {
+        Alph.site.hide_interlinear(Alph.$(".alpheios-word-wrap",
+            Alph.$("browser",panel).get(0).contentDocument).get());
+    }
+};
+
+/**
+ * Static helper method to trigger the display the interlinear alignment 
+ */
+
+Alph.Translation.show_interlinear = function()
+{
+    var panel = Alph.$("#alph-trans-panel");
+    var browser_doc = Alph.main.getCurrentBrowser().contentDocument;
+    var trans_doc =  
+            Alph.$("browser",panel).get(0).contentDocument;
+    
+    Alph.$("#alpheios-trans-opt-inter-trans").
+        parent("toolbaritem").
+        addClass('alpheios-loading');
+    var words = Alph.$(".alpheios-word-wrap",trans_doc).get();
+    
+    Alph.site.populate_interlinear(
+        words,
+        browser_doc,
+        function(){Alph.$("#alpheios-trans-opt-inter-trans").
+            parent("toolbaritem").
+            removeClass('alpheios-loading'); }
+    );
 };
 
 /**
@@ -277,52 +329,6 @@ Alph.Translation.prototype.enable_interactive_query = function(a_params)
     Alph.$('.alpheios-aligned-word',trans_doc).unbind('click',Alph.interactive.checkAlignedSelect);
     Alph.$('.alpheios-aligned-word',trans_doc)
         .bind('click',a_params,Alph.interactive.checkAlignedSelect);            
-};
-
-/**
- * Static helper method to toggle the display state of the interlinear
- * alignment in the source text.  This method is invoked by the command 
- * which responds to selection of the Interlinear Translation item in the
- * Options menu 
- * @param {String} a_type identifieds target location for interlinear translation 
- *                (one of @link Alph.Translation.INTERLINEAR_TARGET_SRC or
- *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
- * @param {Event} a_event the Event which initiated the action (may be null)
- */
-Alph.Translation.toggle_interlinear = function(a_type,a_event)
-{
-    var panel = Alph.$("#alph-trans-panel");
-    var src_doc;
-    var target_doc;
-    var browser_doc = Alph.main.getCurrentBrowser().contentDocument;
-    var trans_doc =  
-            Alph.$("browser",panel).get(0).contentDocument;
-            
-    if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
-    {
-        target_doc = browser_doc;
-        src_doc = trans_doc;
-    }
-    else
-    {
-        target_doc = trans_doc;
-        src_doc = browser_doc;
-    }
-
-    if (Alph.$("#alpheios-trans-opt-inter-" + a_type).attr('checked') == 'true')
-    {
-        // make sure the interlinear translation has been added to the display
-        Alph.pproto.add_interlinear(target_doc,src_doc);
-        Alph.$(".alph-proto-iltrans",target_doc).css('display','block');
-
-        Alph.site.add_interlinear_text(target_doc,src_doc);
-        Alph.$(".alpheios-aligned-trans",target_doc).css('display','inline');
-    } else {
-        Alph.$(".alph-proto-iltrans",target_doc).css('display','none');
-        Alph.$(".alpheios-aligned-trans",target_doc).css('display','none');
-    }
-    Alph.pproto.resize_interlinear(target_doc);
-    Alph.site.resize_interlinear(target_doc);  
 };
 
 /**

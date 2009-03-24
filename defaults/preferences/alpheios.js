@@ -11,6 +11,7 @@ pref("extensions.alpheios.shift.window.loc",
         "topleft");
 pref("extensions.alpheios.features.alpheios-inflect",false);
 pref("extensions.alpheios.features.alpheios-grammar",false);
+pref("extensions.alpheios.features.alpheios-interlinear",true);
 pref("extensions.alpheios.cmds.alpheios-inflect-cmd","handleInflections");
 pref("extensions.alpheios.cmds.alpheios-morph-inflect-cmd","handleInflectionsForMorphWindow");
 pref("extensions.alpheios.cmds.alpheios-grammar-cmd","openGrammar");

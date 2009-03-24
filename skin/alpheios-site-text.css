@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+ 
 .alpheios-highlight-parallel {
     background-color: yellow;
     font-weight: bold;
@@ -31,6 +32,7 @@
 .alpheios-aligned-word {
     cursor: pointer;
 }
+
 
 .alpheios-aligned-trans {
     color: blue;
@@ -45,12 +47,9 @@
 .alpheios-word-wrap {
     display: inline;
     position: relative;
-    margin-bottom: 2em;
+    line-height: 200%;
 }
 
-.alpheios-word-block {
-    margin-bottom: 2em;
-}
 
 .upLink {
     display: none;
@@ -88,4 +87,29 @@
 
 .milestone.line {
     margin-top: 1em;
+}
+
+
+#alpheios-interlinear-parent {
+    position: relative;
+    font-size: small;
+    text-align: right;
+    margin: 1em; 
+}
+
+#alpheios-loading-interlinear {
+    position: absolute;
+    bottom: 0;
+    right: -1em;
+    z-index: 100;
+    text-align: right;
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background-image: url(loading.gif);
+    background-repeat: no-repeat;
+    background-color: #F0F7FF;
+    cursor: progress;
+    white-space: nowrap;
 }
