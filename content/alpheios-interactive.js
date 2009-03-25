@@ -80,8 +80,10 @@ Alph.interactive = {
 
         }
         // if the translation panel is open, offer interactive identification
-        // of definitions
-        if (Alph.main.panels['alph-trans-panel'].is_visible_inline())
+        // of definitions, unless the dependency tree display was the source of the
+        // selection
+        if (Alph.main.panels['alph-trans-panel'].is_visible_inline()
+            && Alph.$("#dependency-tree",a_topdoc).length == 0 )
         {
             var selected_word = Alph.$(".alph-word",a_topdoc).attr("context");
             var src_lang = lang_tool.source_language; 

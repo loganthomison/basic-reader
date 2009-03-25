@@ -152,6 +152,11 @@ Alph.Tree.prototype.show = function()
             );
         }
     }
+    // add the popup trigger handler to the tree browser
+    var trigger = Alph.main.getLanguageTool().getpopuptrigger();
+    Alph.$("browser",this.panel_elem).get(0).
+        addEventListener(trigger, Alph.main.doXlateText, false);
+
     return Alph.Panel.STATUS_SHOW;
 
 };
@@ -244,6 +249,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
                 );
             }
         });
+                
     }
     catch(e)
     {
@@ -274,6 +280,11 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                     .get(0);
             if (pw_bro)
             {
+                // add the popup trigger handler to the tree browser
+                var trigger = 
+                    Alph.main.getLanguageTool().getpopuptrigger();
+                pw_bro.addEventListener(trigger, Alph.main.doXlateText, false);
+
                 var window_doc = pw_bro.contentDocument;
                 var panel_tree = Alph.$("#dependency-tree", treeDoc).get(0);
                 var panel_error = Alph.$("#tree-error",treeDoc).html();
