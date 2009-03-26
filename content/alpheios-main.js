@@ -1160,11 +1160,7 @@ Alph.main =
         
         var lang_tool = Alph.main.getLanguageTool();
         
-        // we might have a custom event object, which contains
-        // the command id in a property
-        var cmd_id = 
-            a_event.target.getAttribute("id") ||
-            a_event.data.alpheios_cmd_id;
+        var cmd_id = a_event.target.getAttribute("id");
         if (cmd_id == null || typeof cmd_id == 'undefined')
         {
             return;
@@ -1233,28 +1229,13 @@ Alph.main =
                     'content="xxxx"></meta>');
         }
 
-        var ped_site;
-        ped_site = Alph.$("meta#alpheios-pedagogical-text",bro.contentDocument).length;
+        var ped_site = 
+            Alph.$("meta#alpheios-pedagogical-text",bro.contentDocument).length > 0
+            ? true : false;
 
-        // backwards compatability with older prototype which doesn't have
-        // the required pedagogical text metadata element
-        if (ped_site == 0)
-        {
-            ped_site = bro.currentURI.spec
-                          .match(Alph.util.getPref("ped-prototype-match"));
-        }
-
-        if (ped_site == null) 
-        {
-            this.get_state_obj(bro)
-                .set_var("level",Alph.main.levels.READER);
-        }
-        
-        if (ped_site != null)
+        if (ped_site)
         { 
-            this.get_state_obj(bro)
-                .set_var("level",
-                    Alph.$("meta#alpheios-level-selected",bro.contentDocument).attr("content"));
+            this.set_mode(bro);
             
             // retrieve the language from the html element of the content document
             var ped_lang = bro.contentDocument.documentElement.getAttribute("xml:lang")
@@ -1298,11 +1279,17 @@ Alph.main =
             this.autoToggle(bro);
             return;
         }
+        else if (this.is_enabled(bro))
+        {
+            // if we're on a basic site, and the extension is enabled,
+            // the set the mode to READER
+            this.set_mode(bro,Alph.main.levels.READER);
+        }
         
-        if (ped_site != null)
+        if (ped_site)
         {
             // these functions should only be called after Alpheios has been auto-toggled
-            // on because otherwise they gets done twice via the send call to reset_state
+            // on because otherwise they get done twice via the send call to reset_state
             // from Alph.main.onTabSelect
 
             // inject the pedagogical site with the alpheios-specific elements
@@ -1314,7 +1301,7 @@ Alph.main =
         Alph.$("broadcaster.alpheios-pedagogical-notifier").each(
             function()
             {
-                if (ped_site == null)
+                if (! ped_site)
                 {
                     Alph.$(this).attr("disabled",true)
                 }
@@ -1330,7 +1317,7 @@ Alph.main =
         Alph.$("broadcaster.alpheios-basic-notifier").each(
             function()
             {
-                if (ped_site == null)
+                if (! ped_site)
                 {
                     Alph.$(this).attr("disabled",false)
                     // only set hidden if the hidden attribute was already set
@@ -1489,6 +1476,69 @@ Alph.main =
             'alpheios-options-dialog', 
             'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
         );
+    },
+
+    /**
+     * set the mode variable for the browser. 
+     * @param a_bro the subject browser
+     * @param {String} a_mode the new mode (optional - if not supplied will
+     *                        be retrieved from the document metadata
+     */
+    set_mode: function(a_bro,a_mode)
+    {
+        if (typeof a_bro == "undefined" || a_bro == null)
+        {
+            a_bro = this.getCurrentBrowser();   
+        }
+        // if we weren't explicity passed the mode, check to see
+        // if it's present in the querystring for the page
+        if (typeof a_mode == "undefined")
+        {
+            var requested_mode = a_bro.currentURI.path.match(/alpheios_mode=([^&;]+)/);
+            if (requested_mode)
+            {
+                a_mode = requested_mode[1]
+            }
+        }
+        if (typeof a_mode != "undefined")
+        {
+            this.get_state_obj(a_bro).set_var("level",a_mode);
+        }
+        var new_mode = this.get_state_obj(a_bro).get_var("level");
+        try
+        {
+            Alph.$(".alpheios-toolbar-level",a_bro.contentDocument).each
+            (
+                function()
+                {
+                    if (Alph.$(this).attr("alpheios-value") ==  new_mode)
+                    {
+                        Alph.$(this).addClass("alpheios-current");
+                        Alph.$(this)
+                            .siblings(".alpheios-toolbar-level")
+                            .removeClass("alpheios-current");
+                    }
+                }
+            );
+        }
+        catch(a_e)
+        {
+            Alph.util.log("Unable to update menu with new mode " + a_e);
+        }             
+    },
+       
+    /**
+     * get the mode variable for the browser
+     * @param a_bro the subject browser
+     */
+    get_mode: function(a_bro)
+    {
+     
+        if (! a_bro)
+        {
+            a_bro = this.getCurrentBrowser();
+        }
+        return this.get_state_obj(a_bro).get_var("level");
     }
 };
 

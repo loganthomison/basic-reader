@@ -32,6 +32,9 @@
  */
 Alph.State = function()
 {
+    /**
+     * default values are in the format [ <default value>, <persist boolean> ]
+     */
     this._defaults = 
     {   enabled: [false,true],
         toggled_by: [Alph.State.SYS_ACTION,true],
@@ -43,7 +46,7 @@ Alph.State = function()
         lastSelection: [null,false],
         lastWord: [null,false],
         word: [null,false], // TODO - these last two should be merged?,
-        level: 'reader'
+        level: ['reader',true]
     };
     
     for (var name in this._defaults)

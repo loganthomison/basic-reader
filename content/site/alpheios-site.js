@@ -105,9 +105,16 @@ Alph.site = {
         );
         Alph.$(".alpheios-toolbar-level",toolbars).bind(
             'click',
-            { alpheios_cmd_id: 'alpheios-level-cmd' },
-            this.do_command_handler
+            function()
+            {
+                var mode = this.getAttribute('alpheios-value');
+                if (mode)
+                {
+                    Alph.main.set_mode(null,mode);
+                }
+            }
         );
+        
         Alph.$(".alpheios-toolbar-inflect",toolbars).bind(
             'click',
             { alpheios_cmd_id: 'alpheios-inflect-cmd' },

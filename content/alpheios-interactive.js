@@ -46,7 +46,7 @@ Alph.interactive = {
      */
     enabled: function(a_bro)
     {
-        return Alph.main.get_state_obj(a_bro).get_var("level") == Alph.main.levels.LEARNER;
+        return Alph.main.get_mode() == Alph.main.levels.LEARNER;
 
     },
     
