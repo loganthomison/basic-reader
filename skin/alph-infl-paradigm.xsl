@@ -4,8 +4,8 @@
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:exsl="http://exslt.org/common">
 
-    <!-- xsl:import href="alph-infl-extras.xsl"/>
-    <xsl:import href="alph-infl-match.xsl"/-->
+    <xsl:import href="alph-infl-extras.xsl"/>
+    <xsl:import href="alph-infl-match.xsl"/>
     
     <xsl:output encoding="UTF-8" indent="yes" method="html"/>
      <xsl:strip-space elements="*"/>
@@ -33,11 +33,9 @@
         <xsl:variable name="table-notes">
             <xsl:if test="@footnote">
                 <div id="table-notes">
-                    <!--
                     <xsl:call-template name="add-footnote">
                         <xsl:with-param name="item" select="."/>
                     </xsl:call-template>
-                    -->
                 </div>
             </xsl:if>    
         </xsl:variable>
@@ -55,7 +53,9 @@
         <xsl:choose>
             <xsl:when test="$fragment">
                 <xsl:copy-of select="$table-notes"/>
-                <xsl:apply-templates select="exsl:node-set($data)"/>
+                <div id="alph-infl-table">
+                        <xsl:apply-templates select="exsl:node-set($data)"/>
+                </div>
             </xsl:when>
             <xsl:otherwise>
                 <html>
@@ -76,13 +76,7 @@
     </xsl:template>
         
     <xsl:template match="infl-paradigm">
-        <xsl:variable name="div_id">
-            <xsl:choose>
-                <xsl:when test="$paradigm_id">alph-infl-table</xsl:when>
-                <xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <div id="{$div_id}">
+        <div id="{@id}">
             <div class="title"><xsl:apply-templates select="title"/></div>
             <xsl:apply-templates select="table"/>
         </div>
@@ -116,6 +110,9 @@
                                 <xsl:for-each select="@*[local-name(.) !='role']">
                                     <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
                                 </xsl:for-each>
+                                <xsl:call-template name="add-footnote">
+                                    <xsl:with-param name="item" select="."/>
+                                </xsl:call-template>
                                 <xsl:apply-templates/>
                                 <!--
                                 <div class="attributes">
