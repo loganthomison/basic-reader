@@ -17,7 +17,7 @@
                     .update_status(
                         window.opener.Alph.main.panels['alph-morph-panel'].hide()
                     );">;
-    <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6.min.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
 

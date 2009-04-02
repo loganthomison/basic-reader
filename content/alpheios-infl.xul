@@ -19,7 +19,7 @@
                       src="chrome://alpheios/locale/alpheios-infl.properties"/>
     </stringbundleset>
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-infl.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.1.min.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery.tablehover.pack.js" />
 
     <vbox flex="1">
