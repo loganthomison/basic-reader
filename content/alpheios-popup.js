@@ -123,7 +123,8 @@ Alph.xlate = {
         if ( Alph.main.getXlateTrigger() == 'mousemove' &&
              ! is_svg_text &&
              (a_e.explicitOriginalTarget.nodeType != 3) && !("form" in a_e.target)) {
-            return Alph.xlate.hidePopup();
+            this.clearSelection();                
+            return;
         }
 
         // disable the translate function if and the mouse is over an 
@@ -132,7 +133,8 @@ Alph.xlate = {
         if ( Alph.$(a_e.explicitOriginalTarget).hasClass('alpheios-ignore') ||
              Alph.$(a_e.explicitOriginalTarget).parents('.alpheios-ignore').length > 0)
         {
-            return Alph.xlate.hidePopup();
+            this.clearSelection();
+            return;
         }
 
         /* The rangeParent is going to be a #text node.
@@ -184,25 +186,37 @@ Alph.xlate = {
         }
 
         // if we advanced past the end of the string without finding anything 
-        // then it was empty space so just close the popup and return 
+        // then it was empty space so just clear the selection and return 
         if (ro >= rngstr.length) {
-            return Alph.xlate.hidePopup();
+            
+            this.clearSelection();
+            return;
         }
         var alphtarget = Alph.main.getLanguageTool().findSelection(ro,rngstr);
 
         // if we couldn't identify the target word, return without doing anything
         if (! alphtarget.getWord())
         {
-            return
+            this.clearSelection();
+            return;
         }
                     
         // nothing to do if same word as last AND the popup is shown
         // (hidePopup removes the last word from the state variable),
+        // unless we're in query  mode, in which case selecting the same word
+        // again should act like a reset
         var alph_state = Alph.main.get_state_obj();
         var lastSelection = alph_state.get_var("lastSelection");
         if (alphtarget.equals(lastSelection))
         {
-            return;
+            if (Alph.interactive.enabled())
+            {
+                Alph.interactive.closeQueryDisplay(Alph.main.getCurrentBrowser());
+            }
+            else
+            {
+                return;
+            }
         }
 
         alph_state.set_var("lastWord",alphtarget.getWord());
@@ -579,23 +593,19 @@ Alph.xlate = {
             Alph.$("body",topdoc).append(popup);
         
             
-            // add a close link if the popup is activated by a double-click
-            // instead of mouseover
-            if (Alph.main.getXlateTrigger() == 'dblclick')
-            {
-                var close_link =
-                   topdoc.createElementNS("http://www.w3.org/1999/xhtml",
+            // add a close link 
+            var close_link =
+                topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                         "div");
-                close_link.setAttribute("id","alph-close");
-                close_link.innerHTML = "[x]";
-                popup.appendChild(close_link);
-                Alph.$("#alph-close",topdoc).bind("click",
-                    function()
-                    {
-                        Alph.xlate.hidePopup()
-                    }
-                );
-            }
+            close_link.setAttribute("id","alph-close");
+            close_link.innerHTML = "[x]";
+            popup.appendChild(close_link);
+            Alph.$("#alph-close",topdoc).bind("click",
+                function()
+                {
+                    Alph.xlate.hidePopup()
+                }
+            );
                 
             var anchor = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                                  "a");
@@ -844,15 +854,7 @@ Alph.xlate = {
         var topdoc = a_node || this.getLastDoc();
         Alph.$("#alph-window",topdoc).css("display","none");
         Alph.$("#alph-text",topdoc).remove();
-        try {
-            topdoc.defaultView.getSelection().removeAllRanges();
-        } catch(a_e)
-        {
-            //TODO sometimes we get a null defaultView. Need to figure
-            // out why and fix, rather than just logging it.
-            Alph.util.log("no default view");
-        }
-        
+        this.clearSelection(topdoc);
         // remove the last word from the state
         var alph_state = Alph.main.get_state_obj();
         if (alph_state.get_var("enabled"))
@@ -1245,6 +1247,28 @@ Alph.xlate = {
             lastdoc = Alph.main.getCurrentBrowser().contentDocument;
         }
         return lastdoc;
+     },
+    
+     /**
+     * Clears the last selection
+     * @param {Document} a_doc the source document 
+     */
+     clearSelection: function(a_doc)
+     {
+        if (typeof a_doc == 'undefined')
+        {
+            a_doc = this.getLastDoc();
+        }
+    
+        try {
+            a_doc.defaultView.getSelection().removeAllRanges();
+        } 
+        catch(a_e)
+        {
+            //TODO sometimes we get a null defaultView. Need to figure
+            // out why and fix, rather than just logging it.
+            Alph.util.log("no default view");
+        }
      }
      
 };

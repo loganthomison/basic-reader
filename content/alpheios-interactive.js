@@ -114,7 +114,8 @@ Alph.interactive = {
         }
         else
         {
-            // hide the popup
+            // hide the popup - but don't call hidePopup because that resets
+            // state which we might need
             Alph.$("#alph-window",a_topdoc).css("display","none");
             params.type = 'full_query';
                 
@@ -359,5 +360,17 @@ Alph.interactive = {
             Alph.$(a_ending).addClass('incorrect');
             return false;
         }    
+     },
+     
+     /**
+      * close the query display window
+      * @param {Browser} a_bro the current browser
+      */
+     closeQueryDisplay: function(a_bro)
+     {
+        if (this.query_visible())
+        {
+            Alph.main.get_state_obj(a_bro).get_var("windows")['alph-query-window'].close();
+        }
      }
 }

@@ -44,13 +44,6 @@ Alph.main =
      */
     mm_languages_updated: false,
     
-    /**
-     * flag for the status of the ctrl key
-     * @private
-     * @type Boolean 
-     */
-    ctrlDown: false,
-
     // id of this extension
     // TODO we can probably remove this now
     extensionGUID: "{4816253c-3208-49d8-9557-0745a5508299}",
@@ -280,7 +273,6 @@ Alph.main =
         this.mouseButtons = 0;
         
         a_bro.addEventListener("keydown", this.onKeyDown, true);
-        a_bro.addEventListener("keyup", this.onKeyUp, true);
         this.get_state_obj(a_bro).set_var("enabled",true);
         if (! this.has_languages)
         {
@@ -324,7 +316,6 @@ Alph.main =
         }
         this.removeXlateTrigger(a_bro);
         a_bro.removeEventListener("keydown", this.onKeyDown, true);
-        a_bro.removeEventListener("keyup", this.onKeyUp, true);
 
         Alph.xlate.removePopup(a_bro);
 
@@ -483,13 +474,6 @@ Alph.main =
         //    return true;
         //}
 
-        // disable the mousemove handler if the ctrl key
-        // is currently pressed
-        // (i.e. to enable mouse movement into the popup to click a link)
-        if ( Alph.main.getXlateTrigger() == 'mousemove' && Alph.main.ctrlDown) {
-            return true;
-        }
-
         Alph.xlate.doMouseMoveOverText(a_event);
     },
 
@@ -518,27 +502,10 @@ Alph.main =
                 Alph.main.getLanguageTool().shiftHandler(a_event,popup);
             }
         }
-        else if (a_event.keyCode == 17) {
-            Alph.main.ctrlDown = true;
-        }
         // return true to allow event propogation if needed
         return true;
     },
 
-    /**
-     * Handler for the KeyUp event
-     * @param {Event} a_event the keyup event
-     */
-    onKeyUp: function(a_event)
-    {
-        // reset the status of the ctrlDown flag
-        // to reenable the mousemove handler
-        if (a_event.keyCode == 17)
-        {
-            Alph.main.ctrlDown = false;
-        }
-        return true;
-    },
 
     /**
      * Toggle the text of the browser menu items for extension to 

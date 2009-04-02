@@ -380,11 +380,10 @@ function(a_ro, a_rngstr)
     Alph.util.log("In doSpaceSeparatedWordSelection for " + a_rngstr);
 
     // If the user selected whitespace in the margins of a range
-    // close the popup and return.
+    // just return.
     if (this.selectionInMargin(a_ro, a_rngstr))
     {
-        // return and hide popup for mouseover whitespace
-        Alph.xlate.hidePopup();
+        // return for mouseover whitespace
         return result; 
     }
     
@@ -482,11 +481,10 @@ function(a_ro, a_rngstr)
     a_rngstr = a_rngstr.replace(/[.,;:!?'\"(){}\[\]\/\\\xA0\n\r]/g, " ");
 
     // If the user selected whitespace in the margins of a range
-    // close the popup and return.
+    // just return.
     if (this.selectionInMargin(a_ro, a_rngstr))
     {
-        // return and hide popup for mouseover whitespace
-        Alph.xlate.hidePopup();
+        // return for mouseover whitespace
         return result; 
     }
 
