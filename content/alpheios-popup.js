@@ -248,7 +248,7 @@ Alph.xlate = {
             alphtarget.setTreebankQuery(treebank_url.replace(/WORD/,treebank_ref));
         }
         // show output
-        this.showPopup(a_e.target, a_e.screenX, a_e.screenY, alphtarget);
+        this.showPopup(a_e,alphtarget);
     },
 
 
@@ -544,14 +544,19 @@ Alph.xlate = {
      * Determines whether or not the popup should be displayed in response
      * to the trigger event. Called by the {@link #doMouseMoveOverText} event handler.
      * @private
-     * @param {Element} a_elem the target Element of the event
-     * @param {int} a_x the X-coordinate of the trigger event
-     * @param {int} a_y the Y-coordinate of the trigger event
+     * @param {Event} the event which triggered the popup
      * @param {Object} the details on the target of the event which triggered the popup
      *                 @see Alph.LanguageTool#findSelection
      */
-    showPopup: function(a_elem, a_x, a_y, a_alphtarget)
+    showPopup: function(a_e, a_alphtarget)
     {
+    
+        var a_elem = a_e.target;
+        var a_x = a_e.screenX;
+        var a_y = a_e.screenY;
+        var pageX = a_e.pageX;
+        var pageY = a_e.pageY;
+        
         const topdoc = a_elem.ownerDocument;
         var alph_state = Alph.main.get_state_obj();
         var popup;
@@ -646,8 +651,6 @@ Alph.xlate = {
         popup.style.maxWidth = "600px";
 
         /* reset the contents of the popup */
-        // TODO - just add a background loading if the popup has contents?
-
         var xlate_loading =
             document
                 .getElementById("alpheios-strings")
@@ -659,154 +662,38 @@ Alph.xlate = {
             '</div></div>'
         );
 
+        // move the popup to just below the selected element
         if (a_elem)
         {
-            popup.style.top = "-1000px";
-            popup.style.left = "0px";
-            popup.style.display = "";
-
-            var pW = popup.offsetWidth;
-            var pH = popup.offsetHeight;
-
-            // we may need to just guess!
-            if (pW <= 0)
-                pW = 200;
-            if (pH <= 0)
+            var offset = 0;
+            // jquery innerHeight calculation doesn't work for svg elements,
+            // so try to get their height from their height attribute;
+            if (a_elem instanceof SVGElement && a_elem.getAttribute("height"))
             {
-                pH = 0;
-                var j = 0;
-                // TODO figure out what to do here since we don't have the text yet
-                //while ((j = a_text.indexOf("<br/>", j)) != -1)
-                while (j < 5)
-                {
-                    j += 5;
-                    pH += 22;
+                try {
+                    offset = parseInt(a_elem.getAttribute("height"));
                 }
-                pH += 25;     
+                catch(a_error)
+                {
+                    Alph.util.log("Unable to parse height of svg element: "+ a_error);
+                }
+                
             }
-
-            // these things are always on top, so go sideways
-            if (a_elem instanceof Components.interfaces.nsIDOMHTMLOptionElement)
-            {
-                // find the position relative to top-most window
-                a_x = 0;
-                a_y = 0;
-
-                var e = a_elem;
-                while (e)
-                {
-                    a_x += e.offsetLeft;
-                    a_y += e.offsetTop;
-                    if (e.offsetParent)
-                    {
-                        e = e.offsetParent;
-                    }
-                    else
-                    {
-                        e = e.ownerDocument;
-                        if ((!e) ||
-                            (!e.defaultView) ||
-                            (!e.defaultView.frameElement))
-                        {
-                           break;
-                        }
-                        e = e.defaultView.frameElement;
-                    }
-                }
-
-                // need another loop since elements like scrollable DIVs
-                // (any others?) are probably not in the path of offsetParent
-                const mainBody = window.content.document.body;
-                e = a_elem;
-                while (e)
-                {
-                    if (e.scrollTop != null)
-                    {
-                        a_x -= e.scrollLeft;
-                        a_y -= e.scrollTop;
-                    }
-                    if (e.parentNode)
-                    {
-                        e = e.parentNode;
-                        if (e == mainBody)
-                            break;
-                    }
-                    else
-                    {
-                        if ((!e.defaultView) || (!e.defaultView.frameElement))
-                            break;
-                        e = e.defaultView.frameElement;
-                    }
-                }
-
-                if (a_x > (content.innerWidth - (a_x + a_elem.offsetWidth)))
-                {
-                    a_x = (a_x - popup.offsetWidth - 5);
-                    if (a_x < 0)
-                        a_x = 0;
-                }
-                else
-                {
-                    a_x += a_elem.offsetWidth + 5;
-                }
-            }
-            // all html elements except option elements?
             else
             {
-                const bbo = gBrowser.mCurrentBrowser.boxObject;
-
-                a_x -= bbo.screenX;
-                a_y -= bbo.screenY;
-                
-                if (typeof frame_offset != "undefined")
-                {
-                    a_x -= frame_offset.left;
-                    a_y -= frame_offset.top;
-                }
-                
-                // go left if necessary
-                if ((a_x + pW) > (content.innerWidth - 15))
-                {
-                    a_x = (content.innerWidth - pW) - 15;
-                    if (a_x < 0)
-                        a_x = 0;
-                }
-
-                // below the mouse
-                var v = 20;
-
-                // under the popup title
-                if ((a_elem.title) && (a_elem.title != ""))
-                    v += 20;
-
-                // go up if necessary
-                if ((a_y + v + pH) > content.innerHeight)
-                {
-                    var t = a_y - pH - 20;
-                    if (t >= 0)
-                        a_y = t;
-                }
-                else
-                    a_y += v;
-
-                a_x += content.scrollX;
-                a_y += content.scrollY;
-                
-                if (typeof frame_scroll != "undefined")
-                {
-                    a_x += frame_scroll.left;
-                    a_y += frame_scroll.top;
-                }
+                offset = Alph.$(a_elem).innerHeight();  
+            }
+            if (offset && offset > 2)
+            {
+                // just adjust by half of the height, because depending upon where
+                // the mouse entered the word, and the padding, the full height
+                // might be too much
+                pageY = pageY + Math.round(offset/2);
             }
         }
-        else
-        {
-            a_x += content.scrollX;
-            a_y += content.scrollY;
-        }
 
-        popup.style.left = a_x + "px";
-        popup.style.top = a_y + "px";
+        popup.style.left = pageX + "px";
+        popup.style.top = pageY + "px";
         popup.style.display = "";
 
         // add the original word to the browser's alpheios object so that the
