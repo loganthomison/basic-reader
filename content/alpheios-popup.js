@@ -456,11 +456,9 @@ Alph.xlate = {
 
         var wordHTML = Alph.xlate.transform(a_xml);
         // just quietly display the morpheus output if the treebank query
-        // returned an error or without any data
-        if (   (wordHTML == '')
-            || (   (Alph.$(".alph-entry",wordHTML).size() == 0)
-                && (Alph.$(".alph-unknown",wordHTML).size() == 0)
-                && (Alph.$(".alph-error",wordHTML).size() == 0)))
+        // returned an error or didn't include any inflection data
+        if (   (wordHTML == '') ||
+               Alph.$(".alph-infl",wordHTML).length == 0)        
         {
             a_doc_array.forEach(
                 function(a_doc)
@@ -478,37 +476,36 @@ Alph.xlate = {
 
             Alph.main.getLanguageTool().postTransform(new_text_node);
 
-            var lemma = Alph.$(".alph-dict",new_text_node).attr("lemma-key");
-            var popup = Alph.$("#alph-text",a_topdoc);
             
-            var entry = [];
-            if (lemma)
-            {
-                entry = Alph.$(".alph-dict[lemma-key="+lemma+"]",popup)
-                    .parent(".alph-entry");
-            }
+            var new_entry = Alph.$(".alph-entry",new_text_node);
+            var new_hdwd = Alph.$(".alph-dict",new_entry).attr("lemma-id");
+            
+            var new_infl_node = 
+                    Alph.$(".alph-infl",new_entry).get(0);
 
-            if (entry.length == 1)
-            {
-                
-                var new_infl_node = 
-                    Alph.$(".alph-infl-set",new_text_node).get(0);
-
-                a_doc_array.forEach(
-                    function(a_doc)
+            
+            
+            a_doc_array.forEach(
+                function(a_doc)
+                {
+                    var popup = Alph.$("#alph-text",a_doc);
+    
+                    // try to find an entry with the same lemma and replace the 
+                    // contents of the first inflection set for that entry 
+                    // with the treebank output
+                    var entry_match = 
+                        Alph.$(".alph-dict[lemma-id=" + new_hdwd +"]",popup)
+                        .parents(".alph-entry");
+                    if (entry_match.length > 0)
                     {
-                        var doc_entry = 
-                            Alph.$("#alph-text .alph-dict[lemma-key="+lemma+"]",a_doc)
-                            .parent(".alph-entry");
-
-                        Alph.$(".alph-infl-set",doc_entry).each(
+                        Alph.$(".alph-infl-set",entry_match).each(
                             function(a_i)
                             {
                                 if (a_i == 0)
-                                {   
-                                    Alph.$(this)
-                                        .after(Alph.$(new_infl_node).clone())
-                                        .remove();
+                                {
+                                    Alph.$(".alph-infl",this).remove();
+                                    Alph.$(this).append(
+                                        Alph.$(new_infl_node).clone(true));
                                 }
                                 else
                                 {
@@ -516,26 +513,29 @@ Alph.xlate = {
                                 }
                             }
                         );
-                        Alph.$(doc_entry).siblings(".alph-entry").remove();
-                        Alph.$(doc_entry).parent(".alph-word").siblings(".alph-word").remove();
-                        Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                        Alph.$(entry_match).siblings('.alph-entry').remove();
+                        Alph.$(entry_match).parent(".alph-word")
+                            .siblings(".alph-word").remove();
+                        
+                    }
+                    // if we can't find a matching entry, then just add the treebank
+                    // info to the popup as a separate entry (it will be missing
+                    // the term stem and suffix)
+                    else
+                    {
+                        Alph.util.log("Can't find entry matching treebank");
+                        Alph.$(".alph-word-first",popup).removeClass("alph-word-first");
+                        Alph.$(popup).prepend(
+                                Alph.$(".alph-word",new_text_node).clone(true)
+                                    .addClass("tb-morph-word")
+                                    .addClass("alph-word-first")
+                        );
+                                            
+                    }
+                    Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                }
                     
-                    }
-                );
-                
-            }
-            else
-            {
-                a_doc_array.forEach(
-                    function(a_doc)
-                    {                     
-                        Alph.$("#alph-text",a_doc).prepend(Alph.$(new_text_node).clone());
-                        Alph.$(".alph-word=first",a_doc).removeClass("alph-word-first");
-                        Alph.$("div.alph-word:first",a_doc).addClass("alph-word-first");
-                        Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
-                    }
-                );
-            }
+            );
         }
         Alph.$("#alph-window-anchor",a_topdoc).focus();
     },
