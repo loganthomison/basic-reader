@@ -393,23 +393,27 @@
   </xsl:template>
 
   <xsl:template match="case">
+    
+    <xsl:variable name="num" select="../num"/>
+    <xsl:variable name="gend" select="../gend"/>
+    <xsl:variable name="pofs" select="../pofs"/>
     <xsl:variable name="context">
       <xsl:value-of select="."/>
       <xsl:text>-</xsl:text>
-      <xsl:value-of select="../num"/>
+      <xsl:value-of select="$num"/>
       <xsl:text>-</xsl:text>
-      <xsl:value-of select="../gend"/>
+      <xsl:value-of select="$gend"/>
       <xsl:text>-</xsl:text>
-      <xsl:value-of select="../pofs"/>
+      <xsl:value-of select="$pofs"/>
     </xsl:variable>
-    <span class="alph-case" context="{translate($context,' ','_')}">
+    <span class="alph-case" context="{translate($context,' ','_')}"
+      alph-num="{$num}" alph-gend="{$gend}" alph-pofs="{$pofs}">
       <xsl:value-of select="."/>
       <xsl:if
         test="(../pofs='pronoun' or
                            ../pofs='adjective' or
                            ../pofs='supine' or
                            ../pofs='verb participle') and ../gend">
-        <xsl:variable name="gend" select="../gend"/>
         <xsl:choose>
           <xsl:when test="$gend='masculine'">
             <xsl:text> (m)</xsl:text>

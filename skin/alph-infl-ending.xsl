@@ -60,6 +60,7 @@
                                     <xsl:call-template name="uni-strip">
                                         <xsl:with-param name="input" select="."/>
                                         <xsl:with-param name="strip-vowels" select="true()"/>
+                                        <xsl:with-param name="strip-diaereses" select="false()"/>
                                         <xsl:with-param name="strip-caps" select="false()"/>
                                     </xsl:call-template>                              
                                 </xsl:when>
@@ -69,12 +70,24 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:variable>
+                        <!-- underscore and hyphen in the declension tables match on no ending -->
+                        <xsl:variable name="ending_match">
+                            <xsl:choose>
+                                <xsl:when test="$stripped-ending = '_' or $stripped-ending = '-'">_</xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="normalize-space($stripped-ending)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
                         <xsl:variable name="selected_class">
                             <xsl:choose>
                                 <!-- if this inflection-set is selected by it's attributes AND
-                                    the ending matches the one supplied in the template params
-                                    then add a 'selected' class to the data element -->                                        
-                                <xsl:when test="contains($selected,concat(',',$stripped-ending,','))">selected</xsl:when>
+                                    a) the ending matches the one supplied in the template params
+                                    OR
+                                    b) the template params didn't identify the ending
+                                    then add a 'selected' class to the data element -->
+                                <xsl:when test="contains($selected,concat(',',$ending_match,','))
+                                    or ($selected != '' and not($selected_endings//span[@class='alph-term']))">selected</xsl:when>
                                 <!-- otherwise add the class 'matched' to indicate that the ending matches but
                                     the form attributes don't -->
                                 <xsl:otherwise>
@@ -86,14 +99,16 @@
                                             translate(text(),
                                             $uni-with-length,
                                             $uni-without-length) 
-                                            = $stripped-ending]
+                                            = $ending_match]
                                             ) &gt; 0">matched</xsl:when>
                                         <xsl:when test="$strip_greek_vowel_length = false()
                                             and count
                                             ($selected_endings//span
                                             [@class='alph-suff' and 
-                                            text() = $stripped-ending]
+                                            text() = $ending_match]
                                             ) &gt; 0">matched</xsl:when>
+                                        <xsl:when test="$selected_endings//span[@class='alph-term']/span[@class='alph-suff' and not(text())]
+                                            and $ending_match = '_'">matched</xsl:when>
                                     </xsl:choose>  
                                 </xsl:otherwise>        
                             </xsl:choose>                                                                                

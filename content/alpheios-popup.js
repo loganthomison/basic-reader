@@ -662,34 +662,12 @@ Alph.xlate = {
             '</div></div>'
         );
 
-        // move the popup to just below the selected element
+        // move the popup to just below the mouse coordinates
+        // (using height of current element isn't reliable because it might 
+        //  a single element which contains a large block of text)
         if (a_elem)
         {
-            var offset = 0;
-            // jquery innerHeight calculation doesn't work for svg elements,
-            // so try to get their height from their height attribute;
-            if (a_elem instanceof SVGElement && a_elem.getAttribute("height"))
-            {
-                try {
-                    offset = parseInt(a_elem.getAttribute("height"));
-                }
-                catch(a_error)
-                {
-                    Alph.util.log("Unable to parse height of svg element: "+ a_error);
-                }
-                
-            }
-            else
-            {
-                offset = Alph.$(a_elem).innerHeight();  
-            }
-            if (offset && offset > 2)
-            {
-                // just adjust by half of the height, because depending upon where
-                // the mouse entered the word, and the padding, the full height
-                // might be too much
-                pageY = pageY + Math.round(offset/2);
-            }
+            pageY = pageY + 12;
         }
 
         popup.style.left = pageX + "px";
