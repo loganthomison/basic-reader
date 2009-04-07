@@ -28,7 +28,6 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:message>Matching on <xsl:value-of select="$ending_match"/></xsl:message>
                 <xsl:variable name="possible">
                     <xsl:for-each select="div[@class='alph-infl']">
                         <xsl:call-template name="find_infl_match">
@@ -114,9 +113,8 @@
                                 translate($current_data/@*[local-name(.)=$att_name],' ','|'),
                                 '|')"/>
                         </xsl:variable>                        
-                        <xsl:message>Checking <xsl:value-of select="$att_name"/> with value of <xsl:value-of select="$att_value"/></xsl:message>
                         <xsl:choose>
-                            <xsl:when test="$skip_att = true()">
+                            <xsl:when test="$skip_att = '1'">
                                 <!-- just advance the counter for the ones we're skipping -->
                                 <xsl:call-template name="find_infl_match">
                                     <xsl:with-param name="current_data" select="$current_data"/>
@@ -134,14 +132,6 @@
                                     (contains($att_value,concat('|',span[@class=$class_name]/text(),'|')))
                                     or
                                     (contains($att_value,concat('|',span[@class=$class_name]/@context,'|')))
-                                    or
-                                    ($att_name='case' and 
-                                        contains($att_value,
-                                                  substring-before(span[@class=$class_name]/@context,'-')))
-                                    or 
-                                    ($att_name='num' and 
-                                    contains($current_data/@*[local-name(.)=$att_name],
-                                    substring-before(span[@class=$class_name]/@context,'-')))
                                     )]"/>
                                 <xsl:call-template name="find_infl_match">
                                     <xsl:with-param name="current_data" select="$current_data"/>

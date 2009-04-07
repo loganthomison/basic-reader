@@ -6,13 +6,20 @@
 
     <xsl:import href="alph-infl-extras.xsl"/>
     <xsl:import href="alph-infl-match.xsl"/>
+    <xsl:import href="paradigm-match.xsl"/>
     
     <xsl:output encoding="UTF-8" indent="yes" method="html"/>
-     <xsl:strip-space elements="*"/>
+    <xsl:strip-space elements="*"/>
+    
+    <!-- debug -->
+    <xsl:param name="test_endings">
+        <div class="alph-entry"><div class="alph-dict" lemma-key="ἐνέπω" lemma-id="n35414" lemma-lang="grc" lemma-lex="lsj"><span class="alph-hdwd">ἐνέπω: </span><div class="alph-morph"><span class="alph-pofs" context="verb">verb</span></div></div><div class="alph-mean">tell or tell of</div><div class="alph-infl-set" context="ἐννεπε"><span class="alph-term">ἐννεπ-<span class="alph-suff">ε</span></span><div class="alph-infl"><span class="alph-pers" context="2nd">2nd person</span><span class="alph-num" context="singular">singular;</span><span class="alph-tense">present</span><span class="alph-mood" context="imperative">imperative;</span><span class="alph-voice">active</span></div></div></div>        
+    </xsl:param>
     
     <xsl:param name="match_pofs"/>
     <!-- the following are optional, used to select specific inflection ending(s) -->
     <xsl:param name="selected_endings" select="/.." />
+    <!--xsl:param name='selected_endings' select="exsl:node-set($test_endings)"/-->
     
     <xsl:param name="form" />
     
@@ -26,6 +33,7 @@
     <xsl:param name="fragment" />
     
     <xsl:param name="paradigm_id"/>
+    
     
     <xsl:key name="footnotes" match="footnote" use="@id"/>
     
@@ -106,7 +114,18 @@
                             </xsl:element>
                         </xsl:if>
                         <xsl:if test="@role='data'">
+                            <xsl:variable name="selected">
+                                <xsl:if test="$selected_endings">
+                                    <xsl:call-template name="check_infl_sets">
+                                        <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                                        <xsl:with-param name="current_data" select="."/>
+                                        <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                                        <xsl:with-param name="strip_greek_vowel_length" select="false()"/>
+                                    </xsl:call-template>
+                                </xsl:if>
+                            </xsl:variable>
                             <xsl:element name="td">
+                                <xsl:attribute name="class"><xsl:if test="$selected != ''">selected</xsl:if></xsl:attribute>
                                 <xsl:for-each select="@*[local-name(.) !='role']">
                                     <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
                                 </xsl:for-each>
@@ -114,6 +133,7 @@
                                     <xsl:with-param name="item" select="."/>
                                 </xsl:call-template>
                                 <xsl:apply-templates/>
+                                
                                 <!--
                                 <div class="attributes">
                                     <xsl:for-each select="@*[local-name(.) !='role']">

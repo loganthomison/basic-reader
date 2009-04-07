@@ -27,3 +27,8 @@ th.empty-cell {
     border-right: none;
 }
 
+td.selected {
+    background-color: yellow;
+    font-weight: bold;
+}
+
