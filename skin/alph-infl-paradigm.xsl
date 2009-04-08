@@ -51,7 +51,11 @@
         <xsl:variable name="data">
             <xsl:choose>
                 <xsl:when test="$paradigm_id">
-                    <xsl:copy-of select="//infl-paradigm[@id=$paradigm_id]"/>
+                    <xsl:call-template name="get_paradigms">
+                        <xsl:with-param name="list" select="$paradigm_id"/>
+                        <xsl:with-param name="delimiter" select="','"/>
+                    </xsl:call-template>
+                    <!--xsl:copy-of select="//infl-paradigm[@id=$paradigm_id]"/-->
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:copy-of select="//infl-paradigm"/>
@@ -62,7 +66,13 @@
             <xsl:when test="$fragment">
                 <xsl:copy-of select="$table-notes"/>
                 <div id="alph-infl-table">
-                        <xsl:apply-templates select="exsl:node-set($data)"/>
+                    <div class="alph-infl-caption">
+                        <xsl:call-template name="form_caption">
+                            <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                            <xsl:with-param name="form" select="$form"/>
+                        </xsl:call-template>
+                    </div>
+                    <xsl:apply-templates select="exsl:node-set($data)"/>
                 </div>
             </xsl:when>
             <xsl:otherwise>
@@ -76,6 +86,12 @@
                     </head>
                     <body>
                         <xsl:copy-of select="$table-notes"/>
+                        <div class="alph-infl-caption">
+                            <xsl:call-template name="form_caption">
+                                <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                                <xsl:with-param name="form" select="$form"/>
+                            </xsl:call-template>
+                        </div>
                         <xsl:apply-templates select="exsl:node-set($data)"/>
                     </body>
                 </html>                
@@ -150,12 +166,28 @@
         </xsl:element>
     </xsl:template>
      
-     <xsl:template match="span">
-         <xsl:copy-of select="."/>
-     </xsl:template>
-        
-        <xsl:template match="reflink">
-            <a href="{@xlink:href}" class="alph-reflink"><xsl:value-of select="."/></a>
-        </xsl:template>
+    <xsl:template match="span">
+        <xsl:copy-of select="."/>
+    </xsl:template>
+    
+    <xsl:template name="get_paradigms">
+        <xsl:param name="list" />
+        <xsl:param name="delimiter" />
+        <xsl:variable name="newlist">
+            <xsl:choose>
+                <xsl:when test="contains($list, $delimiter)"><xsl:value-of select="normalize-space($list)" /></xsl:when>
+                <xsl:otherwise><xsl:value-of select="concat(normalize-space($list), $delimiter)"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="first" select="substring-before($newlist, $delimiter)" />
+        <xsl:variable name="remaining" select="substring-after($newlist, $delimiter)" />
+        <xsl:copy-of select="//infl-paradigm[@id=$first]"/>
+        <xsl:if test="$remaining">
+            <xsl:call-template name="get_paradigms">
+                <xsl:with-param name="list" select="$remaining" />
+                <xsl:with-param name="delimiter"><xsl:value-of select="$delimiter"/></xsl:with-param>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
         
 </xsl:stylesheet>

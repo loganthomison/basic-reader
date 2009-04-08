@@ -69,11 +69,20 @@
                         '|',
                         translate($current_data/@num,' ','|'),
                         '|')"/>
-                    <xsl:variable name="match_gend" select="
-                        concat(
-                        '|',
-                        translate($current_data/@gend,' ','|'),
-                        '|')"/>
+                    <xsl:variable name="match_gend">
+                        <xsl:value-of select="
+                            concat(
+                                '|',
+                                translate($current_data/@gend,' ','|'),
+                                '|')"/>
+                        <!-- make sure that we match the 'common' gender for 
+                             endings which are either masculine or feminine
+                        -->
+                        <xsl:if test="contains($current_data/@gend, 'masculine') or
+                            contains($current_data/@gend,'feminine')">
+                            |common|
+                        </xsl:if>
+                    </xsl:variable>
                 <xsl:choose>
                     <xsl:when test="$filtered_data/../..//span[@class='alph-decl' 
                         and contains(@context,$current_data/@decl)]">

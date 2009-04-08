@@ -137,4 +137,25 @@
             <xsl:value-of select="concat('hdwd:',$infl_set/@hdwd)"/>
         </xsl:if>
     </xsl:template>
+    
+    <!-- caption containing the selected form and the stem/suffixes from the selected
+         endings parameter
+    -->
+    <xsl:template name="form_caption">
+        <xsl:param name="selected_endings"/>
+        <xsl:param name="form"/>
+        <div class="alph-infl-form">
+            <xsl:value-of select="$form"/>
+            <xsl:if test="$selected_endings//span[@class='alph-term']">
+                (
+                <xsl:for-each select="$selected_endings//span[@class='alph-term']">
+                    <xsl:if test="position() &gt; 1">
+                        , 
+                    </xsl:if>
+                    <div class="alph-infl-term"><xsl:copy-of select="current()"/></div>    
+                </xsl:for-each>
+                )
+            </xsl:if>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>

@@ -283,3 +283,7 @@ span.highlight-ending.query.incorrect,span.highlight-ending.matched.query.incorr
     color: black;
     font-weight: normal;
 }
+
+.alph-infl-caption {
+    font-weight: bold;
+}

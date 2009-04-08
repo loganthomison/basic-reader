@@ -143,13 +143,12 @@
     <xsl:template name="infltable">
         <xsl:param name="endings" />
         <table id="alph-infl-table"> <!-- start table -->
-            <caption>
-                <xsl:for-each select="$selected_endings//span[@class='alph-term']">
-                    <xsl:if test="position() &gt; 1">
-                        , 
-                    </xsl:if>
-                    <div class="alph-infl-term"><xsl:copy-of select="current()"/></div>    
-                </xsl:for-each>                
+            <!-- add the caption -->
+            <caption>    
+                <xsl:call-template name="form_caption">
+                    <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                    <xsl:with-param name="form" select="$form"/>
+                </xsl:call-template>
             </caption>
             <!-- write the colgroup elements -->
             <xsl:call-template name="colgroups">

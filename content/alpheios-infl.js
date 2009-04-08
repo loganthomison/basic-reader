@@ -168,6 +168,20 @@ Alph.infl = {
                     var tbl = $('#alph-infl-table',this.contentDocument);
                     Alph.infl.showCols(tbl,link_target,pofs_set);
                     Alph.infl.resize_window(this.contentDocument);
+
+                    // scroll to the current element
+                    var focus_elem = 
+                        $(".highlight-ending:not(.matched)",this.contentDocument).get(0) ||
+                        $(".highlight-ending",this.contentDocument).get(0) ||
+                        $("td.selected",this.contentDocument).get(0);
+                    if (focus_elem)
+                    {
+                        try
+                        {
+                            focus_elem.scrollIntoView();
+                        }
+                        catch(a_e){}
+                    };
                 },
                 true
                 );
@@ -220,7 +234,24 @@ Alph.infl = {
         
         
         var showpofs = a_link_target.showpofs;
-        this.init_table(a_tbl);        
+        
+        //if the main #alph-infl-table element is a table, then initialize it 
+        if ($(a_tbl).eq(0).is('table'))
+        {
+            this.init_table(a_tbl);    
+        }
+        // otherwise, it's probably a div containing one or more tables, so initialize
+        // each child table
+        else
+        {
+            $('table', a_tbl).each(
+                function()
+                {
+                    Alph.infl.init_table(this);
+                }
+            );
+        }
+                
 
         // show the links to the other possible orders
         if (a_link_target.order)
@@ -263,22 +294,20 @@ Alph.infl = {
         }
         $("#alph-inflect-title span.title",topdoc).html(title);
         
-        // add a link to the index (but not if in query mode)
-        if (! a_link_target.query_mode )
-        {
-            $("body",topdoc).prepend(
-                "<div id='alph-infl-index-link'>"
-                + str_props.getString("alph-infl-index-link") 
-                + '</div>');
-                
-            $("#alph-infl-index-link",topdoc).click(
-                function(e)
-                {
-                    a_link_target.lang_tool.
-                            handleInflections(e,$(this),null);
-                }
-            );
-        }
+        // add a link to the index
+        $("body",topdoc).prepend(
+            "<div id='alph-infl-index-link'>"
+            + str_props.getString("alph-infl-index-link") 
+            + '</div>');
+            
+        $("#alph-infl-index-link",topdoc).click(
+            function(e)
+            {
+                a_link_target.lang_tool.
+                        handleInflections(e,$(this),null);
+            }
+        );
+        
         var start = (new Date()).getTime();
         
         // replace the table header text
@@ -357,39 +386,13 @@ Alph.infl = {
         // with nothing highlighted
         
         // add the inflection links for the other parts of speech
-        // but don't do it if we're in query mode, when we only want to
-        // show the most relevant table
-        if (! a_link_target.query_mode)
-        {
-            this.add_infl_links(a_pofs_set,showpofs,topdoc,str_props);
+        this.add_infl_links(a_pofs_set,showpofs,topdoc,str_props);
+    
+        // add the auxiliary inflection links
+        this.add_infl_links(a_link_target.links,showpofs,topdoc,str_props);
         
-            // add the auxiliary inflection links
-            this.add_infl_links(a_link_target.links,showpofs,topdoc,str_props);
-        }
-
         // TODO - dedupe all the inflection links? See congestaque
         
-        // add the query mode links
-        if (a_link_target.query_mode)
-        {
-            $('.ending',a_tbl).addClass('query');
-            $('.ending',a_tbl).click(
-                function()
-                {
-                    var correct = 
-                        window.opener.Alph.interactive.checkInflection(
-                            this,a_link_target);
-                    if (correct)
-                    {
-                        window.close();
-                    }
-                    else
-                    {
-                        window.focus();
-                    }
-                }
-            )
-        }
         // if we have any additional inflection links, show them
         if ($("select#infl-links-select option",topdoc).length > 1)
         {
@@ -437,7 +440,6 @@ Alph.infl = {
         
         var end = (new Date()).getTime();
         window.opener.Alph.util.log("Hiding time: " + (end-start));
-
     },
     
     /**
@@ -470,16 +472,34 @@ Alph.infl = {
      * @param {Document} the window content document
      */
     resize_window: function(topdoc) {
+        
+        var max_tbl_height = 0;
+        var max_tbl_width = 0;
+        
+        $("table",topdoc).each(
+            function()
+            {
+                var height = $(this).height();
+                if (height > max_tbl_height)
+                {
+                    max_tbl_height = height;
+                }
+                var width = $(this).width();
+                if (width > max_tbl_width)
+                {
+                    max_tbl_width = width;
+                }
+            }
+        );
         // resize the window 
+        // add a little space to the top
         var y = 
-            $("#alph-infl-table",topdoc).get(0).offsetHeight +
-            $("#page-header",topdoc).get(0).offsetHeight + 
-            50;
+            max_tbl_height +
+            $("#page-header",topdoc).height() + 
+            75;
                     
-        // add a little room to the right of the table 
-            
-
-        var x = $("#alph-infl-table",topdoc).get(0).offsetWidth + 75;
+        // add a little room to the right  
+        var x = max_tbl_width + 75;
                     
         if (x > window.screen.availWidth) {
             x = window.screen.availWidth - 20; // don't take up the entire screen
