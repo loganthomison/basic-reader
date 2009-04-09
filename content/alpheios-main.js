@@ -118,6 +118,8 @@ Alph.main =
         
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
         gBrowser
+            .addEventListener("DOMContentLoaded", function(event) { Alph.main.insert_metadata(event) }, false);
+        gBrowser
             .addEventListener("DOMContentLoaded", function(event) { Alph.main.reset_state(event) }, false);
       
         var mks = document.getElementById("mainKeyset");
@@ -1170,6 +1172,34 @@ Alph.main =
     },
     
     /**
+     * Insert metadata elements identifying the Alpheios extensions into the browser
+     * content document
+     */
+    insert_metadata: function(a_event)
+    {
+        var doc = a_event.target;
+        // add a metadata elements to the page for each installed Alpheios extension
+        // so that the page can check for the their presense
+        if (Alph.$("meta[name=_alpheios-installed-version]",doc).length == 0)
+        {
+            var pkg_list = Alph.util.getAlpheiosPackages();
+            pkg_list.forEach(
+                function(a_item)
+                {
+                    var content = a_item.id + ':' + a_item.version; 
+                    Alph.$("head",doc)
+                        .append('<meta ' +
+                            'name="_alpheios-installed-version" ' +
+                            'content="' +
+                            content +
+                            '"></meta>');
+                }
+            );
+        }
+        
+    },
+    
+    /**
      * Resets the state element for the current browser.
      */
     reset_state: function(a_event)
@@ -1181,27 +1211,10 @@ Alph.main =
             // TODO - this isn't right .... shouldn't stop the prop of the dom content loaded event
             a_event.stopPropagation();    
         }
+        // NOTE - when a link is opened in a new tab, currentBrowser in 
+        // that case is the browser linked from ...
         var bro = Alph.main.getCurrentBrowser();
         
-        // add a metadata elements to the page for each installed Alpheios extension
-        // so that the page can check for the their presense
-        if (Alph.$("meta[name=_alpheios-installed-version]",bro.contentDocument).length == 0)
-        {
-            var pkg_list = Alph.util.getAlpheiosPackages();
-            pkg_list.forEach(
-                function(a_item)
-                {
-                    var content = a_item.id + ':' + a_item.version; 
-                    Alph.$("head",bro.contentDocument)
-                        .append('<meta ' +
-                            'name="_alpheios-installed-version" ' +
-                            'content="' +
-                            content +
-                            '"></meta>');
-                }
-            );
-        }
-
         var ped_site = 
             Alph.$("meta[name=alpheios-pedagogical-text]",bro.contentDocument).length > 0
             ? true : false;
