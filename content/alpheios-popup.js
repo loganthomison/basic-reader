@@ -241,7 +241,7 @@ Alph.xlate = {
         alphtarget.setRangeParent(rp);
         
         // do we have a treebank query for this word?
-        var treebank_url = Alph.$("#alpheios-treebank-url",doc).attr("content");
+        var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",doc).attr("content");
         var treebank_ref = Alph.$(rp).parents().attr("tbref");
         if (treebank_url && treebank_ref)
         {

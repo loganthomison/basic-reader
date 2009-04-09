@@ -72,7 +72,7 @@ Alph.Tree.prototype.show = function()
     var svgError = "";
 
     var treebankUrl =
-        Alph.$("#alpheios-treebank-diagram-url",bro.contentDocument).attr("content");
+        Alph.$("meta[name=alpheios-treebank-diagram-url]",bro.contentDocument).attr("content");
 
     var tbref;
     var sentence;

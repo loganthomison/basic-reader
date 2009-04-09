@@ -1183,21 +1183,27 @@ Alph.main =
         }
         var bro = Alph.main.getCurrentBrowser();
         
-        // add a metadata element to the page so that it can check
-        // if Alpheios is installed, and if so, get the version information
-        // TODO add version information for the main Alpheios reader as well as any
-        // language extensions, pulled from the install.rdf datasource
-        // see chrome://mozapps/extensions/extensions.js for sample code
-        if (Alph.$("meta#_alpheios-installed-version",bro.contentDocument).length == 0)
+        // add a metadata elements to the page for each installed Alpheios extension
+        // so that the page can check for the their presense
+        if (Alph.$("meta[name=_alpheios-installed-version]",bro.contentDocument).length == 0)
         {
-            Alph.$("head",bro.contentDocument)
-                .append('<meta id="_alpheios-installed-version" ' +
-                    'name="_alpheios-installed-version" ' +
-                    'content="xxxx"></meta>');
+            var pkg_list = Alph.util.getAlpheiosPackages();
+            pkg_list.forEach(
+                function(a_item)
+                {
+                    var content = a_item.id + ':' + a_item.version; 
+                    Alph.$("head",bro.contentDocument)
+                        .append('<meta ' +
+                            'name="_alpheios-installed-version" ' +
+                            'content="' +
+                            content +
+                            '"></meta>');
+                }
+            );
         }
 
         var ped_site = 
-            Alph.$("meta#alpheios-pedagogical-text",bro.contentDocument).length > 0
+            Alph.$("meta[name=alpheios-pedagogical-text]",bro.contentDocument).length > 0
             ? true : false;
 
         if (ped_site)

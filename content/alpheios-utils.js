@@ -68,7 +68,6 @@ Alph.util = {
                       .getService(Components.interfaces.nsIConsoleService);
         this.PROT_HANDLER = Components.classes["@mozilla.org/network/protocol;1?name=file"]
                             .createInstance(Components.interfaces.nsIFileProtocolHandler);
-         
     },
 
     /**
@@ -480,5 +479,39 @@ Alph.util = {
     {
         return this.makeXUL(
             'preference',a_id,['name','type'],[a_name,a_type]);  
+    },
+    
+    /**
+     * Get the id and version for any installed extensions which include
+     * 'Alpheios' in their name
+     * @return list of nsIUpdateItems for the matched extensions
+     * @type Array
+     */
+    getAlpheiosPackages: function()
+    {
+        var alph_pkgs = [];
+        try
+        {
+            var extensionManager = 
+                Components.classes["@mozilla.org/extensions/manager;1"]
+                    .getService(Components.interfaces.nsIExtensionManager);
+            var ext_list = extensionManager.getItemList(
+                Components.interfaces.nsIUpdateItem.TYPE_EXTENSION,{},{});
+                        
+            ext_list.forEach(
+                function(a_item)
+                {
+                    if (a_item.name.match(/Alpheios/))
+                    {
+                        alph_pkgs.push(a_item);
+                    }
+                }
+            );
+        }
+        catch(a_e)
+        {
+            this.log("Error retrieving installed extensions:" + a_e);
+        }
+        return alph_pkgs;
     }
 };
