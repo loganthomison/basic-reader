@@ -1,5 +1,29 @@
 #alpheios-mainmenu-button {
-   list-style-image: url("chrome://alpheios/skin/alpheios.png");
+   list-style-image: url("chrome://alpheios/skin/icons/alpheios_16.png");
+}
+
+#alpheios-lang-button {
+    list-style-image: url("chrome://alpheios/skin/icons/languages_16.png");
+}
+
+#alpheios-help-button {
+    list-style-image: url("chrome://alpheios/skin/icons/help_16.png");
+}
+
+#alpheios-inflection-button {
+   list-style-image: url("chrome://alpheios/skin/icons/inflection_16.png");
+}
+
+#alpheios-grammar-button {
+   list-style-image: url("chrome://alpheios/skin/icons/grammar_16.png");
+}
+
+#alpheios-tree-toggle {
+   list-style-image: url("chrome://alpheios/skin/icons/diagram_16.png");
+}
+
+#alpheios-trans-button {
+   list-style-image: url("chrome://alpheios/skin/icons/translation_16.png");
 }
 
 .alpheios-logo {

@@ -13,7 +13,7 @@
 
     <broadcasterset id="mainBroadcasterSet">
         <broadcaster id="alph-tree-status"
-                     checked="false"
+                     hidden="true"
                      disabled="true" 
                      class="alpheios-pedagogical-notifier"/>
     </broadcasterset>
@@ -31,11 +31,12 @@
       <toolbar id="alpheios-toolbar"> 
         <toolbarbutton
             id="alpheios-tree-toggle"
+            hidden="true"
             label="&alpheios-tools-tree-label;"
             insertafter="alpheios-trans-button"
             command="alpheios-tree-open-cmd"
             tooltiptext="&alpheios-tools-tree-tooltip;"
-            class="menuitem-iconic" />
+            class="toolbarbutton-icon" />
       </toolbar>
 
     <!-- overlay the bottom panel -->

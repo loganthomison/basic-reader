@@ -195,8 +195,11 @@ Alph.Panel.prototype.update_status = function(a_status)
                 panel_obj.toggle_splitter(this,true);
             }
         );
-            
-        Alph.$(notifier).attr("checked", "true");
+        
+        if (Alph.$(notifier).attr("checked") != null)
+        {
+            Alph.$(notifier).attr("checked", "true");
+        }
         // make sure any section parents and section splitters are also expanded
         Alph.$(this.section_parent).each(
             function() {
@@ -261,7 +264,10 @@ Alph.Panel.prototype.update_status = function(a_status)
         {
             // update the state of the checkbox only if we're hiding the panel
             // rather than detaching it (in which case we have STATUS_SHOW)
-            Alph.$(notifier).attr("checked", "false");
+            if (Alph.$(notifier).attr("checked") != null)
+            {
+                Alph.$(notifier).attr("checked", "false");
+            }
             // if the panel is detached, close it 
             if (this.panel_window != null && ! this.panel_window.closed )
             {
@@ -273,7 +279,10 @@ Alph.Panel.prototype.update_status = function(a_status)
         }
         else
         {
-            Alph.$(notifier).attr("checked", "true");
+            if (Alph.$(notifier).attr("checked") != null)
+            {
+                Alph.$(notifier).attr("checked", "true");
+            }
 
         }
     }

@@ -40,9 +40,11 @@
     <broadcasterset id="mainBroadcasterSet">
         <broadcaster id="alpheios-inflect"
                      class="alpheios-language-notifier"
+                     hidden="true"
                      disabled="true"/>
         <broadcaster id="alpheios-grammar"
                      class="alpheios-language-notifier"
+                     hidden="true"
                      disabled="true"/>
         <broadcaster id="alpheios-pedagogical-status"
                      class="alpheios-pedagogical-notifier"
@@ -141,13 +143,13 @@
                  hidden="false" 
                  iconsize="small" 
                  inherits="collapsed,hidden" 
-                 mode="text" 
+                 mode="full" 
                  persist="collapsed,hidden" 
                  toolbarname="&alpheios-toolbar-name;"
                  align="center">
             <toolbarbutton
                 id="alpheios-mainmenu-button"
-                class="toolbarbutton-class"
+                class="toolbarbutton-icon"
                 label="&alpheios.menu;"
                 type="menu">
                 <menupopup
@@ -180,7 +182,7 @@
             </toolbarbutton>               
             <toolbarbutton
                 id="alpheios-lang-button"
-                class="toolbarbutton-class"
+                class="toolbarbutton-icon"
                 label="&alpheios.menu.lang;"
                 insertafter="alpheios-toggle-mm"
                 command="alpheios-lang-cmd"
@@ -191,29 +193,17 @@
                     onpopupshowing="Alph.main.update_main_menu_languages()"/>
             </toolbarbutton>
             <toolbarbutton
-                id="alpheios-tools-button"
-                class="toolbarbutton-class"
-                label="&alpheios-tools-label;"
-                command="alpheios-tools-cmd"
-                tooltiptext="&alpheios-tools-tooltip;"
-                type="menu">
-                <menupopup
-                    id="alpheios-tools-popup"
-                    onpopupshowing="Alph.main.update_tools_menu();">
-                    <menuitem
-                        id="alpheios-inflection-button"
-                        label="&alpheios-tools-inflect-label;"
-                        command="alpheios-inflect-cmd"
-                        tooltiptext="&alpheios-tools-inflect-tooltip;"
-                        class="menuitem-iconic" />
-                    <menuitem
-                        id="alpheios-grammar-button"
-                        label="&alpheios-tools-grammar-label;"
-                        command="alpheios-grammar-cmd"
-                        tooltiptext="&alpheios-tools-grammar-tooltip;"
-                        class="menuitem-iconic" />
-                </menupopup>
-            </toolbarbutton>
+                id="alpheios-inflection-button"
+                class="toolbarbutton-icon"
+                label="&alpheios-tools-inflect-label;"
+                command="alpheios-inflect-cmd"
+                tooltiptext="&alpheios-tools-inflect-tooltip;"/>
+            <toolbarbutton
+                id="alpheios-grammar-button"
+                class="toolbarbutton-icon"
+                label="&alpheios-tools-grammar-label;"
+                command="alpheios-grammar-cmd"
+                tooltiptext="&alpheios-tools-grammar-tooltip;"/>
             <toolbaritem id="alpheios-lookup-text-tbitem">
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"

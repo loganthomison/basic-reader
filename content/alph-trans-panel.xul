@@ -10,6 +10,7 @@
         <broadcaster id="alph-trans-status"
                      disabled="true"
                      checked="false"
+                     hidden="true"
                      class="alpheios-pedagogical-notifier" />
         <broadcaster id="alph-trans-inter-src-status"
                      disabled="true" 
@@ -52,7 +53,7 @@
             command="alpheios-trans-toggle-cmd"
             observes="alph-trans-status"
             tooltiptext="&alpheios-tools-trans-tooltip;"
-            class="menuitem-iconic alph-panel-menuitem"/>
+            class="toolbarbutton-icon"/>
     </toolbar>
 
     <!-- overlay the right panel -->

@@ -14,7 +14,7 @@
             <xul:toolbox anonid="panelToolbox">
                 <xul:toolbar anonid="panelToolbar" align="center">
                     <xul:toolbaritem class="alpheios-logo">
-                        <xul:image src="chrome://alpheios/skin/alpheios.png"/>
+                        <xul:image src="chrome://alpheios/skin/icons/alpheios_16.png"/>
                     </xul:toolbaritem>
                     <children includes="toolbaritem|toolbarbutton|toolbarspring"/>
                     <xul:toolbarspring/>

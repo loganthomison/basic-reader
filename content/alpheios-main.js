@@ -1069,6 +1069,10 @@ Alph.main =
                     disabled = false;
                 }
                 Alph.$(this).attr("disabled",disabled);
+                if (Alph.$(this).attr("hidden") != null)
+                {
+                    Alph.$(this).attr("hidden",disabled);
+                }
             }
         );        
         
@@ -1290,10 +1294,18 @@ Alph.main =
                 if (! ped_site)
                 {
                     Alph.$(this).attr("disabled",true)
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden",true);
+                    }
                 }
                 else
                 {
                     Alph.$(this).attr("disabled",false);
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden",false);
+                    }
                 }
             }
             
