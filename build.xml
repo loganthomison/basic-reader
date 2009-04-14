@@ -124,6 +124,7 @@
 	        	<include name="locale/**" />
 	            <include name="skin/**" />
 	        	<include name="platform/**" />
+	        	<include name="icons/**" />
 	            <exclude name="**/.*" />
 	         </fileset>
 	    </zip>

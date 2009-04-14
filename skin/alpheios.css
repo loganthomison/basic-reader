@@ -39,7 +39,7 @@
 	z-index: 7777;
 	border: 1px solid #BBC !important;
 	padding: 4px;
-	background: #F0F7FF;
+	background: #72CEDF;
 	top: 5px;
 	left: 5px;
 	min-width: 100px;
@@ -149,12 +149,12 @@ div.alph-morph {
 .alph-attr {
     font-weight: normal;
     color: #000000;
-	background: #F0F7FF;
+	background: #72CEdf;
 }
 
 .alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs {
 	color:blue;
-	background: #F0F7FF;
+	background: #72CEDF;
 	cursor: pointer;
 }
 
@@ -180,7 +180,7 @@ div.alph-morph {
 #alph-close {
     text-align: right;
     color: blue;
-    background: #F0F7FF;
+    background: #72CEDF;
     font-size: 85%;
     cursor: pointer;
 }

@@ -183,7 +183,7 @@ a.footnote:after {
     padding: 2px;
     font-weight: normal;
     border: 1px solid #BBC !important;
-    background-color: #F0F7FF;
+    background-color: #72CEDF;
     white-space: normal;
 }
 
@@ -198,13 +198,13 @@ span.highlight-ending {
 }
 
 span.highlight-ending.matched {
-    background-color: #CCFFFF;
+    background-color: #72CEDF;
     font-weight: bold;
     font-size: 1em;
 }
 
 .highlight-hover {
-   background-color: #c7b589;
+   background-color: #8795A2;
    
 }
 
