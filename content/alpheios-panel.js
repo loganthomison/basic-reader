@@ -159,6 +159,8 @@ Alph.Panel.prototype.reset_state = function(a_bro)
  * @param {int} a_status the new panel status (should be one of 
  *              Alph.Panel.STATUS_SHOW, Alph.Panel.STATUS_HIDE 
  *              Alph.Panel.STATUS_AUTOHIDE)
+ * @return the new panel status
+ * @type int
  */
 Alph.Panel.prototype.update_status = function(a_status)
 {
@@ -317,7 +319,10 @@ Alph.Panel.prototype.update_status = function(a_status)
     if (old_status != a_status)
     {
         this.observe_ui_event(bro);
+        Alph.site.set_toolbar_panel_status(bro.contentDocument,this.panel_id,a_status);
     }
+    
+    return a_status;
 };
 
 /**
@@ -358,7 +363,7 @@ Alph.Panel.prototype.detach = function()
         Alph.util.log("Error detaching panel: " + a_e);
     }
   
-    this.update_status(Alph.Panel.STATUS_SHOW);
+    return this.update_status(Alph.Panel.STATUS_SHOW);
 };
 
 /**
@@ -427,19 +432,21 @@ Alph.Panel.prototype.hide = function(a_autoflag)
 
 /**
  * Open the panel or panel window
+ * @return the new panel status
+ * @type int
  */
 Alph.Panel.prototype.open = function()
 {    
     if (Alph.util.getPref('panels.inline.'+this.panel_id)
         || (this.panel_window != null && ! this.panel_window.closed))
     {
-        this.update_status(this.show());
+        return this.update_status(this.show());
     }
     else
     {
         // the handlers for the detached window
         // will call show() to update the panel status 
-        this.detach();
+        return this.detach();
     }
 }
 
@@ -455,11 +462,11 @@ Alph.Panel.prototype.toggle = function()
     
     if (panel_state.status == Alph.Panel.STATUS_SHOW)
     {
-        this.update_status(this.hide());
+        return this.update_status(this.hide());
     }
     else
     {
-        this.open();
+        return this.open();
     }
 };
 

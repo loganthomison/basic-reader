@@ -138,6 +138,55 @@ Alph.site = {
         
     },
     
+
+    /**
+     * set current mode
+     */
+    set_current_mode: function(a_doc,a_mode)
+    {
+        try
+        {
+            Alph.$(".alpheios-toolbar-level[alpheios-value=" + a_mode + "]",a_doc).each
+            (
+                function()
+                {
+                    Alph.$(this).addClass("alpheios-current");
+                    Alph.$(this)
+                        .siblings(".alpheios-toolbar-level")
+                        .removeClass("alpheios-current");
+                }
+            );
+        }
+        catch(a_e)
+        {
+            Alph.util.log("Unable to update menu with new mode " + a_e);
+        }
+    },
+    
+    /**
+     * update panel status
+     */
+    set_toolbar_panel_status: function(a_doc,a_panel_id,a_status)
+    {
+        // for now, only update the toolbar buttons for the translation panel 
+        var toolbar_class = 
+                a_panel_id == 'alph-trans-panel' ? 'alpheios-toolbar-translation'
+                : null;
+
+        if (!toolbar_class)
+        {
+            return;
+        }
+        
+        if (a_status == Alph.Panel.STATUS_SHOW)
+        {
+            Alph.$("."+toolbar_class,a_doc).addClass("alpheios-current");
+        }
+        else
+        {
+            Alph.$("."+toolbar_class,a_doc).removeClass("alpheios-current");
+        }
+    },
     
     /**
      * handler method for click on a toolbar item which 
@@ -148,7 +197,8 @@ Alph.site = {
     toggle_panel_handler: function(a_event)
     {
         // 'this' is the toolbar element
-        Alph.main.toggle_panel(a_event,a_event.data.alpheios_panel_id);
+        var panel_status = 
+            Alph.main.toggle_panel(a_event,a_event.data.alpheios_panel_id);
     },
     
     /**

@@ -1043,7 +1043,7 @@ Alph.main =
         var panel = this.panels[a_panel_id];
         if (typeof panel != "undefined")
         {
-            panel.toggle();
+            return panel.toggle();
         }
     },
     
@@ -1501,29 +1501,16 @@ Alph.main =
         if (typeof a_mode != "undefined")
         {
             this.get_state_obj(a_bro).set_var("level",a_mode);
+            
+            // clear out any popup
+            Alph.xlate.removePopup(a_bro);    
         }
         var new_mode = this.get_state_obj(a_bro).get_var("level");
-        try
-        {
-            Alph.$(".alpheios-toolbar-level",a_bro.contentDocument).each
-            (
-                function()
-                {
-                    if (Alph.$(this).attr("alpheios-value") ==  new_mode)
-                    {
-                        Alph.$(this).addClass("alpheios-current");
-                        Alph.$(this)
-                            .siblings(".alpheios-toolbar-level")
-                            .removeClass("alpheios-current");
-                    }
-                }
-            );
-        }
-        catch(a_e)
-        {
-            Alph.util.log("Unable to update menu with new mode " + a_e);
-        }             
+        // update the site toolbar
+        Alph.site.set_current_mode(a_bro.contentDocument,new_mode);
+
     },
+    
        
     /**
      * get the mode variable for the browser
