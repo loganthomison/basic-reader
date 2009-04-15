@@ -26,16 +26,16 @@
  *
  * @param {String} a_url URL to read
  * @param {String} a_charset character set (or null for no conversion)
- * @param {String} a_separator separator between key and data in file lines
  */
-Alph.Datafile = function(a_url, a_charset, a_separator)
+Alph.Datafile = function(a_url, a_charset)
 {
     Alph.util.log("Loading file " + a_url);
 
     // save parameters for possible future reload
     this.url = a_url;
     this.charset = a_charset;
-    this.separator = a_separator;
+    this.separator = '|';
+    this.specialFlag = '@';
 
     var ios = Components.classes["@mozilla.org/network/io-service;1"]
                         .getService(Components.interfaces.nsIIOService);
@@ -89,6 +89,37 @@ Alph.Datafile.prototype =
     getSeparator: function()
     {
         return this.separator;
+    },
+
+    /**
+     * set separator string
+     *
+     * @param {String} a_separator the separator
+     */
+    setSeparator: function(a_separator)
+    {
+        this.separator = a_separator;
+    },
+
+    /**
+     * get special handling flag
+     *
+     * @return special handling flag
+     * @type String
+     */
+    getSpecialHandlingFlag: function()
+    {
+        return this.specialFlag;
+    },
+
+    /**
+     * set special handling flag
+     *
+     * @param {String} a_specialFlag the special handling flag
+     */
+    setSpecialHandlingFlag: function(a_specialFlag)
+    {
+        this.specialFlag = a_specialFlag;
     },
 
     /**
