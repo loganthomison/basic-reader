@@ -1,0 +1,19 @@
+label {
+    font-weight: bold;
+}
+
+label.alpheios-about-title {
+    font-size: 120%;
+}
+
+label.site-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+image#alpheios-icon {
+   list-style-image: url("chrome://alpheios/skin/icons/alpheios_16.png");
+   max-height: 16px;
+   max-width: 16px;
+}

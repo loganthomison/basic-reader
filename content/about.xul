@@ -1,41 +1,34 @@
 <?xml version="1.0"?>
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?> 
-<?xml-stylesheet href="chrome://mozapps/skin/extensions/about.css" type="text/css"?> 
+<?xml-stylesheet href="chrome://alpheios/skin/about.css" type="text/css"?> 
 
-<!DOCTYPE dialog SYSTEM "chrome://mozapps/locale/extensions/about.dtd">
+<!DOCTYPE dialog SYSTEM "chrome://alpheios/locale/about.dtd">
 
 <dialog id="alpheiosAbout"
+        title="&alpheios-about-title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        buttons="accept" onload="" onaccept="this.close();">
+        buttons="accept" onload="Alph.about.load_about();" onaccept="this.close();">
+
+  <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+  <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-about.js" />
   
   <stringbundleset id="aboutSet">
     <stringbundle id="extensionsStrings" src="chrome://mozapps/locale/extensions/extensions.properties"/>
 
   </stringbundleset>
 
-  <vbox id="clientBox" flex="1">
-    <label id="extensionName" crop="right">Alpheios Reader</label>
-    <label id="extensionVersion" crop="right">Version xxxxxxx</label>
-    <description id="extensionDescription" class="boxIndent">
-        Descriptions and versions of the installed Alpheios Language Tools (and associated binaries, etc.) 
-        to go here...
-    </description>
-
-    <label id="extensionCreatorLabel" class="sectionTitle">&creator.label;</label>
-    <hbox id="creatorBox" class="boxIndent">
-      <label id="extensionCreator" flex="1" crop="right"/>
-
-      <label id="extensionHomepage" onclick="loadHomepage(event);"
-             class="text-link" value="&homepage.label;"/>
+  <vbox flex="1">
+    <hbox>
+        <image id="alpheios-icon"/>
+        <label class="site-link" 
+               onclick="window.open('http://alpheios.net');" 
+               value="http://alpheios.net"/>
     </hbox>
-      
-    <label id="extensionDevelopers" class="sectionTitle">&developers.label;</label>
-    <vbox flex="1" id="developersBox" class="boxIndent"/>
-    <label id="extensionTranslators" class="sectionTitle">&translators.label;</label>
-    <vbox flex="1" id="translatorsBox" class="boxIndent"/>
-    <label id="extensionContributors" class="sectionTitle">&contributors.label;</label>
-    <vbox flex="1" id="contributorsBox" class="boxIndent"/>
+    <groupbox id="alpheios-extension-list">
+        <caption class="alpheios-about-extensions" label="&alpheios-about-versions;"/>
+    </groupbox>
+
   </vbox>
 
     
