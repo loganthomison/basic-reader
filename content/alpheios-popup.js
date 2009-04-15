@@ -374,8 +374,7 @@ Alph.xlate = {
                     Alph.$('#alph-text .alph-dict-link',a_doc).click(
                         function(a_event)
                         {
-                            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
-                            Alph.main.panels['alph-dict-panel'].open();    
+                            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);   
                         }
                     );
                 }                

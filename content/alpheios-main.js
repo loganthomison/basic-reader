@@ -78,7 +78,8 @@ Alph.main =
             HIDE_POPUP: 200,
             REMOVE_POPUP: 300,
             SHOW_DICT: 400,
-            UPDATE_PREF: 500
+            UPDATE_PREF: 500,
+            LOAD_PANEL_WINDOW: 600
         },
 
     /**

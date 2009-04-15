@@ -13,7 +13,7 @@
 <window id="alph-dict-window" title="&alpheios-tools-dict-label;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         windowtype="alph-window"
-        onload="window.opener.Alph.main.broadcast_ui_event(window.opener.Alph.main.events.SHOW_DICT);"
+        onload="window.opener.Alph.main.broadcast_ui_event(window.opener.Alph.main.events.LOAD_PANEL_WINDOW);"
         onunload="window.opener.Alph.main.panels['alph-dict-panel']
                     .update_status(
                         window.opener.Alph.main.panels['alph-dict-panel'].hide()

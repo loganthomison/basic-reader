@@ -652,14 +652,7 @@ Alph.Panel.prototype.get_current_language = function(a_panel_bro)
  */
 Alph.Panel.prototype.is_visible_inline = function(a_bro)
 {
-    var is_visible = false;
-    var panel_state = this.get_browser_state(a_bro);
-    if (Alph.util.getPref('panels.inline.'+this.panel_id)
-            && panel_state.status == Alph.Panel.STATUS_SHOW)
-    {
-        is_visible = true;
-    }
-    return is_visible;
+    return Alph.$(this.parent_box).attr("collapsed") == 'false';
 };
 
 /**

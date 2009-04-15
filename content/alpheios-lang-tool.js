@@ -738,8 +738,6 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         width:"300",
         height:"620",
         screen: Alph.util.getPref("shift.window.loc"),
-        menubar: "yes",
-        toolbar: "yes"
     }
     Alph.xlate.openSecondaryWindow(
                     "alph-infl-table",
