@@ -613,9 +613,26 @@ Alph.infl = {
         var text = $(a_elem).next(".footnote-text");
         if (text.length > 0)
         {
-            $(text).toggleClass("footnote-visible");
+            // if the foot note is already visible, we don't have
+            // to do anything 
+            if (!$(text).hasClass("footnote-visible"))
+            {
+                // if this is the first time we're showing the footnote, 
+                // add the close link
+                if ($(".alph-close-button",text).length == 0)
+                {
+                    $(text).prepend('<div class="alph-close-button">&nbsp;</div><br/>');
+                    $(".alph-close-button",text).bind("click",
+                        function()
+                        {
+                            $(this).parent('.footnote-text').removeClass('footnote-visible');
+                        }
+                    );
+                }
+                $(text).addClass("footnote-visible");    
+            }
             return false;
-        }        
+        }   
     },
     
     /**
