@@ -287,3 +287,19 @@ span.highlight-ending.query.incorrect,span.highlight-ending.matched.query.incorr
 .alph-infl-caption {
     font-weight: bold;
 }
+
+/*
+ * Index classes
+ */
+.tocitem {
+    list-style: url(list-item.gif);
+}
+
+.tochead {
+    list-style-image: url(arrow-rit-sharp.gif);
+    cursor: pointer;
+}
+
+.tochead.openmenu {
+    list-style-image: url(arrow-dn-sharp.gif);
+}

@@ -95,6 +95,7 @@ Alph.infl = {
             var infl_html = Alph.infl.transform(link_target);
             var infl_node = 
                 doc.importNode(infl_html.getElementById("alph-infl-index"),true);
+            this.init_index(infl_node);
             $("body",doc).append(infl_node);   
             // add a click handler to each index link to bring up the 
             // corresponding inflection table
@@ -1017,5 +1018,18 @@ Alph.infl = {
                 }
             }
         } 
+    },
+    
+    /**
+     * Initialize the index menu
+     * @param {Node} a_node the parent node of the index 
+     */
+    init_index: function(a_node)
+    {
+        $('.tochead',a_node).click(function() {
+            $(this).toggleClass("openmenu")
+            $(this).children().toggle();
+            return false;
+        }).children().hide();
     }
 };

@@ -39,9 +39,10 @@
     </xsl:template>
     
     <xsl:template match="tei:item">
-        <li>
+        <xsl:element name="li">
             <xsl:choose>
                 <xsl:when test="count(tei:ptr) > 0">
+                    <xsl:attribute name="class">tocitem</xsl:attribute>
                     <xsl:variable name="url">
                         <xsl:value-of select="tei:ptr/@target"/>
                     </xsl:variable>
@@ -49,6 +50,7 @@
                         <xsl:value-of select="normalize-space(text())"/></a>
                 </xsl:when>
                 <xsl:otherwise>
+                    <xsl:attribute name="class">tochead</xsl:attribute>
                     <xsl:value-of select="normalize-space(text())"/>
                 </xsl:otherwise>
             </xsl:choose>   
@@ -57,7 +59,7 @@
                     <xsl:with-param name="list" select="tei:list"/>
                 </xsl:call-template>
             </xsl:if>
-        </li>
+        </xsl:element>
     </xsl:template>
 
 </xsl:stylesheet>
