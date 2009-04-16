@@ -45,11 +45,11 @@
 	min-width: 100px;
 }
 
-#alph-window.alpheios-pending * {
+#alph-window[alpheios-pending] * {
     display: none;
 }
 
-#alph-window.alpheios-pending #alph-text {
+#alph-window[alpheios-pending] #alph-text {
     display: block;
     height: 20px;
     padding-left: 18px;

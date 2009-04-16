@@ -342,18 +342,20 @@ Alph.xlate = {
         var alphtext_node = 
             window.content.document.importNode(wordHTML.getElementById("alph-text"),true);
         
-        var disambiguate = false;
+        var disambiguate_id = null;
         if (a_alphtarget.getTreebankQuery())
         {
-            disambiguate = true;
+            disambiguate_id =
+                (new Date()).getTime()
+                + encodeURIComponent(a_alphtarget.getWord());
         }
         Alph.main.getLanguageTool().postTransform(alphtext_node);
         a_doc_array.forEach(
             function(a_doc)
             {
-                if (disambiguate)
+                if (disambiguate_id)
                 {
-                    Alph.$("#alph-window",a_doc).addClass("alpheios-pending");
+                    Alph.$("#alph-window",a_doc).attr("alpheios-pending",disambiguate_id);
                 }
                 Alph.$("#alph-window",a_doc).append(Alph.$(alphtext_node).clone());
                 // add the key to the language tool to the element
@@ -406,7 +408,7 @@ Alph.xlate = {
         // know it's final size
         
         // disambiguate if treebank is available
-        if (disambiguate)
+        if (disambiguate_id)
         {
             Alph.util.log("Disambiguating ..." + a_alphtarget.getTreebankQuery());
             // send asynchronous request to the lexicon service
@@ -422,14 +424,23 @@ Alph.xlate = {
                         a_doc_array.forEach(
                             function(a_doc)
                             {
-                                Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                                try
+                                {
+                                    Alph.$("#alph-window[alpheios-pending="+disambiguate_id+"]",a_doc)
+                                        .get(0).removeAttribute("alpheios-pending");
+                                }
+                                catch(a_e)
+                                {
+                                    //it's possible that a new request came in and removed the 
+                                    // attribute, so quietly ignore error removing it 
+                                }
                             }
                         );
                     },
                     success: function(data, textStatus) 
                     {
                     
-                        Alph.xlate.updateTranslation(data,a_alphtarget,a_doc_array);
+                        Alph.xlate.updateTranslation(disambiguate_id,data,a_alphtarget,a_doc_array);
                         // TODO we should prevent the request from re-issuing
                         // for each lexicon panel and instead update them in 
                         // updateTranslation
@@ -442,12 +453,13 @@ Alph.xlate = {
     },  
     /**
      * Update the results of the lexicon lookup in the popup.
+     * @param {String} a_req_id unique identifier for the disambiguate request
      * @param {String} a_xml the xml string containing the lexicon response
      * @param {Object} a_alphtarget the details on the target of the event which triggered the popup
      *                 (as returned by {@link Alph.LanguageTool#findSelection})
      * @param a_doc_array the array of Documents which contain the morphological text  
      */
-     updateTranslation: function(a_xml,a_alphtarget,a_doc_array) 
+     updateTranslation: function(a_req_id,a_xml,a_alphtarget,a_doc_array) 
      {          
         Alph.util.log("Query response:" + a_xml);
         
@@ -463,7 +475,15 @@ Alph.xlate = {
             a_doc_array.forEach(
                 function(a_doc)
                 {
-                    Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                    try
+                    {
+                        Alph.$("#alph-window[alpheios-pending="+a_req_id+"]",a_doc)
+                                    .get(0).removeAttribute("alpheios-pending");
+                    }
+                    catch(a_e){
+                        //it's possible that a new request came in and removed the 
+                        // attribute, so quietly ignore error removing it 
+                    }
                 }
             );
             Alph.util.log("No treebank entries to display.");
@@ -492,8 +512,11 @@ Alph.xlate = {
                     // to the disambiguation requestion, the alpheios-pending class
                     // will have been removed and we will just discard the disabmiguation
                     // results rather than trying to merge them into a new words' results
-                    var popup = Alph.$("#alph-window.alpheios-pending #alph-text",a_doc);
-    
+                    var popup = 
+                        Alph.$("#alph-window[alpheios-pending=" + a_req_id + 
+                                "] #alph-text",a_doc);
+                    
+   
                     // try to find an entry with the same lemma and replace the 
                     // contents of the first inflection set for that entry 
                     // with the treebank output
@@ -536,7 +559,16 @@ Alph.xlate = {
                         );
                                             
                     }
-                    Alph.$("#alph-window",a_doc).removeClass("alpheios-pending");
+                    try
+                    {
+                        Alph.$("#alph-window[alpheios-pending=" + a_req_id + 
+                                "]",a_doc).get(0).removeAttribute("alpheios-pending");
+                    } 
+                    catch(a_e)
+                    {
+                        //it's possible that a new request came in and removed the 
+                        // attribute, so quietly ignore error removing it 
+                    }
                 }
                     
             );
@@ -607,7 +639,7 @@ Alph.xlate = {
         
             
             // add a close link 
-            Alph.$(popup).append('<div class="alph-close-button">&nbsp;</div><br/>')
+            Alph.$(popup).append('<div class="alph-close-button">&#160;</div><br/>')
             Alph.$(".alph-close-button",topdoc).bind("click",
                 function()
                 {
@@ -659,7 +691,7 @@ Alph.xlate = {
                 .getElementById("alpheios-strings")
                 .getFormattedString("alph-loading-translation",[a_alphtarget.getWord()]);
         Alph.$("#alph-text",popup).remove();
-        Alph.$("#alph-window").removeClass("alpheios-pending");
+        Alph.$("#alph-window",topdoc).get(0).removeAttribute("alpheios-pending");
         Alph.$("#alph-window",topdoc).append(
             '<div id="alph-text"><div id="alph-text-loading">' +
             xlate_loading +

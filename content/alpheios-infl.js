@@ -621,7 +621,7 @@ Alph.infl = {
                 // add the close link
                 if ($(".alph-close-button",text).length == 0)
                 {
-                    $(text).prepend('<div class="alph-close-button">&nbsp;</div><br/>');
+                    $(text).prepend('<div class="alph-close-button">&#160;</div><br/>');
                     $(".alph-close-button",text).bind("click",
                         function()
                         {
