@@ -270,25 +270,6 @@ th.reloading {
     text-align: left;
 }
 
-.alph-close-button {
-    float: right;
-    width: 16px;
-    cursor: pointer;
-    padding: 0 !important;
-    border: none !important;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    background-image: url("chrome://alpheios/skin/close.png");
-}
-
-.alph-close-button:hover {
-    background-image: url("chrome://alpheios/skin/closeHover.png");
-}
-
-.alph-close-button:hover:active {
-    background-image: url("chrome://alpheios/skin/closeActive.png");
-}
-
 span.highlight-ending.query,span.highlight-ending.matched.query {
     background-color: transparent;
     color: blue;

@@ -581,8 +581,12 @@ Alph.xlate = {
             css.setAttribute("rel", "stylesheet");
             css.setAttribute("type", "text/css");
             css.setAttribute("href", "chrome://alpheios/skin/alpheios.css");
-            css.setAttribute("id", "alpheios-css");
+            css.setAttribute("class", "alpheios-css");
             Alph.$("head",topdoc).append(css);
+            var css_os = Alph.$(css).clone()
+                .attr("href","chrome://alpheios/skin/alpheios-os.css");
+            Alph.$("head",topdoc).append(css_os);
+            
 
             // add any language-specific stylesheet
             Alph.main.getLanguageTool().addStyleSheet(topdoc);
@@ -1047,7 +1051,7 @@ Alph.xlate = {
      {
         var last_doc = this.getLastDoc();
         // remove the main alpheios stylesheet
-        Alph.$("#alpheios-css",last_doc).remove();
+        Alph.$(".alpheios-css",last_doc).remove();
         
         if (typeof a_lang_tool == "undefined")
         {

@@ -14,3 +14,22 @@ ul.stem-classes li.selected, ul.stem-classes li.primary {
 ul.stem-classes li.highlight-ending {
     list-style-image: url("chrome://alpheios/skin/cbox-check.gif");
 }
+
+.alph-close-button {
+    float: right;
+    width: 16px;
+    cursor: pointer;
+    padding: 0 !important;
+    border: none !important;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    background-image: url("chrome://alpheios/skin/classic/mac/close.png");
+}
+
+.alph-close-button:hover {
+    background-image: url("chrome://alpheios/skin/classic/mac/closeHover.png");
+}
+
+.alph-close-button:hover:active {
+    background-image: url("chrome://alpheios/skin/classic/mac/closeActive.png");
+}
