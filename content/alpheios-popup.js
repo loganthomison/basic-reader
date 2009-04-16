@@ -447,7 +447,8 @@ Alph.xlate = {
      *                 (as returned by {@link Alph.LanguageTool#findSelection})
      * @param a_doc_array the array of Documents which contain the morphological text  
      */
-     updateTranslation: function(a_xml,a_alphtarget,a_doc_array) {
+     updateTranslation: function(a_xml,a_alphtarget,a_doc_array) 
+     {          
         Alph.util.log("Query response:" + a_xml);
         
         // the first document in the array is the main one
@@ -487,7 +488,11 @@ Alph.xlate = {
             a_doc_array.forEach(
                 function(a_doc)
                 {
-                    var popup = Alph.$("#alph-text",a_doc);
+                    // if a request for a new word came in while waiting for the response
+                    // to the disambiguation requestion, the alpheios-pending class
+                    // will have been removed and we will just discard the disabmiguation
+                    // results rather than trying to merge them into a new words' results
+                    var popup = Alph.$("#alph-window.alpheios-pending #alph-text",a_doc);
     
                     // try to find an entry with the same lemma and replace the 
                     // contents of the first inflection set for that entry 
@@ -654,6 +659,7 @@ Alph.xlate = {
                 .getElementById("alpheios-strings")
                 .getFormattedString("alph-loading-translation",[a_alphtarget.getWord()]);
         Alph.$("#alph-text",popup).remove();
+        Alph.$("#alph-window").removeClass("alpheios-pending");
         Alph.$("#alph-window",topdoc).append(
             '<div id="alph-text"><div id="alph-text-loading">' +
             xlate_loading +
