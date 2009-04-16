@@ -25,6 +25,10 @@ body {
 
 #alph-window.full-dict-display div.alph-dict-block {
     display: block;
+    
+}
+
+#alph-window.full-dict-display .entry {
     border-bottom: 1px dotted black;
     margin-bottom: 1.5em;
     padding-bottom: .5em;
