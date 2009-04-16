@@ -120,8 +120,8 @@ Alph.main =
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
         gBrowser
             .addEventListener("DOMContentLoaded", function(event) { Alph.main.insert_metadata(event) }, false);
-        gBrowser
-            .addEventListener("DOMContentLoaded", function(event) { Alph.main.reset_state(event) }, false);
+        gBrowser.addProgressListener(Alph.main.loc_listener,
+            Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
       
         var mks = document.getElementById("mainKeyset");
 
@@ -186,7 +186,7 @@ Alph.main =
             .removeEventListener("select", this.onTabSelect, false);
         gBrowser.mTabContainer
             .removeEventListener("TabClose", this.onTabClose, false);
-        // gBrowser.removeEventListener("load", Alph.main.onPageLoad, false);
+        gBrowser.removeProgressListener(Alph.main.loc_listener);
         
         Alph.util.shutdown();    
     },
@@ -1207,15 +1207,9 @@ Alph.main =
     /**
      * Resets the state element for the current browser.
      */
-    reset_state: function(a_event)
+    reset_state: function(a_window)
     {        
-        if (typeof a_event != "undefined")
-        {
-            // stop the propagation of the event so that it doesn't
-            // get called more than once for the browser
-            // TODO - this isn't right .... shouldn't stop the prop of the dom content loaded event
-            a_event.stopPropagation();    
-        }
+        
         // NOTE - when a link is opened in a new tab, currentBrowser in 
         // that case is the browser linked from ...
         var bro = Alph.main.getCurrentBrowser();
@@ -1525,6 +1519,65 @@ Alph.main =
             a_bro = this.getCurrentBrowser();
         }
         return this.get_state_obj(a_bro).get_var("level");
+    },
+    
+    /**
+     * Implementation of nsIWebProgressListener which listens for 
+     * changes to the url in the location bar, and if the the url changes
+     * calls reset state upon the subsequent page load
+     * @see https://developer.mozilla.org/en/Code_snippets/Progress_Listeners  
+     */
+    loc_listener:
+    {
+        // keep track of the last URL loaded in this window
+        last_url_spec : null,
+        // flag to indicate whether or not we should handle the load state change
+        handle_load: false,
+        
+        QueryInterface: function(aIID)
+        {
+            if (aIID.equals(Components.interfaces.nsIWebProgressListener) ||
+                aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
+                aIID.equals(Components.interfaces.nsISupports))
+              return this;
+            throw Components.results.NS_NOINTERFACE;
+        },
+        
+        onStateChange: function(aWebProgress, aRequest, aFlag, aStatus)
+        {
+           if(aFlag & Components.interfaces.nsIWebProgressListener.STATE_START)
+           {
+             // do nothing at load start
+           }
+           // only handle the load if flagged to by a change in the location bar url 
+           // otherwise we end up calling reset_state much too often because
+           // the load state change handler is called with every ajax request, etc.
+           if(this.handle_load && 
+            (aFlag & Components.interfaces.nsIWebProgressListener.STATE_STOP))
+           {
+             Alph.util.log("handling load stop for " + this.last_url_spec);
+             this.handle_load = false;
+             Alph.main.reset_state(aWebProgress.DOMWindow);
+           }
+           return 0;
+        },
+
+        onLocationChange: function(aProgress, aRequest, aURI)
+        {
+           // This fires when the location bar changes; i.e load event is confirmed
+           // or when the user switches tabs. If you use myListener for more than one tab/window,
+           // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
+            if (this.last_url_spec != aURI.spec)
+            {
+                this.handle_load = true;
+                this.last_url_spec = aURI.spec;
+            }
+           
+        },
+        onProgressChange: function() {},
+        onStatusChange: function() {},
+        onSecurityChange: function() {},
+        onLinkIconAvailable: function() {}
     }
 };
 
