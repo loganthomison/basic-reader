@@ -2,9 +2,9 @@
  * CSS for Noun Inflection tables
  */
 td.regular {
-    border-left: 1px solid gray; 
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-left: 1px solid #4E6476; 
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
     border-right: none;
     padding: 2px;
     white-space: nowrap;
@@ -12,17 +12,17 @@ td.regular {
     
 } 
 td.irregular{
-    border-left: 1px dashed gray; 
-    border-right: 1px solid gray;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-left: 1px dashed #4E6476; 
+    border-right: 1px solid #4E6476;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
     padding: 2px;
     white-space: nowrap;
     vertical-align: bottom;
 }
 
 td.noirreg {
-   border-right: 1px solid gray;
+   border-right: 1px solid #4E6476;
 }
 
 ul.stem-class-block {
@@ -48,7 +48,7 @@ ul.stem-classes {
 ul.stem-class-block.show-list ul.stem-classes{
     display: block;
     position: absolute;
-    border: 1px solid black;
+    border: 1px solid #0E2233;
     background-color: white;
     right: 10px;
 }
@@ -63,11 +63,16 @@ ul.stem-classes li {
 }
 
 li.stem-class-toggle {
-    font-weight: normal;
-    color: blue;
+    font-weight: bold;
+    color: #3E8D9C;
     cursor: pointer;
  
 }
+
+li.stem-class-toggle:hover {
+    color: #5BC8DC;
+}
+
 ul.stem-class-block li.stem-class-toggle {
     list-style-image: url("chrome://alpheios/skin/twisty-clsd.png");
 }
@@ -89,6 +94,6 @@ ul.stem-classes li.highlight-ending {
 }
 
 ul.stem-classes li.highlight-ending .stem-class-desc {
-    background-color: yellow;
+    background-color: #F6D918;
 }
 

@@ -3,7 +3,12 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?> 
 <?xml-stylesheet href="chrome://alpheios/skin/about.css" type="text/css"?> 
 
-<!DOCTYPE dialog SYSTEM "chrome://alpheios/locale/about.dtd">
+<!DOCTYPE dialog [
+    <!ENTITY % aboutDTD SYSTEM "chrome://alpheios/locale/about.dtd">
+    <!ENTITY % alphDTD SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+%aboutDTD;
+%alphDTD;
+]>
 
 <dialog id="alpheiosAbout"
         title="&alpheios-about-title;"
@@ -21,14 +26,17 @@
   <vbox flex="1">
     <hbox>
         <image id="alpheios-icon"/>
-        <label class="site-link" 
-               onclick="window.open('http://alpheios.net');" 
-               value="http://alpheios.net"/>
+        <label class="site-link" id="alpheios-site-link" 
+               onclick="window.opener.Alph.util.open_alpheios_link('main');"/>
     </hbox>
     <groupbox id="alpheios-extension-list">
         <caption class="alpheios-about-extensions" label="&alpheios-about-versions;"/>
     </groupbox>
-
+    <hbox>
+        <label class="site-link" id="alpheios-feedback-link"
+               onclick="window.opener.Alph.util.send_feedback();"
+               value="&alpheios.menu.feedback;"/>
+    </hbox>
   </vbox>
 
     

@@ -47,6 +47,12 @@ if (typeof Alph == "undefined") {
  */
 Alph.util = {
 
+    ALPHEIOS_URLS:
+    {
+        main: 'http://alpheios.net',
+        help:  'http://alpheios.net/content/firefox-extensions',
+        support: 'mailto:support@alpheios.net'
+    },
     XUL_NS: 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
     
     /**
@@ -513,5 +519,36 @@ Alph.util = {
             this.log("Error retrieving installed extensions:" + a_e);
         }
         return alph_pkgs;
+    },
+    
+    /**
+     * Open a link to the alpheios site
+     * @param {String} a_loc site location
+     */
+    open_alpheios_link: function(a_loc)
+    {
+        this.open_new_tab(this.ALPHEIOS_URLS[a_loc]);    
+    },
+    
+    /**
+     * Open a new tab and select it
+     * @param {String} a_url the url to open
+     */
+    open_new_tab: function(a_url)
+    {
+        gBrowser.selectedTab = gBrowser.addTab(a_url);
+    },
+
+    /**
+     * launch the user's email application and prepare feedback email headers
+     */
+    send_feedback: function()
+    {
+        var subject =
+            Alph.$("#alpheios-strings").get(0).getString('alph-feedback-subject');
+        var win = window.open(
+            this.ALPHEIOS_URLS.support +
+            '?subject=' + subject);          
+        win && win.open && !win.closed && win.close(); 
     }
 };

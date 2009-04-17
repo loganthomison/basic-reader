@@ -12,9 +12,14 @@
 }
 
 #alpheios-morph-inflection, #alpheios-dict-browse {
-    text-decoration: underline;
-    color: blue;
+    text-decoration: none;
+    color: #3E8D9C;
+    font-weight: bold;
 }
+
+#alpheios-morph-inflection:hover, #alpheios-dict-browse:hover {
+    color: #5BC8DC;
+} 
 
 #alph-dict-body {
     height: 100%;

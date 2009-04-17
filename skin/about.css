@@ -1,3 +1,10 @@
+dialog {
+    background-color: white;
+}
+
+label,caption,description {
+    background-color: white;
+}
 label {
     font-weight: bold;
 }
@@ -7,9 +14,14 @@ label.alpheios-about-title {
 }
 
 label.site-link {
-    color: blue;
-    text-decoration: underline;
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
     cursor: pointer;
+}
+
+label.site-link:hover {
+    color: #5BC8DC;
 }
 
 image#alpheios-icon {

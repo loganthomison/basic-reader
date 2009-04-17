@@ -20,12 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #alph-window {
+	min-width: 100px;
 	width: auto;
 	height: auto;
-	color: #000000;
-	border-spacing: 0px;
+	color: #0E2233;
+	border: 2px outset #B8B7B5 !important;
+    border-spacing: 0px;
+    padding: 4px;
 	margin: 0px;
-	padding: 0px;
 	letter-spacing: normal;
 	text-align: left;
 	text-decoration: none;
@@ -33,16 +35,14 @@
 	text-transform: none;
 	white-space: normal;
 	word-spacing: normal;
-	font: normal 14px sans-serif;
+	font-family:  Arial, sans-serif;
+	font-size: medium;
 	visibility: visible;
 	position: absolute; 
 	z-index: 7777;
-	border: 1px solid #BBC !important;
-	padding: 4px;
-	background: #72CEDF;
+	background: white;
 	top: 5px;
-	left: 5px;
-	min-width: 100px;
+	left: 5px;	
 }
 
 #alph-window[alpheios-pending] * {
@@ -99,9 +99,7 @@
     font-weight: bold;
 }
 
-/* XML Markup */
 #alph-text {
-    font-size: 1em;
     font-style: normal;
 }
 
@@ -115,7 +113,7 @@
 
 
 .alph-word {
-    border-top: 1px dotted black;
+    border-top: 1px dotted #0E2233;
     padding-top: 10px;
 }
 
@@ -134,7 +132,7 @@
 
 div.alph-morph {
     display: inline;
-    font-size: 85%;
+    font-size: smaller;
 }
 
 .alph-mean {
@@ -148,14 +146,17 @@ div.alph-morph {
 
 .alph-attr {
     font-weight: normal;
-    color: #000000;
-	background: #72CEdf;
+    color: #0E2233;
 }
 
 .alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs {
-	color:blue;
-	background: #72CEDF;
+	color:#3E8D9C;
+	font-weight: bold;
 	cursor: pointer;
+}
+
+.alph-case:hover,.alph-mood:hover,.alph-decl:hover,.alph-conj:hover,.alph-pofs:hover {
+    color: #5BC8DC;
 }
 
 /* attributes inside part-of-speech should not have pointer cursor */
@@ -174,13 +175,13 @@ div.alph-morph {
 
 .alph-infl {
     margin-left: 2em;
-    font-size: 85%;    
+    font-size: smaller;    
 }
 
 #alph-secondary-loading {
     display: inline;
-    color: gray;
-    border: 2px outset black;
+    color: #666666;
+    border: 2px outset #B8B7B5;
     padding-left: 18px;
     padding-top: 2px;
     padding-bottom: 2px;
@@ -216,18 +217,23 @@ div.alph-morph {
 }
 
 #alph-infl-index h1 {
-    font-size: 110%
+    font-size: larger;
 }
 
 #alph-infl-index a.alph-infl-index-link {
-    color: blue;
+    color: #3E8D9C;
+    font-weight: bold;
     text-decoration: none;
+}
+
+#alph-infl-index a.alph-infl-index-link:hover {
+    color: #5BC8DC;
 }
 
 #alph-infl-index a.loading {
     background: transparent url(loading.gif) no-repeat;
     cursor: progress;
-    color: gray;
+    color: #666666;
 }
 
 .alph-query-element {
@@ -236,14 +242,25 @@ div.alph-morph {
 }
 
 .alph-query-infl a {
-    color: blue;
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.alph-query-infl a:hover {
+    color: #5BC8DC;
     text-decoration: none;
 }
 
 .alph-dict-link {
-   color: blue;
+   color: #3E8D9C;
+   font-weight: bold;
    cursor: pointer;
-   text-decoration: underline;
-   font-size: 90%;
+   text-decoration: none;
    text-align: right;
+   font-size: smaller;
+}
+
+.alph-dict-link:hover {
+   color: #5BC8DC;
 }

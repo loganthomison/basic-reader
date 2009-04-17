@@ -11,8 +11,8 @@
 <!ENTITY alpheios.menu "Alpheios">
 <!ENTITY alpheios.menu.options "Options">
 <!ENTITY alpheios.menu.options.tooltip "Configure Alpheios Preferences">
-<!ENTITY alpheios.menu.feedback "Feedback">
-<!ENTITY alpheios.menu.feedback.tooltip "Provide Feedback on Alpheios">
+<!ENTITY alpheios.menu.feedback "Send Feedback">
+<!ENTITY alpheios.menu.feedback.tooltip "Email Feedback on Alpheios">
 <!ENTITY alpheios.menu.about "About">
 <!ENTITY alpheios.menu.about.tooltip "About Alpheios">
 <!ENTITY alpheios.menu.site "Alpheios Site">

@@ -2,7 +2,7 @@
  * CSS for Latin verb conjugation table
  */
 body, th, td {
-    font-family: "Trebuchet MS", "Arial Unicode MS", sans-serif;
+    font-family: "Arial Unicode MS", sans-serif;
     font-size: 90%;
 }
 
@@ -13,7 +13,12 @@ body, th, td {
 }
 
 div#alph-infl-index-link {
-    color: blue;
+    color: #3E8D9C;
+    font-weight: bold;
+}
+
+div#alph-infl-index-link:hover {
+    color: #5BC8DC;
 }
 
 #links a, #infl-links a {
@@ -60,7 +65,7 @@ table#alph-infl-table {
 }
 
 #alph-infl-table tr {
-	border: 1px solid gray;
+	border: 1px solid #4E6476;
 	padding: 2px;
 }
 
@@ -71,10 +76,10 @@ table#alph-infl-table {
 
 th {
     display: none;
-    border-left: 1px solid gray;
-    border-right: 1px solid gray;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-left: 1px solid #4E6476;
+    border-right: 1px solid #4E6476;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
     padding: 2px;
 }
 
@@ -89,10 +94,10 @@ tr#headerrow1 th:first-child {
 
 
 tr#headerrow1-irreg th {
-    border-top: 2px solid black;
-    border-bottom: 1px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border-top: 2px solid #0E2233;
+    border-bottom: 1px solid #0E2233;
+    border-left: 1px solid #0E2233;
+    border-right: 1px solid #0E2233;
     
 }
 
@@ -113,20 +118,20 @@ tr.data-row th {
    display:table-cell;
    font-weight: normal;
    font-style: italic;
-   border-left: 1px solid black;
+   border-left: 1px solid #0E2233;
    border-right: none;
 }
 
 tr.group1row td {
     border-left: none;
     border-right: none;    
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
 }
 
 
 tr.group1row th {
-    border-left: 1px solid black;
+    border-left: 1px solid #0E2233;
     border-right: none;
     text-align: left;
 }
@@ -134,7 +139,6 @@ tr.group1row th {
 tr.data-row td.emptycell {
     border-left: none;
     border-right: none;
-    color: red;
 }
 
 td {
@@ -155,9 +159,14 @@ a.footnote:after {
 
 .footnote {
     vertical-align: super;
-    color: blue;
-    text-decoration: underline;
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
     cursor: pointer;
+}
+
+.footnote:hover {
+    color: #5BC8DC;
 }
 
 .footnote-text {
@@ -167,11 +176,11 @@ a.footnote:after {
 .footnote-visible {
     display: inline;
     position: absolute;
-    color: black;
+    color: #0E2233;
     padding: 2px;
     font-weight: normal;
-    border: 1px solid #BBC !important;
-    background-color: #72CEDF;
+    border: 1px solid #B8B7B5 !important;
+    background-color: white;
     white-space: normal;
 }
 
@@ -181,21 +190,21 @@ td.highlight-ending {
 }
 
 span.highlight-ending {
-    background-color: yellow;
+    background-color: #F6D918;
     font-weight: bold;
     font-size: 1.25em;
 }
 
 .highlight-hover {
-   background-color: #c7b589;
+   background-color: #7E8897;
    
 }
 
 td {
-    border-left: 1px solid gray; 
-    border-right: 1px solid gray;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-left: 1px solid #4E6476; 
+    border-right: 1px solid #4E6476;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
     padding: 2px;
     white-space: nowrap;
     vertical-align: bottom;

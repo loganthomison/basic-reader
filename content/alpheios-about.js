@@ -28,6 +28,10 @@
  {
     load_about: function()
     {
+        // populate the Alpheios site link
+        Alph.$("#alpheios-site-link").attr("value",Alph.util.ALPHEIOS_URLS.main);
+        
+        // add the Alpheios version information
         var pkgs = Alph.util.getAlpheiosPackages();
         pkgs.forEach(
             function(a_item)

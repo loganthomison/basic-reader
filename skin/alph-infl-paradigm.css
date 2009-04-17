@@ -28,7 +28,7 @@ th.empty-cell {
 }
 
 td.selected {
-    background-color: yellow;
+    background-color: #F6D918;
     font-weight: bold;
 }
 

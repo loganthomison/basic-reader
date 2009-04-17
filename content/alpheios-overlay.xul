@@ -77,13 +77,13 @@
         <command id="alpheios-options-cmd" 
             oncommand="Alph.main.show_options();"/>
         <command id="alpheios-feedback-cmd"
-            oncommand="window.open('http://alpheios.net/forum/21','alpheios-feedback')"/>
+            oncommand="Alph.util.send_feedback();"/>
         <command id="alpheios-help-cmd"
-            oncommand="Alph.main.show_help();"/>
+            oncommand="Alph.util.open_alpheios_link('help');"/>
         <command id="alpheios-about-cmd"
             oncommand="Alph.main.show_about();"/>
     	<command id="alpheios-site-cmd"
-            oncommand="window.open('http://alpheios.net','alpheios-home')"/>
+            oncommand="Alph.util.open_alpheios_link('main');"/>
     </commandset>
 
 	<popup id="contentAreaContextMenu">

@@ -2,8 +2,19 @@
  * Base CSS for Inflection tables
  */
 body, th, td {
-    font-family: "Trebuchet MS", "Arial Unicode MS", sans-serif;
+    font-family: "Arial Unicode MS", sans-serif;
     font-size: 90%;
+    color: #0E2233;
+}
+
+a {
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #5BC8DC;
 }
 
 #alph-inflect-title {
@@ -17,7 +28,12 @@ body, th, td {
 }
 
 div#alph-infl-index-link {
-    color: blue;
+    color: #3E8D9C;
+    font-weight: bold;
+}
+
+div#alph-infl-index-link:hover {
+    color: #5BC8DC;
 }
 
 #links a, #infl-links a {
@@ -64,7 +80,7 @@ table#alph-infl-table {
 }
 
 #alph-infl-table tr {
-	border: 1px solid gray;
+	border: 1px solid #4E6476;
 	padding: 2px;
 }
 
@@ -75,10 +91,10 @@ table#alph-infl-table {
 
 th {
     display: none;
-    border-left: 1px solid gray;
-    border-right: 1px solid gray;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-left: 1px solid #4E6476;
+    border-right: 1px solid #4E6476;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
     padding: 2px;
 }
 
@@ -93,10 +109,10 @@ tr#headerrow1 th:first-child {
 
 
 tr#headerrow1-irreg th {
-    border-top: 2px solid black;
-    border-bottom: 1px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border-top: 2px solid #0E2233;
+    border-bottom: 1px solid #0E2233;
+    border-left: 1px solid #0E2233;
+    border-right: 1px solid #0E2233;
     
 }
 
@@ -117,24 +133,24 @@ tr.data-row th {
    display:table-cell;
    font-weight: normal;
    font-style: italic;
-   border-left: 1px solid black;
+   border-left: 1px solid #0E2233;
    border-right: none;
 }
 
 tr.data-row th.rowgroupheader {
-    border-right: 1px solid gray;
+    border-right: 1px solid #4E6476;
 }
 
 tr.group1row td {
     border-left: none;
     border-right: none;    
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
 }
 
 
 tr.group1row th {
-    border-left: 1px solid black;
+    border-left: 1px solid #0E2233;
     border-right: none;
     text-align: left;
 }
@@ -163,9 +179,13 @@ a.footnote:after {
 
 .footnote {
     vertical-align: super;
-    color: blue;
-    text-decoration: underline;
+    color: #3E8D9C;
+    font-weight: bold;
     cursor: pointer;
+}
+
+.footnote:hover {
+    color: #5BC8DC;
 }
 
 .footnote-delimiter {
@@ -179,12 +199,12 @@ a.footnote:after {
 .footnote-visible {
     display: inline;
     position: absolute;
-    color: black;
+    color: #0E2233;
     padding: 2px;
     font-weight: normal;
-    border: 1px solid #BBC !important;
-    background-color: #72CEDF;
+    border: 1px outset #B8B7B5 !important;
     white-space: normal;
+    background-color: white;
 }
 
 td.highlight-ending {
@@ -192,27 +212,27 @@ td.highlight-ending {
 }
 
 span.highlight-ending {
-    background-color: yellow;
+    background-color: #F6D918;
     font-weight: bold;
     font-size: 1.25em;
 }
 
 span.highlight-ending.matched {
-    background-color: #72CEDF;
+    background-color: #73CDDE;
     font-weight: bold;
     font-size: 1em;
 }
 
 .highlight-hover {
-   background-color: #8795A2;
+   background-color: #D1D1D0;
    
 }
 
 td {
-    border-left: 1px solid gray; 
-    border-right: 1px solid gray;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
+    border-left: 1px solid #4E6476; 
+    border-right: 1px solid #4E6476;
+    border-top: 1px solid #4E6476;
+    border-bottom: 1px solid #4E6476;
     padding: 2px;
     white-space: nowrap;
     vertical-align: bottom;
@@ -248,12 +268,17 @@ td {
 
 .endings-toggle {
     display: inline;
-    color: blue;
+    color: #3E8D9C;
+    font-weight: bold;
     text-decoration: none;
     cursor: pointer;
     font-weight: bold;
-    font-size: 150%;
+    font-size: 100%;
     padding-left: .5em;
+}
+
+.endings-toggle:hover {
+    color: #5BC8DC
 }
 
 th.reloading {
@@ -268,20 +293,6 @@ th.reloading {
 
 .footnote-text ul, .footnote-text li {
     text-align: left;
-}
-
-span.highlight-ending.query,span.highlight-ending.matched.query {
-    background-color: transparent;
-    color: blue;
-    font-weight: bold;
-    font-size: 1.25em;
-    cursor: pointer;
-}
-
-span.highlight-ending.query.incorrect,span.highlight-ending.matched.query.incorrect {
-    text-decoration: line-through;
-    color: black;
-    font-weight: normal;
 }
 
 .alph-infl-caption {
