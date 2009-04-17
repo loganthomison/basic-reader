@@ -1567,11 +1567,9 @@ Alph.main =
            // This fires when the location bar changes; i.e load event is confirmed
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
-            if (this.last_url_spec != aURI.spec)
-            {
-                this.handle_load = true;
-                this.last_url_spec = aURI.spec;
-            }
+           // process load event even if we're reloading the same page
+           this.handle_load = true;
+           this.last_url_spec = aURI.spec;
            
         },
         onProgressChange: function() {},

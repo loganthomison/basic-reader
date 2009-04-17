@@ -314,12 +314,13 @@ Alph.Panel.prototype.update_status = function(a_status)
         }
     }
     
+    Alph.site.set_toolbar_panel_status(bro.contentDocument,this.panel_id,a_status);
+    
     // if the panel status changed, call observe_ui_event to make sure the 
     // panel contents are up to date
     if (old_status != a_status)
     {
-        this.observe_ui_event(bro);
-        Alph.site.set_toolbar_panel_status(bro.contentDocument,this.panel_id,a_status);
+        this.observe_ui_event(bro);    
     }
     
     return a_status;
