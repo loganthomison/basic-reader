@@ -24,8 +24,9 @@
 	width: auto;
 	height: auto;
 	color: #0E2233;
-	border: 2px outset #B8B7B5 !important;
-    border-spacing: 0px;
+	border-color: #3E8D9C #B8B7B5 #B8B7B5 #73CDDE !important;
+	border-style: outset !important;
+	border-width: 2px !important;
     padding: 4px;
 	margin: 0px;
 	letter-spacing: normal;
