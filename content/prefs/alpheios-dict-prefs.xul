@@ -7,7 +7,7 @@
 
         <prefpane id="alpheios-prefs-dictionaries" 
               label="&alpheios.prefs.dictionaries;" 
-              image="chrome://alpheios/skin/prefs/text-x-generic.png"
+              image="chrome://alpheios/skin/icons/wordlist_32.png"
               onpaneload="Alph.prefs.init_dict_prefs();">
             <preferences>
                 <preference id="pref-default-timeout"

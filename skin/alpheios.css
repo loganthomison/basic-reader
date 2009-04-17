@@ -156,7 +156,7 @@ div.alph-morph {
 }
 
 .alph-case:hover,.alph-mood:hover,.alph-decl:hover,.alph-conj:hover,.alph-pofs:hover {
-    color: #5BC8DC;
+    color: #5BC8DC !important;
 }
 
 /* attributes inside part-of-speech should not have pointer cursor */
@@ -227,7 +227,7 @@ div.alph-morph {
 }
 
 #alph-infl-index a.alph-infl-index-link:hover {
-    color: #5BC8DC;
+    color: #5BC8DC !important;
 }
 
 #alph-infl-index a.loading {
@@ -248,8 +248,7 @@ div.alph-morph {
 }
 
 .alph-query-infl a:hover {
-    color: #5BC8DC;
-    text-decoration: none;
+    color: #5BC8DC !important; 
 }
 
 .alph-dict-link {
@@ -262,5 +261,5 @@ div.alph-morph {
 }
 
 .alph-dict-link:hover {
-   color: #5BC8DC;
+   color: #5BC8DC !important;
 }
