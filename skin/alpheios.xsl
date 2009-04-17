@@ -71,29 +71,64 @@
           </xsl:for-each>
 
           <!-- process inflected forms -->
-          <xsl:for-each select="infl">
+          <!-- process all forms having no dialect -->
+          <xsl:for-each select="infl[not(dial)]">
             <xsl:sort select="term/stem"/>
             <xsl:sort select="pofs/@order" data-type="number" order="descending"/>
             <xsl:variable name="last-stem" select="term/stem"/>
             <xsl:variable name="last-pofs" select="pofs"/>
-            <!-- if this is a form we haven't seen yet -->
             <xsl:if
               test="not(preceding-sibling::infl[(term/stem=$last-stem) and
-                                                              (pofs=$last-pofs)])">
+                                                (pofs=$last-pofs)])">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(term/stem=$last-stem) and
-                                                     (pofs=$last-pofs)]"
+                                  (pofs=$last-pofs) and
+                                  not(dial)]"
                 />
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
-          <!-- handle any forms that have no stem -->
+          <!-- handle any forms that have no dialect and no stem or part of speech-->
           <xsl:call-template name="inflection-set">
             <xsl:with-param name="inflections"
-              select="infl[not(term/stem) or not(pofs)]"/>
+              select="infl[not(dial) and (not(term/stem) or not(pofs))]"/>
           </xsl:call-template>
+          <!-- process all forms having dialect -->
+          <xsl:for-each select="infl[dial]">
+            <xsl:sort select="dial"/>
+            <xsl:sort select="term/stem"/>
+            <xsl:sort select="pofs/@order" data-type="number" order="descending"/>
+            <xsl:variable name="last-dial" select="dial"/>
+            <xsl:variable name="last-stem" select="term/stem"/>
+            <xsl:variable name="last-pofs" select="pofs"/>
+            <xsl:if test="not(preceding-sibling::infl[(term/stem=$last-stem) and
+                                                      (pofs=$last-pofs) and
+                                                      (dial=$last-dial)])">
+              <!-- process all inflections having this form (stem and part-of-speech) -->
+              <xsl:call-template name="inflection-set">
+                <xsl:with-param name="inflections"
+                  select="../infl[(term/stem=$last-stem) and
+                                  (pofs=$last-pofs) and
+                                  (dial=$last-dial)]"
+                />
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:for-each>
+          <!-- handle any forms that have dialect and no stem or part of speech-->
+          <xsl:for-each select="infl[dial and (not(term/stem) or not(pofs))]">
+            <xsl:sort select="dial"/>
+            <xsl:variable name="last-dial" select="dial"/>
+            <xsl:if test="not(preceding-sibling::infl[dial = $last-dial])">
+              <xsl:call-template name="inflection-set">
+                <xsl:with-param name="inflections"
+                  select="../infl[(dial=$last-dial) and
+                                  (not(term/stem) or not(pofs))]"
+                />
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:for-each>
 
         </div>
       </xsl:for-each>
@@ -146,32 +181,32 @@
       <!-- Note:  Only one of case, gender, or kind can appear, depending on part of speech,
       therefore we can pass all through a single parameter -->
       <xsl:element name="div">
-          <xsl:attribute name="class">alph-morph</xsl:attribute>
-          <xsl:call-template name="part-of-speech">
-            <xsl:with-param name="attr" select="case|gend|kind"/>
-            <xsl:with-param name="pofs" select="pofs"/>
-          </xsl:call-template>
-          <xsl:call-template name="item-plus-text-plus-context">
-            <xsl:with-param name="item" select="decl"/>
-            <xsl:with-param name="suffix" select="' declension'"/>
-          </xsl:call-template>
-          <xsl:call-template name="item-plus-text-plus-context">
-            <xsl:with-param name="item" select="conj"/>
-            <xsl:with-param name="suffix" select="' conjugation'"/>
-          </xsl:call-template>
-          <xsl:call-template name="parenthesize">
-            <xsl:with-param name="items" select="age|area|geo|freq"/>
-            <xsl:with-param name="span-name">attrlist</xsl:with-param>
-            <xsl:with-param name="span-context"/>
-          </xsl:call-template>
-          <xsl:call-template name="item-plus-text">
-            <xsl:with-param name="item" select="src"/>
-            <xsl:with-param name="prefix" select="'['"/>
-            <xsl:with-param name="suffix" select="']'"/>
-          </xsl:call-template>
-          <xsl:call-template name="item-plus-text">
-            <xsl:with-param name="item" select="note"/>
-          </xsl:call-template>
+        <xsl:attribute name="class">alph-morph</xsl:attribute>
+        <xsl:call-template name="part-of-speech">
+          <xsl:with-param name="attr" select="case|gend|kind"/>
+          <xsl:with-param name="pofs" select="pofs"/>
+        </xsl:call-template>
+        <xsl:call-template name="item-plus-text-plus-context">
+          <xsl:with-param name="item" select="decl"/>
+          <xsl:with-param name="suffix" select="' declension'"/>
+        </xsl:call-template>
+        <xsl:call-template name="item-plus-text-plus-context">
+          <xsl:with-param name="item" select="conj"/>
+          <xsl:with-param name="suffix" select="' conjugation'"/>
+        </xsl:call-template>
+        <xsl:call-template name="parenthesize">
+          <xsl:with-param name="items" select="age|area|geo|freq"/>
+          <xsl:with-param name="span-name">attrlist</xsl:with-param>
+          <xsl:with-param name="span-context"/>
+        </xsl:call-template>
+        <xsl:call-template name="item-plus-text">
+          <xsl:with-param name="item" select="src"/>
+          <xsl:with-param name="prefix" select="'['"/>
+          <xsl:with-param name="suffix" select="']'"/>
+        </xsl:call-template>
+        <xsl:call-template name="item-plus-text">
+          <xsl:with-param name="item" select="note"/>
+        </xsl:call-template>
       </xsl:element>
     </xsl:element>
   </xsl:template>
@@ -276,6 +311,12 @@
             <xsl:with-param name="span-context" select="$inflections[1]/pofs"/>
           </xsl:call-template>
         </xsl:if>
+        <xsl:if test="$inflections[1]/dial">
+          <xsl:call-template name="parenthesize">
+            <xsl:with-param name="items" select="$inflections[1]/dial"/>
+            <xsl:with-param name="span-name">dial</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
 
         <!-- decide how to display form based on structure -->
         <xsl:choose>
@@ -304,7 +345,7 @@
                 </xsl:for-each>
               </div>
             </xsl:if>
-            
+
             <!-- process plural case list -->
             <xsl:if test="count($inflections[num = 'plural']/case)">
               <div class="alph-infl">
@@ -316,7 +357,7 @@
                 </xsl:for-each>
               </div>
             </xsl:if>
-            
+
             <!-- process other case list -->
             <xsl:if test="count($inflections[not(num)]/case)">
               <div class="alph-infl">
@@ -393,7 +434,6 @@
   </xsl:template>
 
   <xsl:template match="case">
-    
     <xsl:variable name="num" select="../num"/>
     <xsl:variable name="gend" select="../gend"/>
     <xsl:variable name="pofs" select="../pofs"/>
