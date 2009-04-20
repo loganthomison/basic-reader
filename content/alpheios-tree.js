@@ -53,6 +53,18 @@ Alph.Tree.prototype.get_detach_chrome = function()
     return 'chrome://alpheios/content/alpheios-tree-window.xul';
 };
 
+/** 
+ * Tree panel specific implementation of 
+ * {@link Alph.Panel.#init}
+ */
+Alph.Tree.prototype.init = function()
+{
+    // add the popup trigger handler to the tree browser
+    var trigger = Alph.main.getLanguageTool().getpopuptrigger();
+    Alph.$("browser",this.panel_elem).get(0).
+        addEventListener(trigger, Alph.main.doXlateText, false);
+};
+
 /**
  * Tree panel specific implementation of
  * {@link Alph.Panel#show}
@@ -152,14 +164,64 @@ Alph.Tree.prototype.show = function()
             );
         }
     }
-    // add the popup trigger handler to the tree browser
-    var trigger = Alph.main.getLanguageTool().getpopuptrigger();
-    Alph.$("browser",this.panel_elem).get(0).
-        addEventListener(trigger, Alph.main.doXlateText, false);
 
     return Alph.Panel.STATUS_SHOW;
 
 };
+
+
+/**
+ * Tree specific implementation of 
+ * {@link Alph.Panel.observe_ui_event}
+ * @param {Browser} a_bro the current browser
+ * @param a_event_type the event type (one of @link Alph.main.events)
+ * @param a_event_data optional event data object
+ */
+Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
+{       
+    // listen for the window and the xlate trigger change events 
+    if (a_event_type == Alph.main.events.UPDATE_XLATE_TRIGGER)
+    {
+        Alph.util.log("Tree panel handling event " + a_event_type);
+        var new_trigger = a_event_data.new_trigger;
+        var old_trigger = a_event_data.old_trigger;
+        var pw_bro = null;
+        if (this.panel_window != null && ! this.panel_window.closed)
+        {
+            pw_bro =
+                this.panel_window
+                    .Alph.$("#" + this.panel_id + " browser")
+                    .get(0);
+        }
+
+        if (old_trigger)
+        {
+            Alph.$("browser",this.panel_elem).get(0).
+                removeEventListener(old_trigger, Alph.main.doXlateText,false);
+            if (pw_bro)
+            {
+                pw_bro.removeEventListener(old_trigger, Alph.main.doXlateText,false);
+            }
+        }
+        Alph.$("browser",this.panel_elem).get(0).
+            addEventListener(new_trigger, Alph.main.doXlateText,false);
+        if (pw_bro)
+        {
+            pw_bro.addEventListener(new_trigger, Alph.main.doXlateText,false);
+        }
+    }
+    if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW) 
+    {
+        this.open();
+        var trigger = Alph.main.getXlateTrigger();
+        this.panel_window
+            .Alph.$("#" + this.panel_id + " browser")
+            .get(0)
+            .addEventListener(trigger, Alph.main.doXlateText,false);
+    }    
+    return;
+};
+
 
 /**
  * Parse and display SVG-encoded tree
@@ -280,11 +342,6 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                     .get(0);
             if (pw_bro)
             {
-                // add the popup trigger handler to the tree browser
-                var trigger = 
-                    Alph.main.getLanguageTool().getpopuptrigger();
-                pw_bro.addEventListener(trigger, Alph.main.doXlateText, false);
-
                 var window_doc = pw_bro.contentDocument;
                 var panel_tree = Alph.$("#dependency-tree", treeDoc).get(0);
                 var panel_error = Alph.$("#tree-error",treeDoc).html();

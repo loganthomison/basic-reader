@@ -79,7 +79,9 @@ Alph.main =
             REMOVE_POPUP: 300,
             SHOW_DICT: 400,
             UPDATE_PREF: 500,
-            LOAD_PANEL_WINDOW: 600
+            LOAD_DICT_WINDOW: 600,
+            LOAD_TREE_WINDOW: 700,
+            UPDATE_XLATE_TRIGGER: 800
         },
 
     /**
@@ -121,8 +123,8 @@ Alph.main =
         gBrowser
             .addEventListener("DOMContentLoaded", function(event) { Alph.main.insert_metadata(event) }, false);
         gBrowser.addProgressListener(Alph.main.loc_listener,
-            Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
-      
+            Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);        
+            
         var mks = document.getElementById("mainKeyset");
 
         // note: setting keys seem to only work during startup
@@ -317,7 +319,7 @@ Alph.main =
         {
             return;
         }
-        this.removeXlateTrigger(a_bro);
+        var old_trigger = this.removeXlateTrigger(a_bro);
         a_bro.removeEventListener("keydown", this.onKeyDown, true);
 
         Alph.xlate.removePopup(a_bro);
@@ -915,11 +917,15 @@ Alph.main =
     setXlateTrigger: function(a_bro, a_trigger)
     {
         // first, remove the old one, if any
-        this.removeXlateTrigger(a_bro);
+        var old_trigger = this.removeXlateTrigger(a_bro);
         
         a_bro.addEventListener(a_trigger, this.doXlateText, false);
         this.get_state_obj(a_bro).set_var("xlate_trigger",a_trigger);
-
+        this.broadcast_ui_event(Alph.main.events.UPDATE_XLATE_TRIGGER,
+            {new_trigger: a_trigger,
+             old_trigger: old_trigger
+            }
+        );
     },
     
     /**
@@ -941,6 +947,7 @@ Alph.main =
      * Remove the popup trigger event listener from the browser
      * @private
      * @param a_bro the subject browser  
+     * @return the old trigger
      */
     removeXlateTrigger: function(a_bro)
     {
@@ -950,6 +957,7 @@ Alph.main =
         {
             a_bro.removeEventListener(trigger,this.doXlateText,false);
         }
+        return trigger;
     },
         
     /**
@@ -1164,7 +1172,7 @@ Alph.main =
                 try 
                 {
                     var panel_obj = Alph.main.panels[panel_id];
-                    Alph.util.log("Observing ui event for panel " + panel_id); 
+                    Alph.util.log("Observing ui event " + a_event + " for panel " + panel_id); 
                     panel_obj.observe_ui_event(bro,a_event,a_event_data);    
                 } 
                 catch (e)
@@ -1179,6 +1187,7 @@ Alph.main =
     /**
      * Insert metadata elements identifying the Alpheios extensions into the browser
      * content document
+     * @param {Event} a_event the load event
      */
     insert_metadata: function(a_event)
     {
@@ -1215,9 +1224,8 @@ Alph.main =
         var bro = Alph.main.getCurrentBrowser();
         
         var ped_site = 
-            Alph.$("meta[name=alpheios-pedagogical-text]",bro.contentDocument).length > 0
-            ? true : false;
-
+            Alph.site.is_ped_site(bro.contentDocument);
+            
         if (ped_site)
         { 
             this.set_mode(bro);
@@ -1530,9 +1538,11 @@ Alph.main =
     loc_listener:
     {
         // keep track of the last URL loaded in this window
-        last_url_spec : null,
+        last_url_base : '',
         // flag to indicate whether or not we should handle the load state change
         handle_load: false,
+        // flag to indicate if it's a refresh or reload of the last page
+        handle_refresh: false,
         
         QueryInterface: function(aIID)
         {
@@ -1551,13 +1561,38 @@ Alph.main =
            }
            // only handle the load if flagged to by a change in the location bar url 
            // otherwise we end up calling reset_state much too often because
-           // the load state change handler is called with every ajax request, etc.
-           if(this.handle_load && 
-            (aFlag & Components.interfaces.nsIWebProgressListener.STATE_STOP))
+           // the load state change handler is called with every ajax request
+           if (aFlag & Components.interfaces.nsIWebProgressListener.STATE_STOP)
            {
-             Alph.util.log("handling load stop for " + this.last_url_spec);
-             this.handle_load = false;
-             Alph.main.reset_state(aWebProgress.DOMWindow);
+                // if we're reloading the same page, or following a link
+                // within the page, just refresh the alpheios site elements
+                // but don't do the full state reset for the panels
+                // note that if the user is opening a link to the same
+                // page in a new tab, the call to getCurrentBrowser() will always return
+                // the tab which is in focus and not the new tab.  This is okay
+                // because the page in the new tab will be handled when the user
+                // switches to it by the onTabSelect handler
+                if (this.handle_refresh)
+                {
+                    this.handle_refresh = false;
+                    Alph.util.log("Handling refresh for " + this.last_url_base);
+                    var bro = Alph.main.getCurrentBrowser();
+                    var doc = bro.contentDocument;
+                    Alph.main.insert_metadata({target: doc});
+                    if (Alph.site.is_ped_site(doc))
+                    {
+                        // update the site functionality and toolbar
+                        Alph.site.setup_page(doc,Alph.Translation.INTERLINEAR_TARGET_SRC);
+                        var mode = Alph.main.get_state_obj(bro).get_var("level");
+                        Alph.site.set_current_mode(doc,mode);
+                    }
+                }
+                else if(this.handle_load) 
+                {
+                    this.handle_load = false;
+                    Alph.util.log("Handling load for " + this.last_url_base);
+                    Alph.main.reset_state(aWebProgress.DOMWindow);
+                }
            }
            return 0;
         },
@@ -1567,11 +1602,19 @@ Alph.main =
            // This fires when the location bar changes; i.e load event is confirmed
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
-           // process load event even if we're reloading the same page
-           this.handle_load = true;
-           this.last_url_spec = aURI.spec;
-           
+           // Alph.util.log("caught location change : " + aURI.spec);
+           var new_url_base= aURI.spec.match(/([^#|\?]+)[#|\?]?/)[1]
+           if (new_url_base == this.last_url_base)
+           {
+            this.handle_refresh = true;
+           }
+           else
+           {
+            this.handle_load = true;
+           }
+           this.last_url_base = new_url_base;          
         },
+        
         onProgressChange: function() {},
         onStatusChange: function() {},
         onSecurityChange: function() {},

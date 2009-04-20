@@ -30,6 +30,15 @@
 Alph.site = {
     
     /**
+     * 
+     */
+    is_ped_site: function(a_doc)
+    {             
+        return((Alph.$("meta[name=alpheios-pedagogical-text]",a_doc).length > 0)
+                ? true : false);
+      
+    },
+    /**
      * injects the browser content document with Alpheios pedagogical
      * functionality
      * @param {Document} a_doc the browser content document

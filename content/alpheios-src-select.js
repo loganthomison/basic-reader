@@ -295,7 +295,8 @@ Alph.SourceSelection.prototype.equals = function(a_other)
         this.m_wordStart == a_other.m_wordStart &&
         this.m_wordEnd == a_other.m_wordEnd &&
         this.m_contextStr == a_other.m_contextStr &&
-        this.m_contextPos == a_other.m_contextPos)
+        this.m_contextPos == a_other.m_contextPos &&
+        this.m_rangeParent == this.m_rangeParent)
     {   
         return true;
     }
