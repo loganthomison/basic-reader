@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Copyright 2008 Cantus Foundation
+  Copyright 2008-2009 Cantus Foundation
   http://alpheios.net
  
   This file is part of Alpheios.
@@ -24,8 +24,11 @@
   Stylesheet for transforming lexicon output to HTML
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs">
+<xsl:stylesheet
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  version="1.0"
+  exclude-result-prefixes="xs">
 
   <xsl:import href="beta2unicode.xsl"/>
 
@@ -77,14 +80,17 @@
             <xsl:sort select="pofs/@order" data-type="number" order="descending"/>
             <xsl:variable name="last-stem" select="term/stem"/>
             <xsl:variable name="last-pofs" select="pofs"/>
+            <xsl:variable name="last-stemtype" select="stemtype"/>
             <xsl:if
               test="not(preceding-sibling::infl[(term/stem=$last-stem) and
-                                                (pofs=$last-pofs)])">
+                                                (pofs=$last-pofs) and
+                                                (stemtype=$last-stemtype)])">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(term/stem=$last-stem) and
                                   (pofs=$last-pofs) and
+                                  (stemtype=$last-stemtype) and
                                   not(dial)]"
                 />
               </xsl:call-template>
@@ -97,21 +103,25 @@
           </xsl:call-template>
           <!-- process all forms having dialect -->
           <xsl:for-each select="infl[dial]">
-            <xsl:sort select="dial"/>
             <xsl:sort select="term/stem"/>
             <xsl:sort select="pofs/@order" data-type="number" order="descending"/>
-            <xsl:variable name="last-dial" select="dial"/>
+            <xsl:sort select="dial"/>
             <xsl:variable name="last-stem" select="term/stem"/>
             <xsl:variable name="last-pofs" select="pofs"/>
-            <xsl:if test="not(preceding-sibling::infl[(term/stem=$last-stem) and
-                                                      (pofs=$last-pofs) and
-                                                      (dial=$last-dial)])">
+            <xsl:variable name="last-dial" select="dial"/>
+            <xsl:variable name="last-stemtype" select="stemtype"/>
+            <xsl:if
+              test="not(preceding-sibling::infl[(term/stem=$last-stem) and
+                                                (pofs=$last-pofs) and
+                                                (dial=$last-dial) and
+                                                (stemtype=$last-stemtype)])">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(term/stem=$last-stem) and
                                   (pofs=$last-pofs) and
-                                  (dial=$last-dial)]"
+                                  (dial=$last-dial) and
+                                  (stemtype=$last-stemtype)]"
                 />
               </xsl:call-template>
             </xsl:if>
@@ -120,10 +130,14 @@
           <xsl:for-each select="infl[dial and (not(term/stem) or not(pofs))]">
             <xsl:sort select="dial"/>
             <xsl:variable name="last-dial" select="dial"/>
-            <xsl:if test="not(preceding-sibling::infl[dial = $last-dial])">
+            <xsl:variable name="last-stemtype" select="stemtype"/>
+            <xsl:if
+              test="not(preceding-sibling::infl[(dial=$last-dial) and
+                                                (stemtype=$last-stemtype)])">
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(dial=$last-dial) and
+                                  (stemtype=$last-stemtype) and
                                   (not(term/stem) or not(pofs))]"
                 />
               </xsl:call-template>
@@ -251,32 +265,27 @@
     <xsl:param name="span-name"/>
     <xsl:param name="span-context"/>
     <xsl:if test="$items">
-      <xsl:choose>
+      <span>
+        <xsl:text>(</xsl:text>
+        <!-- if name supplied, add it to span -->
+        <xsl:if test="$span-name">
+          <xsl:attribute name="class">
+            <xsl:value-of select="concat('alph-', $span-name)"/>
+          </xsl:attribute>
+        </xsl:if>
         <!-- if context supplied, add it to span -->
-        <xsl:when test="$span-context">
-          <span class="alph-{$span-name}"
-            context="{translate($span-context,' ','_')}">
-            <xsl:text>(</xsl:text>
-            <xsl:for-each select="$items">
-              <xsl:if test="position() != 1">, </xsl:if>
-              <xsl:value-of select="."/>
-            </xsl:for-each>
-            <xsl:text>)</xsl:text>
-          </span>
-        </xsl:when>
-        <!-- if no context supplied -->
-        <xsl:otherwise>
-          <span class="alph-{$span-name}">
-            <xsl:text>(</xsl:text>
-            <xsl:for-each select="$items">
-              <xsl:if test="position() != 1">, </xsl:if>
-              <xsl:value-of select="."/>
-            </xsl:for-each>
-            <xsl:text>)</xsl:text>
-          </span>
-        </xsl:otherwise>
-      </xsl:choose>
-
+        <xsl:if test="$span-context">
+          <xsl:attribute name="context">
+            <xsl:value-of select="translate($span-context, ' ', '_')"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- for each item supplied -->
+        <xsl:for-each select="$items">
+          <xsl:if test="position() != 1">, </xsl:if>
+          <xsl:value-of select="."/>
+        </xsl:for-each>
+        <xsl:text>)</xsl:text>
+      </span>
     </xsl:if>
   </xsl:template>
 
@@ -311,11 +320,27 @@
             <xsl:with-param name="span-context" select="$inflections[1]/pofs"/>
           </xsl:call-template>
         </xsl:if>
-        <xsl:if test="$inflections[1]/dial">
-          <xsl:call-template name="parenthesize">
-            <xsl:with-param name="items" select="$inflections[1]/dial"/>
-            <xsl:with-param name="span-name">dial</xsl:with-param>
-          </xsl:call-template>
+        <xsl:call-template name="parenthesize">
+          <xsl:with-param name="items" select="$inflections[1]/dial"/>
+          <xsl:with-param name="span-name">dial</xsl:with-param>
+        </xsl:call-template>
+        <xsl:if test="$inflections[1]/derivtype">
+          <xsl:text>d=</xsl:text>
+          <span class="alph-derivtype">
+            <xsl:value-of select="$inflections[1]/derivtype"/>
+          </span>
+        </xsl:if>
+        <xsl:if test="$inflections[1]/stemtype">
+          <xsl:text>s=</xsl:text>
+          <span class="alph-stemtype">
+            <xsl:value-of select="$inflections[1]/stemtype"/>
+          </span>
+        </xsl:if>
+        <xsl:if test="$inflections[1]/morph">
+          <xsl:text>m=</xsl:text>
+          <span class="alph-morph">
+            <xsl:value-of select="$inflections[1]/morph"/>
+          </span>
         </xsl:if>
 
         <!-- decide how to display form based on structure -->
