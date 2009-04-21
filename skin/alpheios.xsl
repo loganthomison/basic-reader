@@ -27,6 +27,7 @@
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:exsl="http://exslt.org/common"
   version="1.0"
   exclude-result-prefixes="xs">
 
@@ -264,26 +265,53 @@
     <xsl:param name="items"/>
     <xsl:param name="span-name"/>
     <xsl:param name="span-context"/>
+
     <xsl:if test="$items">
       <span>
-        <xsl:text>(</xsl:text>
-        <!-- if name supplied, add it to span -->
+        <!-- if argument specifies class -->
         <xsl:if test="$span-name">
           <xsl:attribute name="class">
             <xsl:value-of select="concat('alph-', $span-name)"/>
           </xsl:attribute>
         </xsl:if>
-        <!-- if context supplied, add it to span -->
+
+        <!-- if argument specifies context -->
         <xsl:if test="$span-context">
           <xsl:attribute name="context">
             <xsl:value-of select="translate($span-context, ' ', '_')"/>
           </xsl:attribute>
         </xsl:if>
+
+        <xsl:text>(</xsl:text>
+
         <!-- for each item supplied -->
         <xsl:for-each select="$items">
           <xsl:if test="position() != 1">, </xsl:if>
-          <xsl:value-of select="."/>
+          <span>
+            <xsl:attribute name="class">
+              <xsl:choose>
+                <!-- if item specifies class -->
+                <xsl:when test="./@span-name">
+                  <xsl:value-of
+                    select="concat('alph-nopad alph-', ./@span-name)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>alph-nopad</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+
+            <!-- if item specifies context -->
+            <xsl:if test="./@span-context">
+              <xsl:attribute name="context">
+                <xsl:value-of select="translate(./@span-context, ' ', '_')"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <xsl:value-of select="."/>
+          </span>
         </xsl:for-each>
+
         <xsl:text>)</xsl:text>
       </span>
     </xsl:if>
@@ -324,24 +352,29 @@
           <xsl:with-param name="items" select="$inflections[1]/dial"/>
           <xsl:with-param name="span-name">dial</xsl:with-param>
         </xsl:call-template>
-        <xsl:if test="$inflections[1]/derivtype">
-          <xsl:text>d=</xsl:text>
-          <span class="alph-derivtype">
-            <xsl:value-of select="$inflections[1]/derivtype"/>
-          </span>
-        </xsl:if>
-        <xsl:if test="$inflections[1]/stemtype">
-          <xsl:text>s=</xsl:text>
-          <span class="alph-stemtype">
-            <xsl:value-of select="$inflections[1]/stemtype"/>
-          </span>
-        </xsl:if>
-        <xsl:if test="$inflections[1]/morph">
-          <xsl:text>m=</xsl:text>
-          <span class="alph-morph">
-            <xsl:value-of select="$inflections[1]/morph"/>
-          </span>
-        </xsl:if>
+        <xsl:variable name="dsm-items">
+          <xsl:if test="$inflections[1]/derivtype">
+            <item span-name="derivtype">
+              <xsl:text>d=</xsl:text>
+              <xsl:value-of select="$inflections[1]/derivtype"/>
+            </item>
+          </xsl:if>
+          <xsl:if test="$inflections[1]/stemtype">
+            <item span-name="stemtype">
+              <xsl:text>s=</xsl:text>
+              <xsl:value-of select="$inflections[1]/stemtype"/>
+            </item>
+          </xsl:if>
+          <xsl:if test="$inflections[1]/morph">
+            <item span-name="morphflags">
+              <xsl:text>m=</xsl:text>
+              <xsl:value-of select="$inflections[1]/morph"/>
+            </item>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:call-template name="parenthesize">
+          <xsl:with-param name="items" select="exsl:node-set($dsm-items)/item"/>
+        </xsl:call-template>
 
         <!-- decide how to display form based on structure -->
         <xsl:choose>
