@@ -200,7 +200,12 @@ Alph.xlate = {
             this.clearSelection();
             return;
         }
-                    
+        
+        // add the range parent object to the target
+        // so that the user's selection can be highlighted
+        // again differently after translation, if necessary
+        alphtarget.setRangeParent(rp);
+            
         // nothing to do if same word as last AND the popup is shown
         // (hidePopup removes the last word from the state variable),
         // unless we're in query  mode, in which case selecting the same word
@@ -235,10 +240,6 @@ Alph.xlate = {
             sel.removeAllRanges();
             sel.addRange(r);
         }
-        // add the range parent object to the target
-        // so that the user's selection can be highlighted
-        // again differently after translation, if necessary
-        alphtarget.setRangeParent(rp);
         
         // do we have a treebank query for this word?
         var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",doc).attr("content");
