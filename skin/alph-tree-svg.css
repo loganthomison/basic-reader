@@ -10,7 +10,7 @@ svg {
 
 /* normal text attributes */
 g text {
-    font-family: Times, Arial, Helvetica, Serif;
+    font-family: Georgia, Times, Arial, Helvetica, Serif;
     font-size: 20px;
     stroke: none;
     fill: dimgray;
