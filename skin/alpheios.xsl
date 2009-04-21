@@ -354,19 +354,31 @@
         </xsl:call-template>
         <xsl:variable name="dsm-items">
           <xsl:if test="$inflections[1]/derivtype">
-            <item span-name="derivtype">
+            <item>
+              <xsl:attribute name="span-name">derivtype</xsl:attribute>
+              <xsl:attribute name="span-context">
+                <xsl:value-of select="$inflections[1]/derivtype"/>
+              </xsl:attribute>
               <xsl:text>d=</xsl:text>
               <xsl:value-of select="$inflections[1]/derivtype"/>
             </item>
           </xsl:if>
           <xsl:if test="$inflections[1]/stemtype">
-            <item span-name="stemtype">
+            <item>
+              <xsl:attribute name="span-name">stemtype</xsl:attribute>
+              <xsl:attribute name="span-context">
+                <xsl:value-of select="$inflections[1]/stemtype"/>
+              </xsl:attribute>
               <xsl:text>s=</xsl:text>
               <xsl:value-of select="$inflections[1]/stemtype"/>
             </item>
           </xsl:if>
           <xsl:if test="$inflections[1]/morph">
-            <item span-name="morphflags">
+            <item>
+              <xsl:attribute name="span-name">morphflags</xsl:attribute>
+              <xsl:attribute name="span-context">
+                <xsl:value-of select="$inflections[1]/morph"/>
+              </xsl:attribute>
               <xsl:text>m=</xsl:text>
               <xsl:value-of select="$inflections[1]/morph"/>
             </item>
