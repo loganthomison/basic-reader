@@ -242,11 +242,31 @@ Alph.xlate = {
         }
         
         // do we have a treebank query for this word?
-        var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",doc).attr("content");
-        var treebank_ref = Alph.$(rp).parents().attr("tbref");
-        if (treebank_url && treebank_ref)
+        var treebank_ref = Alph.$(rp).attr("tbref") || Alph.$(rp).parents().attr("tbref");
+        
+        // if we're in the dependency tree diagram, the treebank reference will 
+        // be in the id attribute of the parent tree-node element
+        if (! treebank_ref && is_svg_text)
         {
-            alphtarget.setTreebankQuery(treebank_url.replace(/WORD/,treebank_ref));
+            treebank_ref = Alph.$(rp).parents('.tree-node').attr("id");
+        }
+        if (treebank_ref)
+        {
+            var treebank_url = 
+                Alph.$("meta[name=alpheios-treebank-url]",doc).attr("content");
+            // if we're in the dependency tree diagram, we will have a treebank reference
+            // but no treebank_url. get the treebank url from the main browser window
+            // in that case.
+            if (!treebank_url && is_svg_text )
+            {
+                treebank_url = 
+                    Alph.$("meta[name=alpheios-treebank-url]",
+                        Alph.main.getCurrentBrowser().contentDocument).attr("content");
+            }
+            if (treebank_url)
+            {
+                alphtarget.setTreebankQuery(treebank_url.replace(/WORD/,treebank_ref));
+            }
         }
         // show output
         this.showPopup(a_e,alphtarget);
