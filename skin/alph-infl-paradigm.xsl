@@ -285,7 +285,7 @@
             <xsl:choose>
                 <xsl:when test="$att_name = 'alph-lemma'">
                     <xsl:if 
-                        test="$infl_set/@context = $match_elem/constraint[$num]/text()">1
+                        test="$infl_set/preceding-sibling::*[@class='alph-dict']/@lemma-key = $match_elem/constraint[$num]/text()">1
                     </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
