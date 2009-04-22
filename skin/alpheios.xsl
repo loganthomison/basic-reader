@@ -351,6 +351,7 @@
         <xsl:call-template name="parenthesize">
           <xsl:with-param name="items" select="$inflections[1]/dial"/>
           <xsl:with-param name="span-name">dial</xsl:with-param>
+          <xsl:with-param name="span-context" select="$inflections[1]/dial"/>
         </xsl:call-template>
         <xsl:variable name="dsm-items">
           <xsl:if test="$inflections[1]/derivtype">

@@ -314,3 +314,7 @@ th.reloading {
 .tochead.openmenu {
     list-style-image: url(arrow-dn-sharp.gif);
 }
+.paradigm-nomatch {
+    margin-left: 2em;
+    margin-top: 1em;
+}

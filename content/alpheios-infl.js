@@ -103,17 +103,7 @@ Alph.infl = {
                 function(e)
                 {
                     $(this).addClass("loading");
-                    // TODO syntax will change with linking architecture
-                    // for now, index link syntax is
-                    // #<pofs>[|<addt'l param_name:addt'lparam_value>+]
-                    var target = $(this).attr("href").slice(1).split(/\|/);
-                    var params = {};
-                    params.showpofs = target[0];
-                    for (var i=1; i<target.length; i++)
-                    {
-                        var param = target[i].split(/:/);
-                        params[param[0]]= param[1];
-                    }
+                    var params = Alph.infl.parse_index_link(($(this).attr("href")));
                     link_target.lang_tool.
                         handleInflections(e,$(this),params);
                 }
@@ -477,6 +467,8 @@ Alph.infl = {
         var max_tbl_height = 0;
         var max_tbl_width = 0;
         
+        var min_tbl_height = 400;
+        var min_tbl_width =600;
         $("table",topdoc).each(
             function()
             {
@@ -505,8 +497,16 @@ Alph.infl = {
         if (x > window.screen.availWidth) {
             x = window.screen.availWidth - 20; // don't take up the entire screen
         }
+        else if (x < min_tbl_width)
+        {
+            x = min_tbl_width;
+        }
         if (y > window.screen.availHeight) {
             y = window.screen.availHeight - 20; // don't take up the entire screen 
+        }
+        else if (y < min_tbl_height)
+        {
+            y = min_tbl_height;
         }
         // TODO - need to reset screenX and screenY to original 
         // requested location
@@ -646,12 +646,34 @@ Alph.infl = {
      */
     follow_reflink: function(a_e,a_elem,a_lang_tool)
     {
-        var link_target = $(a_elem).attr("href").split(/:/);
-        // only handle grammar links for now
         // TODO this code will change once we have the real linking architecture
-        if (link_target[0] == 'grammar')
+        // for now reflink syntax is <link_type>:<link url>
+        var link_type_delim = ':';
+        var href = $(a_elem).attr("href");
+        // we can't just split on : because it might be used in later components of the
+        // url
+        var delim_pos = href.indexOf(':')
+        var link_type = href.substring(0,delim_pos);
+        var link_target = href.substring(delim_pos+1)
+        // grammar links
+        if (link_type == 'grammar')
         {
-            a_lang_tool.openGrammar(null,null,link_target[2]);
+            var grammar_ref = link_target.split(/:/);
+            // syntax is grammar_name:target_loc
+            // but right now we only support one grammar per language
+            // TODO support multiple grammars
+            a_lang_tool.openGrammar(null,null,grammar_ref[1]);
+            return false;
+        }
+        // other inflection tables
+        // for now, index link syntax is
+        // #<pofs>[|<addt'l param_name:addt'lparam_value>+]
+        else if (link_type == 'inflect')
+        {
+            var href = link_target;
+            var params = Alph.infl.parse_index_link(link_target);
+            a_lang_tool.
+                handleInflections(a_e,$(this),params);
             return false;
         }
         else
@@ -1048,5 +1070,25 @@ Alph.infl = {
             $(this).children().toggle();
             return false;
         }).children().hide();
+    },
+    
+    /**
+     * Parse an index link
+     * @param {String} a_href the unparsed url
+     */
+    parse_index_link: function(a_href)
+    {
+        // TODO syntax will change with linking architecture
+        // for now, index link syntax is
+        // #<pofs>[|<addt'l param_name:addt'lparam_value>+]
+        var target = a_href.slice(1).split(/\|/);
+        var params = {};
+        params.showpofs = target[0];
+        for (var i=1; i<target.length; i++)
+        {
+            var param = target[i].split(/:/);
+            params[param[0]]= param[1];
+        }
+        return params;    
     }
 };
