@@ -85,13 +85,15 @@
             <xsl:if
               test="not(preceding-sibling::infl[(term/stem=$last-stem) and
                                                 (pofs=$last-pofs) and
-                                                (stemtype=$last-stemtype)])">
+                                                ((not(stemtype) and not($last-stemtype)) or
+                                                 (stemtype=$last-stemtype))])">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(term/stem=$last-stem) and
                                   (pofs=$last-pofs) and
-                                  (stemtype=$last-stemtype) and
+                                  ((not(stemtype) and not($last-stemtype)) or
+                                   (stemtype=$last-stemtype)) and
                                   not(dial)]"
                 />
               </xsl:call-template>
@@ -115,15 +117,17 @@
               test="not(preceding-sibling::infl[(term/stem=$last-stem) and
                                                 (pofs=$last-pofs) and
                                                 (dial=$last-dial) and
-                                                (stemtype=$last-stemtype)])">
+                                                ((not(stemtype) and not($last-stemtype)) or
+                                                 (stemtype=$last-stemtype))])">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(term/stem=$last-stem) and
                                   (pofs=$last-pofs) and
                                   (dial=$last-dial) and
-                                  (stemtype=$last-stemtype)]"
-                />
+                                  ((not(stemtype) and not($last-stemtype)) or
+                                   (stemtype=$last-stemtype))]"
+                  />
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
@@ -134,11 +138,13 @@
             <xsl:variable name="last-stemtype" select="stemtype"/>
             <xsl:if
               test="not(preceding-sibling::infl[(dial=$last-dial) and
-                                                (stemtype=$last-stemtype)])">
+                                                ((not(stemtype) and not($last-stemtype)) or
+                                                 (stemtype=$last-stemtype))])">
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(dial=$last-dial) and
-                                  (stemtype=$last-stemtype) and
+                                  ((not(stemtype) and not($last-stemtype)) or
+                                   (stemtype=$last-stemtype)) and
                                   (not(term/stem) or not(pofs))]"
                 />
               </xsl:call-template>
