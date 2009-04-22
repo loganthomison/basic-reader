@@ -463,6 +463,24 @@
               </div>
             </xsl:for-each>
           </xsl:when>
+          <!-- verbs with no tense -->
+          <xsl:when test="$inflections[1]/pofs = 'verb'">
+            <div class="alph-infl">
+              <xsl:call-template name="item-plus-text-plus-context">
+                <xsl:with-param name="item" select="pers"/>
+                <xsl:with-param name="suffix" select="' person'"/>
+              </xsl:call-template>
+              <xsl:call-template name="item-plus-text-plus-context">
+                <xsl:with-param name="item" select="num"/>
+                <xsl:with-param name="suffix" select="';'"/>
+              </xsl:call-template>
+              <xsl:call-template name="item-plus-text-plus-context">
+                <xsl:with-param name="item" select="mood"/>
+                <xsl:with-param name="suffix" select="';'"/>
+              </xsl:call-template>
+              <xsl:apply-templates select="voice"/>
+            </div>
+          </xsl:when>
           <!-- end verb inflection -->
 
           <!-- adverb inflection -->
