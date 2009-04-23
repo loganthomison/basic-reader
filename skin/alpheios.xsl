@@ -414,6 +414,7 @@
 
         <!-- decide how to display form based on structure -->
         <xsl:choose>
+
           <!-- if inflections have case -->
           <xsl:when test="$inflections/case">
             <div class="alph-infl">
@@ -463,9 +464,10 @@
               </xsl:if>
             </div>
           </xsl:when>
-          <!-- end when inflection has case -->
-          
+          <!-- end when inflections have case -->
+
           <!-- verb inflection -->
+          <!-- verbs with tense -->
           <xsl:when test="$inflections/tense">
             <xsl:for-each select="$inflections[tense]">
               <div class="alph-infl">
@@ -477,7 +479,9 @@
                   <xsl:with-param name="item" select="num"/>
                   <xsl:with-param name="suffix" select="';'"/>
                 </xsl:call-template>
-                <xsl:apply-templates select="tense"/>
+                <xsl:call-template name="item-plus-text-plus-context">
+                  <xsl:with-param name="item" select="tense"/>
+                </xsl:call-template>
                 <xsl:call-template name="item-plus-text-plus-context">
                   <xsl:with-param name="item" select="mood"/>
                   <xsl:with-param name="suffix" select="';'"/>
@@ -486,6 +490,7 @@
               </div>
             </xsl:for-each>
           </xsl:when>
+
           <!-- verbs with no tense -->
           <xsl:when test="$inflections[1]/pofs = 'verb'">
             <div class="alph-infl">
@@ -508,11 +513,14 @@
 
           <!-- adverb inflection -->
           <xsl:when test="$inflections[1]/pofs = 'adverb'">
-            <div class="alph-infl">
-              <xsl:apply-templates select="comp"/>
-            </div>
+            <xsl:if test="comp and (comp != 'positive')">
+              <div class="alph-infl">
+                <xsl:apply-templates select="comp"/>
+              </div>
+            </xsl:if>
           </xsl:when>
           <!-- end adverb inflection -->
+
         </xsl:choose>
       </div>
     </xsl:if>
