@@ -191,7 +191,10 @@
                                 </xsl:if>
                             </xsl:variable>
                             <xsl:element name="td">
-                                <xsl:attribute name="class"><xsl:if test="$selected != ''">selected</xsl:if></xsl:attribute>
+                                <xsl:attribute name="class">
+                                    <!-- don't highlight empty cells -->
+                                    <xsl:if test="($selected != '') and (text() or child::*/text())">selected</xsl:if>
+                                </xsl:attribute>
                                 <xsl:for-each select="@*[local-name(.) !='role']">
                                     <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
                                 </xsl:for-each>
@@ -222,6 +225,7 @@
     
     <xsl:template name="get_paradigms">
         <xsl:param name="list" />
+        <xsl:param name="seen"/>
         <xsl:param name="delimiter" />
         <xsl:variable name="newlist">
             <xsl:choose>
@@ -230,11 +234,16 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="first" select="substring-before($newlist, $delimiter)" />
+        <!-- get rid of duplicates -->
         <xsl:variable name="remaining" select="substring-after($newlist, $delimiter)" />
-        <xsl:copy-of select="//infl-paradigm[@id=$first]"/>
+        <!-- eliminate duplicates -->
+        <xsl:if test="not(contains($seen,concat($delimiter,$first,$delimiter)))">
+            <xsl:copy-of select="//infl-paradigm[@id=$first]"/>
+        </xsl:if>
         <xsl:if test="$remaining">
-            <xsl:call-template name="get_paradigms">
+            <xsl:call-template name="get_paradigms"> 
                 <xsl:with-param name="list" select="$remaining" />
+                <xsl:with-param name="seen" select="concat($seen,$delimiter,$first,$delimiter)"/>
                 <xsl:with-param name="delimiter"><xsl:value-of select="$delimiter"/></xsl:with-param>
             </xsl:call-template>
         </xsl:if>
