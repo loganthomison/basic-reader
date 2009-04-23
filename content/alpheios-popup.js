@@ -489,9 +489,11 @@ Alph.xlate = {
 
         var wordHTML = Alph.xlate.transform(a_xml);
         // just quietly display the morpheus output if the treebank query
-        // returned an error or didn't include any inflection data
+        // returned an error or didn't include any data
+        // note that not all parts of speech include inflection data
+        // so we need to check for the presence of a dictionary entry
         if (   (wordHTML == '') ||
-               Alph.$(".alph-infl",wordHTML).length == 0)        
+               Alph.$(".alph-dict",wordHTML).length == 0)        
         {
             a_doc_array.forEach(
                 function(a_doc)
@@ -519,13 +521,11 @@ Alph.xlate = {
 
             
             var new_entry = Alph.$(".alph-entry",new_text_node);
-            var new_hdwd = Alph.$(".alph-dict",new_entry).attr("lemma-id");
-            
+            var new_dict = Alph.$(".alph-dict",new_entry);
+            var new_hdwd = Alph.$(new_dict).attr("lemma-id");
             var new_infl_node = 
                     Alph.$(".alph-infl",new_entry).get(0);
 
-            
-            
             a_doc_array.forEach(
                 function(a_doc)
                 {
@@ -546,14 +546,32 @@ Alph.xlate = {
                         .parents(".alph-entry");
                     if (entry_match.length > 0)
                     {
+                        Alph.$(".alph-dict",entry_match)
+                        
+                        // if the part of speech indicated by the
+                        // treebank differs from the original
+                        // replace the entire dictionary section
+                        // (conj and declension will likely also be wrong 
+                        // - but these aren't identified by the treebank)
+                        if (Alph.$('.alph-pofs',entry_match).attr('context') !=
+                            Alph.$('.alph-pofs',new_entry).attr('context'))
+                        {
+                            Alph.$('.alph-dict',entry_match)
+                                .before(Alph.$(new_dict).clone(true))
+                                .remove();
+                        }
                         Alph.$(".alph-infl-set",entry_match).each(
                             function(a_i)
                             {
                                 if (a_i == 0)
                                 {
                                     Alph.$(".alph-infl",this).remove();
-                                    Alph.$(this).append(
-                                        Alph.$(new_infl_node).clone(true));
+                                    if (new_infl_node != null)
+                                    {
+                                        Alph.$(this).append(
+                                            Alph.$(new_infl_node).clone(true));
+                                    }
+                                    
                                 }
                                 else
                                 {
