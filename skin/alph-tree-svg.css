@@ -41,6 +41,10 @@ g.key text {
     fill: black;
 }
 
+g.key text.heading {
+	font-weight: bold;
+}
+
 /* normal line attributes */
 g line {
     stroke: black;

@@ -656,16 +656,17 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
     var textHeight = (5 * a_fontSize) / 4;
     for (var i = 0; i < texts.size(); ++i)
     {
-        if (i < texts.size() - 1)
-        {
-            var thisRect = rects.get(i);
-            thisRect.setAttribute("x", 0);
-            thisRect.setAttribute("y", y);
-            thisRect.setAttribute("width", width);
-            thisRect.setAttribute("height", textHeight);
-        }
+        // position highlighting rectangle
+        var thisRect = rects.get(i);
+        thisRect.setAttribute("x", 0);
+        thisRect.setAttribute("y", y);
+        thisRect.setAttribute("width", width);
+        thisRect.setAttribute("height", textHeight);
 
+        // position text
         var thisText = texts.get(i);
+		if (thisText.getAttribute("class") == "heading")
+			thisText.setAttribute("dy", -a_fontSize / 2);
         var thisWidth = thisText.getComputedTextLength();
         thisText.setAttribute("x", a_fontSize);
         thisText.setAttribute("y", y + a_fontSize);
