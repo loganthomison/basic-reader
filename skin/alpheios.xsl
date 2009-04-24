@@ -83,13 +83,15 @@
             <xsl:variable name="last-pofs" select="pofs"/>
             <xsl:variable name="last-comp" select="comp"/>
             <xsl:variable name="last-stemtype" select="stemtype"/>
-            <xsl:if
-              test="not(preceding-sibling::infl[(term/stem=$last-stem) and
-                                                (pofs=$last-pofs) and
-                                                ((not(comp) and not($last-comp)) or
-                                                 (comp=$last-comp)) and
-                                                ((not(stemtype) and not($last-stemtype)) or
-                                                 (stemtype=$last-stemtype))])">
+            <xsl:variable name="preceding"
+              select="preceding-sibling::infl[(term/stem=$last-stem) and
+                                              (pofs=$last-pofs) and
+                                              ((not(comp) and not($last-comp)) or
+                                               (comp=$last-comp)) and
+                                              ((not(stemtype) and not($last-stemtype)) or
+                                               (stemtype=$last-stemtype)) and
+                                               not(dial)]"/>
+            <xsl:if test="count($preceding) = 0">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
@@ -119,14 +121,17 @@
             <xsl:variable name="last-dial" select="dial"/>
             <xsl:variable name="last-comp" select="comp"/>
             <xsl:variable name="last-stemtype" select="stemtype"/>
-            <xsl:if
-              test="not(preceding-sibling::infl[(term/stem=$last-stem) and
-                                                (pofs=$last-pofs) and
-                                                (dial=$last-dial) and
-                                                ((not(comp) and not($last-comp)) or
-                                                 (comp=$last-comp)) and
-                                                ((not(stemtype) and not($last-stemtype)) or
-                                                 (stemtype=$last-stemtype))])">
+            <xsl:variable name="preceding"
+              select="preceding-sibling::infl[(term/stem=$last-stem) and
+                                              (pofs=$last-pofs) and
+                                              (dial=$last-dial) and
+                                              ((not(comp) and not($last-comp)) or
+                                               (comp=$last-comp)) and
+                                              ((not(stemtype) and not($last-stemtype)) or
+                                               (stemtype=$last-stemtype)) and
+                                              dial]">
+            </xsl:variable>
+            <xsl:if test="count($preceding) = 0">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
@@ -136,8 +141,8 @@
                                   ((not(comp) and not($last-comp)) or
                                    (comp=$last-comp)) and
                                   ((not(stemtype) and not($last-stemtype)) or
-                                   (stemtype=$last-stemtype))]"
-                  />
+                                   (stemtype=$last-stemtype)) and
+                                  dial]"/>
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
@@ -147,12 +152,15 @@
             <xsl:variable name="last-dial" select="dial"/>
             <xsl:variable name="last-comp" select="comp"/>
             <xsl:variable name="last-stemtype" select="stemtype"/>
-            <xsl:if
-              test="not(preceding-sibling::infl[(dial=$last-dial) and
-                                                ((not(comp) and not($last-comp)) or
-                                                 (comp=$last-comp)) and
-                                                ((not(stemtype) and not($last-stemtype)) or
-                                                 (stemtype=$last-stemtype))])">
+            <xsl:variable name="preceding"
+              select="preceding-sibling::infl[(dial=$last-dial) and
+                                              ((not(comp) and not($last-comp)) or
+                                               (comp=$last-comp)) and
+                                              ((not(stemtype) and not($last-stemtype)) or
+                                               (stemtype=$last-stemtype)) and
+                                              dial and
+                                              (not(term/stem) or not(pofs))]"/>
+            <xsl:if test="count($preceding) = 0">
               <xsl:call-template name="inflection-set">
                 <xsl:with-param name="inflections"
                   select="../infl[(dial=$last-dial) and
@@ -160,8 +168,8 @@
                                    (comp=$last-comp)) and
                                   ((not(stemtype) and not($last-stemtype)) or
                                    (stemtype=$last-stemtype)) and
-                                  (not(term/stem) or not(pofs))]"
-                />
+                                   dial and
+                                   (not(term/stem) or not(pofs))]"/>
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
@@ -470,52 +478,73 @@
 
           <!-- if inflections have case -->
           <xsl:when test="$inflections/case">
-            <div class="alph-infl">
-              <!-- process singular case list -->
-              <xsl:if test="count($inflections[num = 'singular']/case)">
+            <!-- process singular case list -->
+            <xsl:if test="count($inflections[num = 'singular']/case)">
+              <div class="alph-infl">
                 <xsl:text>Singular: </xsl:text>
                 <xsl:for-each select="$inflections[num = 'singular']/case">
                   <xsl:sort select="./@order" data-type="number"
                     order="descending"/>
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
-              </xsl:if>
 
-              <!-- process dual case list -->
-              <xsl:if test="count($inflections[num = 'dual']/case)">
+                <!-- handle comparative -->
+                <xsl:if test="$comp and ($comp != 'positive')">
+                  <xsl:apply-templates select="$inflections[1]/comp"/>
+                </xsl:if>
+              </div>
+            </xsl:if>
+
+            <!-- process dual case list -->
+            <xsl:if test="count($inflections[num = 'dual']/case)">
+              <div class="alph-infl">
                 <xsl:text>Dual: </xsl:text>
                 <xsl:for-each select="$inflections[num = 'dual']/case">
                   <xsl:sort select="./@order" data-type="number"
                     order="descending"/>
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
-              </xsl:if>
 
-              <!-- process plural case list -->
-              <xsl:if test="count($inflections[num = 'plural']/case)">
+                <!-- handle comparative -->
+                <xsl:if test="$comp and ($comp != 'positive')">
+                  <xsl:apply-templates select="$inflections[1]/comp"/>
+                </xsl:if>
+              </div>
+            </xsl:if>
+
+            <!-- process plural case list -->
+            <xsl:if test="count($inflections[num = 'plural']/case)">
+              <div class="alph-infl">
                 <xsl:text>Plural: </xsl:text>
                 <xsl:for-each select="$inflections[num = 'plural']/case">
                   <xsl:sort select="./@order" data-type="number"
                     order="descending"/>
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
-              </xsl:if>
 
-              <!-- process other case list -->
-              <xsl:if test="count($inflections[not(num)]/case)">
+                <!-- handle comparative -->
+                <xsl:if test="$comp and ($comp != 'positive')">
+                  <xsl:apply-templates select="$inflections[1]/comp"/>
+                </xsl:if>
+              </div>
+            </xsl:if>
+
+            <!-- process other case list -->
+            <xsl:if test="count($inflections[not(num)]/case)">
+              <div class="alph-infl">
                 <xsl:text>Case: </xsl:text>
                 <xsl:for-each select="$inflections[not(num)]/case">
                   <xsl:sort select="./@order" data-type="number"
                     order="descending"/>
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
-              </xsl:if>
 
-              <!-- handle comparative -->
-              <xsl:if test="$comp and ($comp != 'positive')">
-                <xsl:apply-templates select="$inflections[1]/comp"/>
-              </xsl:if>
-            </div>
+                <!-- handle comparative -->
+                <xsl:if test="$comp and ($comp != 'positive')">
+                  <xsl:apply-templates select="$inflections[1]/comp"/>
+                </xsl:if>
+              </div>
+            </xsl:if>
           </xsl:when>
           <!-- end when inflections have case -->
 
@@ -727,9 +756,21 @@
           <xsl:choose>
             <!-- if betacode -->
             <xsl:when test="$isbeta > 0">
+              <xsl:variable name="item-text">
+                <xsl:choose>
+                  <xsl:when test="$item/*">
+                    <xsl:for-each select="$item/*">
+                      <xsl:value-of select="./text()"/>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$item/text()"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
               <!-- convert it to unicode -->
               <xsl:call-template name="beta-to-uni">
-                <xsl:with-param name="input" select="$item"/>
+                <xsl:with-param name="input" select="$item-text"/>
                 <xsl:with-param name="partial" select="$partial"/>
               </xsl:call-template>
             </xsl:when>
