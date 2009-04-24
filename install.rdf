@@ -25,7 +25,7 @@
         <em:targetPlatform>Linux</em:targetPlatform>
         <em:targetPlatform>Darwin</em:targetPlatform>
         
-		<em:iconURL></em:iconURL>
+		<em:iconURL>chrome://alpheios/skin/icons/alpheios_32.ico</em:iconURL>
 		<em:homepageURL>http://alpheios.net</em:homepageURL>
 		<em:optionsURL>chrome://alpheios/content/alpheios-prefs.xul</em:optionsURL>
 		<em:updateURL>http://alpheios.net/xpi-updates/update.rdf</em:updateURL>
