@@ -653,6 +653,7 @@
       <xsl:if
         test="(../pofs='pronoun' or
                ../pofs='adjective' or
+               ../pofs='article' or
                ../pofs='supine' or
                ../pofs='verb participle') and ../gend">
         <xsl:choose>
