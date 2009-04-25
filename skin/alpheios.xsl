@@ -603,6 +603,15 @@
           </xsl:when>
           <!-- end adverb inflection -->
 
+          <!-- miscellaneous others -->
+          <xsl:otherwise>
+            <div class="alph-infl">
+              <xsl:apply-templates select="gend"/>
+              <xsl:if test="comp and (comp != 'positive')">
+                <xsl:apply-templates select="comp"/>
+              </xsl:if>
+            </div>
+          </xsl:otherwise>
         </xsl:choose>
       </div>
     </xsl:if>
@@ -655,7 +664,8 @@
                ../pofs='adjective' or
                ../pofs='article' or
                ../pofs='supine' or
-               ../pofs='verb participle') and ../gend">
+               ../pofs='verb participle' or
+               ((../pofs='noun') and (../gend!=../../dict/gend))) and ../gend">
         <xsl:choose>
           <xsl:when test="$gend='masculine'">
             <xsl:text> (m)</xsl:text>
