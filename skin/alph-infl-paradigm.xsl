@@ -13,9 +13,8 @@
     
     <!-- debug -->
     <xsl:param name="test_endings">        
-        <!--
         <div class="alph-entry"><div lemma-lex="lsj" lemma-lang="grc" lemma-id="n33457" lemma-key="ἐλαύνω" class="alph-dict"><span class="alph-hdwd">ἐλαύνω: </span><div class="alph-morph"><span context="verb" class="alph-pofs">verb</span></div></div><div class="alph-mean">drive, set in motion</div><div context="ἐλᾶ" class="alph-infl-set"><span class="alph-term">ἐλ-<span class="alph-suff">ᾶ</span></span><span context="Attic_Doric_Aeolic" class="alph-dial">(<span class="alph-nopad">Attic Doric Aeolic</span>)</span><span>(<span context="a_stem" class="alph-nopad alph-derivtype">d=a_stem</span>, <span context="aw_fut" class="alph-nopad alph-stemtype">s=aw_fut</span>, <span context="contr" class="alph-nopad alph-morphflags">m=contr</span>)</span><div class="alph-infl"><span context="1st" class="alph-pers">1st person</span><span context="singular" class="alph-num">singular;</span><span class="alph-tense">future</span><span context="indicative" class="alph-mood">indicative;</span><span class="alph-voice">active</span></div></div><div context="ἐλᾶ" class="alph-infl-set"><span class="alph-term">ἐλ-<span class="alph-suff">ᾶ</span></span><span context="epic_Doric_Aeolic" class="alph-dial">(<span class="alph-nopad">epic Doric Aeolic</span>)</span><span>(<span context="a_stem" class="alph-nopad alph-derivtype">d=a_stem</span>, <span context="aw_pr" class="alph-nopad alph-stemtype">s=aw_pr</span>, <span context="contr_poetic_rare" class="alph-nopad alph-morphflags">m=contr poetic rare</span>)</span><div class="alph-infl"><span context="1st" class="alph-pers">1st person</span><span context="singular" class="alph-num">singular;</span><span class="alph-tense">present</span><span context="subjunctive" class="alph-mood">subjunctive;</span><span class="alph-voice">active</span></div><div class="alph-infl"><span context="1st" class="alph-pers">1st person</span><span context="singular" class="alph-num">singular;</span><span class="alph-tense">present</span><span context="indicative" class="alph-mood">indicative;</span><span class="alph-voice">active</span></div></div></div>
-        <div class="alph-entry">
+        <!--div class="alph-entry">
             <div lemma-lex="lsj" lemma-lang="grc" lemma-id="n20598" lemma-key="βουλεύω" class="alph-dict">
                 <span class="alph-hdwd">βουλεύω: </span>
                 <div class="alph-morph">
@@ -43,8 +42,7 @@
                     <span class="alph-voice">active</span>
                 </div>
             </div>
-        </div>
-        -->
+        </div-->
     </xsl:param>
     
     <xsl:param name="match_pofs"/>
@@ -79,6 +77,14 @@
                 </div>
             </xsl:if>    
         </xsl:variable>
+
+        <xsl:variable name="infl_constraint_data">
+            <xsl:if test="(not($paradigm_id) and $selected_endings)">
+                <xsl:call-template name="get_paradigms_for_selection">
+                    <xsl:with-param name="match_table" select="morpheus-paradigm-match"/>
+                </xsl:call-template>                    
+            </xsl:if>    
+        </xsl:variable>        
         
         <xsl:variable name="data">
             <xsl:variable name="paradigm_list">
@@ -86,10 +92,10 @@
                     <xsl:when test="$paradigm_id">
                         <xsl:value-of select="$paradigm_id"/>
                     </xsl:when>
-                    <xsl:when test="$selected_endings">
-                        <xsl:call-template name="get_paradigms_for_selection">
-                            <xsl:with-param name="match_table" select="morpheus-paradigm-match"/>
-                        </xsl:call-template>    
+                    <xsl:when test="$infl_constraint_data">
+                        <xsl:for-each select="exsl:node-set($infl_constraint_data)/match_for_infl">
+                            <xsl:value-of select="@paradigm_id_ref"/>,
+                        </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>all</xsl:otherwise>
                 </xsl:choose>
@@ -119,7 +125,10 @@
                     <xsl:if test="$data = ''">
                         <xsl:apply-templates select="morpheus-paradigm-match/nomatch"/>                         
                     </xsl:if>
-                    <xsl:apply-templates select="exsl:node-set($data)"/>
+                    <xsl:call-template name="paradigms">
+                        <xsl:with-param name="paradigms" select="exsl:node-set($data)"/>
+                        <xsl:with-param name="infl_constraint_data" select="exsl:node-set($infl_constraint_data)/match_for_infl"/>
+                    </xsl:call-template> 
                 </div>
             </xsl:when>
             <xsl:otherwise>
@@ -142,81 +151,101 @@
                         <xsl:if test="$data=''">
                             <xsl:apply-templates select="morpheus-paradigm-match/nomatch"/>                         
                         </xsl:if>                        
-                        <xsl:apply-templates select="exsl:node-set($data)"/>
+                        <xsl:call-template name="paradigms">
+                            <xsl:with-param name="paradigms" select="exsl:node-set($data)"/>
+                            <xsl:with-param name="infl_constraint_data" select="exsl:node-set($infl_constraint_data)/match_for_infl"/>                        
+                        </xsl:call-template>                         
                     </body>
                 </html>                
             </xsl:otherwise>
         </xsl:choose>            
     </xsl:template>
-        
-    <xsl:template match="infl-paradigm">
-        <div id="{@id}">
-            <div class="title"><xsl:apply-templates select="title"/></div>
-            <xsl:apply-templates select="table"/>
-        </div>
+    
+
+    <xsl:template name="paradigms">
+        <xsl:param name="paradigms"/>
+        <xsl:param name="infl_constraint_data"/>
+        <xsl:for-each select="$paradigms/infl-paradigm">
+            <xsl:variable name="paradigm_id" select="@id"/>
+            <div id="{$paradigm_id}">
+                <div class="title"><xsl:apply-templates select="title"/></div>
+                <xsl:call-template name="paradigm_table">
+                    <xsl:with-param name="tables" select="table"/>
+                    <xsl:with-param name="infl_constraint_data"
+                        select="$infl_constraint_data[@paradigm_id_ref = $paradigm_id]"/>
+                </xsl:call-template>
+            </div>
+        </xsl:for-each>
     </xsl:template>
     
-    <xsl:template match="table">
-        <xsl:element name="table">
-            <xsl:attribute name="class"><xsl:value-of select="@role"/></xsl:attribute>
-            <xsl:for-each select="row">
-                <xsl:element name="tr">
-                    <xsl:attribute name="class"><xsl:value-of select="@role"/></xsl:attribute>
-                    <xsl:for-each select="cell">
-                        <xsl:if test="@role = 'label'">
-                            <xsl:element name="th">
-                                <xsl:variable name="class">
-                                    <xsl:if test="not(following-sibling::cell[1]/text())"><xsl:text>next-empty </xsl:text></xsl:if>
-                                    <xsl:if test="not(preceding-sibling::cell[1]/text())"><xsl:text>prev-empty </xsl:text></xsl:if>
-                                    <xsl:if test="../@role='data' and following-sibling::cell[1]/@role[. = 'label']"><xsl:text>next-label </xsl:text></xsl:if>
-                                    <xsl:if test="../@role='data' and preceding-sibling::cell[1]/@role[. = 'label']"><xsl:text>prev-label </xsl:text></xsl:if>
-                                    <xsl:if test="not(text())"><xsl:text>empty-cell </xsl:text></xsl:if>
-                                </xsl:variable>
-                                <xsl:attribute name="class"><xsl:value-of select="$class"/></xsl:attribute>
-                                <xsl:for-each select="@*[local-name(.) !='role']">
-                                    <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
-                                </xsl:for-each>
-                                <xsl:apply-templates/>
-                            </xsl:element>
-                        </xsl:if>
-                        <xsl:if test="@role='data'">
-                            <xsl:variable name="selected">
-                                <xsl:if test="$selected_endings">
-                                    <xsl:call-template name="check_infl_sets">
-                                        <xsl:with-param name="selected_endings" select="$selected_endings"/>
-                                        <xsl:with-param name="current_data" select="."/>
-                                        <xsl:with-param name="match_pofs" select="$match_pofs"/>
-                                        <xsl:with-param name="strip_greek_vowel_length" select="false()"/>
-                                    </xsl:call-template>
-                                </xsl:if>
-                            </xsl:variable>
-                            <xsl:element name="td">
-                                <xsl:attribute name="class">
-                                    <!-- don't highlight empty cells -->
-                                    <xsl:if test="($selected != '') and (text() or child::*/text())">selected</xsl:if>
-                                </xsl:attribute>
-                                <xsl:for-each select="@*[local-name(.) !='role']">
-                                    <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
-                                </xsl:for-each>
-                                <xsl:call-template name="add-footnote">
-                                    <xsl:with-param name="item" select="."/>
-                                </xsl:call-template>
-                                <xsl:apply-templates/>
-                                
-                                <!--
-                                <div class="attributes">
+    <xsl:template name="paradigm_table">
+        <xsl:param name="tables"/>
+        <xsl:param name="infl_constraint_data"/>
+        <xsl:for-each select="$tables">        
+            <xsl:element name="table">
+                <xsl:attribute name="class"><xsl:value-of select="@role"/></xsl:attribute>
+                <xsl:for-each select="row">
+                    <xsl:element name="tr">
+                        <xsl:attribute name="class"><xsl:value-of select="@role"/></xsl:attribute>
+                        <xsl:for-each select="cell">
+                            <xsl:if test="@role = 'label'">
+                                <xsl:element name="th">
+                                    <xsl:variable name="class">
+                                        <xsl:if test="not(following-sibling::cell[1]/text())"><xsl:text>next-empty </xsl:text></xsl:if>
+                                        <xsl:if test="not(preceding-sibling::cell[1]/text())"><xsl:text>prev-empty </xsl:text></xsl:if>
+                                        <xsl:if test="../@role='data' and following-sibling::cell[1]/@role[. = 'label']"><xsl:text>next-label </xsl:text></xsl:if>
+                                        <xsl:if test="../@role='data' and preceding-sibling::cell[1]/@role[. = 'label']"><xsl:text>prev-label </xsl:text></xsl:if>
+                                        <xsl:if test="not(text())"><xsl:text>empty-cell </xsl:text></xsl:if>
+                                    </xsl:variable>
+                                    <xsl:attribute name="class"><xsl:value-of select="$class"/></xsl:attribute>
                                     <xsl:for-each select="@*[local-name(.) !='role']">
-                                        <xsl:value-of select="."/> 
-                                        <xsl:text> </xsl:text>
+                                        <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
                                     </xsl:for-each>
-                                </div>
-                                -->
-                            </xsl:element>
-                        </xsl:if>
-                    </xsl:for-each>
-                </xsl:element>
-            </xsl:for-each>
-        </xsl:element>
+                                    <xsl:apply-templates/>
+                                </xsl:element>
+                            </xsl:if>
+                            <xsl:if test="@role='data'">
+                                <xsl:variable name="selected">
+                                    <xsl:if test="$selected_endings">
+                                        <xsl:call-template name="check_infl_sets">
+                                            <xsl:with-param name="selected_endings" 
+                                                select="$selected_endings"/>
+                                            <xsl:with-param name="current_data" select="."/>
+                                            <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                                            <xsl:with-param name="strip_greek_vowel_length" select="false()"/>
+                                            <xsl:with-param name="infl_constraint" 
+                                                select="$infl_constraint_data"/>
+                                        </xsl:call-template>
+                                    </xsl:if>
+                                </xsl:variable>
+                                <xsl:element name="td">
+                                    <xsl:attribute name="class">
+                                        <!-- don't highlight empty cells -->
+                                        <xsl:if test="($selected != '') and (text() or child::*/text())">selected</xsl:if>
+                                    </xsl:attribute>
+                                    <xsl:for-each select="@*[local-name(.) !='role']">
+                                        <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
+                                    </xsl:for-each>
+                                    <xsl:call-template name="add-footnote">
+                                        <xsl:with-param name="item" select="."/>
+                                    </xsl:call-template>
+                                    <xsl:apply-templates/>
+                                    
+                                    <!--
+                                    <div class="attributes">
+                                        <xsl:for-each select="@*[local-name(.) !='role']">
+                                            <xsl:value-of select="."/> 
+                                            <xsl:text> </xsl:text>
+                                        </xsl:for-each>
+                                    </div>
+                                    -->
+                                </xsl:element>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:element>
+                </xsl:for-each>
+            </xsl:element>
+        </xsl:for-each>
     </xsl:template>
      
     <xsl:template match="span">
@@ -256,13 +285,14 @@
               look for item in morpheus-paradigm-match which has the same attributes
               if multiple take one which most matched attributes?
         -->
-        <xsl:for-each select="$selected_endings//div[@class='alph-infl-set']">
-            <xsl:variable name="infl_set" select="current()"/>
+        <xsl:for-each select="$selected_endings//div[@class='alph-infl']">
+            <xsl:variable name="infl" select="current()"/>
             <xsl:variable name="match_elems">
                 <xsl:for-each select="$match_table/match">
                     <xsl:call-template name="check_constrained_match">
                         <xsl:with-param name="match_elem" select="current()"/>
-                        <xsl:with-param name="infl_set" select="$infl_set"/>
+                        <xsl:with-param name="infl" select="$infl"/>
+                        <xsl:with-param name="infl_id" select="generate-id($infl)"/>
                     </xsl:call-template>
                 </xsl:for-each>            
             </xsl:variable>   
@@ -271,37 +301,58 @@
                     <xsl:with-param name="nodes" select="exsl:node-set($match_elems)"/>
                 </xsl:call-template>
             </xsl:variable>
-            <xsl:value-of select="$best_matches"/>
+            <xsl:copy-of select="$best_matches"/>
         </xsl:for-each>
     </xsl:template>
     
     <xsl:template name="check_constrained_match">
-        <xsl:param name="infl_set"/>
+        <xsl:param name="infl"/>
         <xsl:param name="match_elem"/>
+        <xsl:param name="infl_id"/>
         <xsl:param name="num" select="1"/>
         <xsl:variable name="num_constraints" select="count($match_elem/constraint)"/>
         <xsl:variable name="att_name"
-            select="concat('alph-',$match_elem/constraint[$num]/@name)"/>
-        
-        <!--
-        <xsl:message>Context:
-            <xsl:value-of select="concat('_',$infl_set//*[contains(@class,$att_name)]/@context,'_')"/></xsl:message>
-        <xsl:message>Constraint:
-            <xsl:value-of select="concat('_',$match_text_lower,'_')"/></xsl:message>
-        -->
+        select="concat('alph-',$match_elem/constraint[$num]/@name)"/>
+                
         <xsl:variable name="matched">
-            <!-- speciall handling for lemma -->
+            
             <xsl:choose>
+                <!-- special handling for lemma -->
                 <xsl:when test="$att_name = 'alph-lemma'">
                     <xsl:if 
-                        test="$infl_set/preceding-sibling::*[@class='alph-dict']/@lemma-key = $match_elem/constraint[$num]/text()">1
+                        test="$infl/ancestor::div[@class='alph-infl-set']
+                            /preceding-sibling::*[@class='alph-dict']/@lemma-key
+                                = $match_elem/constraint[$num]/text()">1
+                    </xsl:if>
+                </xsl:when>
+                <!-- inflection_set atts -->
+                <xsl:when test="
+                    ($att_name = 'alph-stemtype') or 
+                    ($att_name = 'alph-derivtype') or
+                    ($att_name = 'alph-morphflags') or
+                    ($att_name = 'alph-dial')">   
+                    <xsl:variable name="match_text_lower" 
+                        select="translate($match_elem/constraint[$num]/text(),
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
+                    <xsl:if test="$infl/ancestor::div[@class='alph-infl-set']//*[contains(@class,$att_name) 
+                        and 
+                        ((translate(text(),
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')= $match_text_lower)
+                        or
+                        (contains(
+                        translate(concat('_',@context,'_'),
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),
+                        concat('_',$match_text_lower,'_')
+                        )
+                        ))
+                        ]">1
                     </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:variable name="match_text_lower" 
                         select="translate($match_elem/constraint[$num]/text(),
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
-                    <xsl:if test="$infl_set//*[contains(@class,$att_name) 
+                    <xsl:if test="$infl//*[contains(@class,$att_name) 
                         and 
                         ((translate(text(),
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')= $match_text_lower)
@@ -320,13 +371,24 @@
         <xsl:choose>
             <xsl:when test="$num_constraints = $num">
                 <xsl:if test="$matched=1">
-                    <xsl:copy-of select="$match_elem"/>
+                    <xsl:element name="match_for_infl">
+                        <xsl:attribute name="infl_id">
+                            <xsl:value-of select="$infl_id"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="match_order">
+                            <xsl:value-of select="$match_elem/@match_order"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="paradigm_id_ref">
+                            <xsl:value-of select="@paradigm_id_ref"/>
+                        </xsl:attribute>
+                    </xsl:element>
                 </xsl:if>
             </xsl:when>
             <xsl:when test="$matched=1">
                 <xsl:call-template name="check_constrained_match">
                     <xsl:with-param name="num" select="number($num+1)"/>
-                    <xsl:with-param name="infl_set" select="$infl_set"/>
+                    <xsl:with-param name="infl" select="$infl"/>
+                    <xsl:with-param name="infl_id" select="$infl_id"/>
                     <xsl:with-param name="match_elem" select="$match_elem"/>
                 </xsl:call-template>
             </xsl:when>  
@@ -336,17 +398,29 @@
     
     <xsl:template name="best_match">
         <xsl:param name="nodes"/>
+        <!-- when looking for the best match, we need to look at the matches
+             for each inflection separately
+        -->
         <xsl:if test="$nodes">
-            <xsl:variable name="max">
-                <xsl:for-each select="$nodes/match">
-                    <xsl:sort select="@match_order" data-type="number"  order="descending"/>
-                    <xsl:if test="position() = 1">
-                        <xsl:value-of select="number(@match_order)" />
-                    </xsl:if>
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:for-each select="$nodes/match[@match_order = $max]">
-                <xsl:value-of select="@paradigm_id_ref"/>,
+            <xsl:variable name="infl_ids" select="$nodes/match_for_infl/@infl_id"/>
+            <xsl:for-each select="$infl_ids">
+                <xsl:variable name="last_infl_id" select="."/>
+                <xsl:if test="generate-id(.) = generate-id($infl_ids[.=current()])">
+                    <xsl:variable name="max">
+                        <xsl:for-each select="$nodes/match_for_infl[@infl_id=$last_infl_id]">
+                            <xsl:sort select="@match_order" 
+                                data-type="number"  
+                                order="descending"/>
+                            <xsl:if test="position() = 1">
+                                <xsl:value-of select="number(@match_order)" />
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:variable>
+                    <xsl:for-each select="$nodes/match_for_infl
+                        [(@infl_id=$last_infl_id) and (number(@match_order) = $max)]">
+                        <xsl:copy-of select="."/>
+                    </xsl:for-each>
+                </xsl:if>
             </xsl:for-each>
         </xsl:if>
     </xsl:template>

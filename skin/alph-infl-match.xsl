@@ -8,33 +8,43 @@
         <xsl:param name="current_data"/>
         <xsl:param name="match_pofs"/>
         <xsl:param name="strip_greek_vowel_length"/>
+        <xsl:param name="infl_constraint"/>
         <xsl:variable name="matches">
             <xsl:for-each select="$selected_endings//div[@class='alph-infl-set' and 
-                ../div[@class='alph-dict']//span[(@class='alph-pofs') and (@context = $match_pofs)]]
+                ../div[contains(@class,'alph-dict')]//span[(contains(@class,'alph-pofs')) and (@context = $match_pofs)]]
                 ">                    
                 <xsl:variable name="ending_match">
                     <xsl:choose>
                         <!-- empty suffixes are matched with _ -->
-                        <xsl:when test="span[@class='alph-term']/span[@class='alph-suff' and not(text())]">_</xsl:when>
+                        <xsl:when test="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff') and not(text())]">_</xsl:when>
                         <xsl:when test="$strip_greek_vowel_length = true()">
                             <xsl:call-template name="uni-strip">
-                                <xsl:with-param name="input" select="span[@class='alph-term']/span[@class='alph-suff']"/>
+                                <xsl:with-param name="input" select="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff')]"/>
                                 <xsl:with-param name="strip-vowels" select="true()"/>
                                 <xsl:with-param name="strip-caps" select="false()"/>
                             </xsl:call-template>                              
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="span[@class='alph-term']/span[@class='alph-suff']"/>
+                            <xsl:value-of select="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff')]"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
                 <xsl:variable name="possible">
                     <xsl:for-each select="div[@class='alph-infl']">
+                        <xsl:variable name="fail_infl_constraint">
+                            <xsl:call-template name="check_infl_constraint">
+                                <xsl:with-param name="infl" select="."/>
+                                <xsl:with-param name="constraint_data" 
+                                    select="$infl_constraint"/>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:if test="not($fail_infl_constraint = '1')">
                         <xsl:call-template name="find_infl_match">
                             <xsl:with-param name="current_data" select="$current_data"/>
                             <xsl:with-param name="filtered_data" select="(.)"/>
                             <xsl:with-param name="match_pofs" select="$match_pofs"/>
                         </xsl:call-template>
+                        </xsl:if>
                     </xsl:for-each>
                 </xsl:variable>
                 <xsl:if test="$possible &gt; 0">,<xsl:value-of select="$ending_match"/>,</xsl:if>
@@ -84,9 +94,9 @@
                         </xsl:if>
                     </xsl:variable>
                 <xsl:choose>
-                    <xsl:when test="$filtered_data/../..//span[@class='alph-decl' 
+                    <xsl:when test="$filtered_data/../..//span[contains(@class,'alph-decl') 
                         and contains(@context,$current_data/@decl)]">
-                        <xsl:value-of select="count($filtered_data//span[@class='alph-case'
+                        <xsl:value-of select="count($filtered_data//span[contains(@class,'alph-case')
                             and contains($match_case,concat('|',substring-before(@context,'-'),'|'))
                             and (@alph-pofs = $match_pofs)
                             and contains($match_gend,concat('|',@alph-gend,'|'))
@@ -104,7 +114,7 @@
                 <!-- only try match if current data element has the attribute -->
                 <xsl:for-each select="$current_data/@*">
                     <xsl:if test="position() = $att_pos + 1">
-                        <xsl:variable name="att_name" select="name()"/>
+                        <xsl:variable name="att_name" select="name()"/>                       
                         <!-- should we skip this attribute? -->
                         <xsl:variable name="skip_att">
                             <xsl:call-template name="check_att">
@@ -129,8 +139,29 @@
                                     <xsl:with-param name="current_data" select="$current_data"/>
                                     <xsl:with-param name="filtered_data" 
                                         select="$filtered_data"/>
-                                    <xsl:with-param name="att_pos" select="$att_pos+1"/>                           
+                                    <xsl:with-param name="att_pos" select="$att_pos+1"/>
                                 </xsl:call-template>                                
+                            </xsl:when>
+                            <!-- stemtype is on the infl-set -->
+                            <xsl:when test="$att_name = 'stemtype'">
+                                <xsl:variable name="class_name">
+                                    <xsl:value-of select="concat('alph-',$att_name)"/>
+                                </xsl:variable>
+                                <!-- test on stemtype assumes morpheus output only ever outputs
+                                     a single stemtype for a given form, but that inflection data
+                                     stemtype attribute may be multi-valued -->
+                                <xsl:variable name="latest_data"
+                                    select="$filtered_data[ancestor::div[@class='alph-infl-set']//span
+                                        [contains(@class,$class_name) and 
+                                            contains(concat('|',$att_value,'|'),concat('|',@context,'|'))
+                                            
+                                         ]]"/>
+                                <xsl:call-template name="find_infl_match">
+                                    <xsl:with-param name="current_data" select="$current_data"/>
+                                    <xsl:with-param name="filtered_data" 
+                                        select="$latest_data"/>
+                                    <xsl:with-param name="att_pos" select="$att_pos+1"/>
+                                </xsl:call-template>               
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:variable name="class_name">
@@ -138,15 +169,15 @@
                                 </xsl:variable>
                                 <xsl:variable name="latest_data"
                                     select="$filtered_data[(
-                                    (contains($att_value,concat('|',span[@class=$class_name]/text(),'|')))
+                                    (contains($att_value,concat('|',span[contains(@class,$class_name)]/text(),'|')))
                                     or
-                                    (contains($att_value,concat('|',span[@class=$class_name]/@context,'|')))
+                                    (contains($att_value,concat('|',span[contains(@class,$class_name)]/@context,'|')))
                                     )]"/>
                                 <xsl:call-template name="find_infl_match">
                                     <xsl:with-param name="current_data" select="$current_data"/>
                                     <xsl:with-param name="filtered_data" 
                                         select="$latest_data"/>
-                                    <xsl:with-param name="att_pos" select="$att_pos+1"/>                           
+                                    <xsl:with-param name="att_pos" select="$att_pos+1"/>
                                 </xsl:call-template>                                
                             </xsl:otherwise>
                         </xsl:choose>                                        
@@ -157,11 +188,19 @@
         </xsl:choose>
     </xsl:template>    
     
-    <!-- template which can be overridden for language and pofs to control matching
+    <!-- templates which can be overridden for language and pofs to control matching
          behavior
     -->
+    <!-- template to filter matching to specific attributes -->
     <xsl:template name="check_att">
         <xsl:param name="att_name"/>
         <xsl:param name="data"/>
     </xsl:template>
+    
+    <!-- template to filter matching to specific inflection sets -->
+    <xsl:template name="check_infl_constraint">
+        <xsl:param name="infl"/>
+        <xsl:param name="constraint_data"/>
+    </xsl:template>
 </xsl:stylesheet>
+
