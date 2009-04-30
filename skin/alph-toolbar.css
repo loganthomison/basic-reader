@@ -26,6 +26,14 @@
    list-style-image: url("chrome://alpheios/skin/icons/translation_16.png");
 }
 
+#alpheios-level-button-learner {
+    list-style-image: url("chrome://alpheios/skin/icons/learning_16.png");
+}
+
+#alpheios-level-button-reader {
+    list-style-image: url("chrome://alpheios/skin/icons/reading_16.png");
+}
+
 .alpheios-logo {
    margin-left: 4px;
 }

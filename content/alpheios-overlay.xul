@@ -84,6 +84,10 @@
             oncommand="Alph.main.show_about();"/>
     	<command id="alpheios-site-cmd"
             oncommand="Alph.util.open_alpheios_link('main');"/>
+        <command id="alpheios-level-learner-cmd"
+            oncommand="Alph.main.set_mode(null,'learner');"/>
+        <command id="alpheios-level-reader-cmd"
+            oncommand="Alph.main.set_mode(null,'reader');"/>
     </commandset>
 
 	<popup id="contentAreaContextMenu">
@@ -192,6 +196,25 @@
                     id="alpheios-lang-popup-mm" 
                     onpopupshowing="Alph.main.update_main_menu_languages()"/>
             </toolbarbutton>
+            <toolbarbutton
+                id="alpheios-level-button-reader"
+                type="radio"
+                group="AlpheiosLevelGroup"
+                class="toolbarbutton-icon"
+                label="&alpheios.menu.level.reader;"
+                command="alpheios-level-reader-cmd"
+                tooltiptext="&alpheios.menu.level.reader.tooltip;"
+                observes="alpheios-pedagogical-status"
+                checked="true"/>
+            <toolbarbutton
+                id="alpheios-level-button-learner"
+                type="radio"
+                group="AlpheiosLevelGroup"
+                class="toolbarbutton-icon"
+                label="&alpheios.menu.level.learner;"
+                command="alpheios-level-learner-cmd"
+                tooltiptext="&alpheios.menu.level.learner.tooltip;"
+                observes="alpheios-pedagogical-status"/>
             <toolbarbutton
                 id="alpheios-inflection-button"
                 class="toolbarbutton-icon"

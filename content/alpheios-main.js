@@ -1511,7 +1511,11 @@ Alph.main =
         var new_mode = this.get_state_obj(a_bro).get_var("level");
         // update the site toolbar
         Alph.site.set_current_mode(a_bro.contentDocument,new_mode);
-
+        // make sure the ff toolbar button has the right state
+        Alph.$("toolbarbutton[group=AlpheiosLevelGroup]").each(
+            function() { this.setAttribute("checked",'false');}
+        );
+        Alph.$("#alpheios-level-button-"+new_mode).attr("checked",true);
     },
     
        
