@@ -485,6 +485,14 @@
                     order="descending"/>
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
+                
+                <!--handle voice and tense -->
+                <xsl:for-each select="$inflections[ num = 'singular' and tense]">
+                  <xsl:call-template name="item-plus-text-plus-context">
+                    <xsl:with-param name="item" select="tense"/>
+                  </xsl:call-template>
+                  <xsl:apply-templates select="voice"/>
+                </xsl:for-each>
 
                 <!-- handle comparative -->
                 <xsl:if test="$comp and ($comp != 'positive')">
@@ -503,10 +511,19 @@
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
 
+                <!--handle voice and tense -->
+                <xsl:for-each select="$inflections[ num = 'dual' and tense]">
+                  <xsl:call-template name="item-plus-text-plus-context">
+                    <xsl:with-param name="item" select="tense"/>
+                  </xsl:call-template>
+                  <xsl:apply-templates select="voice"/>
+                </xsl:for-each>
+                
                 <!-- handle comparative -->
                 <xsl:if test="$comp and ($comp != 'positive')">
                   <xsl:apply-templates select="$inflections[1]/comp"/>
                 </xsl:if>
+                                
               </div>
             </xsl:if>
 
@@ -520,10 +537,18 @@
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
 
+                <xsl:for-each select="$inflections[ num = 'plural' and tense]">
+                  <xsl:call-template name="item-plus-text-plus-context">
+                    <xsl:with-param name="item" select="tense"/>
+                  </xsl:call-template>
+                  <xsl:apply-templates select="voice"/>
+                </xsl:for-each>
+                
                 <!-- handle comparative -->
                 <xsl:if test="$comp and ($comp != 'positive')">
                   <xsl:apply-templates select="$inflections[1]/comp"/>
                 </xsl:if>
+                
               </div>
             </xsl:if>
 
@@ -537,14 +562,24 @@
                   <xsl:apply-templates select="."/>
                 </xsl:for-each>
 
+                <xsl:for-each select="$inflections[ not(num) and tense]">
+                  <xsl:call-template name="item-plus-text-plus-context">
+                    <xsl:with-param name="item" select="tense"/>
+                  </xsl:call-template>
+                  <xsl:apply-templates select="voice"/>
+                </xsl:for-each>
+                
                 <!-- handle comparative -->
                 <xsl:if test="$comp and ($comp != 'positive')">
                   <xsl:apply-templates select="$inflections[1]/comp"/>
                 </xsl:if>
+                
               </div>
             </xsl:if>
+            
           </xsl:when>
           <!-- end when inflections have case -->
+          
 
           <!-- verb inflection -->
           <!-- verbs with tense -->
@@ -655,7 +690,7 @@
       <xsl:value-of select="$pofs"/>
     </xsl:variable>
     <span class="alph-case" context="{translate($context,' ','_')}"
-      alph-num="{$num}" alph-gend="{$gend}" alph-pofs="{$pofs}">
+      alph-num="{$num}" alph-gend="{$gend}" alph-pofs="{translate($pofs,' ','_')}">
       <xsl:value-of select="."/>
       <xsl:if
         test="(../pofs='pronoun' or

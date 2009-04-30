@@ -330,7 +330,8 @@
                     ($att_name = 'alph-stemtype') or 
                     ($att_name = 'alph-derivtype') or
                     ($att_name = 'alph-morphflags') or
-                    ($att_name = 'alph-dial')">   
+                    ($att_name = 'alph-dial') or
+                    ($att_name = 'alph-pofs')">   
                     <xsl:variable name="match_text_lower" 
                         select="translate($match_elem/constraint[$num]/text(),
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>

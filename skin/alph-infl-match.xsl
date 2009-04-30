@@ -12,8 +12,12 @@
         <xsl:param name="infl_constraint"/>
         <xsl:variable name="matches">
             <xsl:for-each select="$selected_endings//div[@class='alph-infl-set' and 
-                ../div[contains(@class,'alph-dict')]//span[(contains(@class,'alph-pofs')) and (@context = $match_pofs)]]
+                (../div[contains(@class,'alph-dict')]//span[(contains(@class,'alph-pofs')) and (@context = $match_pofs)])
+                or
+                (span[(contains(@class,'alph-pofs') and @context = $match_pofs)])
+                ]
                 ">
+                <xsl:message>Found selected</xsl:message>
                 <xsl:variable name="match_text">
                     <xsl:choose>
                         <xsl:when test="$match_form"> <!-- match the form -->
@@ -113,8 +117,7 @@
                             -->
                             
                         <xsl:if test="contains($current_data/@gend, 'masculine') or
-                            contains($current_data/@gend,'feminine')">
-                            |common|
+                            contains($current_data/@gend,'feminine')">|common|
                         </xsl:if>
                     </xsl:if>
                 </xsl:variable>
