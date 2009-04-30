@@ -8,27 +8,39 @@
         <xsl:param name="current_data"/>
         <xsl:param name="match_pofs"/>
         <xsl:param name="strip_greek_vowel_length"/>
+        <xsl:param name="match_form"/>
         <xsl:param name="infl_constraint"/>
         <xsl:variable name="matches">
             <xsl:for-each select="$selected_endings//div[@class='alph-infl-set' and 
                 ../div[contains(@class,'alph-dict')]//span[(contains(@class,'alph-pofs')) and (@context = $match_pofs)]]
-                ">                    
-                <xsl:variable name="ending_match">
+                ">
+                <xsl:variable name="match_text">
                     <xsl:choose>
+                        <xsl:when test="$match_form"> <!-- match the form -->
+                            <xsl:value-of select="@context"/>                
+                        </xsl:when>
                         <!-- empty suffixes are matched with _ -->
                         <xsl:when test="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff') and not(text())]">_</xsl:when>
-                        <xsl:when test="$strip_greek_vowel_length = true()">
+                        <xsl:otherwise><!-- match the ending -->
+                            <xsl:value-of select="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff')]"/>                  
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <xsl:variable name="stripped_match_text">
+                    <xsl:choose>
+                        <xsl:when test="$strip_greek_vowel_length = true() and not($match_text = '_')">
                             <xsl:call-template name="uni-strip">
-                                <xsl:with-param name="input" select="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff')]"/>
+                                <xsl:with-param name="input" select="$match_text"/>        
                                 <xsl:with-param name="strip-vowels" select="true()"/>
                                 <xsl:with-param name="strip-caps" select="false()"/>
                             </xsl:call-template>                              
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff')]"/>
+                            <xsl:value-of select="$match_text"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
+                <xsl:message>Matching on <xsl:value-of select="$stripped_match_text"/></xsl:message>
                 <xsl:variable name="possible">
                     <xsl:for-each select="div[@class='alph-infl']">
                         <xsl:variable name="fail_infl_constraint">
@@ -47,7 +59,7 @@
                         </xsl:if>
                     </xsl:for-each>
                 </xsl:variable>
-                <xsl:if test="$possible &gt; 0">,<xsl:value-of select="$ending_match"/>,</xsl:if>
+                <xsl:if test="$possible &gt; 0">,<xsl:value-of select="$stripped_match_text"/>,</xsl:if>
             </xsl:for-each>    
         </xsl:variable>
         <xsl:value-of select="$matches"/>
@@ -68,39 +80,52 @@
             <xsl:when test="$current_data/@case">
                 <!-- handle attributes with case non-recursively because we need
                      to match case number and gender together
+                     only require matches on attributes which are actually
+                     in the inflection table 
                 -->
-                    <xsl:variable name="match_case" select="
-                        concat(
-                        '|',
-                        translate($current_data/@case,' ','|'),
-                        '|')"/>
-                    <xsl:variable name="match_num" select="
-                        concat(
-                        '|',
-                        translate($current_data/@num,' ','|'),
-                        '|')"/>
-                    <xsl:variable name="match_gend">
+                <xsl:variable name="match_case">
+                    <xsl:if test="$current_data/@case">
                         <xsl:value-of select="
                             concat(
-                                '|',
-                                translate($current_data/@gend,' ','|'),
-                                '|')"/>
-                        <!-- make sure that we match the 'common' gender for 
-                             endings which are either masculine or feminine
-                        -->
+                            '|',
+                            translate($current_data/@case,' ','|'),
+                            '|')"/>
+                    </xsl:if>
+                </xsl:variable>
+                <xsl:variable name="match_num">
+                    <xsl:if test="$current_data/@num">
+                        <xsl:value-of select="
+                            concat(
+                            '|',
+                        translate($current_data/@num,' ','|'),
+                        '|')"/>        
+                    </xsl:if>
+                </xsl:variable>
+                <xsl:variable name="match_gend">
+                    <xsl:if test="$current_data/@gend">
+                        <xsl:value-of select="
+                            concat(
+                            '|',
+                            translate($current_data/@gend,' ','|'),
+                            '|')"/>
+                            <!-- make sure that we match the 'common' gender for 
+                                 endings which are either masculine or feminine
+                            -->
+                            
                         <xsl:if test="contains($current_data/@gend, 'masculine') or
                             contains($current_data/@gend,'feminine')">
                             |common|
                         </xsl:if>
-                    </xsl:variable>
+                    </xsl:if>
+                </xsl:variable>
                 <xsl:choose>
-                    <xsl:when test="$filtered_data/../..//span[contains(@class,'alph-decl') 
-                        and contains(@context,$current_data/@decl)]">
+                    <xsl:when test="($filtered_data/../..//span[contains(@class,'alph-decl') 
+                        and contains(@context,$current_data/@decl)]) or not($current_data/@decl)">
                         <xsl:value-of select="count($filtered_data//span[contains(@class,'alph-case')
-                            and contains($match_case,concat('|',substring-before(@context,'-'),'|'))
+                            and ($match_case = '' or contains($match_case,concat('|',substring-before(@context,'-'),'|')))
                             and (@alph-pofs = $match_pofs)
-                            and contains($match_gend,concat('|',@alph-gend,'|'))
-                            and contains($match_num,concat('|',@alph-num,'|'))
+                            and ($match_gend = '' or contains($match_gend,concat('|',@alph-gend,'|')))
+                            and ($match_num = '' or contains($match_num,concat('|',@alph-num,'|')))
                             ])"/>        
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>

@@ -17,6 +17,7 @@
         <xsl:param name="show_only_matches"/>
         <xsl:param name="context"/>
         <xsl:param name="group_by"/>
+        <xsl:param name="match_form"/>
         
         <xsl:variable name="group_att">
             <xsl:choose>

@@ -52,6 +52,11 @@
          used for adjectives or other parts of speech -->
     <xsl:param name="match_pofs" select="'noun'"/>
     
+    <!-- optional parameter to indicate the matching is at the form level
+         rather than on the endings only 
+    -->
+    <xsl:param name="match_form" select="false()"/>
+    
     <!-- Flag to request that endings be deduped according to a specific
          set of attributes. The only supported value currently is 'case-num-gend'
     -->
@@ -219,6 +224,7 @@
                                         <xsl:with-param name="selected_endings" select="$selected_endings"/>
                                         <xsl:with-param name="current_data" select="." />
                                         <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                                        <xsl:with-param name="match_form" select="$match_form"/>
                                         <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                
                                     </xsl:call-template>
                                 </xsl:variable>                     
@@ -318,6 +324,7 @@
                                 <xsl:with-param name="current_data" select="$celldata" />
                                 <xsl:with-param name="selected_endings" select="$selected_endings"/>
                                 <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                                <xsl:with-param name="match_form" select="$match_form"/>
                                 <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                             </xsl:call-template>
                         </xsl:variable>

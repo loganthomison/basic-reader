@@ -48,6 +48,12 @@
          used for adjectives or other parts of speech -->
     <xsl:param name="match_pofs" select="'noun'"/>
     
+    <!-- optional parameter to indicate the matching is at the form level
+        rather than on the endings only 
+    -->
+    <xsl:param name="match_form" select="false()"/>
+    
+    
     <!-- Flag to request that endings be deduped according to a specific
          set of attributes. The only supported value currently is 'case-num-gend'
     -->
@@ -62,39 +68,29 @@
     
     <!-- debug -->
     <xsl:param name="test_endings">
+        <!--
         <div class="alph-entry">
-            <div class="alph-dict">
-                <span class="alph-hdwd">Μοῦσα: </span>
-                <span context="noun" class="alph-pofs">
-                    <span class="alph-attr">feminine</span>noun
+            <div lemma-lex="aut" lemma-lang="grc" lemma-id="n30657" lemma-key="ἐγώ" class="alph-dict">
+                <span class="alph-hdwd">ἐγώ: </span>
+                <div class="alph-morph">
+                    <span context="pronoun" class="alph-pofs">pronoun</span>
+                </div>
+            </div>
+            <div class="alph-mean">I, me</div>
+            <div context="ἐγώ" class="alph-infl-set">
+                <span class="alph-term">ἐγώ<span class="alph-suff"></span></span>
+                <span>(<span context="pron1" class="alph-nopad alph-stemtype">s=pron1</span>, 
+                    <span context="indeclform" class="alph-nopad alph-morphflags">m=indeclform</span>)
                 </span>
-            </div>
-            <div class="alph-mean">the Muse</div>
-            <div context="μοῦσα" class="alph-infl-set">
-                <span class="alph-term">μοῡσ•<span class="alph-suff">α</span></span>
                 <div class="alph-infl">Singular: 
-                    <span context="nominative-singular-feminine-noun" class="alph-case">nominative</span>
-                    <span context="vocative-singular-feminine-noun" class="alph-case">vocative</span>
+                    <span alph-pofs="pronoun" alph-gend="masculine" alph-num="singular" context="nominative-singular-masculine-pronoun" class="alph-case">nominative (m)</span>
+                    <span alph-pofs="pronoun" alph-gend="feminine" alph-num="singular" context="nominative-singular-feminine-pronoun" class="alph-case">nominative (f)</span>
+                    <span alph-pofs="pronoun" alph-gend="masculine" alph-num="singular" context="vocative-singular-masculine-pronoun" class="alph-case">vocative (m)</span>
+                    <span alph-pofs="pronoun" alph-gend="feminine" alph-num="singular" context="vocative-singular-feminine-pronoun" class="alph-case">vocative (f)</span>
                 </div>
             </div>
-          </div>
-          <!--
-            <div class="alph-entry">
-                <div class="alph-dict">
-                    <span class="alph-hdwd">νόστος: </span>
-                    <span context="noun" class="alph-pofs">
-                        <span class="alph-attr">masculine</span>noun</span>
-                </div>
-                <div class="alph-mean">a return home</div>
-                <div context="νόστον" class="alph-infl-set">
-                    <span class="alph-term">νόστον
-                        <span class="alph-suff"></span>
-                    </span>
-                    <div class="alph-infl">Singular: 
-                        <span context="accusative-singular-masculine-noun" class="alph-case">accusative</span>
-                    </div>
-                </div>
-            </div-->
+        </div>
+        -->
     </xsl:param>
     <!--xsl:param name='selected_endings' select="exsl:node-set($test_endings)"/-->
     
@@ -209,6 +205,7 @@
                                         <xsl:with-param name="selected_endings" select="$selected_endings"/>
                                         <xsl:with-param name="current_data" select="." />
                                         <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                                        <xsl:with-param name="match_form" select="$match_form"/>
                                         <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                
                                     </xsl:call-template>
                                 </xsl:variable>                     
@@ -302,6 +299,7 @@
                             <xsl:with-param name="current_data" select="$celldata" />
                             <xsl:with-param name="selected_endings" select="$selected_endings"/>
                             <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                            <xsl:with-param name="match_form" select="$match_form"/>
                             <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                                            
                         </xsl:call-template>
                     </xsl:variable>
