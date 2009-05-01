@@ -1,3 +1,14 @@
+#alph-inflect-title {
+    display: none;
+}
+
+.alph-infl-caption {
+    margin-bottom: 1.5em;
+}
+
+.paradigm-links {
+}
+
 table {
     border-collapse: collapse;
     border: 2px solid;

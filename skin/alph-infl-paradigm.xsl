@@ -169,6 +169,10 @@
             <xsl:variable name="paradigm_id" select="@id"/>
             <div id="{$paradigm_id}">
                 <div class="title"><xsl:apply-templates select="title"/></div>
+                <xsl:if test="@lemmas">
+                    <xsl:variable name="lemma_list" select="@lemmas"/>
+                    <div class="paradigm-links"><a class="alph-lang-infl-link principal-parts" href="{concat('#',$lemma_list)}">Principal Parts >></a></div>
+                </xsl:if>
                 <xsl:call-template name="paradigm_table">
                     <xsl:with-param name="tables" select="table"/>
                     <xsl:with-param name="infl_constraint_data"
@@ -181,7 +185,7 @@
     <xsl:template name="paradigm_table">
         <xsl:param name="tables"/>
         <xsl:param name="infl_constraint_data"/>
-        <xsl:for-each select="$tables">        
+        <xsl:for-each select="$tables">
             <xsl:element name="table">
                 <xsl:attribute name="class"><xsl:value-of select="@role"/></xsl:attribute>
                 <xsl:for-each select="row">

@@ -406,6 +406,12 @@ Alph.infl = {
         
         // add a click handler to the footnotes
         $(".footnote",topdoc).click(function(e){return Alph.infl.show_footnote(e,this)});
+        
+        // add a click handler to any language-specific functional links
+        $(".alph-lang-infl-link",topdoc).click(
+            function(e)
+            { return Alph.infl.do_language_specific_feature(e,this,a_link_target.lang_tool)}
+        );
 
         // add a click handler to the reference links
         $(".alph-reflink",a_tbl).click(function(e){return Alph.infl.follow_reflink(e,this,a_link_target.lang_tool)});
@@ -1090,5 +1096,19 @@ Alph.infl = {
             params[param[0]]= param[1];
         }
         return params;    
+    },
+    
+    /** 
+     * Handle a language-specific feature
+     * @param {Event} a_event the click event
+     * @param {Element} a_elem the target of the action
+     * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced 
+     *                                        the inflection table
+     * @return false 
+     */
+    do_language_specific_feature: function(a_event,a_elem,a_lang_tool)
+    {
+        a_lang_tool.handle_inflection_feature(a_event,a_elem);
     }
+    
 };

@@ -550,5 +550,46 @@ Alph.util = {
             this.ALPHEIOS_URLS.support +
             '?subject=' + subject);          
         win && win.open && !win.closed && win.close(); 
+    },
+    
+    /**
+     * Transforms an xml document, sending supplied parameters
+     * to the stylesheet
+     * @param {Node} a_target
+     * @return an Node containing the transformed text
+     * @type Node
+     */
+    transform: function(a_target)
+    {
+        this.xsltProcessor = new XSLTProcessor();
+        var p = new XMLHttpRequest();      
+        p.open("GET", a_target.xslt_url, false);
+        p.send(null);
+        var xslRef = p.responseXML;
+        this.xsltProcessor.importStylesheet(xslRef)
+        
+        p.open("GET",a_target.xml_url,false);
+        p.send(null);
+        var xmlRef = p.responseXML;
+        
+        var inflHTML = '';
+        try
+        {
+            // add the xslt parameters
+            for (var param in a_target.xslt_params)
+            {
+                this.xsltProcessor.setParameter("",param,a_target.xslt_params[param]);
+            }
+            var start = (new Date()).getTime();
+            inflHTML = this.xsltProcessor.transformToDocument(xmlRef);
+            var end = (new Date()).getTime();
+            this.log("Transformation time: " + (end-start));
+
+        }
+        catch (e)
+        {
+            this.log(e);
+        }
+        return inflHTML;
     }
 };
