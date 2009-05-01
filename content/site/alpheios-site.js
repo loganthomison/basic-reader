@@ -163,6 +163,11 @@ Alph.site = {
                     Alph.$(this)
                         .siblings(".alpheios-toolbar-level")
                         .removeClass("alpheios-current");
+                    Alph.$("#alpheios-current-level",a_doc).attr("alpheios-value",a_mode);
+                    Alph.$("#alpheios-current-level *:not([alpheios-value="+a_mode+"])",a_doc)
+                        .removeClass("alpheios-current");
+                    Alph.$("#alpheios-current-level *[alpheios-value="+a_mode+"]",a_doc)
+                        .addClass("alpheios-current");
                 }
             );
         }
