@@ -414,7 +414,7 @@ Alph.infl = {
         );
 
         // add a click handler to the reference links
-        $(".alph-reflink",a_tbl).click(function(e){return Alph.infl.follow_reflink(e,this,a_link_target.lang_tool)});
+        $(".alph-reflink",topdoc).click(function(e){return Alph.infl.follow_reflink(e,this,a_link_target.lang_tool)});
         
         // add a toggle to show the stem classes
         $(".stem-class-toggle",a_tbl).click(

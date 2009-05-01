@@ -345,9 +345,9 @@
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')= $match_text_lower)
                         or
                         (contains(
-                        translate(concat('_',@context,'_'),
+                        translate(concat('|',@context,'|'),
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),
-                        concat('_',$match_text_lower,'_')
+                        concat('|',$match_text_lower,'|')
                         )
                         ))
                         ]">1
@@ -363,9 +363,9 @@
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')= $match_text_lower)
                         or
                         (contains(
-                        translate(concat('_',@context,'_'),
+                        translate(concat('|',@context,'|'),
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),
-                        concat('_',$match_text_lower,'_')
+                        concat('|',$match_text_lower,'|')
                         )
                         ))
                         ]">1
