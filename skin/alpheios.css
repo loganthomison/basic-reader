@@ -66,14 +66,15 @@
     display: none;
 }
 
-#alph-window.alpheios-inline-query #alph-text {
+#alph-window.alpheios-inline-query #alph-text, 
+#alph-window.alpheios-inline-query #alph-align-answer-prompt {
    display: block;
+   padding-left: 20px;
 }
 
 #alph-window.alpheios-inline-query #alph-text #alph-inline-query-instruct {
     display: block; 
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 20px 20px 20px 20px;
 }
 #alph-window.alpheios-inline-query #alph-text #alph-inline-query-instruct span {
     display: inline;
@@ -81,10 +82,18 @@
 
 #alph-window.alpheios-inline-query #alph-text .alph-align-answer {
     display: block;
+    padding-left: 20px;
 }
 
 #alph-window.alpheios-inline-query #alph-text .alph-align-answer span {
     display: inline;
+}
+
+#alph-align-answer-prompt {
+    color: #E49A0D;
+    font-style: italic;
+    font-weight: bold;
+    padding-left: 20px; 
 }
 
 .alph-align-answer span {

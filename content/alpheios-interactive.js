@@ -90,10 +90,9 @@ Alph.interactive = {
             Alph.$("#alph-window",a_topdoc).addClass("alpheios-inline-query");
             Alph.$("#alph-window #alph-text",a_topdoc).append(
                 '<div id="alph-inline-query-instruct">' +
-                '<span class="alph-inline-query-word ' + src_lang + '">' 
-                + selected_word + ': </span>' +
-                str.getString("alph-inline-query-instruct") +
+                str.getFormattedString("alph-inline-query-instruct",[selected_word]) +
                 '</div>' +
+                '<div id="alph-align-answer-prompt"/>' + 
                 '<div id="alph-inline-query-correct">'+
                 '<span class="alph-inline-query-heading">' +
                 str.getString("alph-inline-query-correct") +
@@ -197,15 +196,19 @@ Alph.interactive = {
      
         if (! matched)
         {
-            //alert("Try again");
+            Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
+                .html(str.getString("alph-query-incorrect"));
         }
         else if (params.aligned_ids.length < params.source_align.length)
         {
-            //alert("Correct, but more selections are needed");
+            Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
+                .html(str.getString("alph-query-more"));
         }
         
         if (params.aligned_ids.length == params.source_align.length)
         {
+            Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
+                .html('');
             Alph.$("#alph-window",params.source_node.ownerDocument).css("display","none");
             Alph.interactive.openQueryWindow(params);
         }

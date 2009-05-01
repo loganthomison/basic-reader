@@ -208,13 +208,14 @@ Alph.xlate = {
             
         // nothing to do if same word as last AND the popup is shown
         // (hidePopup removes the last word from the state variable),
-        // unless we're in query  mode, in which case selecting the same word
+        // unless we're in query  mode and the popup isn't showing,
+        // in which case selecting the same word
         // again should act like a reset
         var alph_state = Alph.main.get_state_obj();
         var lastSelection = alph_state.get_var("lastSelection");
         if (alphtarget.equals(lastSelection))
         {
-            if (Alph.interactive.enabled())
+            if (Alph.interactive.enabled() && (! this.popupVisible()) )
             {
                 Alph.interactive.closeQueryDisplay(Alph.main.getCurrentBrowser());
             }
