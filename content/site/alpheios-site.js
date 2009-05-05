@@ -49,30 +49,28 @@ Alph.site = {
         // unless interactivity is enabled,
         // add the mouseover handlers for the parallel alignment
         // and the interlinear alignment toggle
-        if (! Alph.interactive.enabled())
+        Alph.$(".alpheios-aligned-word",a_doc).mouseover(  
+            function(e) { Alph.site.toggle_alignment(e,this,a_type,true)}
+        );
+            
+        Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
+            function(e) { Alph.site.toggle_alignment(e,this,a_type,false)}
+        );
+            
+        // wrap a div around each target word so that the aligned text can
+        // be floated under it
+        if (Alph.$(".alpheios-word-wrap",a_doc).length == 0)
         {
-            Alph.$(".alpheios-aligned-word",a_doc).mouseover(  
-                function(e) { Alph.site.toggle_alignment(e,this,a_type,true)}
-            );
-            
-            Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
-                function(e) { Alph.site.toggle_alignment(e,this,a_type,false) }
-            );
-            
-            // wrap a div around each target word so that the aligned text can
-            // be floated under it
-            if (Alph.$(".alpheios-word-wrap",a_doc).length == 0)
-            {
-                Alph.$(".alpheios-aligned-word",a_doc)
-                    .wrap("<div class='alpheios-word-wrap'></div>");
-            }
+            Alph.$(".alpheios-aligned-word",a_doc)
+                .wrap("<div class='alpheios-word-wrap'></div>");
+        }
                 
 
-            if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
-            {
-                this.add_interlinear_toggle(a_doc);
-            }
+        if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
+        {
+            this.add_interlinear_toggle(a_doc);
         }
+        
         this.enable_toolbar(a_doc);
         
         
@@ -168,6 +166,10 @@ Alph.site = {
                         .removeClass("alpheios-current");
                     Alph.$("#alpheios-current-level *[alpheios-value="+a_mode+"]",a_doc)
                         .addClass("alpheios-current");
+                    Alph.$("body",a_doc).attr("alpheios-level",a_mode);
+                    ;
+                    Alph.$("body",(Alph.main.panels['alph-trans-panel'].get_current_doc())[0])
+                        .attr("alpheios-level",a_mode);
                 }
             );
         }
@@ -266,9 +268,12 @@ Alph.site = {
             if (Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == 'true')
             {
                 Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",true);
-                Alph.site.handle_interlinear_toggle(null,
-                    Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
-            }
+                if (! Alph.interactive.enabled())
+                {
+                    Alph.site.handle_interlinear_toggle(null,
+                        Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
+                }
+            }   
             
         }
     },

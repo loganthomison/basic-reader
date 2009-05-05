@@ -126,14 +126,18 @@ Alph.Translation.handle_error = function(a_error,a_trans_doc)
  * Populate the pedagogical panel with the translation
  */
 Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
-    Alph.$("body",a_trans_doc).html(a_data);
+    var new_doc = (new DOMParser()).parseFromString(
+                            a_data,
+                            "application/xhtml+xml");
+    Alph.$("head",a_trans_doc).html(Alph.$("head",new_doc).contents())
+    Alph.$("body",a_trans_doc).html(Alph.$("body",new_doc).contents());
 
     // setup the display
     Alph.site.setup_page(a_trans_doc,'trans');
                         
     var disable_interlinear = true;
     if ( (Alph.$(".alpheios-aligned-word",a_trans_doc).length > 0) &&
-          Alph.util.getPref("features.alpheios-interlinear") )
+          Alph.util.getPref("features.alpheios-interlinear"))
     {
         disable_interlinear = false;
         
@@ -143,6 +147,7 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
     // populate the interlinear display if it's checked and enabled
     if ( ! disable_interlinear &&
         (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
+        && ! Alph.interactive.enabled()
        )
     {
         Alph.Translation.show_interlinear();
@@ -286,19 +291,10 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_
     {
         parallel_doc = Alph.main.getCurrentBrowser().contentDocument;
     }
-    // the original prototype text element used the "ref" attribute to identify the
-    // corresponding element(s) in the parallel aligned translation
-    if (Alph.$(a_elem).attr("ref"))
-    {     
-        var ids = Alph.$(a_elem).attr("ref").split(/\s|,/);
-        for (var i=0; i<ids.length; i++) {
-            Alph.$('.alph-proto-word[id="' + ids[i] + '"]',parallel_doc)
-                .toggleClass("alph-highlight-parallel");    
-        }
-    }
+ 
     // the source text element uses the "nrefs" attribute to identify the
     // corresponding element(s) in the parallel aligned translation
-    else if (Alph.$(a_elem).attr("nrefs"))
+    if (Alph.$(a_elem).attr("nrefs"))
     {     
         var ids = Alph.$(a_elem).attr("nrefs").split(/\s|,/);
         for (var i=0; i<ids.length; i++) {

@@ -337,7 +337,14 @@ Alph_Inter =
     {
 
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
-        var pofs = $('.alph-pofs',a_src_node).attr('context'); 
+        var pofs = $('.alph-pofs',a_src_node).attr('context');
+        var decls = [];
+        $('.alph-decl',a_src_node).each(
+            function()
+            {
+                decls.push($(this).attr('context'));      
+            }
+        );
         
         var infl_set = $('.alph-infl-set',a_src_node);
         
@@ -359,6 +366,7 @@ Alph_Inter =
                 context['alph-voice'] = $('.alph-voice',this).text();
                 context['alph-pers'] = $('.alph-pers',this).attr('context');
                 context['alph-mood'] = $('.alph-mood',this).attr('context');
+                context['alph-decl'] = decls.join(/_/);
                 // one inflection set may contain many cases
                 var cases = $('.alph-case',this);
                 if (cases.length > 0)
@@ -393,6 +401,7 @@ Alph_Inter =
                 $(".alph-query-element",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
+                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '_',
                    attributes: context_list[0]
                 },
                 Alph_Inter.on_infl_correct

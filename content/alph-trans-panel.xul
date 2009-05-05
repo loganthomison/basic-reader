@@ -29,8 +29,10 @@
          <command 
             id="alpheios-trans-toggle-inter-trans-cmd" 
             oncommand="Alph.Translation.toggle_interlinear('trans',event);"
-            observes="alph-trans-inter-trans-status"
-            disabled="true"/>
+            disabled="true">
+            <observes element="alph-trans-inter-trans-status" attribute="disabled"/>
+            <observes element="alpheios-learner-disabled" attribute="hidden"/>
+        </command>
     </commandset>    
     
     <popupset id="mainPopupSet">
@@ -77,8 +79,7 @@
                           label="&alpheios.panel.trans.opt.inter.src;"  
                           hidden="true"
                           type="checkbox"/>
-            <toolbaritem
-                    observes="alph-trans-inter-trans-status">
+            <toolbaritem>
                     <checkbox id="alpheios-trans-opt-inter-trans" 
                           label="&alpheios.panel.trans.opt.inter.trans;"  
                           command="alpheios-trans-toggle-inter-trans-cmd"/>

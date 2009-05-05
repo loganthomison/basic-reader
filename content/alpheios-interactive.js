@@ -197,12 +197,12 @@ Alph.interactive = {
         if (! matched)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(str.getString("alph-query-incorrect"));
+                .html(Alph.$("#alpheios-strings").get(0).getString("alph-query-incorrect"));
         }
         else if (params.aligned_ids.length < params.source_align.length)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(str.getString("alph-query-more"));
+                .html(Alph.$("#alpheios-strings").get(0).getString("alph-query-more"));
         }
         
         if (params.aligned_ids.length == params.source_align.length)

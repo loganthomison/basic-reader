@@ -1491,6 +1491,7 @@ Alph.main =
         {
             a_bro = this.getCurrentBrowser();   
         }
+        
         // if we weren't explicity passed the mode, check to see
         // if it's present in the querystring for the page
         if (typeof a_mode == "undefined")
@@ -1516,6 +1517,22 @@ Alph.main =
             function() { this.setAttribute("checked",'false');}
         );
         Alph.$("#alpheios-level-button-"+new_mode).attr("checked",true);
+        Alph.$("broadcaster.alpheios-level-disable-notifier").each(
+            function()
+            {
+                
+                var disabled = false;
+                if (this.getAttribute("id").indexOf(new_mode) >= 0)
+                {
+                    disabled = true;
+                }
+                Alph.$(this).attr("disabled",disabled);
+                if (Alph.$(this).attr("hidden") != null)
+                {
+                    Alph.$(this).attr("hidden",disabled);
+                }
+            }
+        );
     },
     
        

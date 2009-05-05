@@ -7,7 +7,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs"
     xmlns:exsl="http://exslt.org/common"
     xmlns:xlink="http://www.w3.org/1999/xlink">
-    <xsl:import href="alph-infl-form.xsl"/>
+    <xsl:import href="alph-query-ending.xsl"/>
     <xsl:import href="alph-infl-match.xsl"/>
     <xsl:import href="alph-infl-extras.xsl"/>    
     <!--
@@ -26,6 +26,8 @@
                 
     <!-- all parameters may be supplied in transformation -->
 
+     <xsl:param name="decl"/>
+    
     <!-- row groupings --> 
     <xsl:param name="group1" select="'case'"/>
     
@@ -46,17 +48,7 @@
     <!-- by default this stylesheet applies to nouns, but may also be
          used for adjectives or other parts of speech -->
     <xsl:param name="match_pofs" select="'noun'"/>
-    
-    <!-- Flag to request that endings be deduped according to a specific
-         set of attributes. The only supported value currently is 'case-num-gend'
-    -->
-    <xsl:param name="dedupe_by" select="''"/>
-    
-    <!-- Flag to request that only the endings which match the form exactly be
-        included in the table
-    -->
-    <xsl:param name="show_only_matches" select="false()"/>
-        
+            
     <!-- skip the enclosing html and body tags -->
     <xsl:param name="fragment" />
         
@@ -74,7 +66,7 @@
             <xsl:when test="$fragment">
                 <xsl:copy-of select="$table-notes"/>
                 <xsl:call-template name="infltable">
-                    <xsl:with-param name="endings" select="//infl-form-set"/>
+                    <xsl:with-param name="endings" select="//infl-ending-set[contains($decl,@decl)]"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -84,7 +76,7 @@
                     <body>
                         <xsl:copy-of select="$table-notes"/>
                         <xsl:call-template name="infltable">
-                            <xsl:with-param name="endings" select="//infl-form-set"/>
+                            <xsl:with-param name="endings" select="//infl-ending-set[contains($decl,@decl)]"/>
                         </xsl:call-template>                     
                     </body>
                 </html>                
@@ -191,8 +183,6 @@
                     <xsl:with-param name="selected_endings" select="$selected_endings"/>
                     <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
                     <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
-                    <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
-                    <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
                     <xsl:with-param name="context" select="$context"/>
                 </xsl:call-template>
             </xsl:for-each>            
