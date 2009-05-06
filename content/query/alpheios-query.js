@@ -352,9 +352,9 @@ Alph_Inter =
 
         var base_ctx = 
         {
-            // skip declension and conjugation for now -- may add back in later
-            //'alph-decl': $('.alph-decl',query_parent.previousSibling).attr('context'),
+            // skip conjugation for now -- may add back in later
             //'alph-conj': $('.alph-conj',query_parent.previousSibling).attr('context')
+            'alph-decl' : decls.join('|')
         }
         $('.alph-infl',infl_set).each(
             function()
@@ -362,11 +362,11 @@ Alph_Inter =
                 var context = $.extend({},base_ctx);
                 context['alph-num'] = $('.alph-num',this).attr('context');
                 context['alph-gend'] = $('.alph-gend',this).attr('context');
-                context['alph-tense'] = $('.alph-tense',this).text();
+                context['alph-tense'] = $('.alph-tense',this).attr('context');
                 context['alph-voice'] = $('.alph-voice',this).text();
                 context['alph-pers'] = $('.alph-pers',this).attr('context');
                 context['alph-mood'] = $('.alph-mood',this).attr('context');
-                context['alph-decl'] = decls.join(/_/);
+                
                 // one inflection set may contain many cases
                 var cases = $('.alph-case',this);
                 if (cases.length > 0)
@@ -401,12 +401,10 @@ Alph_Inter =
                 $(".alph-query-element",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
-                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '_',
+                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-',
                    attributes: context_list[0]
                 },
                 Alph_Inter.on_infl_correct
-                
-                
             );
         this.resize_window();
     },

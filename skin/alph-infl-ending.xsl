@@ -15,7 +15,6 @@
         <xsl:param name="strip_greek_vowel_length" />
         <xsl:param name="dedupe_by"/>
         <xsl:param name="show_only_matches"/>
-        <xsl:param name="context"/>
         <xsl:param name="group_by"/>
         <xsl:param name="match_form"/>
         
@@ -31,7 +30,6 @@
         </xsl:variable>
         
         <xsl:variable name="ending_types" select="//order-item[@attname=$group_att]"/>
-        <xsl:variable name="infl_set" select="$infl-endings/../infl-set"/>
                 
         <!-- group by type -->
         <xsl:for-each select="$ending_types">
@@ -131,8 +129,7 @@
                                         @gend = $this_gend and @num = $this_num]/infl-ending/text() = .">duplicate</xsl:if>
                                 </xsl:variable>                                       
                                 <span class="ending {@type} {$selected_class} {$notfirst} {$duplicate}" 
-                                    stem-class="{@stem-class}"
-                                    context="{translate($context,' ','_')}">
+                                    stem-class="{@stem-class}">
                                     <xsl:value-of select="."/>
                                 </span>
                                 <xsl:call-template name="add-dialect">

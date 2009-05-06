@@ -15,11 +15,8 @@
         <xsl:param name="strip_greek_vowel_length" />
         <xsl:param name="dedupe_by"/>
         <xsl:param name="show_only_matches"/>
-        <xsl:param name="context"/>
         <xsl:param name="match_form"/>
-        
-        <xsl:variable name="infl_set" select="$infl-endings/../infl-set"/>
-                
+
         <td class="ending-group"> <!-- start new cell -->
         <xsl:variable name="cellgroup" 
             select="$infl-endings/infl-ending[contains(@type,'primary')]"/>
@@ -100,11 +97,55 @@
             <xsl:variable name="this_case" select="../@case"/>
             <xsl:variable name="this_num" select="../@num"/>
             <xsl:variable name="this_gend" select="../@gend"/>
-            <span class="ending {@type} {$selected_class} {$notfirst}" 
-                stem-class="{@stem-class}"
-                context="{translate($context,' ','_')}">
+            <xsl:element name="span">
+                <xsl:attribute name="class">
+                    <xsl:value-of select="concat('ending ', @type, ' ', $selected_class, ' ', $notfirst)"/>
+                </xsl:attribute>
+                <xsl:attribute name="stem-class">
+                    <xsl:value-of select="@stem-class"/>
+                </xsl:attribute>
+                <xsl:if test="../@pers">
+                    <xsl:attribute name="alph-pers">
+                        <xsl:value-of select="concat('|', translate(../@pers,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@gend">
+                    <xsl:attribute name="alph-gend">
+                        <xsl:value-of select="concat('|', translate(../@gend,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@num">
+                    <xsl:attribute name="alph-num">
+                        <xsl:value-of select="concat('|', translate(../@num,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@case">
+                    <xsl:attribute name="alph-case">
+                        <xsl:value-of select="concat('|', translate(../@case,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@voice">
+                    <xsl:attribute name="alph-voice">
+                        <xsl:value-of select="concat('|', translate(../@voice,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@tense">
+                    <xsl:attribute name="alph-tense">
+                        <xsl:value-of select="concat('|', translate(../@tense,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@mood">
+                    <xsl:attribute name="alph-mood">
+                        <xsl:value-of select="concat('|', translate(../@mood,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="../@hdwd">
+                    <xsl:attribute name="alph-hdwd">
+                        <xsl:value-of select="concat('|', translate(../@hdwd,' ','|'), '|')"/>
+                    </xsl:attribute>
+                </xsl:if>    
                 <xsl:value-of select="."/>
-            </span>
+            </xsl:element>
         </xsl:for-each>
         </td>                                   
     </xsl:template>

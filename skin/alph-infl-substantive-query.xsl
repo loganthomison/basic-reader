@@ -149,13 +149,18 @@
             <xsl:variable name="lastgroup4" select="."/>
             <xsl:if test="position()=1">
                 <!-- add the row header cell if it's the first cell in 
-                    the row -->
-                <th class="rowgroupheader header-text">
+                the row -->
+                <xsl:element name="th">
+                    <xsl:attribute name="class">rowgroupheader header-text</xsl:attribute>
+                    <xsl:attribute name="context"><xsl:value-of select="$group1"/></xsl:attribute>
+                    <xsl:attribute name="{concat('alph-',$group1)}">
+                        <xsl:value-of select="$groupheader"/>
+                    </xsl:attribute>
                     <xsl:value-of select="$groupheader"/>
                     <xsl:call-template name="add-footnote">
                         <xsl:with-param name="item" select="/infl-data/order-table/order-item[@attname=$groupheader]"/>
                     </xsl:call-template>
-                </th>
+                </xsl:element>
             </xsl:if>
             <xsl:for-each select="$group5_vals">
                 <xsl:sort select="@order"/> 
@@ -172,18 +177,12 @@
                         <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                     </xsl:call-template>
                 </xsl:variable>
-                <xsl:variable name="context">
-                    <xsl:call-template name="infl-set-context">
-                        <xsl:with-param name="infl_set" select="$celldata"/>
-                    </xsl:call-template>
-                </xsl:variable>                                
                 <xsl:call-template name="ending-cell">
                     <xsl:with-param name="infl-endings" select="$celldata"/>
                     <xsl:with-param name="selected" select="$selected"/>
                     <xsl:with-param name="selected_endings" select="$selected_endings"/>
                     <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
                     <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
-                    <xsl:with-param name="context" select="$context"/>
                 </xsl:call-template>
             </xsl:for-each>            
         </xsl:for-each>
@@ -205,11 +204,20 @@
             <xsl:for-each select="$headerrow1">
                 <xsl:sort select="@order" data-type="number"/>
                 <xsl:variable name="colspan" 
-                    select="'2'"/>
-                    <th colspan="{$row2count}">
-                        <span class="header-text"><xsl:value-of select="."/></span>
-                        <xsl:apply-templates select="."/>
-                    </th>
+                select="'2'"/>
+                <xsl:element name="th">
+                    <xsl:attribute name="colspan">
+                        <xsl:value-of select="$row2count"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="context">
+                        <xsl:value-of select="$group4"/>
+                    </xsl:attribute>                    
+                    <xsl:attribute name="{concat('alph-',$group4)}">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>
+                    <span class="header-text"><xsl:value-of select="."/></span>
+                    <xsl:apply-templates select="."/>
+                </xsl:element>
             </xsl:for-each>            
         </tr>
         <tr id="headerrow2" class='expand-ctl'>
@@ -222,10 +230,19 @@
             <xsl:for-each select="$headerrow1">
                 <xsl:sort select="@order" data-type="number"/>
                 <xsl:for-each select="$headerrow2">
-                    <th colspan="1">
+                    <xsl:element name="th">
+                        <xsl:attribute name="colspan">
+                            <xsl:value-of select="1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="context">
+                            <xsl:value-of select="$group5"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="{concat('alph-',$group5)}">
+                            <xsl:value-of select="."/>
+                        </xsl:attribute>
                         <span class="header-text"><xsl:value-of select="."/></span>
                         <xsl:apply-templates select="."/>
-                    </th>
+                    </xsl:element>
                 </xsl:for-each>
             </xsl:for-each>            
         </tr>
