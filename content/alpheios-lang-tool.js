@@ -968,10 +968,10 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
                 Alph.$("#alpheios-strings").get(0)
                     .getFormattedString('alph-dictionary-link',[dict_name_str]);
             dict_link =
-                '<div class="alph-dict-link">' +
-                dict_link_text
-                '</div>'
-
+                '<a class="alph-dict-link" href="#alph-dict" title="' 
+                + dict_link_text + '">' +
+                '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
+                'alt="' + dict_link_text + '"/></a>';
         }
         catch(a_e)
         {
@@ -1316,4 +1316,83 @@ Alph.LanguageTool.prototype.get_string = function(a_name,a_replace)
         }
     }
     return str || "";
+}
+
+/**
+ * Add the language-specific tools to the word lookup
+ * @paramaters {Node} a_node the node which contains the results 
+ *                              of the word lookup  
+ * @params {Alph.SourceSelection} a_target the target element of the user's selection
+ */
+Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
+{
+    var lang_tool = this;
+    var strings = Alph.$("#alpheios-strings").get(0);
+    
+    // add diagram link, if appropriate
+    if (a_target.getTreebankQuery())
+    {
+        var diagram_alt_text = strings.getString('alph-diagram-link');
+        Alph.$("#alph-word-tools",a_node).append(
+            '<a class="alph-diagram-link" ' + 
+            'href="#alpheios-diagram" title="' + diagram_alt_text + '">' + 
+            '<img src="chrome://alpheios/skin/icons/diagram_16.png"' +
+            'alt="' + diagram_alt_text + '"/></a>'
+        );
+        Alph.$('#alph-word-tools .alph-diagram-link',a_node).click(
+            function(a_e)
+            {
+                Alph.$("#alpheios-tree-open-cmd").get(0).doCommand(a_e);
+                return false;
+            }
+        );
+    }
+    // add the inflection tool, if any
+    if (this.getFeature('alpheios-inflect'))
+    {
+        var inflect_alt_text = strings.getString('alph-inflect-link');
+        Alph.$("#alph-word-tools",a_node).append(
+            '<a class="alph-inflect-link" ' + 
+            'href="#alpheios-inflect" title="' + inflect_alt_text + '">' + 
+            '<img src="chrome://alpheios/skin/icons/inflection_16.png"' +
+            'alt="' + inflect_alt_text + '"/></a>'
+        );
+        Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
+            function(a_e)
+            {
+                lang_tool.handleInflections(a_e,a_node);
+                return false;
+            }
+        );
+    }
+    
+    // add language-specific dictionary link, if any
+    if (! Alph.main.panels['alph-dict-panel'].
+        is_visible_inline(Alph.main.getCurrentBrowser()))
+    {
+        Alph.$("#alph-word-tools",a_node).append(
+            this.getDictionaryLink()
+        );
+        // TODO the dictionary handler should be dinfed in Alph.Dict
+        // rather than here. also doesn't work from a detached window yet.
+        Alph.$('#alph-word-tools .alph-dict-link',a_node).click(
+            function(a_event)
+            {
+                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);   
+            }
+        );
+        
+        Alph.$("#alph-word-tools",a_node).append('<div class="alph-tooltip"/>');
+        Alph.$('#alph-word-tools a',a_node).hover(
+            function()
+            {
+                Alph.$(this).after(
+                    '<span class="alph-tooltip">' + this.getAttribute('title') + '</span>');                      
+            },
+            function()
+            {
+                Alph.$(this).next('.alph-tooltip').remove();                      
+            }
+        );
+    }   
 }

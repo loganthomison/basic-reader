@@ -386,22 +386,10 @@ Alph.xlate = {
                 // add language-specific click handler, if any
                 Alph.main.getLanguageTool().contextHandler(a_doc);
         
-                // add language-specific dictionary link, if any
-                if (! Alph.main.panels['alph-dict-panel'].
-                        is_visible_inline(Alph.main.getCurrentBrowser()))
-                {
-                    Alph.$("#alph-text",a_doc).append(
-                        Alph.main.getLanguageTool().getDictionaryLink()
-                    );
-                    // TODO the dictionary handler should be dinfed in Alph.Dict
-                    // rather than here. also doesn't work from a detached window yet.
-                    Alph.$('#alph-text .alph-dict-link',a_doc).click(
-                        function(a_event)
-                        {
-                            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);   
-                        }
-                    );
-                }                
+                Alph.$("#alph-text",a_doc).prepend('<div id="alph-word-tools"/>');
+                Alph.main.getLanguageTool().add_word_tools(
+                    Alph.$("#alph-text",a_doc),
+                    a_alphtarget);                
             }
         );
 

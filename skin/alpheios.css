@@ -273,3 +273,29 @@ div.alph-morph {
 .alph-dict-link:hover {
    color: #5BC8DC !important;
 }
+
+#alph-word-tools {
+    position: relative;
+}
+
+#alph-word-tools img {
+    border: none;
+    padding: 0 3px;
+}
+
+#alph-word-tools a {
+    text-decoration: none;
+}
+
+#alph-word-tools a:hover img {
+    border: 1px solid #5BC8DC;
+}
+
+.alph-tooltip {
+    font-size: small;
+    background-color: #5BC8DC;
+    border: 1px solid #B8B7B5;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+}

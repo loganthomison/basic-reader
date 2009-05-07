@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://alpheios/content/bindings.css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/alph-panel-window.css"?>
 
  
 <!DOCTYPE window [

@@ -41,13 +41,6 @@
                 <label id="alph-morph-label" 
                        value="&alpheios-morph-toolbar-label;"/>
             </toolbaritem>
-            <toolbarbutton 
-                id="alpheios-morph-inflection" 
-                class="toolbarbutton-class"
-                label="&alpheios-tools-inflect-label;" 
-                tooltiptext="&alpheios-tools-inflect-label;"
-                type="button"
-                command="alpheios-morph-inflect-cmd"/>
             <browser
                 id="alph-morph-body"
                 flex="1"
