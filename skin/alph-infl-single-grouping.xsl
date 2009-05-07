@@ -48,10 +48,8 @@
          used for adjectives or other parts of speech -->
     <xsl:param name="match_pofs" select="'noun'"/>
     
-    <!-- optional parameter to indicate the matching is at the form level
-        rather than on the endings only 
-    -->
-    <xsl:param name="match_form" select="false()"/>
+    <!-- optional parameter to supply a form to match on rather than endings-->
+    <xsl:param name="match_form"/>
     
     
     <!-- Flag to request that endings be deduped according to a specific
@@ -64,8 +62,6 @@
     -->
     <xsl:param name="show_only_matches" select="false()"/>
         
-    <!--xsl:param name="form" select="'Μοῦσα'"/-->
-    
     <!-- debug -->
     <xsl:param name="test_endings">
         <!--
@@ -205,7 +201,9 @@
                                         <xsl:with-param name="selected_endings" select="$selected_endings"/>
                                         <xsl:with-param name="current_data" select="." />
                                         <xsl:with-param name="match_pofs" select="$match_pofs"/>
-                                        <xsl:with-param name="match_form" select="$match_form"/>
+                                        <xsl:with-param name="match_form">
+                                            <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
+                                        </xsl:with-param>
                                         <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                
                                     </xsl:call-template>
                                 </xsl:variable>                                           
@@ -293,7 +291,9 @@
                             <xsl:with-param name="current_data" select="$celldata" />
                             <xsl:with-param name="selected_endings" select="$selected_endings"/>
                             <xsl:with-param name="match_pofs" select="$match_pofs"/>
-                            <xsl:with-param name="match_form" select="$match_form"/>
+                            <xsl:with-param name="match_form">
+                                <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
+                            </xsl:with-param>                            
                             <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                                            
                         </xsl:call-template>
                     </xsl:variable>

@@ -17,11 +17,15 @@
                 (span[(contains(@class,'alph-pofs') and @context = $match_pofs)])
                 ]
                 ">
-                <xsl:message>Found selected</xsl:message>
                 <xsl:variable name="match_text">
                     <xsl:choose>
-                        <xsl:when test="$match_form"> <!-- match the form -->
-                            <xsl:value-of select="@context"/>                
+                        <xsl:when test="$match_form != ''"> 
+                            <!-- match the originally selected form 
+                                 it must be the form from context of the word, which 
+                                 is the user's selected form, as the context on
+                                 the inflection set is the stem+suffix which may not
+                                 be exactly the same (See Bug 152)-->
+                            <xsl:value-of select="$match_form"/>                
                         </xsl:when>
                         <!-- empty suffixes are matched with _ -->
                         <xsl:when test="span[contains(@class,'alph-term')]/span[contains(@class,'alph-suff') and not(text())]">_</xsl:when>
@@ -44,7 +48,6 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:message>Matching on <xsl:value-of select="$stripped_match_text"/></xsl:message>
                 <xsl:variable name="possible">
                     <xsl:for-each select="div[@class='alph-infl']">
                         <xsl:variable name="fail_infl_constraint">
