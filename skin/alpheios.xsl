@@ -265,13 +265,15 @@
         </xsl:choose>
         <xsl:choose>
           <xsl:when test="decl">
-            <xsl:call-template name="declension">
+            <xsl:call-template name="item-plus-text-plus-context">
               <xsl:with-param name="item" select="decl"/>
+              <xsl:with-param name="suffix" select="' declension'"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="../infl[1]/decl">
-            <xsl:call-template name="declension">
+            <xsl:call-template name="item-plus-text-plus-context">
               <xsl:with-param name="item" select="../infl[1]/decl"/>
+              <xsl:with-param name="suffix" select="' declension'"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
@@ -721,48 +723,6 @@
         </xsl:choose>
       </xsl:if>
     </span>
-  </xsl:template>
-
-  <!-- declensions -->
-  <!-- turn "x" into "x declension" -->
-  <!-- turn "x & y" into "x" & "y declension" -->
-  <xsl:template name="declension">
-    <xsl:param name="item"/>
-    <xsl:for-each select="$item">
-      <xsl:choose>
-        <!-- if x & y -->
-        <xsl:when test="contains(., ' &amp; ')">
-          <!-- create x -->
-          <xsl:variable name="first">
-            <decl>
-              <xsl:value-of select="substring-before(., ' &amp; ')"/>
-            </decl>
-          </xsl:variable>
-          <xsl:call-template name="item-plus-text-plus-context">
-            <xsl:with-param name="item" select="exsl:node-set($first)"/>
-            <xsl:with-param name="name" select="'decl'"/>
-          </xsl:call-template>
-          <xsl:text>&amp; </xsl:text>
-          <!-- create x -->
-          <xsl:variable name="second">
-            <decl>
-              <xsl:value-of select="substring-after(., ' &amp; ')"/>
-            </decl>
-          </xsl:variable>
-          <xsl:call-template name="item-plus-text-plus-context">
-            <xsl:with-param name="item" select="exsl:node-set($second)"/>
-            <xsl:with-param name="name" select="'decl'"/>
-            <xsl:with-param name="suffix" select="' declension'"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="item-plus-text-plus-context">
-            <xsl:with-param name="item" select="."/>
-            <xsl:with-param name="suffix" select="' declension'"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
   </xsl:template>
 
   <!-- item plus leading/trailing text -->
