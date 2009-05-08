@@ -245,8 +245,9 @@
         <xsl:with-param name="suffix" select="'] '"/>
       </xsl:call-template>
 
-      <!-- Note:  Only one of case, gender, or kind can appear, depending on part of speech,
-      therefore we can pass all through a single parameter -->
+      <!-- Note:  Only one of case, gender, or kind can appear,
+           depending on part of speech, therefore we can pass all
+           through a single parameter -->
       <xsl:element name="div">
         <xsl:attribute name="class">alph-morph</xsl:attribute>
         <xsl:choose>
@@ -263,17 +264,27 @@
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
+        <xsl:variable name="pofs">
+          <xsl:choose>
+            <xsl:when test="pofs">
+              <xsl:value-of select="pofs"/>
+            </xsl:when>
+            <xsl:when test="../infl[1]/pofs">
+              <xsl:value-of select="../infl[1]/pofs"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:variable>
         <xsl:choose>
           <xsl:when test="decl">
-            <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:call-template name="declension">
               <xsl:with-param name="item" select="decl"/>
-              <xsl:with-param name="suffix" select="' declension'"/>
+              <xsl:with-param name="pofs" select="$pofs"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="../infl[1]/decl">
-            <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:call-template name="declension">
               <xsl:with-param name="item" select="../infl[1]/decl"/>
-              <xsl:with-param name="suffix" select="' declension'"/>
+              <xsl:with-param name="pofs" select="$pofs"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
@@ -725,6 +736,66 @@
     </span>
   </xsl:template>
 
+  <!-- declensions -->
+  <!-- turn "x" into "x declension" -->
+  <!-- turn "x & y" into "x" & "y declension" -->
+  <xsl:template name="declension">
+    <xsl:param name="item"/>
+    <xsl:param name="pofs"/>
+
+    <!-- append '_adjective' to context if adjective, else no suffix -->
+    <xsl:variable name="context-suffix">
+      <xsl:choose>
+        <xsl:when test="$pofs = 'adjective'">
+          <xsl:value-of select="'_adjective'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="''"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:for-each select="$item">
+      <xsl:choose>
+        <!-- if x & y -->
+        <xsl:when test="contains(., ' &amp; ')">
+          <!-- create x -->
+          <xsl:variable name="first">
+            <decl>
+              <xsl:value-of select="substring-before(., ' &amp; ')"/>
+            </decl>
+          </xsl:variable>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="exsl:node-set($first)"/>
+            <xsl:with-param name="name" select="'decl'"/>
+            <xsl:with-param name="context-suffix" select="$context-suffix"/>
+          </xsl:call-template>
+          <xsl:text>&amp; </xsl:text>
+          <!-- create y -->
+          <xsl:variable name="second">
+            <decl>
+              <xsl:value-of select="substring-after(., ' &amp; ')"/>
+            </decl>
+          </xsl:variable>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="exsl:node-set($second)"/>
+            <xsl:with-param name="name" select="'decl'"/>
+            <xsl:with-param name="suffix" select="' declension'"/>
+            <xsl:with-param name="context-suffix" select="$context-suffix"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="."/>
+            <xsl:with-param name="name" select="'decl'"/>
+            <xsl:with-param name="suffix" select="' declension'"/>
+            <xsl:with-param name="context-suffix" select="$context-suffix"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
   <!-- item plus leading/trailing text -->
   <!-- use name of item as class -->
   <!-- use value of item as context, if requested -->
@@ -733,6 +804,8 @@
     <xsl:param name="name"/>
     <xsl:param name="prefix" select="''"/>
     <xsl:param name="suffix" select="''"/>
+    <xsl:param name="context-prefix" select="''"/>
+    <xsl:param name="context-suffix" select="''"/>
     <xsl:for-each select="$item">
       <xsl:variable name="item-name">
         <xsl:choose>
@@ -744,7 +817,11 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <span class="alph-{$item-name}" context="{translate(.,' ','_')}">
+      <xsl:variable name="item-context">
+        <xsl:value-of select="concat($context-prefix, ., $context-suffix)"/>
+      </xsl:variable>
+      <span class="alph-{$item-name}"
+            context="{translate($item-context,' ','_')}">
         <xsl:value-of select="$prefix"/>
         <xsl:value-of select="."/>
         <xsl:value-of select="$suffix"/>
