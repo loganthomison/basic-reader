@@ -53,8 +53,8 @@ Alph.Tree.prototype.get_detach_chrome = function()
     return 'chrome://alpheios/content/alpheios-tree-window.xul';
 };
 
-/** 
- * Tree panel specific implementation of 
+/**
+ * Tree panel specific implementation of
  * {@link Alph.Panel.#init}
  */
 Alph.Tree.prototype.init = function()
@@ -171,15 +171,15 @@ Alph.Tree.prototype.show = function()
 
 
 /**
- * Tree specific implementation of 
+ * Tree specific implementation of
  * {@link Alph.Panel.observe_ui_event}
  * @param {Browser} a_bro the current browser
  * @param a_event_type the event type (one of @link Alph.main.events)
  * @param a_event_data optional event data object
  */
 Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
-{       
-    // listen for the window and the xlate trigger change events 
+{
+    // listen for the window and the xlate trigger change events
     if (a_event_type == Alph.main.events.UPDATE_XLATE_TRIGGER)
     {
         Alph.util.log("Tree panel handling event " + a_event_type);
@@ -210,7 +210,7 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             pw_bro.addEventListener(new_trigger, Alph.main.doXlateText,false);
         }
     }
-    if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW) 
+    if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW)
     {
         this.open();
         var trigger = Alph.main.getXlateTrigger();
@@ -218,7 +218,7 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             .Alph.$("#" + this.panel_id + " browser")
             .get(0)
             .addEventListener(trigger, Alph.main.doXlateText,false);
-    }    
+    }
     return;
 };
 
@@ -248,6 +248,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
         var textSize = Alph.Tree.position_text(treeDoc, maxWidth, fontSize);
         Alph.Tree.position_all(treeDoc, treeSize, textSize, keySize, fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+        Alph.Tree.highlight_first(treeDoc, a_id);
         Alph.Tree.highlight_word(treeDoc, a_id);
 //        Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
@@ -311,7 +312,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
                 );
             }
         });
-                
+
     }
     catch(e)
     {
@@ -322,7 +323,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
 };
 
 /**
- * Update a browser in the detached panel window with the current 
+ * Update a browser in the detached panel window with the current
  * state of that browser the real (attached) panel
  * @param {Object} a_panel_state the panel state object
  * @param {String} a_browser_id the id of the browser to update
@@ -353,11 +354,11 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                     .get(0).setAttribute("width",panel_tree.getAttribute("width"));
                 Alph.$("#dependency-tree", window_doc)
                     .get(0).setAttribute("height",panel_tree.getAttribute("height"));
-            
+
                 // resize the panel window according to the dimensions of the svg diagram
-                try 
+                try
                 {
-                    var w = parseInt(panel_tree.getAttribute("width")); 
+                    var w = parseInt(panel_tree.getAttribute("width"));
                     var h = parseInt(panel_tree.getAttribute("height"));
                     this.resize_panel_window(w,h);
                 }
@@ -365,7 +366,7 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                 {
                     Alph.util.log("Error parsing window size: " + a_e);
                 }
-            
+
                 this.panel_window.focus();
             }
          } catch(a_e)
@@ -538,7 +539,7 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
             this.setAttribute("height", textHeight);
         }
     )
-    
+
     return Array(size, xCenter, textWidth);
 };
 
@@ -665,8 +666,6 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
 
         // position text
         var thisText = texts.get(i);
-		if (thisText.getAttribute("class") == "heading")
-			thisText.setAttribute("dy", -a_fontSize / 2);
         var thisWidth = thisText.getComputedTextLength();
         thisText.setAttribute("x", a_fontSize);
         thisText.setAttribute("y", y + a_fontSize);
@@ -683,7 +682,7 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
                 "translate(" + a_fontSize + "," + a_fontSize + ")");
         }
     );
-      
+
     bound.each(
         function()
         {
@@ -691,10 +690,10 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
             this.setAttribute("y", 0);
             this.setAttribute("width", width);
             this.setAttribute("height", y);
-        
+
         }
     );
-    
+
     return Array(width, y);
 };
 
@@ -732,7 +731,7 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
         else if (thisClass == "key")
         {
             // position key below tree, slightly indented
-            thisTransform = 
+            thisTransform =
                 "translate(" + a_fontSize + "," +
                                (a_textSize[1] + a_treeSize[1]) + ")";
         }
@@ -795,13 +794,13 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
                 thisNode.find("line").each(
                     function()
                     {
-                        this.setAttribute("showme", "normal");      
+                        this.setAttribute("showme", "normal");
                     }
                 );
                 thisNode.find("rect").each(
                     function()
                     {
-                        this.setAttribute("showme", "normal");      
+                        this.setAttribute("showme", "normal");
                     }
                 );
             }
@@ -820,7 +819,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
             thisNode.find("text").each(
                 function()
                 {
-                    this.setAttribute("showme", "grayed");      
+                    this.setAttribute("showme", "grayed");
                 }
             );
         }
@@ -829,14 +828,14 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
             thisNode.find("line").each(
                 function()
                 {
-                    this.setAttribute("showme", "grayed");        
+                    this.setAttribute("showme", "grayed");
                 }
             );
-            
+
             thisNode.find("rect").each(
                 function()
                 {
-                    this.setAttribute("showme", "grayed");      
+                    this.setAttribute("showme", "grayed");
                 }
             );
         }
@@ -849,25 +848,25 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     focusNode.children("text").each(
         function()
         {
-            this.setAttribute("showme", "focus-child");      
+            this.setAttribute("showme", "focus-child");
         }
     );
     focusNode.children("text:first").each(
         function()
         {
-            this.setAttribute("showme", "focus");      
+            this.setAttribute("showme", "focus");
         }
     );
     focusNode.children("rect").each(
         function()
         {
-            this.setAttribute("showme", "focus");     
+            this.setAttribute("showme", "focus");
         }
     );
     focusNode.children("line").each(
         function()
         {
-            this.setAttribute("showme", "focus-child");     
+            this.setAttribute("showme", "focus-child");
         }
     );
     //   descendant words at all levels
@@ -881,7 +880,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     descendants.children("line").each(
         function()
         {
-            this.setAttribute("showme", "focus-descendant");          
+            this.setAttribute("showme", "focus-descendant");
         }
     )
     descendants.children("text").each(
@@ -907,15 +906,15 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     });
     //   label on parent word
     //   line and label from parent word
-     if (focusNode.parent().get(0).getAttribute("class") == "tree-node")
+    if (focusNode.parent().get(0).getAttribute("class") == "tree-node")
     {
         focusNode.parent().children("text:first").each(
             function()
             {
-                this.setAttribute("showme", "focus-parent");        
+                this.setAttribute("showme", "focus-parent");
             }
         );
-            
+
         focusNode.parent().children("rect").each(
             function() { this.setAttribute("showme", "focus-parent"); }
         );
@@ -927,7 +926,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
         });
     }
 
-    // set highlights on text words below tree
+    // set highlights on text words
     Alph.Tree.highlight_text_word(a_doc, a_id, "focus");
     Alph.Tree.highlight_text_word(a_doc,
                                   focusNode.parent().get(0).getAttribute("id"),
@@ -963,5 +962,35 @@ Alph.Tree.highlight_text_word = function(a_doc, a_id, a_focus)
         {
             this.setAttribute("showme", a_focus);
         }
+    });
+};
+
+/**
+ * Highlight initial word in the tree
+ *
+ * @param a_doc the document
+ * @param {String} a_id id of word in tree
+ */
+Alph.Tree.highlight_first = function(a_doc, a_id)
+{
+    // find node of interest
+    var focusNode = Alph.$("#" + a_id, a_doc);
+
+    // if no id or bad id
+    if (focusNode.size() == 0)
+        return;
+
+    // set attribute in tree
+    focusNode.children("text:first").each(
+        function() { this.setAttribute("first", "yes"); });
+    focusNode.children("rect").each(
+        function() { this.setAttribute("first", "yes"); });
+
+    // set attribute in text
+    Alph.$("rect", a_doc).each(
+    function()
+    {
+        if (this.getAttribute('tbref') == a_id)
+            this.setAttribute("first", "yes");
     });
 };
