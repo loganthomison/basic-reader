@@ -117,20 +117,33 @@
                             '|')"/>
                             <!-- make sure that we match the 'common' gender for 
                                  endings which are either masculine or feminine
-                            -->
-                            
+                            -->                            
                         <xsl:if test="contains($current_data/@gend, 'masculine') or
                             contains($current_data/@gend,'feminine')">|common|
                         </xsl:if>
                     </xsl:if>
                 </xsl:variable>
+                <xsl:variable name="match_decl">
+                    <xsl:if test="$current_data/@decl">
+                        <xsl:value-of select="
+                            concat(
+                            '|',
+                            translate($current_data/@decl,' ','|'),
+                            '|')"/>
+                    </xsl:if>
+                </xsl:variable>
+                
                 <xsl:choose>
-                    <xsl:when test="($filtered_data/../..//span[contains(@class,'alph-decl') 
-                        and contains(@context,$current_data/@decl)]) or not($current_data/@decl)">
+                    <xsl:when test="not($current_data/@decl) or
+                            ($filtered_data/../..//span[contains(@class,'alph-decl') 
+                            and contains($match_decl,
+                            concat('|',substring-before(@context,'_'),'|'))])">
                         <xsl:value-of select="count($filtered_data//span[contains(@class,'alph-case')
                             and ($match_case = '' or contains($match_case,concat('|',substring-before(@context,'-'),'|')))
                             and (@alph-pofs = $match_pofs)
-                            and ($match_gend = '' or contains($match_gend,concat('|',@alph-gend,'|')))
+                            and ($match_gend = '' or 
+                                contains($match_gend,concat('|',@alph-gend,'|'))
+                                or @alph-gend = 'all')
                             and ($match_num = '' or contains($match_num,concat('|',@alph-num,'|')))
                             ])"/>        
                     </xsl:when>
