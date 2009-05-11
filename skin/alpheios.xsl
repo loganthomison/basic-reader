@@ -74,11 +74,7 @@
             <xsl:apply-templates select="."/>
           </xsl:for-each>
 
-          <!-- process inflected forms -->
-          <xsl:if test="infl">
-            <!-- one label for all forms -->
-            <div class="alpheios-label">Form(s):</div>
-          </xsl:if>
+          <xsl:variable name="infl_sets">
           <!-- process all forms having no dialect -->
           <xsl:for-each select="infl[not(dial)]">
             <xsl:sort select="term/stem"/>
@@ -177,7 +173,16 @@
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
-
+          </xsl:variable>
+          
+          <!-- process inflected forms -->
+          <xsl:if test="$infl_sets != ''">
+            <!-- one label for all forms -->
+            <div class="alpheios-label">Form(s):</div>
+            <xsl:copy-of select="$infl_sets"/>
+          </xsl:if>
+          
+          
         </div>
       </xsl:for-each>
       <!-- end for each entry -->
