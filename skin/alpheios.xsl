@@ -75,6 +75,10 @@
           </xsl:for-each>
 
           <!-- process inflected forms -->
+          <xsl:if test="infl">
+            <!-- one label for all forms -->
+            <div class="alpheios-label">Form(s):</div>
+          </xsl:if>
           <!-- process all forms having no dialect -->
           <xsl:for-each select="infl[not(dial)]">
             <xsl:sort select="term/stem"/>

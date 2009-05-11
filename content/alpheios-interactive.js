@@ -74,7 +74,7 @@ Alph.interactive = {
         {
             lang_tool: lang_tool,
             main_str: str,
-            source_node: Alph.$(".alph-word",a_topdoc).get(0),
+            source_node: Alph.$("#alph-window #alph-text",a_topdoc).get(0),
             source_align: source_align || [],
             transform: Alph.xlate.transform,
 
@@ -116,28 +116,8 @@ Alph.interactive = {
             // hide the popup - but don't call hidePopup because that resets
             // state which we might need
             Alph.$("#alph-window",a_topdoc).css("display","none");
-            params.type = 'full_query';
-                
-            var sentence = 
-                Alph.$.map(
-                    Alph.$('.alpheios-aligned-word',a_topdoc),
-                    function(a) { return Alph.$(a).text() })
-                .join(' ');
-            Alph.util.log("Sentence: " + sentence);
-    
-            params.sentence = sentence;
-            
-            Alph.util.log("Sentence: " + params.sentence);
-    
-            params.target= new Alph.SourceSelection();
-            params.target.setWord(sentence);
-            params.target.setWordStart(0);
-            params.target.setWordEnd(sentence.length -1);
-            params.target.setContext(sentence);
-            params.target.setContextPos(0);
-            lang_tool.handleConversion(params.target);
-    
-            Alph.util.log("Target: " + params.target.getWord());
+            params.type = 'full_query';    
+            params.target= a_target;
             this.openQueryWindow(params);
         }
      },

@@ -24,7 +24,7 @@
 
     <hbox id="alph-query-box-outer" 
           flex="100" persist="height" collapsed="false">
-        <iframe id="alph-query-frame" 
+        <browser id="alph-query-frame" 
                 src="chrome://alpheios/content/html/alph-panel.html" flex="1"/>
     </hbox>
 </window>

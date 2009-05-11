@@ -55,17 +55,21 @@ Alph_Inter =
         Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
           .getService(Components.interfaces.mozIJSSubScriptLoader)
           .loadSubScript(template_src,this.query_template);
-
         this.main_str = params.main_str;
         this.load_query_head(params);
         
         if (params.type == 'full_query')
         {
-            this.do_full_query(params);
+            this.add_pofs_query(params);
+            this.add_defs_query(params);
         }
         else if (params.type == 'infl_query')
         {
-            this.do_infl_query(params);
+            var query_doc = $("#alph-query-frame").get(0).contentDocument;
+            this.add_pofs_query(params);
+            this.on_defs_correct(
+                params.aligned_defs.join(' '),params.source_node,$(".alph-query-element",query_doc));
+            $('.alph-query-defs',query_doc).css('display','block');
         }
      },
 
@@ -85,10 +89,10 @@ Alph_Inter =
             '<link type="text/css" rel="stylesheet" href="' + lang_css_url + '"/>'            
         );
         
-        var src_context = $(a_params.source_node).attr('context');
+        var src_context = $(".alph-word",a_params.source_node).attr('context');
         var query_html = 
             '<div class="alph-query-context">' + src_context + '</div>' +
-            '<div class="alph-query-element">' +
+            '<div class="alph-query-element">' + 
             '  <div class="alph-query-pofs">\n' +
             '    <div class="alph-query-header">' +
                 this.main_str.getFormattedString("alph-query-pofs",[src_context]) +
@@ -101,37 +105,23 @@ Alph_Inter =
             '  </div>\n' +
             '<div class="alph-query-infl" style="display:none;">' +
             '    <div class="alph-query-header">' +
-               this.main_str.getString("alph-query-infl") +
+               this.main_str.getFormattedString("alph-query-infl",[src_context]) +
+            '    </div>\n' +
+            '    <div class="alph-query-hint">' + 
+               this.main_str.getFormattedString("alph-query-infl-hint",[src_context]) +
             '    </div>\n' +
             '    <div class="answer"/>' +
             '  </div>\n' +
-            '</div>';
+            '</div>\n';
         $("#alph-panel-body-template",query_doc).after(query_html);
         $("#alph-panel-body-template",query_doc).css('display','none');
+        //TODO the tools aren't working here yet, but not sure if we're
+        // keeping them on this display 
+        var tools = $("#alph-word-tools",a_params.source_node).clone(true);
+        $(".alph-query-context",query_doc).prepend(tools);
      },
      
-     do_infl_query: function(a_params)
-     {
-
-        var query_doc = 
-            $("#alph-query-frame").get(0).contentDocument;
-
-        var valid_pofs = $('.alph-pofs',a_params.source_node).attr('context');
-        
-        $('.alph-query-pofs',query_doc)
-                    .append('<div class="answer">' + valid_pofs + '</div>');
-        
-        $('.alph-query-defs',query_doc)
-            .append('<div class="answer">' 
-                + a_params.aligned_defs.join(' ')
-                + '</div>').css('display','block');
-        
-        $('.alph-query-infl',query_doc).css('display','block');
-        
-        this.load_query_infl(a_params.source_node);        
-     },
-     
-     do_full_query: function(a_params)
+     add_pofs_query: function(a_params)
      {
         var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
@@ -164,7 +154,13 @@ Alph_Inter =
                 return true;
             }
         );
-        
+    },
+    
+    add_defs_query: function(a_params)
+    {
+         var query_doc = 
+            $("#alph-query-frame").get(0).contentDocument;
+            
         var select_defs = 
             '<div class="loading">' +
             this.main_str.getString('alph-loading-misc') +
@@ -181,8 +177,6 @@ Alph_Inter =
                 return true;
             }
         );
-        
-        this.load_query_short_defs(a_params, valid_pofs);
     },
     
     /**
@@ -195,15 +189,9 @@ Alph_Inter =
         var selected_value = a_select.options[a_select.selectedIndex].value;
         var selected_text = a_select.options[a_select.selectedIndex].text;
         var query_parent = $(a_select).parents('.alph-query-element').get(0); 
-        if (selected_value == $(a_src_node).attr('context') ||
-            selected_text == $('.alph-mean',a_src_node).text()
-            )
-        {
-            $(a_select).css('display','none');
-            $('.alph-query-defs',query_parent)
-                .append('<div class="answer">' + selected_text + '</div>');
-            
-            $('.alph-query-infl',query_parent).css('display','block');
+        if (selected_value == 'correct')
+        {            
+            this.on_defs_correct(selected_text,a_src_node,query_parent);
             this.load_query_infl(a_src_node);
          }
          else
@@ -214,6 +202,28 @@ Alph_Inter =
             // TODO - need to check and handle scenario when only correct answer is left
          }
     },
+    
+    /**
+     * function called once the user has correctly identified the definition
+     */
+    on_defs_correct: function(a_answer,a_src_node,a_query_parent)
+    { 
+        $('.alph-query-defs select',a_query_parent).css('display','none');
+        $('.alph-query-defs .alph-query-header',a_query_parent)
+            .text(this.main_str.getString("alph-query-defs-correct"));
+        $('.alph-query-defs',a_query_parent)
+                .append('<div class="answer">' + a_answer + '</div>');
+                
+        var dict_link = $("#alph-word-tools .alph-dict-link",a_src_node).clone(true);
+        var short_def_label = this.main_str.getString("alph-short-definition");
+        $(".alph-query-defs",a_query_parent).append('<div class="alph-query-dict"/>');
+        $(".alph-query-dict",a_query_parent).append(
+                dict_link,
+                '<div class="alpheios-label">' + short_def_label + '</div>',
+                $(".alph-hdwd",a_src_node).clone(true),
+                $(".alph-mean",a_src_node).clone(true));
+    },
+    
     /**
       * checks whether the part of speech selection is correct
       * @param {HTMLSelect} a_select the containing Select element
@@ -229,9 +239,26 @@ Alph_Inter =
         if (selected_value == answer)
         {
             $(a_select).css('display','none');
+            
+            $('.alph-query-pofs .alph-query-header',query_parent)
+                .text(this.main_str.getString("alph-query-pofs-correct"));
+
             $('.alph-query-pofs',query_parent)
                     .append('<div class="answer">' + selected_value + '</div>');
-            $('.alph-query-defs',query_parent).css('display','block');
+            // if the definitions part is already displayed,  move on to the inflections
+            if ( $(".alph-query-defs .answer",query_parent).length == 1)
+            {
+                this.load_query_infl(a_src_node);
+            }
+            else
+            {
+                $('.alph-query-defs',query_parent).css('display','block');
+                // execute the call to load the query definitions in a thread
+                // because it can take a little while .. postpone the call
+                // by a few milliseconds so the loading message has time to
+                // display
+                setTimeout(Alph_Inter.load_query_context_defs,50);
+            }
         }
         else
         {
@@ -244,89 +271,153 @@ Alph_Inter =
      },
 
      /**
-      * query short definitions
-      * @param {Object} a_params the window parameters
-      * @param {String} a_pofs the correct part of speech
+      * Load the contextual definitions (from the alignment) for the selected word
+      * This should be called in a separate thread, as it may take a little while to 
+      * process the aligned sentence.
       */
-     load_query_short_defs: function(a_params,a_pofs)
+     load_query_context_defs: function()
      {
-        var my_obj = this;
-        
-        var doc = $("#alph-query-frame").get(0).contentDocument;
-        
-        a_params.lang_tool.lexiconLookup( 
-            a_params.target,
-            function(a_xml)
-            {
-                var result_html = a_params.transform(a_xml);
-                
-                // handle empty results
-                if ( (result_html == '')
-                    || (($(".alph-entry",result_html).size() == 0)
-                    && ($(".alph-unknown",result_html).size() == 0)
-                    && ($(".alph-error",result_html).size() == 0)))
-                    
+        var a_params = window.arguments[0];
+        var a_pofs = $('.alph-pofs',a_params.source_node).attr('context');
+        // Load the aligned translation translation document 
+        // if it hasn't already been loaded for this document
+        // can't use jQuery for ajax request because the document
+        // might be in the chrome
+        if ($("#alpheios-context-defs",a_params.source_node.ownerDocument).length == 0)
+        {
+            // add container for the alignment data to the source document
+            $("body",a_params.source_node.ownerDocument)
+                    .append('<div id="alpheios-context-defs" style="display:none;"/>');
+            var align_doc = 
+                window.opener.
+                Alph.site.load_alignment(a_params.source_node.ownerDocument,
+                function(a_align_doc)
                 {
-                        // TODO - handle empty query results
+                    $(".alpheios-aligned-word",a_align_doc).each
+                    (   
+                        function()
+                        {
+                            // clone the aligned word elements,
+                            // and move their ids to a new attribute
+                            // to avoid clashing with any ids in the source
+                            // document
+                            var new_elem = $(this).clone();
+                            var old_id = $(new_elem).attr('id');
+                            $(new_elem).attr('alph-align-id',old_id);
+                            $(new_elem).attr('id','');
+                            $("#alpheios-context-defs",a_params.source_node.ownerDocument)    
+                            .append(new_elem);
+                        }
+                    );
+                    Alph_Inter.display_context_defs(a_params,a_pofs);
+                },
+                function(a_error)
+                {
+                    
+                    Alph_Inter.display_context_defs(a_params,a_pofs);
                 }
-                else
-                {
-                    $(".alph-query-defs .loading",doc).css('display','none');
-                    a_params.lang_tool.postTransform(result_html);
-                    
+            );
+        }
+        else
+        {
+            Alph_Inter.display_context_defs(a_params,a_pofs)
+        }
+        
+    },                        
 
-                    var words = $("div.alph-word",result_html).get();
-                    
-                    // HACK to add some test definitions to the list for now
-                    // TODO figure out exactly where the definitions should come from
-                    var test_defs = my_obj.query_template.TEMPLATE[a_pofs].test_defs;
-                    if (typeof test_defs == "undefined")
-                    {
-                        test_defs = []
-                    }
-                    
-                    test_defs.forEach(
-                        function(a_def)
-                        {
-                            words.push(a_def);
-                        }
-                            
-                    );
-                    //END HACK
-                    
-                    // TODO - unique isn't working here
-                    var unique_words = $.unique(words);
-                    unique_words.sort( Alph_Inter.sort_random ); 
-                       
-                    unique_words.forEach(
-                        function(a_word)
-                        {
-                            var pofs = $('.alph-pofs',a_word).attr('context')
-                                || a_pofs;
-                            if (pofs == a_pofs)
-                            {
-                                var context = $(a_word).attr("context") || a_word;
-                                var mean = $('.alph-mean',a_word).text() || a_word;
-                                if (mean != '')
-                                {
-                                    $(".alph-defs-select",doc).append(
-                                        '<option value="' + 
-                                        context +
-                                        '">' + 
-                                        mean +
-                                        '</option>'
-                                    );
-                                }
-                            }
-                        }
-                    );
+    display_context_defs: function(a_params,a_pofs)
+    {
+        var query_doc = $("#alph-query-frame").get(0).contentDocument;
+        var src_doc = a_params.source_node.ownerDocument;
+        var defs = [];
+        // if we can't find any contextual definitions, just 
+        // hide the query and display the short definition
+        if ($("#alpheios-context-defs .alpheios-aligned-word",src_doc).length > 0)
+        {
+            var correct = [];
+        
+            a_params.source_align.forEach(
+                function(a_id)
+                {
+                    correct.push( 
+                        $("#alpheios-context-defs .alpheios-aligned-word[alph-align-id=" +
+                        a_id + "]",src_doc).text()
+                    );                      
                 }
-            },
-            function(a_msg)
-            {       
-                $('.alph-defs-select',doc).after('<div class="error">' + a_msg + "</div>");
+            );
+        
+            defs.push('<option value="correct">' + correct.join(' ') + '</option>');
+            
+            try 
+            {
+                var src_word = 
+                    $(a_params.target.getRangeParent()).parents('.alpheios-aligned-word')
+                    .get(0);
+                var s_num = src_word.id.match(/^(s(\d+)_)/)[1];
+                
+                var incorrect = [];
+                // get the rest of the words from selected sentence and their 
+                // alignments to use as incorrect choices
+                $(".alpheios-aligned-word[id ^= "+ s_num + "]",src_doc).each(
+                    function()
+                    {
+                        if ((this.id != src_word.id) && $(this).attr("nrefs"))
+                        {
+                            var choice = [];
+                            $(this).attr("nrefs").split(/\s|,/).forEach(
+                                function(a_id)
+                                {
+                                    choice.push(
+                                      $("#alpheios-context-defs " + 
+                                        ".alpheios-aligned-word[alph-align-id=" +a_id + "]",src_doc)
+                                        .text());
+                                }
+                            );
+                            incorrect.push('<option value="incorrect">' + choice.join(' ') + '</option>'); 
+                        }
+                    }
+                );
+                incorrect.sort(Alph_Inter.sort_random);
+                var max = 4;
+                if (incorrect.length < max)
+                {
+                    max = incorrect.length;
+                }
+                defs = defs.concat(incorrect.slice(0,max)).sort(Alph_Inter.sort_random);
+                
             }
-        );
+            catch(a_e)
+            {
+                //alert("Can't find aligned defs:" + a_e);
+            }
+        }            
+        
+        if (defs.length > 0)
+        {
+            defs.forEach(
+                function(a_opt)
+                {
+                    $(".alph-defs-select",query_doc).append(a_opt);
+                }
+            );
+        }
+        else
+        {
+            // if we can't come up with a list of choices for the definition
+            // show the correct answer (if we have it, or an error if not)
+            var answer = '';
+            if (defs.length == 1 && defs[0].indexOf('value="correct"') > 0)
+            {
+                answer = defs[0].match(/>(.*?)</)[1];
+            }
+            else
+            {
+                answer = this.main_str.getString("alph-query-defs-not-found");
+            }
+            this.on_defs_correct(answer,a_params,$(".alph-query-element",query_doc));
+        }
+        $(".alph-query-defs .loading",query_doc).remove();
+        
     },
     
     /**
@@ -337,6 +428,7 @@ Alph_Inter =
     {
 
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
+        $('.alph-query-infl',parent_doc).css('display','block');
         var pofs = $('.alph-pofs',a_src_node).attr('context');
         var decls = [];
         $('.alph-decl',a_src_node).each(
@@ -397,15 +489,20 @@ Alph_Inter =
         // treebanked text there should only be one set, but we may eventually
         // need to handle the case where more the one possible answer exists
         // for other uses
-        Alph_Inter.query_template.make_infl_query(
+        var has_infl_query = Alph_Inter.query_template.make_infl_query(
                 $(".alph-query-element",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
-                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-',
+                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-', 
                    attributes: context_list[0]
                 },
-                Alph_Inter.on_infl_correct
+                function() { Alph_Inter.on_infl_correct(a_src_node) }
             );
+        if (! has_infl_query)
+        {
+            this.on_infl_correct(a_src_node,
+                this.main_str.getString("alph-query-infl-missing"));
+        }
         this.resize_window();
     },
     
@@ -422,12 +519,33 @@ Alph_Inter =
      * Callback executed when the correct inflection details are selected
      * @param {String} a_answer the answer string to be displayed
      */
-    on_infl_correct: function(a_answer_string)
+    on_infl_correct: function(a_src_node,a_message)
     {
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
-        $(".alph-query-infl .answer",parent_doc)
-            .text(a_answer_string);
-     
+        $('.alph-query-infl .alph-query-header',parent_doc)
+            .text(Alph_Inter.main_str.getString("alph-query-infl-correct"));
+        if (typeof a_message == 'string')
+        {
+            $('.alph-query-infl .alph-query-hint',parent_doc)
+            .text(a_message);
+        }
+        else
+        {
+            $('.alph-query-infl .alph-query-hint',parent_doc)
+            .remove();
+        
+        }
+        // clone the entire entry to get any bound events on the child elements
+        var entry = $(".alph-entry",a_src_node).clone();
+        // remove the hdwd, meaning and the part of speech,
+        // keeping any attributes on the part of speech
+        $(".alph-hdwd",entry).remove();
+        $(".alpheios-label",entry).remove();
+        $(".alph-mean",entry).remove();
+        var attr = $(".alph-morph .alph-pofs .alph-attr",entry);
+        $(".alph-morph .alph-pofs",entry).html(attr);
+        $(".alph-query-infl .answer",parent_doc).append(entry);
+        window.arguments[0].lang_tool.contextHandler(parent_doc);
     },
     
     /**

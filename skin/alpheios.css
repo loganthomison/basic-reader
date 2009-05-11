@@ -146,8 +146,10 @@ div.alph-morph {
 }
 
 .alph-mean {
-    font-style: italic;
+    font-style: normal;
+    font-weight: bolder;
     margin-left: 1em;
+    margin-bottom: .5em;
 }
 
 .alph-entry,.alph-unknown,.alph-error {
@@ -249,6 +251,7 @@ div.alph-morph {
 .alph-query-element {
     margin-left: 1em;
     margin-bottom: 1em;
+    font-family: Arial, sans-serif;
 }
 
 .alph-query-infl a {
@@ -298,4 +301,15 @@ div.alph-morph {
     position: absolute;
     top: 16px;
     left: 16px;
+}
+
+.alpheios-label {
+    font-size: small;
+    vertical-align: bottom;
+    color: #4E6476;
+    font-style: normal; 
+}
+
+.alph-dict {
+    margin-bottom: .5em;
 }

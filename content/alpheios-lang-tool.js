@@ -671,7 +671,7 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
     var params = Alph.$.extend(
         {
             target_href: a_target,
-            callback: Alph.xlate.hideLoadingMessage,
+            callback: function() { Alph.xlate.hideLoadingMessage(a_node.ownerDocument) },
             lang_tool: thisObj
         },
         a_params || {}

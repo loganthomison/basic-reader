@@ -319,41 +319,24 @@ Alph.site = {
             // it from the translation panel, because the translation panel may
             // not be open. We may also eventually want to be able to use a different document 
             // for the interlinear than the side by side alignment.
-            // using XMLHttpRequest directly here because the interlinear may be in the
-            // chrome, which jQuery doesn't support
-            var r = new XMLHttpRequest();
-            r.onreadystatechange = function()
-            {
-                if (r.readyState == 4 && r.responseText) 
+            Alph.site.load_alignment(toggle_elem.ownerDocument,
+                function(a_align_doc)
                 {
-                    var src_doc; 
-                    try {
-                        src_doc = (new DOMParser()).parseFromString(
-                            r.responseText,
-                            "application/xhtml+xml");
-                        Alph.site.populate_interlinear(
-                            words,
-                            src_doc,
-                            function() {
-                                Alph.$("#alpheios-loading-interlinear",
-                                    toggle_elem.ownerDocument).remove();
-                            });
-                    }
-                    catch(a_e)
-                    {
-                        Alph.$("#alpheios-loading-interlinear",
-                                    toggle_elem.ownerDocument).remove();
-                        Alph.util.log("Unable to parse translation: " + a_e);
-                    }
-                    
-                }
-                else 
+                    Alph.site.populate_interlinear(
+                        words,
+                        a_align_doc,
+                        function() {
+                            Alph.$("#alpheios-loading-interlinear",
+                            toggle_elem.ownerDocument).remove();
+                        });
+                },
+                function(a_e)
                 {
-                    Alph.util.log("Loading translation...");
+                    Alph.$("#alpheios-loading-interlinear",
+                        toggle_elem.ownerDocument).remove();
+                    Alph.util.log("Unable to parse translation: " + a_e);
                 }
-            }
-            r.open("GET", trans_url);
-            r.send(null);                                
+            );                  
         } else {
             Alph.site.hide_interlinear(words);
 
@@ -544,7 +527,57 @@ Alph.site = {
                 Alph.$(parent).css("padding-left",0);
             }
         );
-    }
+    },
     
+    /**
+     * Load the document contained the aligned text for the supplied source document
+     * @param Document a_src_doc the source document
+     * @param Function a_success success callback (gets the parsed alignment document
+     *                           as the first parameter)
+     * @param Function a_error error callback (gets the error message as the
+     *                         first parameter
+     * @return the alignment document, parsed as xhtml+xml
+     * @type Document
+     */
+    load_alignment: function(a_src_doc,a_success,a_error)
+    {
+        var align_url = Alph.$("#alph-trans-url",a_src_doc).attr("url");
+        var align_doc = null;
+        
+        // using XMLHttpRequest directly here because the alignment document
+        // may be in the chrome, which jQuery doesn't support
+        var r = new XMLHttpRequest();
+        r.onreadystatechange = function()
+        {
+            if (r.readyState == 4 && r.responseText) 
+            {
+                // TODO - should really handle 301 and 302 too?
+                if (r.status == 200)
+                { 
+                    try {
+                        align_doc = (new DOMParser()).parseFromString(
+                        r.responseText,
+                        "application/xhtml+xml");
+                        a_success(align_doc);
+                    }
+                    catch(a_e)
+                    {
+                        a_error("Unable to parse translation: " + a_e);
+                    }
+                }
+                else
+                {
+                     a_error("Unable to retrieve translation. Response: " +
+                        r.status + ':' + r.responseText); 
+                }
+            }
+            else 
+            {
+                Alph.util.log("Loading alignment from " + align_url + "...");
+            }
+        }
+        r.open("GET", align_url);
+        r.send(null);                                   
+    }
     
 };

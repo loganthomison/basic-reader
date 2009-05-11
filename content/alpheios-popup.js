@@ -1066,15 +1066,15 @@ Alph.xlate = {
 
     /**
      * Callback to hide the loading message in the popup.
-     * @param {Event} a_event the event which initiated the callback 
+     * @param {Document} document which contains the loading message 
      */
-    hideLoadingMessage: function(a_event)
+    hideLoadingMessage: function(a_doc)
     {
         
+        var topdoc = a_doc || Alph.xlate.getLastDoc(); 
         try {
             // we can't use the event target, because the event is 
             // in the 2ndary window not the one showing the message
-            var topdoc = Alph.xlate.getLastDoc();
             Alph.$("#alph-secondary-loading",topdoc).remove();
             
             // also check the morphology and dictionary windows

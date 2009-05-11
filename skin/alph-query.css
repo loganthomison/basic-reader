@@ -7,36 +7,40 @@ body {
 }
 
 .alph-query-element {
+    width: 100%;
 }
 
 .alph-query-pofs {
     float: left;
-    font-size: 110%;
+    padding-right: 1.5em;
+    width: 20%
 }
 
 .alph-query-defs {
     float: left;
-    margin-left: 2em;
-    font-size: 110%;
+    padding-right: 1.5em;
+    width: 30%
 }
 
 .alph-query-defs select {
     width: 100%;
     overflow: scroll;
+    width: 40%
 }
 
 .alph-query-header {
     font-weight: bold;
+    font-size: 110%;
 }
 
 .alph-query-infl {
     float: left;
-    font-size: 110%;
-    margin-left: 2em;
 }
 
 .answer {
+    font-family: Georgia,serif;
     font-style: italic;
+    font-size: 100%
 }
 
 .alph-query-context {
@@ -45,4 +49,39 @@ body {
     text-align: left;
     margin-left: 1em;
     margin-bottom: 2em;
+}
+
+.alph-query-hint {
+    color: #4E6476;
+    font-style: italic;
+    font-size: smaller;
+}
+
+.alph-query-dict {
+    margin-top: .5em;
+    border: 1px dotted #9E9C9A;
+    padding: .25em;
+    font-size: smaller;
+}
+
+.alph-query-dict .alph-dict-link {
+    float: right;
+}
+
+.alph-query-dict .alph-dict-link img {
+    border: none;
+}
+
+.alph-query-infl .alph-morph *, .alph-query-infl .alph-infl * {
+    font-size: 100%;
+    font-style: italic; 
+    font-weight: normal;
+}
+
+.alph-query-infl .alph-pofs:after {
+    content: "";
+}
+
+.alph-query-context #alph-word-tools {
+    float: right;
 }
