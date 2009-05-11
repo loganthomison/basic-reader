@@ -89,7 +89,8 @@ Alph.infl = {
         var infl_browser = $("#alph-infl-browser");
         
         // if we don't have a requested part of speech, show the index
-        if (typeof link_target.showpofs == 'undefined' && link_target.xml_url)
+        if (typeof link_target.showpofs == 'undefined' || 
+            link_target.xml_url.match(/alph-infl-index.xml/))
         {
             var doc = $(infl_browser).get(0).contentDocument;
             var infl_html = Alph.infl.transform(link_target);
