@@ -283,7 +283,8 @@
                     and .=$lastgroup4]/.."/>
             <xsl:choose>
                 <xsl:when test="count($celldata) = 0">
-                    <td class="emptycell {$lastgroup4}" colspan="2">&#160;</td>
+                    <td class="{$lastgroup4}"><span class="emptycell">&#160;</span></td>
+                    <td class="{$lastgroup4}"><span class="emptycell">&#160;</span></td>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:variable name="selected">
@@ -365,7 +366,8 @@
         <xsl:param name="headerrow2"/>
         <xsl:param name="headerrow3"/>
         <xsl:for-each select="$headerrow1">
-            <td colspan="2">&#160;</td>
+            <td class="emptycell">&#160;</td>
+            <td class="emptycell">&#160;</td>
         </xsl:for-each>       
     </xsl:template>
     
