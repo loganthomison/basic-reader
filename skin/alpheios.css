@@ -297,11 +297,14 @@ div.alph-morph {
 
 .alph-tooltip {
     font-size: small;
+    font-weight: normal;
     background-color: #5BC8DC;
     border: 1px solid #B8B7B5;
     position: absolute;
     top: 16px;
     left: 16px;
+    z-index: 1000;
+    font-family:  Arial, sans-serif;
 }
 
 .alpheios-label {
@@ -313,4 +316,30 @@ div.alph-morph {
 
 .alph-dict {
     margin-bottom: .5em;
+}
+
+.alph-dial {
+    font-size: smaller;
+}
+
+.alph-form-end, .alph-infl-end {
+    position: relative;
+}
+
+.alph-help-link {
+   color: #3E8D9C;
+   font-weight: bold !important;
+   cursor: pointer;
+   text-decoration: none;
+   font-size: 10px;
+   vertical-align: super;
+}
+
+.alph-help-link:hover {
+   color: #5BC8DC !important;
+}
+
+.alph-help-link .alph-tooltip {
+    top: 1em;
+    left: 1em;
 }

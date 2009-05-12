@@ -1329,16 +1329,18 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     var lang_tool = this;
     var strings = Alph.$("#alpheios-strings").get(0);
     
-    // add diagram link, if appropriate
-    if (a_target.getTreebankQuery())
+    var tools_node = Alph.$("#alph-word-tools",a_node);
+    // add diagram link, if appropriate (only add if we have a treebank reference
+    // and we're not already on the tree
+    if (a_target.getTreebankQuery() &&
+        Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length == 0)
     {
         var diagram_alt_text = strings.getString('alph-diagram-link');
-        Alph.$("#alph-word-tools",a_node).append(
-            '<a class="alph-diagram-link" ' + 
-            'href="#alpheios-diagram" title="' + diagram_alt_text + '">' + 
+        Alph.$('<a class="alph-diagram-link" ' + 
+            'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+  
             '<img src="chrome://alpheios/skin/icons/diagram_16.png"' +
-            'alt="' + diagram_alt_text + '"/></a>'
-        );
+            ' alt="' + diagram_alt_text + '" /></a>',a_node)
+            .appendTo(tools_node);
         Alph.$('#alph-word-tools .alph-diagram-link',a_node).click(
             function(a_e)
             {
@@ -1354,7 +1356,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
         Alph.$("#alph-word-tools",a_node).append(
             '<a class="alph-inflect-link" ' + 
             'href="#alpheios-inflect" title="' + inflect_alt_text + '">' + 
-            '<img src="chrome://alpheios/skin/icons/inflection_16.png"' +
+            '<img src="chrome://alpheios/skin/icons/inflection_16.png" ' +
             'alt="' + inflect_alt_text + '"/></a>'
         );
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
@@ -1394,5 +1396,101 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
                 Alph.$(this).next('.alph-tooltip').remove();                      
             }
         );
-    }   
+    }
 }
+    
+/**
+ * Add language-specific help links to the inflections component of the 
+ * word lookup output (if any)
+ * @paramaters {Node} a_node the node which contains the results 
+ *                              of the word lookup  
+ * @params {Alph.SourceSelection} a_target the target element of the user's selection
+*/
+Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
+{
+    var strings = Alph.$("#alpheios-strings").get(0);
+    var form = strings.getString("alph-morph-form");
+    var stem = strings.getString("alph-morph-stem");
+    var suffix = strings.getString("alph-morph-suffix"); 
+    Alph.$(".alph-term",a_node).each(
+        function()
+        {
+            Alph.$(this).append('<span class="alph-form-end"><span class="alph-help-link">?</span></span>');
+            var message = Alph.$('.alph-suff',this).length == 0 
+                ?  form : stem + "+" + suffix; 
+            Alph.$('.alph-help-link',this).hover(
+                function()
+                {
+                    Alph.$(this).after(
+                        '<span class="alph-tooltip">' + message + '</span>');                      
+                },
+                function()
+                {
+                    Alph.$(this).next('.alph-tooltip').remove();                      
+                }
+            );
+        }
+    );
+    Alph.$(".alph-infl",a_node).each(
+        function()
+        {
+            
+            var atts = [];
+            Alph.$("span",this).each(
+                function()
+                {
+                    var title;
+                    var class_list = Alph.$(this).attr("class");
+                    if ( class_list && (title = class_list.match(/alph-(\w+)/)))
+                    {
+                        var name;
+                        try
+                        {
+                            if (Alph.$(this).nextAll(".alph-"+title[1]).length > 0)
+                            {
+                                name = 
+                                    strings.getString("alph-morph-" +title[1] + '-plural');    
+                            }
+                            else 
+                            {
+                                name = 
+                                    strings.getString("alph-morph-" +title[1]);    
+                            }
+                            // only display attributes for which we have explicitly
+                            // defined strings, and which we haven't already added
+                            if (Alph.$(this).prevAll(".alph-"+title[1]).length == 0)
+                            {
+                                atts.push(name);
+                            }
+                        }
+                        catch(a_e)
+                        {
+                            // quietly ignore missing strings
+                        }
+                         
+                    }
+                }
+            );
+            if (atts.length > 0)
+            {
+                var message = atts.join(',');
+                Alph.$(this).append('<span class="alph-infl-end"><span class="alph-help-link">?</span></span>');
+             
+                Alph.$('.alph-help-link',this).hover(
+                    function()
+                    {
+                        Alph.$(this).after(
+                            '<span class="alph-tooltip">' + message + '</span>');                      
+                    },
+                    function()
+                    {
+                        Alph.$(this).next('.alph-tooltip').remove();                      
+                    }
+                );
+            }
+        }
+    );
+
+    
+}
+

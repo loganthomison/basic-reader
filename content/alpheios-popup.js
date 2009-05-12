@@ -389,6 +389,10 @@ Alph.xlate = {
                 Alph.$("#alph-text",a_doc).prepend('<div id="alph-word-tools"/>');
                 Alph.main.getLanguageTool().add_word_tools(
                     Alph.$("#alph-text",a_doc),
+                    a_alphtarget);
+                
+                Alph.main.getLanguageTool().add_infl_help(
+                    Alph.$("#alph-text",a_doc),
                     a_alphtarget);                
             }
         );
@@ -507,14 +511,15 @@ Alph.xlate = {
                     Alph.$("#alph-text",wordHTML).get(0),true);
 
             Alph.main.getLanguageTool().postTransform(new_text_node);
-
+            Alph.main.getLanguageTool().add_infl_help(
+                    new_text_node,a_alphtarget);        
             
             var new_entry = Alph.$(".alph-entry",new_text_node);
             var new_dict = Alph.$(".alph-dict",new_entry);
             var new_hdwd = Alph.$(new_dict).attr("lemma-id");
             var new_infl_node = 
                     Alph.$(".alph-infl",new_entry).get(0);
-
+            
             a_doc_array.forEach(
                 function(a_doc)
                 {
