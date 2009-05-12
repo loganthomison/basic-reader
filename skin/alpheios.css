@@ -186,6 +186,10 @@ div.alph-morph {
     font-weight: bold;
 }
 
+.alph-suff {
+    padding-right: 0 !important;
+}
+
 .alph-infl {
     margin-left: 2em;
     font-size: smaller;    

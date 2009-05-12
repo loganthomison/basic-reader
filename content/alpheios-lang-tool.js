@@ -1415,22 +1415,26 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
     Alph.$(".alph-term",a_node).each(
         function()
         {
-            Alph.$(this).append('<span class="alph-form-end"><span class="alph-help-link">?</span></span>');
             var message = Alph.$('.alph-suff',this).length == 0 
-                ?  form : stem + "+" + suffix; 
-            Alph.$('.alph-help-link',this).hover(
-                function()
-                {
-                    Alph.$(this).after(
-                        '<span class="alph-tooltip">' + message + '</span>');                      
-                },
-                function()
-                {
-                    Alph.$(this).next('.alph-tooltip').remove();                      
-                }
+                ?  form : stem + "+" + suffix;
+            var help_node = Alph.$('<span class="alph-form-end"/>',a_node);
+            help_node.append(Alph.$('<span class="alph-help-link">?</span>',
+                a_node).hover(
+                   function()
+                   {
+                       Alph.$(this).after(
+                           '<span class="alph-tooltip">' + message + '</span>');                      
+                   },
+                   function()
+                   {
+                       Alph.$(this).next('.alph-tooltip').remove();                      
+                   }
+                )
             );
+            Alph.$(this).after(help_node);
         }
     );
+    
     Alph.$(".alph-infl",a_node).each(
         function()
         {
