@@ -703,7 +703,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     // in the default content document
     if (! a_node)
     {
-        a_node = Alph.$("#alph-text", content.document).clone();
+        a_node = Alph.$("#alph-text", Alph.xlate.getLastDoc()).clone();
     }
     if (Alph.$(a_node).length != 0)
     {
