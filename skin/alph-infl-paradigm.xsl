@@ -79,7 +79,7 @@
         </xsl:variable>
 
         <xsl:variable name="infl_constraint_data">
-            <xsl:if test="(not($paradigm_id) and $selected_endings)">
+            <xsl:if test="((not($paradigm_id) or $paradigm_id = 'all') and $selected_endings)">
                 <xsl:call-template name="get_paradigms_for_selection">
                     <xsl:with-param name="match_table" select="morpheus-paradigm-match"/>
                 </xsl:call-template>                    
@@ -122,9 +122,20 @@
                             <xsl:with-param name="form" select="$form"/>
                         </xsl:call-template>
                     </div>
-                    <xsl:if test="$data = ''">
-                        <xsl:apply-templates select="morpheus-paradigm-match/nomatch"/>                         
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$data = ''">
+                            <xsl:apply-templates select="morpheus-paradigm-match/nomatch"/>
+                        </xsl:when>
+                        <xsl:when test="$selected_endings and $paradigm_id != 'all'">
+                            <div class="alpheios-hint">
+                                <xsl:text>The following table(s) show conjugation patterns for verbs which are similar to those of </xsl:text>
+                                <xsl:element name="span">
+                                    <xsl:attribute name="class">alph-infl-form</xsl:attribute>
+                                    <xsl:value-of select="$form"/>.
+                                </xsl:element>                                  
+                            </div>
+                        </xsl:when>                    
+                    </xsl:choose>
                     <xsl:call-template name="paradigms">
                         <xsl:with-param name="paradigms" select="exsl:node-set($data)"/>
                         <xsl:with-param name="infl_constraint_data" select="exsl:node-set($infl_constraint_data)/match_for_infl"/>

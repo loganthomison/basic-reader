@@ -511,6 +511,7 @@ Alph.xlate = {
                     Alph.$("#alph-text",wordHTML).get(0),true);
 
             Alph.main.getLanguageTool().postTransform(new_text_node);
+            Alph.main.getLanguageTool().contextHandler(new_text_node);
             Alph.main.getLanguageTool().add_infl_help(
                     new_text_node,a_alphtarget);        
             

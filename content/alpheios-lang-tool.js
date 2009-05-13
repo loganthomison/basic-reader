@@ -603,44 +603,26 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 {
     var myobj=this;
     var links = this.getgrammarlinks();
-    Alph.$(".alph-entry",a_doc).bind(
-        "click",
-        function(a_e)
+    
+    for (var link_name in links)
+    {
+        if (links.hasOwnProperty(link_name))
         {
-            // jquery Event API was changed in 1.2.2. Use the original
-            // Event object to access the rangeParent and Offset
-            var o_e = a_e.originalEvent;
-            var rp = o_e.rangeParent;
-            var ro = o_e.rangeOffset;
-            var range = document.createRange();
-            range.selectNode(rp);
-
-            // get class and context from containing span
-            var attrs = range.startContainer.attributes;
-            var rngClass = null;
-            var rngContext = null;
-            for (var i = 0; i < attrs.length; ++i)
-            {
-                if (attrs[i].name == "class")
-                    rngClass = attrs[i].value;
-                if (attrs[i].name == "context")
-                    rngContext = attrs[i].value;
-            }
-
-            // if this is one of the classes we want to handle
-            if ( links[rngClass] )
-            {
-                // build target inside grammar
-                var target = rngClass;
-                if (rngContext != null)
+            Alph.$(".alph-entry ." + link_name,a_doc).bind('click',link_name,
+                function(a_e)
                 {
-                    target += "-" + rngContext.split(/-/)[0];
+                      // build target inside grammar
+                      var target = a_e.data;
+                      var rngContext = Alph.$(this).attr("context");
+                      if (rngContext != null)
+                      {
+                        target += "-" + rngContext.split(/-/)[0];
+                      }
+                      myobj.openGrammar(a_e.originaEvent,this,target);   
                 }
-
-                myobj.openGrammar(o_e,range.startContainer,target);
-            }
-         }
-     );
+            );
+        }
+    }
 };
 
 /**
@@ -1415,7 +1397,8 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
     Alph.$(".alph-term",a_node).each(
         function()
         {
-            var message = Alph.$('.alph-suff',this).length == 0 
+            var suff_elem = Alph.$('.alph-suff',this);
+            var message = (suff_elem.length == 0 || suff_elem.text() == '') 
                 ?  form : stem + "+" + suffix;
             var help_node = Alph.$('<span class="alph-form-end"/>',a_node);
             help_node.append(Alph.$('<span class="alph-help-link">?</span>',

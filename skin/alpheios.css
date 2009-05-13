@@ -177,8 +177,12 @@ div.alph-morph {
     cursor: default;
 }
 
-.alph-pofs:after {
+.alph-morph .alph-pofs:after {
     content: ";";
+}
+
+.alph-infl-set .alph-pofs {
+    font-size: smaller;
 }
 
 .alph-term {
@@ -283,6 +287,7 @@ div.alph-morph {
 }
 
 #alph-word-tools {
+    margin-bottom: .5em;
     position: relative;
 }
 
@@ -305,7 +310,7 @@ div.alph-morph {
     background-color: #5BC8DC;
     border: 1px solid #B8B7B5;
     position: absolute;
-    top: 16px;
+    top: 20px;
     left: 16px;
     z-index: 1000;
     font-family:  Arial, sans-serif;
