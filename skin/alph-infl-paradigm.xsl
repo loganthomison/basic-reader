@@ -64,6 +64,7 @@
     
     <xsl:param name="paradigm_id"/>
     
+    <xsl:param name="query_mode"/>
     
     <xsl:key name="footnotes" match="footnote" use="@id"/>
     
@@ -221,7 +222,7 @@
                             </xsl:if>
                             <xsl:if test="@role='data'">
                                 <xsl:variable name="selected">
-                                    <xsl:if test="$selected_endings">
+                                    <xsl:if test="$selected_endings and not($query_mode)">
                                         <xsl:call-template name="check_infl_sets">
                                             <xsl:with-param name="selected_endings" 
                                                 select="$selected_endings"/>
@@ -236,10 +237,15 @@
                                 <xsl:element name="td">
                                     <xsl:attribute name="class">
                                         <!-- don't highlight empty cells -->
-                                        <xsl:if test="($selected != '') and (text() or child::*/text())">selected</xsl:if>
+                                        <xsl:if test="($selected != '') and (text() or child::*/text())">
+                                            <xsl:text>selected </xsl:text>
+                                        </xsl:if>
+                                        <xsl:text>ending-group</xsl:text>
                                     </xsl:attribute>
                                     <xsl:for-each select="@*[local-name(.) !='role']">
-                                        <xsl:attribute name="{concat('alph-',local-name(.))}"><xsl:value-of select="."/></xsl:attribute>
+                                        <xsl:attribute name="{concat('alph-',local-name(.))}">
+                                            <xsl:value-of select="concat('|', translate(.,' ','|'), '|')"/>
+                                        </xsl:attribute>
                                     </xsl:for-each>
                                     <xsl:call-template name="add-footnote">
                                         <xsl:with-param name="item" select="."/>
@@ -264,7 +270,13 @@
     </xsl:template>
      
     <xsl:template match="span">
-        <xsl:copy-of select="."/>
+        <xsl:element name="span">
+            <xsl:attribute name="xml:lang"><xsl:value-of select="@xml:lang"/></xsl:attribute>
+            <xsl:if test="$query_mode">
+                <xsl:attribute name="class">ending</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="."/>
+        </xsl:element>
     </xsl:template>
     
     <xsl:template name="get_paradigms">

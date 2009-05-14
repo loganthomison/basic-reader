@@ -17,7 +17,48 @@
         <xsl:param name="show_only_matches"/>
         <xsl:param name="match_form"/>
 
-        <td class="ending-group"> <!-- start new cell -->
+        <xsl:element name="td"><!-- start new cell -->
+            <xsl:attribute name="class">ending-group</xsl:attribute> 
+            <xsl:if test="$infl-endings/@pers">
+                <xsl:attribute name="alph-pers">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@pers,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@gend">
+                <xsl:attribute name="alph-gend">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@gend,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@num">
+                <xsl:attribute name="alph-num">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@num,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@case">
+                <xsl:attribute name="alph-case">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@case,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@voice">
+                <xsl:attribute name="alph-voice">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@voice,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@tense">
+                <xsl:attribute name="alph-tense">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@tense,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@mood">
+                <xsl:attribute name="alph-mood">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@mood,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$infl-endings/@hdwd">
+                <xsl:attribute name="alph-hdwd">
+                    <xsl:value-of select="concat('|', translate($infl-endings/@hdwd,' ','|'), '|')"/>
+                </xsl:attribute>
+            </xsl:if>    
         <xsl:variable name="cellgroup" 
             select="$infl-endings/infl-ending[contains(@type,'primary')]"/>
             <xsl:if test="count($cellgroup) = 0">
@@ -104,50 +145,10 @@
                 <xsl:attribute name="stem-class">
                     <xsl:value-of select="@stem-class"/>
                 </xsl:attribute>
-                <xsl:if test="../@pers">
-                    <xsl:attribute name="alph-pers">
-                        <xsl:value-of select="concat('|', translate(../@pers,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@gend">
-                    <xsl:attribute name="alph-gend">
-                        <xsl:value-of select="concat('|', translate(../@gend,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@num">
-                    <xsl:attribute name="alph-num">
-                        <xsl:value-of select="concat('|', translate(../@num,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@case">
-                    <xsl:attribute name="alph-case">
-                        <xsl:value-of select="concat('|', translate(../@case,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@voice">
-                    <xsl:attribute name="alph-voice">
-                        <xsl:value-of select="concat('|', translate(../@voice,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@tense">
-                    <xsl:attribute name="alph-tense">
-                        <xsl:value-of select="concat('|', translate(../@tense,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@mood">
-                    <xsl:attribute name="alph-mood">
-                        <xsl:value-of select="concat('|', translate(../@mood,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="../@hdwd">
-                    <xsl:attribute name="alph-hdwd">
-                        <xsl:value-of select="concat('|', translate(../@hdwd,' ','|'), '|')"/>
-                    </xsl:attribute>
-                </xsl:if>    
                 <xsl:value-of select="."/>
             </xsl:element>
         </xsl:for-each>
-        </td>                                   
+        </xsl:element>                                   
     </xsl:template>
     
 

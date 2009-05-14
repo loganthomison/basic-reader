@@ -90,6 +90,23 @@ Alph_Inter =
         );
         
         var src_context = $(".alph-word",a_params.source_node).attr('context');
+        var pofs = $('.alph-pofs',a_params.source_node).attr('context');
+
+        var infl_hint = '';
+        // look for a part-of-speech specific hint, and if not defined, use
+        // the more general inflection hint
+        try 
+        {
+            infl_hint = 
+                this.main_str.getFormattedString("alph-query-infl-hint-"+pofs,
+                [src_context]);
+        }
+        catch(a_e)
+        {
+            infl_hint = 
+                this.main_str.getFormattedString("alph-query-infl-hint",
+                [src_context]);
+        }
         var query_html = 
             '<div class="alph-query-context">' + src_context + '</div>' +
             '<div class="alph-query-element">' + 
@@ -107,9 +124,7 @@ Alph_Inter =
             '    <div class="alph-query-header">' +
                this.main_str.getFormattedString("alph-query-infl",[src_context]) +
             '    </div>\n' +
-            '    <div class="alph-query-hint">' + 
-               this.main_str.getFormattedString("alph-query-infl-hint",[src_context]) +
-            '    </div>\n' +
+            '    <div class="alph-query-hint">' + infl_hint + '</div>\n' +
             '    <div class="answer"/>' +
             '  </div>\n' +
             '</div>\n';
@@ -494,7 +509,8 @@ Alph_Inter =
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
                    ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-', 
-                   attributes: context_list[0]
+                   attributes: context_list[0],
+                   src_node: a_src_node
                 },
                 function() { Alph_Inter.on_infl_correct(a_src_node) }
             );
