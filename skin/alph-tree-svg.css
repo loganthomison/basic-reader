@@ -26,7 +26,12 @@ g text.node-label {
 }
 
 g text.arc-label {
-    font-size: 15px;
+    font-size: 11px;
+    fill: black;
+}
+
+g text.arc-label-help {
+    font-size: 11px;
     fill: black;
 }
 

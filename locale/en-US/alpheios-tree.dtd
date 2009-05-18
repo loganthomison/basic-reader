@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY alpheios-tools-tree-label "Diagram">
 <!ENTITY alpheios-tools-tree-tooltip "Open Dependency Tree">
-<!ENTITY alpheios-tree-toolbar-label "Alpheios: Dependency Tree View">
+<!ENTITY alpheios-tree-toolbar-label "Alpheios: Diagram View">
 
