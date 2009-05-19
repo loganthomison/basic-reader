@@ -121,7 +121,7 @@ Alph.main =
         
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
         gBrowser
-            .addEventListener("DOMContentLoaded", function(event) { Alph.main.insert_metadata(event) }, false);
+            .addEventListener("DOMContentLoaded", function(event) { Alph.main.first_load(event) }, false);
         gBrowser.addProgressListener(Alph.main.loc_listener,
             Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);        
             
@@ -1184,6 +1184,32 @@ Alph.main =
         
     },
     
+    
+    /** 
+     * Event handler called when a document is loaded into the browser (i.e. response
+     * to the DOMContentLoaded event
+     * @param {Event} a_event the load event
+     */
+    first_load: function(a_event)
+    {
+        var doc = a_event.target;
+        var requested_mode = doc.baseURIObject.path.match(/alpheios_mode=([^&;#]+)/);
+        if (requested_mode &&
+            Alph.$("meta[name=_alpheios-doc-id]",doc).length == 0)
+        {
+                
+            var a_mode = requested_mode[1]
+            var id = Alph.XFRState.new_state_request('reqlevel',a_mode,true);
+            Alph.$("head",doc)
+                .append('<meta ' +
+                    'name="_alpheios-doc-id" ' +
+                    'content="' +
+                    id +
+                    '"></meta>');
+        }
+        Alph.main.insert_metadata(a_event);
+    },
+    
     /**
      * Insert metadata elements identifying the Alpheios extensions into the browser
      * content document
@@ -1210,7 +1236,6 @@ Alph.main =
                 }
             );
         }
-        
     },
     
     /**
@@ -1496,10 +1521,25 @@ Alph.main =
         // if it's present in the querystring for the page
         if (typeof a_mode == "undefined")
         {
-            var requested_mode = a_bro.currentURI.path.match(/alpheios_mode=([^&;]+)/);
-            if (requested_mode)
+            var requested_mode = a_bro.currentURI.path.match(/alpheios_mode=([^&;#]+)/);
+            var doc_id = Alph.$("head meta[name=_alpheios-doc-id]",a_bro.contentDocument).attr("content");
+            // if the mode is specified in the query string, and we haven't
+            // already responded to the query string for this document once,
+            // then set the mode according to the query string.
+            // we don't want to do this more than once per document, because the user
+            // can change the mode after it's loaded, and we don't want to reset it 
+            // if the user switches to another tab or window after changing it.
+            if (requested_mode && doc_id)
             {
-                a_mode = requested_mode[1]
+                var uri_mode = Alph.XFRState.get_state_value(doc_id,'reqlevel');
+                if (uri_mode == requested_mode[1])
+                {
+                    a_mode = requested_mode[1];
+                }
+            }
+            else if (requested_mode)
+            {
+                Alph.XFRState.get_state_value(doc_id,'reqlevel')
             }
         }
         if (typeof a_mode != "undefined")

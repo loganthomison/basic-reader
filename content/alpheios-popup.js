@@ -682,7 +682,7 @@ Alph.xlate = {
         
             
             // add a close link 
-            Alph.$(popup).append('<div class="alph-close-button">&#160;</div><br/>')
+            Alph.$(popup).append('<div class="alph-title-bar"><div class="alph-close-button">&#160;</div></div>')
             Alph.$(".alph-close-button",topdoc).bind("click",
                 function()
                 {

@@ -27,7 +27,7 @@
 	border-color: #3E8D9C #B8B7B5 #B8B7B5 #73CDDE !important;
 	border-style: outset !important;
 	border-width: 2px !important;
-    padding: 4px;
+    padding: 0px;
 	margin: 0px;
 	letter-spacing: normal;
 	text-align: left;
@@ -70,6 +70,7 @@
 #alph-window.alpheios-inline-query #alph-align-answer-prompt {
    display: block;
    padding-left: 20px;
+   border: none;
 }
 
 #alph-window.alpheios-inline-query #alph-text #alph-inline-query-instruct {
@@ -121,10 +122,11 @@
     display: none;
 }
 
-
 .alph-word {
     border-top: 1px dotted #0E2233;
     padding-top: 10px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .alph-word-first {
@@ -188,6 +190,7 @@ div.alph-morph {
 .alph-term {
     margin-left: 1em;
     font-weight: bold;
+    padding-right: 0 !important;
 }
 
 .alph-suff {
@@ -273,35 +276,37 @@ div.alph-morph {
     color: #5BC8DC !important; 
 }
 
-.alph-dict-link {
-   color: #3E8D9C;
-   font-weight: bold;
-   cursor: pointer;
-   text-decoration: none;
-   text-align: right;
-   font-size: smaller;
+#alph-window #alph-word-tools {
+    margin: 2px 0 0 2px;
+    position: relative; 
+    padding: 0;    
 }
 
-.alph-dict-link:hover {
-   color: #5BC8DC !important;
-}
-
-#alph-word-tools {
-    margin-bottom: .5em;
-    position: relative;
-}
-
-#alph-word-tools img {
-    border: none;
-    padding: 0 3px;
-}
-
-#alph-word-tools a {
+.alph-tool-icon {
+    background-color: #ebe9d7;
+    border-width: 1px;
+    border-style: solid;  
+    border-color: #9E9C9A;
     text-decoration: none;
+    margin-right: 1px;
+    cursor: pointer;
+    display: inline;
+    position: relative;
+    float: left;
+    font-size: 10px;
+    text-align: center;
+    width: 40px;
+    height: 32px;
 }
 
-#alph-word-tools a:hover img {
-    border: 1px solid #5BC8DC;
+.alph-tool-icon img {
+    margin: 0 0;
+    vertical-align: bottom;
+    border: 1px solid transparent; 
+}
+
+.alph-tool-icon:hover {
+    border-color: ThreeDHighlight ThreeDShadow ThreeDShadow ThreeDHighlight;
 }
 
 .alph-tooltip {
@@ -325,6 +330,7 @@ div.alph-morph {
 
 .alph-dict {
     margin-bottom: .5em;
+    clear: both;
 }
 
 .alph-dial {
@@ -336,12 +342,12 @@ div.alph-morph {
 }
 
 .alph-help-link {
-   color: #3E8D9C;
    font-weight: bold !important;
    cursor: pointer;
    text-decoration: none;
-   font-size: 10px;
    vertical-align: super;
+   padding: 0;
+   margin: 0;
 }
 
 .alph-help-link:hover {
@@ -351,4 +357,17 @@ div.alph-morph {
 .alph-help-link .alph-tooltip {
     top: 1em;
     left: 1em;
+}
+
+.alpheios-toolbar-label {
+    color: #0e2233;
+    font-size: smaller;
+    padding-right: 0 4px; 
+    display: none;
+}
+
+.alph-title-bar {
+    border: 1px solid #9e9c98;
+    background-color: #9e9c9a;
+    height: 18px;
 }

@@ -950,10 +950,10 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
                 Alph.$("#alpheios-strings").get(0)
                     .getFormattedString('alph-dictionary-link',[dict_name_str]);
             dict_link =
-                '<a class="alph-dict-link" href="#alph-dict" title="' 
+                '<div class="alph-tool-icon alph-dict-link" href="#alph-dict" title="' 
                 + dict_link_text + '">' +
                 '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
-                'alt="' + dict_link_text + '"/></a>';
+                'alt="' + dict_link_text + '"/><div>Define</div></div>';
         }
         catch(a_e)
         {
@@ -1318,10 +1318,11 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
         Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length == 0)
     {
         var diagram_alt_text = strings.getString('alph-diagram-link');
-        Alph.$('<a class="alph-diagram-link" ' + 
+        Alph.$('' +
+            '<div class="alph-tool-icon alph-diagram-link" ' + 
             'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+  
             '<img src="chrome://alpheios/skin/icons/diagram_16.png"' +
-            ' alt="' + diagram_alt_text + '" /></a>',a_node)
+            ' alt="' + diagram_alt_text + '" /><div>Diagram</div></div>',a_node)
             .appendTo(tools_node);
         Alph.$('#alph-word-tools .alph-diagram-link',a_node).click(
             function(a_e)
@@ -1336,10 +1337,10 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     {
         var inflect_alt_text = strings.getString('alph-inflect-link');
         Alph.$("#alph-word-tools",a_node).append(
-            '<a class="alph-inflect-link" ' + 
+            '<div class="alph-tool-icon alph-inflect-link" ' + 
             'href="#alpheios-inflect" title="' + inflect_alt_text + '">' + 
             '<img src="chrome://alpheios/skin/icons/inflection_16.png" ' +
-            'alt="' + inflect_alt_text + '"/></a>'
+            'alt="' + inflect_alt_text + '"/><div>Inflect</div></div>'
         );
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
             function(a_e)
@@ -1366,17 +1367,24 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             }
         );
         
-        Alph.$("#alph-word-tools",a_node).append('<div class="alph-tooltip"/>');
-        Alph.$('#alph-word-tools a',a_node).hover(
+        Alph.$('#alph-word-tools img',a_node).hover(
             function()
             {
                 Alph.$(this).after(
-                    '<span class="alph-tooltip">' + this.getAttribute('title') + '</span>');                      
+                    '<span class="alph-tooltip">' + this.getAttribute('alt') + '</span>');                      
             },
             function()
             {
                 Alph.$(this).next('.alph-tooltip').remove();                      
             }
+        );
+    }
+    
+    if (Alph.$("#alph-word-tools",a_node).children().length > 0)
+    {
+        if (Alph.$("#alph-word-tools",a_node).prepend(
+            '<span class="alpheios-toolbar-label">' + strings.getString("alph-tools")
+            + '</span>')
         );
     }
 }
@@ -1401,7 +1409,7 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
             var message = (suff_elem.length == 0 || suff_elem.text() == '') 
                 ?  form : stem + "+" + suffix;
             var help_node = Alph.$('<span class="alph-form-end"/>',a_node);
-            help_node.append(Alph.$('<span class="alph-help-link">?</span>',
+            help_node.append(Alph.$('<span class="alph-help-link"><img src="chrome://alpheios/skin/icons/information-16.png" alt="Info" /></span>',
                 a_node).hover(
                    function()
                    {
@@ -1461,7 +1469,7 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
             if (atts.length > 0)
             {
                 var message = atts.join(',');
-                Alph.$(this).append('<span class="alph-infl-end"><span class="alph-help-link">?</span></span>');
+                Alph.$(this).append('<span class="alph-infl-end"><span class="alph-help-link"><img src="chrome://alpheios/skin/icons/information-16.png" alt="Info" /></span></span>');
              
                 Alph.$('.alph-help-link',this).hover(
                     function()

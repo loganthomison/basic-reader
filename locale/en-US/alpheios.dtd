@@ -21,8 +21,8 @@
 <!ENTITY alpheios.menu.lang.tooltip "Select Language for Alpheios">
 <!ENTITY alpheios.menu.level.reader "Reading Mode">
 <!ENTITY alpheios.menu.level.reader.tooltip "Alpheios Reading Mode">
-<!ENTITY alpheios.menu.level.learner "Learning Mode">
-<!ENTITY alpheios.menu.level.learner.tooltip "Alpheios Learning Mode">
+<!ENTITY alpheios.menu.level.learner "Quiz Mode">
+<!ENTITY alpheios.menu.level.learner.tooltip "Alpheios Quiz Mode">
 <!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-view-label "View">
 <!ENTITY alpheios-view-tooltip "Alpheios Browser Panels">

@@ -39,6 +39,8 @@ if (typeof Alph == "undefined") {
           .loadSubScript("chrome://alpheios/content/jquery-1.2.6-alph.js", Alph);
     Alph.$ = jQuery.noConflict(true);
     
+    // load the transfer state object
+    Components.utils.import("resource://alpheios/alpheios-xfer-state.jsm",Alph);
 }
 
 /**
