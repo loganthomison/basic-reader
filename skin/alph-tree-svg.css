@@ -23,6 +23,7 @@ g text.error {
 
 g text.node-label {
     text-anchor: middle;
+    cursor: pointer;
 }
 
 g text.arc-label {
@@ -38,6 +39,7 @@ g text.arc-label-help {
 g.text text {
     text-anchor: start;
     fill: black;
+    cursor: pointer;
 }
 
 g.key text {
