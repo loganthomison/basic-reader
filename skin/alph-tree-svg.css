@@ -31,7 +31,12 @@ g text.arc-label {
     fill: black;
 }
 
-g text.arc-label-help {
+g text.arc-label-help-up {
+    font-size: 11px;
+    fill: black;
+}
+
+g text.arc-label-help-dn {
     font-size: 11px;
     fill: black;
 }

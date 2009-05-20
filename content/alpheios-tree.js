@@ -314,16 +314,22 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
                     'mouseenter',
                     function()
                     {
-                        var tip = Alph.$('text', Alph.$(this))[0];
-                        tip.style.visibility = "visible";
+                        Alph.$('text', Alph.$(this)).each(
+                        function()
+                        {
+                            this.style.visibility = "visible";
+                        });
                     }
                 );
                 thisNode.bind(
                     'mouseleave',
                     function()
                     {
-                        var tip = Alph.$('text', Alph.$(this))[0];
-                        tip.style.visibility = "hidden";
+                        Alph.$('text', Alph.$(this)).each(
+                        function()
+                        {
+                            this.style.visibility = "hidden";
+                        });
                     }
                 );
             }
@@ -556,10 +562,19 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
         var yl = (y1 + 2 * y2) / 3;
         label.setAttribute("x", xl);
         label.setAttribute("y", yl);
-        var tip = Alph.$('text', Alph.$(label))[0];
-        tip.setAttribute("text-anchor", "start");
-        tip.setAttribute("x", (x2 <= xCenter) ? xl - width : xl);
-        tip.setAttribute("y", yl - 3 * a_fontSize / 4);
+
+        // set up help text for arc label
+        var dyl = 3 * a_fontSize / 4;
+        Alph.$('text', Alph.$(label)).each(
+        function()
+        {
+            this.setAttribute("text-anchor", "start");
+            this.setAttribute("x", (x2 <= xCenter) ? xl - width : xl);
+            if (this.getAttribute("class") == "arc-label-help-up")
+                this.setAttribute("y", yl - dyl);
+            else
+                this.setAttribute("y", yl + dyl);
+        });
     }
 
     // position text and rectangle
