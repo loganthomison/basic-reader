@@ -72,8 +72,9 @@ Alph.site = {
         }
         
         this.enable_toolbar(a_doc);
-        
-        
+        var bro = Alph.main.getCurrentBrowser();
+        var trigger = Alph.main.getXlateTrigger(bro);
+        this.add_trigger_hint(a_doc,trigger,Alph.main.getLanguageTool(bro));
     },
     
     /**
@@ -578,6 +579,40 @@ Alph.site = {
         }
         r.open("GET", align_url);
         r.send(null);                                   
+    },
+    
+    /**
+     * Observe a ui event
+     * @param {Browser} a_bro the current browser
+     * @param {int} a_event_type the event type (one of @link Alph.main.events)
+     * @param {Object} a_event_data optional event data object
+     */
+    observe_ui_event: function(a_bro,a_event_type,a_event_data)
+    {
+        if (a_event_type == Alph.main.events.UPDATE_XLATE_TRIGGER)
+        {
+            //TODO - won't work for frames
+            var doc = a_bro.contentDocument;
+            this.add_trigger_hint(
+                doc,a_event_data.new_trigger,Alph.main.getLanguageTool(a_bro));
+        }
+
+    },
+    
+    /**
+     * Add trigger hint
+     * @param {Document} a_doc the document
+     * @param {String} a_trigger the current trigger
+     * @pram {Alp.LanguageTool} a_lang_tool the current language tool 
+     * 
+     */
+    add_trigger_hint: function(a_doc,a_trigger,a_lang_tool)
+    {
+        var hint_prop = 'alph-trigger-hint-'+a_trigger;
+        var lang = a_lang_tool.source_language;
+        var hint = a_lang_tool.get_string_or_default(hint_prop,[lang]);
+        Alph.util.log("Hint="+hint);
+        Alph.$(".alpheios-trigger-hint",a_doc).html(hint);
     }
     
 };

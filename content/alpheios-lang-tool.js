@@ -1301,6 +1301,34 @@ Alph.LanguageTool.prototype.get_string = function(a_name,a_replace)
 }
 
 /**
+ * Get a language specific string, or the default string for all languages
+ * @param {String} a_name the name of the property
+ * @param {Array} a_replace Optional list of replacement strings
+ * @return the requested string (or empty string if not found)
+ * @type String
+ 
+*/
+Alph.LanguageTool.prototype.get_string_or_default = function(a_name,a_replace)
+{
+    var str = this.get_string(a_name,a_replace);
+    if (str == '')
+    {
+       try
+       {
+            str = Alph.$("#alpheios-strings").get(0)
+                .getFormattedString(a_name,a_replace);
+       }
+       catch(a_e)
+       {
+            
+            Alph.util.log("Error retrieving default string " + a_name + ":" + a_e);
+            str = ''
+       }
+    }
+    return str;
+}
+
+/**
  * Add the language-specific tools to the word lookup
  * @paramaters {Node} a_node the node which contains the results 
  *                              of the word lookup  
@@ -1487,4 +1515,3 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
 
     
 }
-

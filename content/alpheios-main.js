@@ -1181,6 +1181,8 @@ Alph.main =
                 }
             }
         );
+        // Update the site
+        Alph.site.observe_ui_event(bro,a_event,a_event_data);
         
     },
     

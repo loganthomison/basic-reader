@@ -131,7 +131,7 @@ Alph_Quiz =
             '      <legend class="alph-query-header">' +
                this.main_str.getString("alph-query-infl") +
             '      </legend>' + 
-            '      <div class="alph-query-hint"/>' +
+            '      <div class="alph-query-hint alpheios-hint"/>' +
             '    </fieldset>' +
             '  </div>\n' +
             '</div>';

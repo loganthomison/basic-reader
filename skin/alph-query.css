@@ -59,8 +59,6 @@ body {
 }
 
 .alph-query-hint {
-    color: #4E6476;
-    font-style: italic;
     margin-bottom: 1em;
 }
 
@@ -114,7 +112,22 @@ label.incorrect {
     background: url(icons/redx.png) no-repeat;
 }
 
-label.answer:hover,label.incorrect:hover, .hovered.incorrect, .hovered.correct {
+td.incorrect {
+    background-image: url(icons/redx.png);
+    background-repeat: no-repeat;
+    background-position: 0% 50%;
+    padding-left: 18px !important;
+    
+}
+
+td.correct {
+    background-image: url(icons/checkmark.png);
+    background-repeat: no-repeat;
+    padding-left: 18px !important;
+    background-position: 0% 50%;
+}
+
+label.answer:hover, label.correct:hover, label.incorrect:hover, .hovered.incorrect, .hovered.correct {
     border: none !important;
     border-collapse: collapse;
 }
@@ -124,4 +137,10 @@ label.answer:hover,label.incorrect:hover, .hovered.incorrect, .hovered.correct {
     margin-right: 1em;
 }
 
+label {
+    line-height: 1.25em;
+}
 
+input[type=radio] {
+    margin-right: .5em;
+}
