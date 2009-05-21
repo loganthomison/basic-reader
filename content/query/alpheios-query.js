@@ -34,11 +34,11 @@
 /**
  * @singleton
  */
-Alph_Inter =
+Alph_Quiz =
 {
 
     main_str: null,
-    
+        
     /**
      * load data into the interactive querying window
      */
@@ -47,7 +47,6 @@ Alph_Inter =
         this.query_template = {};
         
         var params = window.arguments[0];
-
         var template_src = 
             "chrome://"
                 + params.lang_tool.getchromepkg()
@@ -58,21 +57,41 @@ Alph_Inter =
         this.main_str = params.main_str;
         this.load_query_head(params);
         
+        this.add_pofs_query(params);
+        this.add_defs_query(params);
+
         if (params.type == 'full_query')
         {
-            this.add_pofs_query(params);
-            this.add_defs_query(params);
+            // need to initiate the load of the contextual definitions
+            // in a separate thread, after the on load handler has had a 
+            // chance to complete. there ought to be a more reliable way
+            // of doing this, but I haven't been able to find it.
+            setTimeout("Alph_Quiz.load_query_context_defs()",500);
         }
         else if (params.type == 'infl_query')
         {
             var query_doc = $("#alph-query-frame").get(0).contentDocument;
-            this.add_pofs_query(params);
+            this.load_done();
             this.on_defs_correct(
-                params.aligned_defs.join(' '),params.source_node,$(".alph-query-element",query_doc));
-            $('.alph-query-defs',query_doc).css('display','block');
+                params.aligned_defs.join(' '),
+                params.source_node,$(".alph-query-element",query_doc));
+            
         }
      },
 
+     /**
+      * displays the elements on the page
+      * (to be called once the contextual definitions have finished loading
+      * because the elements aren't usuable until that's done.)
+      */
+     load_done: function()
+     {
+        var doc = $("#alph-query-frame").get(0).contentDocument;
+        $(".alph-query-element .loading",doc).remove();
+        $(".alph-select-pofs",doc).css("display","block");
+        $(".alph-defs-select,",doc).css("display","block");
+     },
+     
      load_query_head: function(a_params)
      {
         var query_doc = 
@@ -86,54 +105,47 @@ Alph_Inter =
         $("head",query_doc).append(
             '<link type="text/css" rel="stylesheet" href="chrome://alpheios/skin/alpheios.css"/>' +
             '<link type="text/css" rel="stylesheet" href="chrome://alpheios/skin/alph-query.css"/>' +
-            '<link type="text/css" rel="stylesheet" href="' + lang_css_url + '"/>'            
+            '<link type="text/css" rel="stylesheet" href="' + lang_css_url + '"/>'
         );
         
         var src_context = $(".alph-word",a_params.source_node).attr('context');
         var pofs = $('.alph-pofs',a_params.source_node).attr('context');
 
-        var infl_hint = '';
-        // look for a part-of-speech specific hint, and if not defined, use
-        // the more general inflection hint
-        try 
-        {
-            infl_hint = 
-                this.main_str.getFormattedString("alph-query-infl-hint-"+pofs,
-                [src_context]);
-        }
-        catch(a_e)
-        {
-            infl_hint = 
-                this.main_str.getFormattedString("alph-query-infl-hint",
-                [src_context]);
-        }
         var query_html = 
-            '<div class="alph-query-context">' + src_context + '</div>' +
-            '<div class="alph-query-element">' + 
-            '  <div class="alph-query-pofs">\n' +
-            '    <div class="alph-query-header">' +
-                this.main_str.getFormattedString("alph-query-pofs",[src_context]) +
-            '    </div>\n' +
+            '<div class="alph-query-instruct">' +
+            '  <button class="alph-query-close alpheios-button">'+
+                    this.main_str.getString("alph-query-close") +
+            '  </button>' +
+             '  <div class="alph-query-context">' +
+                    this.main_str.getFormattedString("alph-query-header",[src_context]) +
+            '  </div>' +
+            '</div>\n' +
+            '<div class="alph-query-element">' +
+            '  <div class="loading">' +
+            this.main_str.getString('alph-loading-misc') +
+            '  </div>'+
+                        '  <div class="alph-query-pofs" />\n' +
+            '  <div class="alph-query-defs" />\n' +
+            '  <div class="alph-query-infl" style="display:none;">' +
+            '    <fieldset class="alph-infl-select">' + 
+            '      <legend class="alph-query-header">' +
+               this.main_str.getString("alph-query-infl") +
+            '      </legend>' + 
+            '      <div class="alph-query-hint"/>' +
+            '    </fieldset>' +
             '  </div>\n' +
-            '  <div class="alph-query-defs" style="display:none;">' +
-            '    <div class="alph-query-header">' +
-               this.main_str.getFormattedString("alph-query-defs",[src_context]) +
-            '    </div>\n' +
-            '  </div>\n' +
-            '<div class="alph-query-infl" style="display:none;">' +
-            '    <div class="alph-query-header">' +
-               this.main_str.getFormattedString("alph-query-infl",[src_context]) +
-            '    </div>\n' +
-            '    <div class="alph-query-hint">' + infl_hint + '</div>\n' +
-            '    <div class="answer"/>' +
-            '  </div>\n' +
-            '</div>\n';
+            '</div>';
         $("#alph-panel-body-template",query_doc).after(query_html);
+        $(".alph-query-close",query_doc).click(
+            function()
+            {
+                window.close();
+            }
+        );
         $("#alph-panel-body-template",query_doc).css('display','none');
         //TODO the tools aren't working here yet, but not sure if we're
         // keeping them on this display 
-        var tools = $("#alph-word-tools",a_params.source_node).clone(true);
-        $(".alph-query-context",query_doc).prepend(tools);
+        
      },
      
      add_pofs_query: function(a_params)
@@ -146,26 +158,27 @@ Alph_Inter =
         var valid_pofs = $('.alph-pofs',a_params.source_node).attr('context');
    
         var select_pofs =
-            "<select class='alph-select-pofs'>" + 
-            '<option value="">---</option>';
+             '<fieldset class="alph-select-pofs" style="display: none;">' + 
+             '  <legend class="alph-query-header">' +
+                this.main_str.getString("alph-query-pofs") +
+            '  </legend>';
             
         pofs_list.forEach(
             function(a)
             {
                 select_pofs = select_pofs 
-                    + "<option value='"
+                    + "<label>" 
+                    + '<input type="radio" name="alph-select-pofs" value="' + a + '" />' 
                     + a
-                    + "'>"
-                    + a
-                    + "</option>";
+                    + "</label><br/>";
             }
         );
-        select_pofs = select_pofs + '</select>';
+        select_pofs = select_pofs + '</fieldset>';
         $('.alph-query-pofs',query_doc).append(select_pofs);
-        $(".alph-select-pofs",query_doc).change(
+        $("input[name=alph-select-pofs]",query_doc).click(
             function(e)
             {
-                Alph_Inter.checkPofsSelect(this,a_params.source_node);
+                Alph_Quiz.checkPofsSelect(this,a_params.source_node);
                 return true;
             }
         );
@@ -177,21 +190,13 @@ Alph_Inter =
             $("#alph-query-frame").get(0).contentDocument;
             
         var select_defs = 
-            '<div class="loading">' +
-            this.main_str.getString('alph-loading-misc') +
-            '</div>\n' +
-            '<select class="alph-defs-select">\n' +
-            '<option value="">---</option>\n' + 
-            '</select>\n';
-
-        $('.alph-query-defs',query_doc).append(select_defs);       
-        $(".alph-defs-select",query_doc).change(
-            function(e)
-            {
-                Alph_Inter.checkDefsSelect(this,a_params.source_node);
-                return true;
-            }
-        );
+            '<fieldset class="alph-defs-select" style="display: none;">' + 
+             '  <legend class="alph-query-header">' +
+                this.main_str.getString("alph-query-defs") +
+            '  </legend>' +
+            '</fieldset>\n';
+        $('.alph-query-defs',query_doc).append(select_defs);
+        
     },
     
     /**
@@ -199,21 +204,25 @@ Alph_Inter =
      * @param {HTMLSelect} a_select the containing Select element
      * @param {Element} a_src_node 
      */ 
-    checkDefsSelect: function(a_select,a_src_node)
+    checkDefsSelect: function(a_elem,a_src_node)
     {
-        var selected_value = a_select.options[a_select.selectedIndex].value;
-        var selected_text = a_select.options[a_select.selectedIndex].text;
-        var query_parent = $(a_select).parents('.alph-query-element').get(0); 
+        var selected_value = a_elem.value;
+        var selected_text = $(a_elem).parent("label").text();
+        var query_parent = $(a_elem).parents('.alph-query-element').get(0); 
         if (selected_value == 'correct')
         {            
             this.on_defs_correct(selected_text,a_src_node,query_parent);
-            this.load_query_infl(a_src_node);
+            // if the pofs is already answered,  move on to the inflections
+            if ( $(".alph-select-pofs .answer",query_parent).length > 0)
+            {
+                this.load_query_infl(a_src_node);
+            }
          }
          else
          {
-            alert(this.main_str.getString("alph-query-incorrect"));
-            // remove the incorrect answer from the list of options
-            $(a_select.options[a_select.selectedIndex]).remove();
+            $(a_elem).parent("label").addClass("incorrect");
+            $(a_elem).css("display","none");
+            //alert(this.main_str.getString("alph-query-incorrect"));
             // TODO - need to check and handle scenario when only correct answer is left
          }
     },
@@ -223,17 +232,18 @@ Alph_Inter =
      */
     on_defs_correct: function(a_answer,a_src_node,a_query_parent)
     { 
-        $('.alph-query-defs select',a_query_parent).css('display','none');
-        $('.alph-query-defs .alph-query-header',a_query_parent)
-            .text(this.main_str.getString("alph-query-defs-correct"));
-        $('.alph-query-defs',a_query_parent)
-                .append('<div class="answer">' + a_answer + '</div>');
-                
-        var dict_link = $("#alph-word-tools .alph-dict-link",a_src_node).clone(true);
+        var legend = 
+            '<legend class="alph-query-header">' + 
+            this.main_str.getString("alph-query-defs-correct") +
+            '</legend>';
+        $(".alph-defs-select",a_query_parent)
+                .html(legend)
+                .append('<label class="answer">' + a_answer + '</label>');                
+        $("#alph-word-tools .alph-dict-link",$(a_query_parent).get(0).ownerDocument)
+            .css("visibility","visible");
         var short_def_label = this.main_str.getString("alph-short-definition");
         $(".alph-query-defs",a_query_parent).append('<div class="alph-query-dict"/>');
         $(".alph-query-dict",a_query_parent).append(
-                dict_link,
                 '<div class="alpheios-label">' + short_def_label + '</div>',
                 $(".alph-hdwd",a_src_node).clone(true),
                 $(".alph-mean",a_src_node).clone(true));
@@ -243,43 +253,32 @@ Alph_Inter =
       * checks whether the part of speech selection is correct
       * @param {HTMLSelect} a_select the containing Select element
       */
-     checkPofsSelect: function(a_select,a_src_node)
+     checkPofsSelect: function(a_elem,a_src_node)
      {
-        var selected_value = a_select.options[a_select.selectedIndex].value;
-        var query_parent = $(a_select).parents('.alph-query-element').get(0);
         // TODO - for now, only looking at the first word in the popup -
         // need to add support for multiple words (and multiple entries per word??)
         var answer = $('.alph-pofs',a_src_node).attr('context');
-        
+        var selected_value = a_elem.value;
         if (selected_value == answer)
         {
-            $(a_select).css('display','none');
-            
-            $('.alph-query-pofs .alph-query-header',query_parent)
-                .text(this.main_str.getString("alph-query-pofs-correct"));
-
-            $('.alph-query-pofs',query_parent)
-                    .append('<div class="answer">' + selected_value + '</div>');
-            // if the definitions part is already displayed,  move on to the inflections
-            if ( $(".alph-query-defs .answer",query_parent).length == 1)
+            var legend = 
+                '<legend class="alph-query-header">' + 
+                this.main_str.getString("alph-query-pofs-correct") +
+                '</legend>';
+            $(a_elem).parents("fieldset")
+                .html(legend)
+                .append('<label class="answer">' + selected_value + '</label>');
+            // if the definitions part is already answered,  move on to the inflections
+            if ( $(".alph-defs-select .answer",a_elem.ownerDocument).length > 0)
             {
                 this.load_query_infl(a_src_node);
-            }
-            else
-            {
-                $('.alph-query-defs',query_parent).css('display','block');
-                // execute the call to load the query definitions in a thread
-                // because it can take a little while .. postpone the call
-                // by a few milliseconds so the loading message has time to
-                // display
-                setTimeout(Alph_Inter.load_query_context_defs,50);
             }
         }
         else
         {
-            alert(this.main_str.getString("alph-query-incorrect"));
-            // remove the incorrect answer from the list of options
-            $(a_select.options[a_select.selectedIndex]).remove();
+            $(a_elem).parent("label").addClass("incorrect");
+            $(a_elem).css("display","none");
+            //alert(this.main_str.getString("alph-query-incorrect"));
             // TODO - need to check and handle scenario when only correct answer is left
         }
         return false;
@@ -324,19 +323,20 @@ Alph_Inter =
                             .append(new_elem);
                         }
                     );
-                    Alph_Inter.display_context_defs(a_params,a_pofs);
+                    Alph_Quiz.display_context_defs(a_params,a_pofs);
                 },
                 function(a_error)
                 {
                     
-                    Alph_Inter.display_context_defs(a_params,a_pofs);
+                    Alph_Quiz.display_context_defs(a_params,a_pofs);
                 }
             );
         }
         else
         {
-            Alph_Inter.display_context_defs(a_params,a_pofs)
+            Alph_Quiz.display_context_defs(a_params,a_pofs)
         }
+        Alph_Quiz.load_done();
         
     },                        
 
@@ -361,7 +361,9 @@ Alph_Inter =
                 }
             );
         
-            defs.push('<option value="correct">' + correct.join(' ') + '</option>');
+            defs.push(
+                '<label><input type="radio" name="alph-defs-select" value="correct"/>' + 
+                correct.join(' ') + '</label>');
             
             try 
             {
@@ -388,17 +390,19 @@ Alph_Inter =
                                         .text());
                                 }
                             );
-                            incorrect.push('<option value="incorrect">' + choice.join(' ') + '</option>'); 
+                            incorrect.push(
+                                '<label><input type="radio" name="alph-defs-select" value="incorrect"/>' + 
+                                choice.join(' ') + '</label>'); 
                         }
                     }
                 );
-                incorrect.sort(Alph_Inter.sort_random);
+                incorrect.sort(Alph_Quiz.sort_random);
                 var max = 4;
                 if (incorrect.length < max)
                 {
                     max = incorrect.length;
                 }
-                defs = defs.concat(incorrect.slice(0,max)).sort(Alph_Inter.sort_random);
+                defs = defs.concat(incorrect.slice(0,max)).sort(Alph_Quiz.sort_random);
                 
             }
             catch(a_e)
@@ -412,9 +416,17 @@ Alph_Inter =
             defs.forEach(
                 function(a_opt)
                 {
-                    $(".alph-defs-select",query_doc).append(a_opt);
+                    $(".alph-defs-select",query_doc).append(a_opt + '<br/>');
                 }
             );
+            $("input[name=alph-defs-select]",query_doc).click(
+            function(e)
+            {
+                Alph_Quiz.checkDefsSelect(this,a_params.source_node);
+                return true;
+            }
+        );
+
         }
         else
         {
@@ -429,10 +441,8 @@ Alph_Inter =
             {
                 answer = this.main_str.getString("alph-query-defs-not-found");
             }
-            this.on_defs_correct(answer,a_params,$(".alph-query-element",query_doc));
+            this.on_defs_correct(answer,a_params.source_node,$(".alph-query-element",query_doc));
         }
-        $(".alph-query-defs .loading",query_doc).remove();
-        
     },
     
     /**
@@ -444,6 +454,7 @@ Alph_Inter =
 
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
         $('.alph-query-infl',parent_doc).css('display','block');
+        var form = $(".alph-word",a_src_node).attr('context');
         var pofs = $('.alph-pofs',a_src_node).attr('context');
         var decls = [];
         $('.alph-decl',a_src_node).each(
@@ -504,22 +515,66 @@ Alph_Inter =
         // treebanked text there should only be one set, but we may eventually
         // need to handle the case where more the one possible answer exists
         // for other uses
-        var has_infl_query = Alph_Inter.query_template.make_infl_query(
-                $(".alph-query-element",parent_doc),
+        var has_infl_query = Alph_Quiz.query_template.make_infl_query(
+                $(".alph-infl-select",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
                    ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-', 
                    attributes: context_list[0],
                    src_node: a_src_node
                 },
-                function() { Alph_Inter.on_infl_correct(a_src_node) }
+                function() { Alph_Quiz.on_infl_correct(a_src_node) }
             );
         if (! has_infl_query)
         {
             this.on_infl_correct(a_src_node,
                 this.main_str.getString("alph-query-infl-missing"));
         }
-        this.resize_window();
+        else
+        {
+            var text = this.main_str.getFormattedString("alph-query-infl-continue",[form]);
+            var infl_hint = '';
+                // look for a part-of-speech specific hint, and if not defined, use
+                // the more general inflection hint
+            try 
+            {
+                infl_hint = 
+                    this.main_str.getFormattedString("alph-query-infl-hint-"+pofs,
+                    [form]);
+            }
+            catch(a_e)
+            {
+                infl_hint = 
+                    this.main_str.getFormattedString("alph-query-infl-hint",
+                        [form]);
+            } 
+            $(".alph-infl-select .alph-query-hint",parent_doc).html(text);
+            $('.alph-infl-select',parent_doc).append(
+                 '<label><input type="radio" name="do-infl" value="1">' +
+                    this.main_str.getString('alph-query-infl-yes') +
+                 '</label><br/>\n' +
+                 '<label><input type="radio" name="do-infl" value="0">' +
+                    this.main_str.getString('alph-query-infl-no') +
+                 '</label><br/>\n'
+                );
+            $('input[name=do-infl]',parent_doc).click(
+                function()
+                {
+                    $(this).parents("fieldset").children("label").remove();
+                    if (this.value == 1)
+                    {
+                        $(".alph-infl-select .alph-query-hint",parent_doc).html(infl_hint);
+                        $(".query-table",parent_doc).css("display",'block');
+                    }
+                    else
+                    {
+                        Alph_Quiz.on_infl_correct(a_src_node);
+                    }
+                    Alph_Quiz.resize_window();
+                }
+            );
+        }
+        
     },
     
     /**
@@ -528,7 +583,30 @@ Alph_Inter =
      */
     resize_window: function() 
     {
-        // TODO resize the window to fit the contents 
+        var parent_doc = $("#alph-query-frame").get(0).contentDocument;
+        var height = $(".alph-query-element",parent_doc).height();
+        var width = $(".alph-query-element",parent_doc).width();
+        
+        var min_height = 800;
+        var min_width = 800;
+        
+        // resize the window 
+        // add a little space to the top
+        if (width > window.screen.availWidth) {
+            width = window.screen.availWidth - 20; // don't take up the entire screen
+        }
+        else if (width < min_width)
+        {
+            width = min_width;
+        }
+        if (height > window.screen.availHeight) {
+            height = window.screen.availHeight - 20; // don't take up the entire screen 
+        }
+        else if (height < min_height)
+        {
+            height = min_height;
+        }
+        window.resizeTo(width,height);
     },
     
     /**
@@ -539,18 +617,9 @@ Alph_Inter =
     {
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
         $('.alph-query-infl .alph-query-header',parent_doc)
-            .text(Alph_Inter.main_str.getString("alph-query-infl-correct"));
-        if (typeof a_message == 'string')
-        {
-            $('.alph-query-infl .alph-query-hint',parent_doc)
-            .text(a_message);
-        }
-        else
-        {
-            $('.alph-query-infl .alph-query-hint',parent_doc)
-            .remove();
-        
-        }
+            .text(Alph_Quiz.main_str.getString("alph-query-infl-correct"));
+        $('.alph-query-infl .alph-query-hint',parent_doc).remove();
+            
         // clone the entire entry to get any bound events on the child elements
         var entry = $(".alph-entry",a_src_node).clone();
         // remove the hdwd, meaning and the part of speech,
@@ -560,8 +629,10 @@ Alph_Inter =
         $(".alph-mean",entry).remove();
         var attr = $(".alph-morph .alph-pofs .alph-attr",entry);
         $(".alph-morph .alph-pofs",entry).html(attr);
-        $(".alph-query-infl .answer",parent_doc).append(entry);
+        $(".alph-infl-select",parent_doc).prepend(entry);                
         window.arguments[0].lang_tool.contextHandler(parent_doc);
+        this.quiz_done();
+        this.resize_window();
     },
     
     /**
@@ -570,5 +641,27 @@ Alph_Inter =
     sort_random: function(a,b)
     {
         return (Math.round(Math.random())-0.5);
+    },
+    
+    /**
+     * function called when the user is finished with the quiz.
+     */
+    quiz_done: function()
+    {
+        var params = window.arguments[0];
+        var form = $(".alph-word",params.source_node).attr('context');
+        var query_doc = $("#alph-query-frame").get(0).contentDocument;
+        /**
+         * add further instructions and the word tools to the window
+         */
+        var tools = $("#alph-word-tools",params.source_node).clone();
+        $(".alph-query-context",query_doc)
+            .after('<div class="alph-query-context">' +
+                this.main_str.getFormattedString('alph-query-done-hint',[form]) +
+                '</div>')
+            .remove();
+        $(".alph-query-instruct",query_doc).append(tools).append('<br/>');
     }
+    
+    
 }

@@ -133,7 +133,7 @@ Alph.interactive = {
                 chrome: "yes",
                 dialog: "no",
                 resizable: "yes",
-                width: "1024",
+                width: "800",
                 height: "800",
                 scrollbars: "yes"
             };

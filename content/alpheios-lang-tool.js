@@ -950,7 +950,7 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
                 Alph.$("#alpheios-strings").get(0)
                     .getFormattedString('alph-dictionary-link',[dict_name_str]);
             dict_link =
-                '<div class="alph-tool-icon alph-dict-link" href="#alph-dict" title="' 
+                '<div class="alph-tool-icon alpheios-button alph-dict-link" href="#alph-dict" title="' 
                 + dict_link_text + '">' +
                 '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
                 'alt="' + dict_link_text + '"/><div>Define</div></div>';
@@ -1319,7 +1319,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     {
         var diagram_alt_text = strings.getString('alph-diagram-link');
         Alph.$('' +
-            '<div class="alph-tool-icon alph-diagram-link" ' + 
+            '<div class="alph-tool-icon alpheios-button alph-diagram-link" ' + 
             'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+  
             '<img src="chrome://alpheios/skin/icons/diagram_16.png"' +
             ' alt="' + diagram_alt_text + '" /><div>Diagram</div></div>',a_node)
@@ -1332,25 +1332,6 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             }
         );
     }
-    // add the inflection tool, if any
-    if (this.getFeature('alpheios-inflect'))
-    {
-        var inflect_alt_text = strings.getString('alph-inflect-link');
-        Alph.$("#alph-word-tools",a_node).append(
-            '<div class="alph-tool-icon alph-inflect-link" ' + 
-            'href="#alpheios-inflect" title="' + inflect_alt_text + '">' + 
-            '<img src="chrome://alpheios/skin/icons/inflection_16.png" ' +
-            'alt="' + inflect_alt_text + '"/><div>Inflect</div></div>'
-        );
-        Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
-            function(a_e)
-            {
-                lang_tool.handleInflections(a_e,a_node);
-                return false;
-            }
-        );
-    }
-    
     // add language-specific dictionary link, if any
     if (! Alph.main.panels['alph-dict-panel'].
         is_visible_inline(Alph.main.getCurrentBrowser()))
@@ -1379,7 +1360,25 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             }
         );
     }
-    
+    // add the inflection tool, if any
+    if (this.getFeature('alpheios-inflect'))
+    {
+        var inflect_alt_text = strings.getString('alph-inflect-link');
+        Alph.$("#alph-word-tools",a_node).append(
+            '<div class="alph-tool-icon alpheios-button alph-inflect-link" ' + 
+            'href="#alpheios-inflect" title="' + inflect_alt_text + '">' + 
+            '<img src="chrome://alpheios/skin/icons/inflection_16.png" ' +
+            'alt="' + inflect_alt_text + '"/><div>Inflect</div></div>'
+        );
+        Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
+            function(a_e)
+            {
+                lang_tool.handleInflections(a_e,a_node);
+                return false;
+            }
+        );
+    }
+        
     if (Alph.$("#alph-word-tools",a_node).children().length > 0)
     {
         if (Alph.$("#alph-word-tools",a_node).prepend(

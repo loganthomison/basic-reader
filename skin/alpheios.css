@@ -227,6 +227,7 @@ div.alph-morph {
 }
 
 .loading {
+    font-size: smaller;
     padding-left: 18px;
     padding-top: 2px;
     padding-bottom: 2px;
@@ -283,18 +284,10 @@ div.alph-morph {
 }
 
 .alph-tool-icon {
-    background-color: #ebe9d7;
-    border-width: 1px;
-    border-style: solid;  
-    border-color: #9E9C9A;
-    text-decoration: none;
-    margin-right: 1px;
-    cursor: pointer;
     display: inline;
     position: relative;
     float: left;
     font-size: 10px;
-    text-align: center;
     width: 40px;
     height: 32px;
 }
@@ -303,10 +296,6 @@ div.alph-morph {
     margin: 0 0;
     vertical-align: bottom;
     border: 1px solid transparent; 
-}
-
-.alph-tool-icon:hover {
-    border-color: ThreeDHighlight ThreeDShadow ThreeDShadow ThreeDHighlight;
 }
 
 .alph-tooltip {
@@ -362,7 +351,7 @@ div.alph-morph {
 .alpheios-toolbar-label {
     color: #0e2233;
     font-size: smaller;
-    padding-right: 0 4px; 
+    padding-right: 4px; 
     display: none;
 }
 
@@ -370,4 +359,19 @@ div.alph-morph {
     border: 1px solid #9e9c98;
     background-color: #9e9c9a;
     height: 18px;
+}
+
+.alpheios-button {
+    background-color: #ebe9d7;
+    border-width: 1px;
+    border-style: solid;  
+    border-color: #9E9C9A;
+    text-decoration: none;
+    cursor: pointer;
+    margin-right: 1px;
+    text-align: center;
+}
+
+.alpheios-button:hover {
+    border-color: ThreeDHighlight ThreeDShadow ThreeDShadow ThreeDHighlight;
 }

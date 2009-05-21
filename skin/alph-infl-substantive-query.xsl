@@ -154,7 +154,8 @@
                     <xsl:attribute name="class">rowgroupheader header-text</xsl:attribute>
                     <xsl:attribute name="context"><xsl:value-of select="$group1"/></xsl:attribute>
                     <xsl:attribute name="{concat('alph-',$group1)}">
-                        <xsl:value-of select="$groupheader"/>
+                        <xsl:value-of select="
+                            concat('|',translate($groupheader,' ','|'),'|')"/>
                     </xsl:attribute>
                     <xsl:value-of select="$groupheader"/>
                     <xsl:call-template name="add-footnote">
@@ -213,7 +214,8 @@
                         <xsl:value-of select="$group4"/>
                     </xsl:attribute>                    
                     <xsl:attribute name="{concat('alph-',$group4)}">
-                        <xsl:value-of select="."/>
+                        <xsl:value-of select="
+                            concat('|',translate(.,' ','|'),'|')"/>
                     </xsl:attribute>
                     <span class="header-text"><xsl:value-of select="."/></span>
                     <xsl:apply-templates select="."/>
@@ -229,6 +231,7 @@
             </th>        
             <xsl:for-each select="$headerrow1">
                 <xsl:sort select="@order" data-type="number"/>
+                <xsl:variable name="lastgroup4" select="."/>
                 <xsl:for-each select="$headerrow2">
                     <xsl:element name="th">
                         <xsl:attribute name="colspan">
@@ -238,8 +241,14 @@
                             <xsl:value-of select="$group5"/>
                         </xsl:attribute>
                         <xsl:attribute name="{concat('alph-',$group5)}">
-                            <xsl:value-of select="."/>
+                            <xsl:value-of select="
+                                concat('|',translate(.,' ','|'),'|')"/>
                         </xsl:attribute>
+                        <xsl:attribute name="{concat('alph-',$group4)}">
+                            <xsl:value-of select="
+                                concat('|',translate($lastgroup4,' ','|'),'|')"/>
+                        </xsl:attribute>
+                        
                         <span class="header-text"><xsl:value-of select="."/></span>
                         <xsl:apply-templates select="."/>
                     </xsl:element>

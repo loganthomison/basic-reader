@@ -9,7 +9,7 @@
 <window id="alpheiosQuery"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         title="&alpheios.query.full.title;"
-        buttons="accept" onload="Alph_Inter.load_query_window();" 
+        buttons="accept" onload="Alph_Quiz.load_query_window();" 
         onaccept="this.close();">
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery.tablehover.pack.js" />
