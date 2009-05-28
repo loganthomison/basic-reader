@@ -387,6 +387,7 @@ Alph.prefs = {
         
         var URL = '.url';
         var LEMMA = '.lemma_param';
+        var ID = '.id_param';
         var MULTI = '.multiple_lemmas';
         
         var dict_parent = 
@@ -415,6 +416,12 @@ Alph.prefs = {
                 Alph.util.makePref(
                     pref_id + LEMMA,
                     pref_base_s + LEMMA,
+                    'string')
+            );
+            prefs.appendChild(
+                Alph.util.makePref(
+                    pref_id + ID,
+                    pref_base_s + ID,
                     'string')
             );
             prefs.appendChild(
@@ -461,6 +468,25 @@ Alph.prefs = {
                     [pref_id+LEMMA,'param']
                 )
             );
+            var hbox_id =
+                Alph.util.makeXUL('hbox','',[],[]);
+            hbox_id.appendChild(
+                Alph.util.makeXUL(
+                    'label',
+                    '',
+                    ['control','value'],
+                    [ctl_id+ID,
+                     strings.getString('dict.url' + ID)]
+                )
+            );
+            hbox_id.appendChild(
+                Alph.util.makeXUL(
+                    'textbox',
+                    ctl_id + ID,
+                    ['preference','class'],
+                    [pref_id+ID,'param']
+                )
+            );
             var hbox_multi =
                 Alph.util.makeXUL('hbox','',['align'],['top']);
             hbox_multi.appendChild(
@@ -473,6 +499,7 @@ Alph.prefs = {
             );
               
             dict_parent.appendChild(hbox);
+            dict_parent.appendChild(hbox_id);
             dict_parent.appendChild(hbox_lemma);
             dict_parent.appendChild(hbox_multi);
         }
