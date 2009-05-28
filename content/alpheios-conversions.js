@@ -164,7 +164,7 @@ Alph.convert = {
         {
             var xmlDoc = document.implementation.createDocument("", "", null);
             xmlDoc.async = false;
-            xmlDoc.load("chrome://alpheios/skin/alpheios-normalize-unicode.xsl");
+            xmlDoc.load("chrome://alpheios/skin/alpheios-normalize-greek.xsl");
             this.uNormalizer = new XSLTProcessor();
             this.uNormalizer.importStylesheet(xmlDoc);
         }
