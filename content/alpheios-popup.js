@@ -517,7 +517,7 @@ Alph.xlate = {
             
             var new_entry = Alph.$(".alph-entry",new_text_node);
             var new_dict = Alph.$(".alph-dict",new_entry);
-            var new_hdwd = Alph.$(new_dict).attr("lemma-id");
+            var new_hdwd = Alph.$(new_dict).attr("lemma-key");
             var new_infl_node = 
                     Alph.$(".alph-infl",new_entry).get(0);
             
@@ -537,7 +537,7 @@ Alph.xlate = {
                     // contents of the first inflection set for that entry 
                     // with the treebank output
                     var entry_match = 
-                        Alph.$(".alph-dict[lemma-id=" + new_hdwd +"]",popup)
+                        Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
                         .parents(".alph-entry");
                     if (entry_match.length > 0)
                     {
