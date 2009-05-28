@@ -41,6 +41,13 @@ Alph.convert = {
     u2bConverter: null,
 
     /**
+     * An XSLT Processor for unicode normalization
+     * @private
+     * @type XSLTProcessor
+     */
+    uNormalizer: null,
+
+    /**
      * @type nsIScriptableUnicodeConverter
      */
     unicode_conv: 
@@ -141,5 +148,38 @@ Alph.convert = {
             Alph.util.log(e);
         }
         return betaText;
+    }
+
+    /**
+     * greek normalization (precomposed/decomposed Unicode)
+     * @param {String} a_str the string to normalize
+     * @param {Boolean} a_precomposed whether to output precomposed Unicode
+     * @return the normalized string
+     * @type {String}
+     */
+    normalize_greek: function(a_str, a_precomposed)
+    {
+        /* initialize the XSLT converter if we haven't done so already */
+        if (this.uNormalizer == null)
+        {
+            var xmlDoc = document.implementation.createDocument("", "", null);
+            xmlDoc.async = false;
+            xmlDoc.load("chrome://alpheios/skin/alpheios-normalize-unicode.xsl");
+            this.uNormalizer = new XSLTProcessor();
+            this.uNormalizer.importStylesheet(xmlDoc);
+        }
+        var normText = '';
+        try
+        {
+            this.uNormalizer.setParameter(null, "input", a_str);
+            this.uNormalizer.setParameter(null, "precomposed", (a_precomposed ? 1 : 0));
+            var dummy = (new DOMParser()).parseFromString("<root/>","text/xml");
+            normText = this.uNormalizer.transformToDocument(dummy).documentElement.textContent;
+        }
+        catch (e)
+        {
+            Alph.util.log(e);
+        }
+        return normText;
     }
 };
