@@ -50,33 +50,11 @@
                     <label id="alph-dict-label" 
                            value="&alpheios-dict-toolbar-label;"/>
                 </toolbaritem>
-                <toolbarbutton id="alpheios-dict-browse" 
-                          label="&alpheios.panel.dict.browse;"
-                          tooltiptext="&alpheios.panel.dict.browse;"
-                          command="alpheios-dict-browse-cmd"
-                          type="button"
-                          class="menuitem-iconic"/>
                 <browser 
                     id="alph-dict-body"
                     flex="1"
                     src="chrome://alpheios/content/html/alph-panel.html" 
-                    class="alph-lexicon-output"/>
-                
-                <toolbarbutton id="alpheios-dict-switch-menu"
-                     label="&alpheios.panel.dict.menu;"
-                     observes="alpheios-enabled-status"
-                     type="menu">
-                    <menupopup
-                        id = "alph-dict-menu-popup"
-                        onpopupshowing="Alph.Dict.update_dict_menu(this)">       
-                       <menuitem id="alpheios-dict-none" 
-                          label="&alpheios.panel.dict.none;"
-                          name="alpheios-dict-current"
-                          command="alpheios-dict-switch-cmd"
-                          type="radio"
-                          class="menuitem-iconic"/>
-                    </menupopup>
-                </toolbarbutton>
+                    class="alph-lexicon-output"/>                
             </alpheiosPanel>
     </hbox>  
 </overlay>
