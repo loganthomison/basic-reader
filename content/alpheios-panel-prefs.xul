@@ -1,12 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
-<!-- Alpheios Panel Preferences Overlay -->
-<overlay id="alpheios-panel-prefs"
-         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    
+<?xml version="1.0"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/prefs/alpheios-prefs.css" type="text/css"?>
+<prefwindow id="alpheios-prefs-panel-dlg" 
+    type="child"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    title="&alpheios.prefs.windows;"
+    dlgbuttons="accept,cancel">
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />    
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
 
-    <prefpane id="alpheios-prefs-windows"
+    <prefpane id="alpheios-panel-prefs"
               onpaneload="Alph.prefs.init_panel_prefs();">
         <preferences>
             <preference id="pref-panels-sticky"
@@ -49,10 +54,9 @@
                         name="extensions.alpheios.panels.alph-tree-panel.basic" 
                         type="int"/>
         </preferences>
-    </prefpane>
     
-    <vbox id ="window-prefs-box">
-        <tabbox id="alpheios-panel-prefs" insertbefore="shift-window-loc-label">
+    
+        <tabbox id="alpheios-panel-prefs">
             <tabs id="panel-prefs-tabs">
                 <tab label="&alpheios.prefs.panels.default;"/>
             </tabs>
@@ -66,7 +70,7 @@
                             <checkbox 
                                 id="panels-sticky"
                                 preference="pref-panels-sticky"/>
-                            <button oncommand="Alph.prefs.restore_panel_defaults();"
+                            <button oncommand="Alph.prefs.restore_panel_defaults(this);"
                                 label="&alpheios.prefs.panels.restore.defaults;"/>
                         </hbox>
                         <groupbox>
@@ -184,5 +188,5 @@
                 </tabpanel>           
             </tabpanels>
         </tabbox>
-    </vbox>
-</overlay>
+    </prefpane>
+</prefwindow>

@@ -13,3 +13,7 @@
 #alpheios-panel-prefs rows row {
     -moz-box-align: center;
 }
+
+tabpanel radiogroup caption {
+    background: inherit;
+}

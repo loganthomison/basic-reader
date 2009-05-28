@@ -142,18 +142,9 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
         disable_interlinear = false;
         
     }
-    Alph.$("#alph-trans-inter-trans-status").attr("disabled",disable_interlinear);
-    Alph.$("#alph-trans-inter-trans-status").attr("hidden",disable_interlinear);
-    // populate the interlinear display if it's checked and enabled
-    if ( ! disable_interlinear &&
-        (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
-        && ! Alph.interactive.enabled()
-       )
-    {
-        Alph.Translation.show_interlinear();
-    }
-                       
-}
+    Alph.Translation.set_interlinear_toggle(disable_interlinear);                       
+},
+
 
 /**
  * Translation panel specific implementation of 
@@ -182,6 +173,23 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
         Alph.Translation.loadUrl(null,url_bar);
     }
     **/
+};
+
+/**
+ * Translation specific implementation of
+ * {@link Alph.Panel.observe_ui_event}
+ * @param {Browser} a_bro the current browser
+ * @param a_event_type the event type (one of @link Alph.main.events)
+ * @param a_event_data optional event data object
+ */
+Alph.Translation.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
+{
+    if (a_event_type == Alph.main.events.UPDATE_PREF 
+        && a_event_data.name.indexOf('features.alpheios-interlinear') >= 0)
+    {
+        Alph.Translation.set_interlinear_toggle(! a_event_data.value);             
+    }
+
 };
 
 /**
@@ -343,3 +351,23 @@ Alph.Translation.INTERLINEAR_TARGET_SRC = 'src';
  * @type String
  */ 
 Alph.Translation.INTERLINEAR_TARGET_TRANS = 'trans';
+
+/**
+ * Responds to a change in the enabled/disabled status
+ * of the interlinear translation feature
+ * @param {Boolean} a_disabled true if the feature is disabled, false if it
+ *                             is enabled
+ */
+Alph.Translation.set_interlinear_toggle = function(a_disabled)
+{
+    Alph.$("#alph-trans-inter-trans-status").attr("disabled",a_disabled);
+    Alph.$("#alph-trans-inter-trans-status").attr("hidden",a_disabled);
+    // populate the interlinear display if it's checked and enabled
+    if ( ! a_disabled &&
+        (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
+        && ! Alph.interactive.enabled()
+       )
+    {
+        Alph.Translation.show_interlinear();
+    }
+};

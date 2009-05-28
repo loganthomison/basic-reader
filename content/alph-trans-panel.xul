@@ -31,6 +31,7 @@
             oncommand="Alph.Translation.toggle_interlinear('trans',event);"
             disabled="true">
             <observes element="alph-trans-inter-trans-status" attribute="disabled"/>
+            <observes element="alph-trans-inter-trans-status" attribute="hidden"/>
             <observes element="alpheios-learner-disabled" attribute="hidden"/>
         </command>
     </commandset>    

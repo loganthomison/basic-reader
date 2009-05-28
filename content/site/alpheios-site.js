@@ -275,7 +275,12 @@ Alph.site = {
                         Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
                 }
             }   
+            Alph.$("#alpheios-interlinear-parent",a_doc).css("display","block");
             
+        }
+        else
+        {
+            Alph.$("#alpheios-interlinear-parent",a_doc).css("display","none");
         }
     },
 
@@ -589,12 +594,19 @@ Alph.site = {
      */
     observe_ui_event: function(a_bro,a_event_type,a_event_data)
     {
+       //TODO - won't work for frames
+       var doc = a_bro.contentDocument;
+       
         if (a_event_type == Alph.main.events.UPDATE_XLATE_TRIGGER)
         {
-            //TODO - won't work for frames
-            var doc = a_bro.contentDocument;
             this.add_trigger_hint(
                 doc,a_event_data.new_trigger,Alph.main.getLanguageTool(a_bro));
+        }
+        // observe change to config setting which enables interlinear
+        else if (a_event_type == Alph.main.events.UPDATE_PREF 
+                 && a_event_data.name.indexOf('features.alpheios-interlinear') >= 0)
+        {
+            this.add_interlinear_toggle(doc);             
         }
 
     },

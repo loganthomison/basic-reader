@@ -1,14 +1,17 @@
 <!ENTITY alpheios.prefs.preferences "Alpheios Preferences">
 <!ENTITY alpheios.prefs.mouse "Mouse Settings">
-<!ENTITY alpheios.prefs.system "System Settings">
-<!ENTITY alpheios.prefs.general "General">
-<!ENTITY alpheios.prefs.debug "Enable Console Debugging">
+<!ENTITY alpheios.prefs.advanced "Advanced">
+<!ENTITY alpheios.prefs.advanced.label "Advanced...">
+<!ENTITY alpheios.prefs.features "General">
+<!ENTITY alpheios.prefs.debug "Debugging">
+<!ENTITY alpheios.prefs.debug.enable "Enable Console Debugging">
 <!ENTITY alpheios.prefs.includecontext "Extract Surrounding Context From Word">
-<!ENTITY alpheios.prefs.popuptrigger "Event triggers for popup:">
-<!ENTITY alpheios.prefs.popuptrigger.default "Default:">
+<!ENTITY alpheios.prefs.popuptrigger "Mouse action to trigger lookup:">
+<!ENTITY alpheios.prefs.popuptrigger.default "Default mouse action for lookup:">
 <!ENTITY alpheios.prefs.popuptrigger.mousemove "mousemove">
 <!ENTITY alpheios.prefs.popuptrigger.dblclick "dblclick">
-<!ENTITY alpheios.prefs.windows "Window Preferences">
+<!ENTITY alpheios.prefs.windows "Window and Panel Preferences">
+<!ENTITY alpheios.prefs.windows.label "Window/Panel Settings...">
 <!ENTITY alpheios.prefs.grammar.window.loc "Grammar Window Location">
 <!ENTITY alpheios.prefs.shift.window.loc "Shift Key Window Location">
 <!ENTITY alpheios.prefs.top.left "Top Left">
@@ -18,7 +21,7 @@
 <!ENTITY alpheios.prefs.default.language "Preferred Language">
 <!ENTITY alpheios.prefs.panels.default "Panel Defaults">
 <!ENTITY alpheios.prefs.panels.use.defaults "Use Global Defaults">
-<!ENTITY alpheios.prefs.panels.restore.defaults "Restore Panel Defaults">
+<!ENTITY alpheios.prefs.panels.restore.defaults "Restore Defaults">
 <!ENTITY alpheios.prefs.panels.sticky "Interface Changes Sticky">
 <!ENTITY alpheios.prefs.panel.name "Panel Name">
 <!ENTITY alpheios.prefs.panel.ped "Pedagogical">
@@ -29,6 +32,19 @@
 <!ENTITY alpheios.prefs.panel.tree "Dependency Tree Panel">
 <!ENTITY alpheios.prefs.panel.etym "Etymology/Cognates Panel">
 <!ENTITY alpheios.prefs.dictionaries "Dictionaries">
+<!ENTITY alpheios.prefs.dictionaries.advanced "Advanced Dictionary Settings">
+<!ENTITY alpheios.prefs.lookup "Word Lookup">
 <!ENTITY alpheios.prefs.toolbar.lookup "Enable Toolbar Lookup">
 <!ENTITY alpheios.prefs.panels.inline "Inline Panels">
 <!ENTITY alpheios.prefs.panels.default.caption "Panels Open By Default">
+<!ENTITY alpheios.prefs.services.advanced "Advanced Service Settings">
+<!ENTITY advanced.accesskey "a">
+<!ENTITY alpheios.prefs.interlinear "Interlinear Translation">
+<!ENTITY alpheios.prefs.interlinear.enable "Enable Interlinear Translation (Alpheios Enhanced Texts only) EXPERIMENTAL">
+<!ENTITY alpheios.prefs.url.morph "Morphology Service URL:">
+<!ENTITY alpheios.prefs.url.morph.request "Morphology Service Request Parameters:">
+<!ENTITY alpheios.prefs.url.morph.timeout "Morphology Service Timeout (ms):">
+<!ENTITY alpheios.prefs.popuptrigger.mousemove "mousemove">
+<!ENTITY alpheios.prefs.popuptrigger.dblclick "dblclick">
+<!ENTITY alpheios.prefs.timeouts.default "Default Request Timeouts">
+<!ENTITY alpheios.prefs.dict.full.timeout "Full Dictionary Request Timeout (ms):">
