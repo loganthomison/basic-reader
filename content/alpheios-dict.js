@@ -260,7 +260,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             var lemma_lex = this.getAttribute("lemma-lex");
             if (lemma || lemma_id)
             {
-                // lemma may have multiple value, so split
+                // lemma may have multiple values, so split
                 var lemset = lemma.split(' ');
                 for (var i in lemset)
                     lemmas.push([lemma_id, lemset[i], lemma_lang, lemma_lex]);
@@ -272,7 +272,6 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     // if we don't have any lemmas
     if (lemmas.length > 0)
     {
-
         if (typeof dictionary_callback != 'function')
         {
             // if we don't have any callback defined for this language,
@@ -335,7 +334,6 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
                         request.pending = false;
                         Alph.util.log("Request complete: " + lemmas.join(', '));
                     }
-
                 );
 
             }
