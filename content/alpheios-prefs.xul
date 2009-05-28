@@ -19,6 +19,7 @@
           image="chrome://alpheios/skin/icons/alpheios_32.ico">
         <preferences>
             <preference id="pref-tblookup" name="extensions.alpheios.toolbar.lookup" type="bool"/>
+            <preference id="pref-smallicons" name="extensions.alpheios.smallicons" type="bool"/>
             <preference id="pref-interlinear" 
                         name="extensions.alpheios.features.alpheios-interlinear" 
                         type="bool"/>
@@ -37,6 +38,10 @@
                         <checkbox id="tblookup" 
                                   label="&alpheios.prefs.toolbar.lookup;" 
                                   preference="pref-tblookup"/>
+                        <checkbox id="smallicons" 
+                                  label="&alpheios.prefs.smallicons;" 
+                                  preference="pref-smallicons"/>
+
                         <hbox>
                         <button id="alpheios-prefs-svc-button"
                             label="&alpheios.prefs.advanced.label;"
@@ -63,6 +68,9 @@
             <preference id="pref-dictionaries-full-timeout" 
                         name="extensions.alpheios.methods.dictionary.full.default.timeout" 
                         type="int"/>
+            <preference id="pref-default-language" 
+                        name="extensions.alpheios.default_language"
+                        type="string"/> 
 
         </preferences>
         <vbox id="alpheios-prefs-adv-set" flex="1">
@@ -78,7 +86,11 @@
                     </radiogroup>
             </groupbox>
             <groupbox>
-                <caption label="&alpheios.prefs.timeouts.default;" />
+                <caption label="&alpheios.prefs.defaults.misc;" />
+                 <label value="&alpheios.prefs.default.language;" 
+                        control="default-language"/>
+                 <textbox id="default-language" 
+                         preference="pref-default-language"/>      
                  <label value="&alpheios.prefs.dict.full.timeout;" 
                         control="dictionaries-full-timeout"/>
                 <textbox id="dictionaries-full-timeout" 

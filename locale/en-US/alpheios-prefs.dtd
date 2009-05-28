@@ -47,4 +47,6 @@
 <!ENTITY alpheios.prefs.popuptrigger.mousemove "mousemove">
 <!ENTITY alpheios.prefs.popuptrigger.dblclick "dblclick">
 <!ENTITY alpheios.prefs.timeouts.default "Default Request Timeouts">
+<!ENTITY alpheios.prefs.defaults.misc "Miscellaneous Defaults">
 <!ENTITY alpheios.prefs.dict.full.timeout "Full Dictionary Request Timeout (ms):">
+<!ENTITY alpheios.prefs.smallicons "Use Small Icons in Popup">

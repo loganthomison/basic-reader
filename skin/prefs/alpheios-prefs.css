@@ -17,3 +17,16 @@
 tabpanel radiogroup caption {
     background: inherit;
 }
+
+
+textbox.url {
+    width: 50em;
+}
+
+textbox.param {
+    width: 5em;
+}
+
+label.cbxlabel {
+    margin-left: 0; 
+}

@@ -14,17 +14,9 @@
       <stringbundle id="alpheios-prefs-strings" 
                       src="chrome://alpheios/locale/alpheios-prefs.properties"/>
     </stringbundleset>
-
-    <preferences>
-        <preference id="pref-default-timeout"
-                    name="extensions.alpheios.methods.dictionary.default.timeout"
-                    type="int"/>
-        <preference id="pref-default-multiple"
-                    name="extensions.alpheios.methods.dictionary.default.multiple_lemmas_allowed"
-                    type="bool"/>
-    </preferences>
     <prefpane id="alpheios-prefs-dict-advanced"
               onpaneload="Alph.prefs.init_adv_dict_prefs();">
+        <preferences/>
         <vbox id="alpheios-dict-tabs-advanced"/>
     </prefpane>
 </prefwindow>
