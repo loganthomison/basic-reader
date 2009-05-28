@@ -107,7 +107,7 @@
                                             text() = $ending_match]
                                             ) &gt; 0">matched</xsl:when>
                                         <xsl:when test="$selected_endings//span[@class='alph-term']/span[@class='alph-suff' and not(text())]
-                                            and $ending_match = '_'">matched</xsl:when>
+                                            and not($match_form) and $ending_match = '_'">matched</xsl:when>
                                     </xsl:choose>  
                                 </xsl:otherwise>        
                             </xsl:choose>                                                                                

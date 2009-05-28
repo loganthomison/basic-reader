@@ -236,6 +236,7 @@
                                     <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                                     <xsl:with-param name="selected" select="$selected"/>
                                     <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
+                                    <xsl:with-param name="match_form" select="$match_form"/>
                                 </xsl:call-template>                                    
                             </xsl:for-each>
                         </tr>
@@ -332,6 +333,7 @@
                             <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                             <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                             <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
+                            <xsl:with-param name="match_form" select="$match_form"/>
                         </xsl:call-template>
                     <!--/xsl:otherwise>
                 </xsl:choose-->
