@@ -450,20 +450,24 @@ Alph.xlate = {
                                 }
                             }
                         );
+                        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
                     },
                     success: function(data, textStatus) 
                     {
                     
                         Alph.xlate.updateTranslation(disambiguate_id,data,a_alphtarget,a_doc_array);
-                        // TODO we should prevent the request from re-issuing
-                        // for each lexicon panel and instead update them in 
-                        // updateTranslation
+                        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+                        Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
                     } 
                 }   
             );
         }
-        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
-        Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
+        else
+        {
+            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+            Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
+        }
+        
     },  
     /**
      * Update the results of the lexicon lookup in the popup.
