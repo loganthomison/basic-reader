@@ -140,57 +140,67 @@ Alph.LanguageTool = function(a_language,a_properties)
         }
     }
 
+    this.lexicon_setup();
+};
+
+/**
+ * Initializes lexicon search parameters
+ */
+Alph.LanguageTool.prototype.lexicon_setup = function()
+{
+    // nothing to do if no language defined
+    var language = this.source_language;
+    if (!language || typeof language == "undefined")
+        return;
+
     // read lexicon parameters
     // look first for lexicon-specific values and then, if not found,
     // for generic lexicon-independent values
-    if (typeof a_language != "undefined")
+    Alph.util.log("Reading params for " + language);
+    this.lexiconSearch = Array();
+    var codeList = Alph.util.getPref("dictionaries.full", language);
+    var codes = (codeList ? codeList.split(',') : Array());
+    var defaultBase = "dictionary.full.search.";
+    for (var i = 0; i < codes.length; ++i)
     {
-        Alph.util.log("Reading params for " + a_language);
-        this.lexiconSearch = Array();
-        var codeList = Alph.util.getPref("dictionaries.full", a_language);
-        var codes = (codeList ? codeList.split(',') : Array());
-        var defaultBase = "dictionary.full.search.";
-        for (var i = 0; i < codes.length; ++i)
-        {
-            var code = codes[i];
-            var base = "dictionary.full." + code + ".search.";
-            this.lexiconSearch[code] = Array();
-            this.lexiconSearch[code]["url"] =
-                Alph.util.getPref(base + "url", a_language);
+        var code = codes[i];
+        var base = "dictionary.full." + code + ".search.";
+        this.lexiconSearch[code] = Array();
+        this.lexiconSearch[code]["url"] =
+            Alph.util.getPref(base + "url", language);
 
-            // if lexicon-specific URL is defined
-            if (this.lexiconSearch[code]["url"])
-            {
-                // read lexicon-specific values
-                this.lexiconSearch[code]["lemma"] =
-                    Alph.util.getPref(base + "lemma_param", a_language);
-                this.lexiconSearch[code]["id"] =
-                    Alph.util.getPref(base + "id_param", a_language);
-                this.lexiconSearch[code]["multiple"] =
-                    Alph.util.getPref(base + "multiple", a_language);
-                this.lexiconSearch[code]["convert"] =
-                    Alph.util.getPref(base + "convert_method", a_language);
-                this.lexiconSearch[code]["transform"] =
-                    Alph.util.getPref(base + "transform_method", a_language);
-            }
-            // else use lexicon-independent values
-            else
-            {
-                this.lexiconSearch[code]["url"] =
-                    Alph.util.getPref(defaultBase + "url", a_language);
-                this.lexiconSearch[code]["lemma"] =
-                    Alph.util.getPref(defaultBase + "lemma_param", a_language);
-                this.lexiconSearch[code]["id"] =
-                    Alph.util.getPref(defaultBase + "id_param", a_language);
-                this.lexiconSearch[code]["multiple"] =
-                    Alph.util.getPref(defaultBase + "multiple", a_language);
-                this.lexiconSearch[code]["convert"] =
-                    Alph.util.getPref(defaultBase + "convert_method",
-                                      a_language);
-                this.lexiconSearch[code]["transform"] =
-                    Alph.util.getPref(defaultBase + "transform_method",
-                                      a_language);
-            }
+        // if lexicon-specific URL is defined
+        if (this.lexiconSearch[code]["url"])
+        {
+            // read lexicon-specific values
+            this.lexiconSearch[code]["lemma"] =
+                Alph.util.getPref(base + "lemma_param", language);
+            this.lexiconSearch[code]["id"] =
+                Alph.util.getPref(base + "id_param", language);
+            this.lexiconSearch[code]["multiple"] =
+                Alph.util.getPref(base + "multiple", language);
+            this.lexiconSearch[code]["convert"] =
+                Alph.util.getPref(base + "convert_method", language);
+            this.lexiconSearch[code]["transform"] =
+                Alph.util.getPref(base + "transform_method", language);
+        }
+        // else use lexicon-independent values
+        else
+        {
+            this.lexiconSearch[code]["url"] =
+                Alph.util.getPref(defaultBase + "url", language);
+            this.lexiconSearch[code]["lemma"] =
+                Alph.util.getPref(defaultBase + "lemma_param", language);
+            this.lexiconSearch[code]["id"] =
+                Alph.util.getPref(defaultBase + "id_param", language);
+            this.lexiconSearch[code]["multiple"] =
+                Alph.util.getPref(defaultBase + "multiple", language);
+            this.lexiconSearch[code]["convert"] =
+                Alph.util.getPref(defaultBase + "convert_method",
+                                  language);
+            this.lexiconSearch[code]["transform"] =
+                Alph.util.getPref(defaultBase + "transform_method",
+                                  language);
         }
     }
 };
@@ -335,7 +345,6 @@ Alph.LanguageTool.prototype.set_lexicon_lookup = function()
     else if (typeof this[lexicon_method] == 'function')
     {
         this.lexiconLookup = this[lexicon_method];
-
     }
     else
     {
