@@ -543,6 +543,17 @@ Alph.xlate = {
                     var entry_match = 
                         Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
                         .parents(".alph-entry");
+
+                    // if we didn't have a match, and the treebank lemma has a 1
+                    // at the end of it (which means 1st sense in the dictionary entry)
+                    // drop the 1 and try again
+                    if (entry_match.length == 0 && new_hdwd.match(/1$/))
+                    {
+                        new_hdwd = new_hdwd.replace(/1$/,'');
+                    }
+                    entry_match = 
+                        Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
+                        .parents(".alph-entry");
                     if (entry_match.length > 0)
                     {
                         Alph.$(".alph-dict",entry_match)
