@@ -510,6 +510,7 @@ Alph.xlate = {
         }
         else
         {
+            
             var new_text_node = 
                     window.content.document.importNode(
                     Alph.$("#alph-text",wordHTML).get(0),true);
@@ -536,7 +537,10 @@ Alph.xlate = {
                         Alph.$("#alph-window[alpheios-pending=" + a_req_id + 
                                 "] #alph-text",a_doc);
                     
-   
+                    // remove the old word tool icons from the popup, we need to refresh
+                    // them with new tools after we incorporate the disambiguated output
+                    Alph.$("#alph-word-tools",popup).remove();
+            
                     // try to find an entry with the same lemma and replace the 
                     // contents of the first inflection set for that entry 
                     // with the treebank output
@@ -551,12 +555,15 @@ Alph.xlate = {
                     {
                         new_hdwd = new_hdwd.replace(/1$/,'');
                     }
+                    // we're only going to use the first matching entry
+                    // if multiple entries match, we can throw the rest out
+                    // because we're going to narrow it down to just the 
+                    // disambiguated morphology
                     entry_match = 
                         Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
-                        .parents(".alph-entry");
-                    if (entry_match.length > 0)
+                        .parents(".alph-entry").get(0);
+                    if (entry_match)
                     {
-                        Alph.$(".alph-dict",entry_match)
                         
                         // if the part of speech indicated by the
                         // treebank differs from the original
@@ -622,10 +629,15 @@ Alph.xlate = {
                         //it's possible that a new request came in and removed the 
                         // attribute, so quietly ignore error removing it 
                     }
+                    Alph.$(popup).prepend('<div id="alph-word-tools"/>');
+                    Alph.main.getLanguageTool().add_word_tools(
+                        Alph.$(popup),a_alphtarget);
+
                 }
                     
             );
         }
+                
         Alph.$("#alph-window-anchor",a_topdoc).focus();
     },
         
