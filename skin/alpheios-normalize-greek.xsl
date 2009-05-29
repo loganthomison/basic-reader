@@ -32,24 +32,15 @@
 -->
 
   <xsl:output method="text"/>
-  <xsl:include href="uni2betacode.xsl"/>
-  <xsl:include href="beta2unicode.xsl"/>
-
+  <xsl:include href="normalize-greek.xsl"/>
   <xsl:param name="input"/>
   <xsl:param name="precomposed" select="1"/>
   <xsl:param name="partial" select="0"/>
-
   <xsl:template match="/">
-    <xsl:call-template name="beta-to-uni">
-      <xsl:with-param name="input">
-        <xsl:call-template name="uni-to-beta">
-          <xsl:with-param name="input" select="$input"/>
-          <xsl:with-param name="upper" select="false()"/>
-        </xsl:call-template>
-      </xsl:with-param>
+    <xsl:call-template name="normalize-greek">
+      <xsl:with-param name="input" select="$input"/>
       <xsl:with-param name="precomposed" select="$precomposed != 0"/>
       <xsl:with-param name="partial" select="$partial != 0"/>
     </xsl:call-template>
   </xsl:template>
-
 </xsl:stylesheet>
