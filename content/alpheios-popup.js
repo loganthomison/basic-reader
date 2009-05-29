@@ -558,15 +558,6 @@ Alph.xlate = {
                             Alph.$('.alph-dict',entry_match)
                                 .before(Alph.$(new_dict).clone(true))
                                 .remove();
-                            // check to see if the dictionary pofs now matches
-                            // the inflection set pofs if it exists, and remove
-                            // it if it does
-                            var infl_set_pofs = Alph.$(".alph-infl-set .alph-pofs",entry_match);
-                            if (infl_set_pofs.length > 0 && Alph.$(infl_set_pofs).attr('context') == 
-                                Alph.$('.alph-pofs',new_entry).attr('context'))
-                            {
-                                Alph.$(infl_set_pofs).remove();    
-                            }
                         }
                         Alph.$(".alph-infl-set",entry_match).each(
                             function(a_i)
@@ -587,6 +578,10 @@ Alph.xlate = {
                                 }
                             }
                         );
+                        // remove the pofs on the inflection set because
+                        // disambiguated output will always list the pofs 
+                        // of the dictionary entry as the pofs of the inflection set
+                        Alph.$(".alph-infl-set .alph-pofs",entry_match).remove();
                         Alph.$(entry_match).siblings('.alph-entry').remove();
                         Alph.$(entry_match).parent(".alph-word")
                             .siblings(".alph-word").remove();

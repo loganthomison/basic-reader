@@ -14,6 +14,7 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery.tablehover.pack.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/query/alpheios-query.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
     
     <stringbundleset id="stringbundleset">
         <stringbundle id="alpheios-strings" 

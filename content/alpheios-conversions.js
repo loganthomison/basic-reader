@@ -148,7 +148,7 @@ Alph.convert = {
             Alph.util.log(e);
         }
         return betaText;
-    }
+    },
 
     /**
      * greek normalization (precomposed/decomposed Unicode)

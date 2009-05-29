@@ -6,6 +6,7 @@
     <xsl:import href="alph-infl-extras.xsl"/>
     <xsl:import href="beta-uni-util.xsl"/>
     <xsl:import href="uni2ascii.xsl"/>
+    <xsl:import href="normalize-greek.xsl"/>
     
     <xsl:template name="ending-cell">
         <xsl:param name="infl-endings"/>
@@ -13,6 +14,7 @@
         <xsl:param name="selected"/>
         <xsl:param name="translit_ending_table_match" />
         <xsl:param name="strip_greek_vowel_length" />
+        <xsl:param name="normalize_greek"/>
         <xsl:param name="dedupe_by"/>
         <xsl:param name="show_only_matches"/>
         <xsl:param name="group_by"/>
@@ -74,7 +76,17 @@
                             <xsl:choose>
                                 <xsl:when test="$stripped-ending = '_' or $stripped-ending = '-'">_</xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="normalize-space($stripped-ending)"/>
+                                    <xsl:choose>
+                                        <xsl:when test="$normalize_greek">
+                                            <xsl:call-template name="normalize-greek">
+                                                <xsl:with-param name="input" select="normalize-space($stripped-ending)"/>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="normalize-space($stripped-ending)"/>        
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:variable>

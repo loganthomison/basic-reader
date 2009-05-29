@@ -2,12 +2,14 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:import href="beta-uni-util.xsl"/>
     <xsl:import href="uni2ascii.xsl"/>
+    <xsl:import href="normalize-greek.xsl"/>
     
     <xsl:template name="check_infl_sets">
         <xsl:param name="selected_endings"/>
         <xsl:param name="current_data"/>
         <xsl:param name="match_pofs"/>
         <xsl:param name="strip_greek_vowel_length"/>
+        <xsl:param name="normalize_greek"/>
         <xsl:param name="match_form"/>
         <xsl:param name="infl_constraint"/>
         <xsl:variable name="matches">
@@ -48,6 +50,18 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
+                <xsl:variable name="normalized_match_text">
+                    <xsl:choose>
+                        <xsl:when test="$normalize_greek = true() and not($match_text = '_')">
+                            <xsl:call-template name="normalize-greek">
+                                <xsl:with-param name="input" select="$stripped_match_text"/>        
+                            </xsl:call-template>                              
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$stripped_match_text"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
                 <xsl:variable name="possible">
                     <xsl:for-each select="div[@class='alph-infl']">
                         <xsl:variable name="fail_infl_constraint">
@@ -66,7 +80,7 @@
                         </xsl:if>
                     </xsl:for-each>
                 </xsl:variable>
-                <xsl:if test="$possible &gt; 0">,<xsl:value-of select="$stripped_match_text"/>,</xsl:if>
+                <xsl:if test="$possible &gt; 0">,<xsl:value-of select="$normalized_match_text"/>,</xsl:if>
             </xsl:for-each>    
         </xsl:variable>
         <xsl:value-of select="$matches"/>

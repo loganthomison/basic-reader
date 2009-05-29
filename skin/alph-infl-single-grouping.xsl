@@ -1,67 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-    Stylesheet for transformation of inflection data to HTML
--->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs"
     xmlns:exsl="http://exslt.org/common"
     xmlns:xlink="http://www.w3.org/1999/xlink">
-    <xsl:import href="alph-infl-ending.xsl"/>
-    <xsl:import href="alph-infl-match.xsl"/>
-    <xsl:import href="alph-infl-extras.xsl"/>    
+    
+    <!--
+        Copyright 2009 Cantus Foundation
+        http://alpheios.net
+        
+        This file is part of Alpheios.
+        
+        Alpheios is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        
+        Alpheios is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    -->
     <!--
         This stylesheet groups the data on 3 attributes for the rows, 
         and groups on 1 variable attribute plus the type for the columns.
-        The variable grouping attribute is supplied as a parameter.
-        A optional ending parameter can be used to identify the ending
-        to be indicated as 'selected' in the HTML table.     
+        
+        Parameters: per alph-infl-params.xsl
     -->
+    <xsl:import href="alph-infl-params.xsl"/>
+    <xsl:import href="alph-infl-ending.xsl"/>
+    <xsl:import href="alph-infl-match.xsl"/>
+    <xsl:import href="alph-infl-extras.xsl"/>    
+    
     
     <xsl:output method="html" encoding="UTF-8" indent="yes"/>
     
     <xsl:strip-space elements="*"/>
     
     <xsl:key name="footnotes" match="footnote" use="@id"/>
-                
-    <!-- all parameters may be supplied in transformation -->
-    <!-- row groupings --> 
-    <!-- default order is Number, Case -->
-    
-    <xsl:param name="group1" select="'num'"/>
-    <xsl:param name="group2" select="'case'"/>
-    
-    <!-- column groupings -->
-    <!-- default order is Declension, Gender-->
-    <xsl:param name="group4" select="'gend'"/>
-    
-    <!-- the following are optional, used to select specific inflection ending(s) -->
-    <xsl:param name="selected_endings" select="/.." />
-    <xsl:param name="form" />
-    
-    <!-- by default greek vowel length is stripped but this can be overridden -->
-    <xsl:param name="strip_greek_vowel_length" select="true()"/>
-    
-    <!-- transliterate unicode in the ending tables before matching? -->
-    <xsl:param name="translit_ending_table_match" select="false()"/>
-    <!-- by default this stylesheet applies to nouns, but may also be
-         used for adjectives or other parts of speech -->
-    <xsl:param name="match_pofs" select="'noun'"/>
-    
-    <!-- optional parameter to supply a form to match on rather than endings-->
-    <xsl:param name="match_form"/>
-    
-    
-    <!-- Flag to request that endings be deduped according to a specific
-         set of attributes. The only supported value currently is 'case-num-gend'
-    -->
-    <xsl:param name="dedupe_by" select="''"/>
-    
-    <!-- Flag to request that only the endings which match the form exactly be
-        included in the table
-    -->
-    <xsl:param name="show_only_matches" select="false()"/>
-        
+                        
     <!-- debug -->
     <xsl:param name="test_endings">
         <!--
@@ -89,9 +69,6 @@
         -->
     </xsl:param>
     <!--xsl:param name='selected_endings' select="exsl:node-set($test_endings)"/-->
-    
-    <!-- skip the enclosing html and body tags -->
-    <xsl:param name="fragment" />
         
     <xsl:template match="/infl-data">
         <xsl:variable name="table-notes">
@@ -204,7 +181,8 @@
                                         <xsl:with-param name="match_form">
                                             <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
                                         </xsl:with-param>
-                                        <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                
+                                        <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
+                                        <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                                     </xsl:call-template>
                                 </xsl:variable>                                           
                                 <xsl:call-template name="ending-cell">
@@ -216,6 +194,7 @@
                                     <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                                     <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
                                     <xsl:with-param name="match_form" select="$match_form"/>
+                                    <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                                 </xsl:call-template>                                    
                             </xsl:for-each>
                         </tr>
@@ -296,7 +275,8 @@
                             <xsl:with-param name="match_form">
                                 <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
                             </xsl:with-param>                            
-                            <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>                                                                                                            
+                            <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
+                            <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                         </xsl:call-template>
                     </xsl:variable>
                     <xsl:call-template name="ending-cell">
@@ -308,6 +288,7 @@
                         <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                         <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
                         <xsl:with-param name="match_form" select="$match_form"/>
+                        <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                     </xsl:call-template>
                 </xsl:otherwise>
             </xsl:choose>

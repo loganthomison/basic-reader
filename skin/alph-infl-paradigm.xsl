@@ -3,13 +3,45 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:exsl="http://exslt.org/common">
+    <!--
+        Copyright 2009 Cantus Foundation
+        http://alpheios.net
+        
+        This file is part of Alpheios.
+        
+        Alpheios is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        
+        Alpheios is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    -->
+    
+    <!--
+         Stylesheet for transformation of paradigm tables
+         Parameters per alph-infl-params.xsl
+         
+         Stylesheet-specific params:
+             $paradigm_id: list of paradigm ids to filter transformed paradigms to
+             $query_mode: set to true if transformed output is for Quiz display
+    -->
 
+    <xsl:import href="alph-infl-params.xsl"/>
     <xsl:import href="alph-infl-extras.xsl"/>
     <xsl:import href="alph-infl-match.xsl"/>
     <xsl:import href="paradigm-match.xsl"/>
     
     <xsl:output encoding="UTF-8" indent="yes" method="html"/>
     <xsl:strip-space elements="*"/>
+
+    <xsl:param name="paradigm_id"/>
+    <xsl:param name="query_mode" select="false()"/>
     
     <!-- debug -->
     <xsl:param name="test_endings">        
@@ -45,27 +77,9 @@
         </div-->
     </xsl:param>
     
-    <xsl:param name="match_pofs"/>
-    <!-- the following are optional, used to select specific inflection ending(s) -->
-    <xsl:param name="selected_endings" select="/.." />
     <!-- DEBUG -->
     <!--xsl:param name='selected_endings' select="exsl:node-set($test_endings)"/-->
-    
-    <xsl:param name="form" />
-    
-    <!-- by default greek vowel length is stripped but this can be overridden -->
-    <xsl:param name="strip_greek_vowel_length" select="true()"/>
-    
-    <!-- transliterate unicode in the ending tables before matching? -->
-    <xsl:param name="translit_ending_table_match" select="false()"/>
-    
-    <!-- skip the enclosing html and body tags -->
-    <xsl:param name="fragment" />
-    
-    <xsl:param name="paradigm_id"/>
-    
-    <xsl:param name="query_mode"/>
-    
+        
     <xsl:key name="footnotes" match="footnote" use="@id"/>
     
     <xsl:template match="/infl-paradigms">
