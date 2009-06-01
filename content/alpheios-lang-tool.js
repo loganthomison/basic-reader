@@ -822,6 +822,16 @@ Alph.LanguageTool.prototype.handleInflectionsForMorphWindow = function(a_event,a
 }
 
 /**
+ * Check to see if this language tool can produce an inflection table display
+ * for the current node
+ */
+Alph.LanguageTool.prototype.canInflect = function(a_node)
+{
+    var params = this.getInflectionTable(a_node,{});
+    return (typeof params.showpofs == 'string');
+}
+
+/**
  * Helper function to determine if the user's selection
  * is in the margin of the document
  * @private
@@ -1382,7 +1392,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
         );
     }
     // add the inflection tool, if any
-    if (this.getFeature('alpheios-inflect'))
+    if (this.getFeature('alpheios-inflect') && this.canInflect(a_node))
     {
         var inflect_alt_text = strings.getString('alph-inflect-link');
         Alph.$("#alph-word-tools",a_node).append(

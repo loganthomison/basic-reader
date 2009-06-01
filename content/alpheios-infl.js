@@ -54,9 +54,17 @@ Alph.infl = {
         var xslRef = p.responseXML;
         this.xsltProcessor.importStylesheet(xslRef)
         
-        p.open("GET",a_target.xml_url,false);
-        p.send(null);
-        var xmlRef = p.responseXML;
+        var xmlRef;
+        if (a_target.xml_url)
+        {
+            p.open("GET",a_target.xml_url,false);
+            p.send(null);
+            xmlRef = p.responseXML;
+        }
+        else
+        {
+            xmlRef = a_target.xml_obj;    
+        }
         
         var inflHTML = '';
         try
@@ -90,7 +98,7 @@ Alph.infl = {
         
         // if we don't have a requested part of speech, show the index
         if (typeof link_target.showpofs == 'undefined' || 
-            link_target.xml_url.match(/alph-infl-index.xml/))
+            (link_target.xml_url && link_target.xml_url.match(/alph-infl-index.xml/)))
         {
             var doc = $(infl_browser).get(0).contentDocument;
             var infl_html = Alph.infl.transform(link_target);
@@ -139,7 +147,7 @@ Alph.infl = {
                 function() 
                 {
 
-                    if (link_target.xml_url && link_target.xslt_url)
+                    if ((link_target.xml_url || link_target.xml_obj) && link_target.xslt_url)
                     {
                         var infl_html = Alph.infl.transform(link_target);
                         var infl_node = 
@@ -227,8 +235,9 @@ Alph.infl = {
         
         var showpofs = a_link_target.showpofs;
         
-        //if the main #alph-infl-table element is a table, then initialize it 
-        if ($(a_tbl).eq(0).is('table'))
+        //if the main #alph-infl-table element is a table and it contains data,
+        // then initialize it 
+        if ($(a_tbl).eq(0).is('table') && ! $(a_tbl).eq(0).hasClass('nomatch') )
         {
             this.init_table(a_tbl);    
         }

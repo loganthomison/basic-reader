@@ -324,6 +324,11 @@ th.reloading {
     margin-top: 1em;
 }
 
+table#alph-infl-table.nomatch, 
+table#alph-infl-table.nomatch * {
+    border: none;
+}
+
 .alpheios-hint {
     color: #4E6476;
     font-style: italic;

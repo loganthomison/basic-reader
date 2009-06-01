@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
     xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:exsl="http://exslt.org/common"
     version="1.0">
+    
+    <xsl:template name="make_ref_link">
+        <xsl:param name="target"/>
+        <xsl:if test="$target">
+            <xsl:variable name="link_elem">
+                <xsl:element name="reflink">
+                    <xsl:attribute name="xmlns:xlink">http://www.w3.org/1999/xlink</xsl:attribute>
+                    <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="substring-before($target,'|')"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="substring-after($target,'|')"/>
+                </xsl:element>
+            </xsl:variable>
+            <xsl:apply-templates select="exsl:node-set($link_elem)"/>
+        </xsl:if>    
+    </xsl:template>
+    
     <xsl:template match="reflink">
         <a href="{@xlink:href}" class="alph-reflink"><xsl:value-of select="."/></a>
     </xsl:template>
@@ -112,5 +130,5 @@
                 )
             </xsl:if>
         </div>
-    </xsl:template>
+    </xsl:template>    
 </xsl:stylesheet>

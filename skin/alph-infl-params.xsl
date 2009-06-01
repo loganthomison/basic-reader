@@ -73,4 +73,6 @@
     <!-- skip the enclosing html and body tags -->
     <xsl:param name="fragment" />
     
+    <!-- instead of displaying inflections, display a link to another location -->
+    <xsl:param name="link_content"/>
 </xsl:stylesheet>
