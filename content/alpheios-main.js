@@ -160,7 +160,9 @@ Alph.main =
         
         Alph.main.enable_tb_lookup(); 
         Alph.main.has_languages = Alph.main.set_languages();
+        Alph.main.show_update_help();
     },
+     
 
     /**
      * Unload handler for the window. Iteraters through the open tabs and 
@@ -1682,6 +1684,47 @@ Alph.main =
         onStatusChange: function() {},
         onSecurityChange: function() {},
         onLinkIconAvailable: function() {}
+    },
+    
+    /**
+     * Iterate through the installed Alpheios packages and 
+     * open a new tab with the release notes if any package has been updated 
+     */
+    show_update_help: function()
+    {
+        var firstrun = [];
+        var alph_pkgs = Alph.util.getAlpheiosPackages();
+        alph_pkgs.forEach(
+            function(a_pkg)
+            {
+                try
+                {
+                    var last_install_ver = Alph.util.getPref('firstrun.'+ a_pkg.id);
+                    if (! last_install_ver || (last_install_ver != a_pkg.version))
+                    {
+                        firstrun.push(a_pkg);
+                    }
+                }
+                catch (a_e)
+                {
+                    // if the preference isn't set, it's the first run
+                    firstrun.push(a_pkg)
+                }
+            }
+        );
+                
+        if (firstrun.length > 0)
+        {
+            // TODO should we open multiple release/package specific pages?
+            Alph.util.open_alpheios_link('release-notes');
+            firstrun.forEach(
+                function(a_pkg)
+                {
+                    Alph.util.setPref('firstrun.'+a_pkg.id,a_pkg.version);
+                }
+            );
+        }
+
     }
 };
 

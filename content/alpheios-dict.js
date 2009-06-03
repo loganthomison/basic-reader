@@ -201,16 +201,13 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     // of the following conditions is met:
     // - panel is being detached for the first time (LOAD_DICT_WINDOW event)
     // - dictionary link is clicked (SHOW_DICT event)
-    // - panel is visible inline, AND we're showing a new translation in the popup 
-    //   (SHOW_TRANS event, or event_type is undefined in the case of being called
-    //    from update_status when the panel is already open)
+    // - this method has been called from a change in panel status, in which
+    //   case the event type will be undefined
     // - the panel or window is visible AND we're switching to a new dictionary
     var do_lookup = 
        (  a_event_type == Alph.main.events.LOAD_DICT_WINDOW ||
           a_event_type == Alph.main.events.SHOW_DICT ||
-         (this.is_visible_inline() && 
-            (typeof a_event_type == "undefined" || 
-             a_event_type == Alph.main.events.SHOW_TRANS)) ||
+          typeof a_event_type == "undefined" ||
          ((panel_state.status == Alph.Panel.STATUS_SHOW) && new_dict )  
        );
     if (! do_lookup )

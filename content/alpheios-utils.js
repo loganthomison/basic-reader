@@ -53,7 +53,8 @@ Alph.util = {
     {
         main: 'http://alpheios.net',
         help:  'http://alpheios.net/content/firefox-extensions',
-        support: 'mailto:support@alpheios.net'
+        support: 'mailto:support@alpheios.net',
+        content: 'http://alpheios.net/content/',
     },
     XUL_NS: 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
     
@@ -285,7 +286,7 @@ Alph.util = {
         else if (type == Components.interfaces.nsIPrefBranch.PREF_BOOL)
             this.ALPH_PREFS.setBoolPref(a_name, a_value);
         else
-            this.log("Invalid preference type for " + a_name)
+            this.log("Invalid preference type for " + a_name + "(" + type + ":" + typeof a_value + ")")
             // fall through behavior is to not set the pref if we don't know what type it is
     },
     
@@ -529,7 +530,15 @@ Alph.util = {
      */
     open_alpheios_link: function(a_loc)
     {
-        this.open_new_tab(this.ALPHEIOS_URLS[a_loc]);    
+        var url = this.ALPHEIOS_URLS[a_loc];
+        // if we don't have a specific location defined,
+        // then default to adding the location to the 
+        // main content url
+        if (typeof url != 'string')
+        {
+          url = this.ALPHEIOS_URLS.content + a_loc;   
+        }
+        this.open_new_tab(url);    
     },
     
     /**
