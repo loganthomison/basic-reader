@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<!--
+  <!--
   Copyright 2009 Cantus Foundation
   http://alpheios.net
  
@@ -21,25 +21,28 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  -->
 
-<!--
+  <!--
   Normalize Greek Unicode to precomposed/decomposed characters
 
   Parameters:
     $input        text to normalize
     $precomposed  whether to produce precomposed output (default=true)
+    $strip        betacode characters to strip (e.g. "/\=" to remove accents)
     $partial      whether this is a partial word (default=false)
-                  (If true, do not use final sigma for last letter)
+    (If true, do not use final sigma for last letter)
 -->
 
   <xsl:output method="text"/>
   <xsl:include href="normalize-greek.xsl"/>
   <xsl:param name="input"/>
   <xsl:param name="precomposed" select="1"/>
+  <xsl:param name="strip" select="''"/>
   <xsl:param name="partial" select="0"/>
   <xsl:template match="/">
     <xsl:call-template name="normalize-greek">
       <xsl:with-param name="input" select="$input"/>
       <xsl:with-param name="precomposed" select="$precomposed != 0"/>
+      <xsl:with-param name="strip" select="$strip"/>
       <xsl:with-param name="partial" select="$partial != 0"/>
     </xsl:call-template>
   </xsl:template>

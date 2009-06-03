@@ -154,10 +154,17 @@ Alph.convert = {
      * greek normalization (precomposed/decomposed Unicode)
      * @param {String} a_str the string to normalize
      * @param {Boolean} a_precomposed whether to output precomposed Unicode
+     *   (default = true)
+     * @param {String} a_strip characters/attributes to remove
+     *   (specified as betacode characters - e.g. "/\\=" to remove accents)
+     *   (default = no stripping)
+     * @param {Boolean} a_partial whether this is partial word
+     *   (if true, ending sigma is treated as medial not final)
+     *   (default = false)
      * @return the normalized string
      * @type {String}
      */
-    normalize_greek: function(a_str, a_precomposed)
+    normalize_greek: function(a_str, a_precomposed, a_strip, a_partial)
     {
         /* initialize the XSLT converter if we haven't done so already */
         if (this.uNormalizer == null)
@@ -168,11 +175,22 @@ Alph.convert = {
             this.uNormalizer = new XSLTProcessor();
             this.uNormalizer.importStylesheet(xmlDoc);
         }
+
+        // set defaults for missing params
+        if (typeof a_precomposed == "undefined")
+            a_precomposed = true;
+        if (typeof a_strip == "undefined")
+            a_strip = "";
+        if (typeof a_partial == "undefined")
+            a_partial = false;
+
         var normText = '';
         try
         {
             this.uNormalizer.setParameter(null, "input", a_str);
             this.uNormalizer.setParameter(null, "precomposed", (a_precomposed ? 1 : 0));
+            this.uNormalizer.setParameter(null, "strip", a_strip);
+            this.uNormalizer.setParameter(null, "partial", (a_partial ? 1 : 0));
             var dummy = (new DOMParser()).parseFromString("<root/>","text/xml");
             normText = this.uNormalizer.transformToDocument(dummy).documentElement.textContent;
         }
