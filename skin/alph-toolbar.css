@@ -81,3 +81,7 @@ toolbaritem.alpheios-loading {
     cursor: progress;
 }
 
+/** hide the detach button the translation panel until it's implemented **/
+#alph-trans-panel toolbarbutton.alph-detach-button {
+    display: none !important;
+}
