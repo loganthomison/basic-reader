@@ -377,6 +377,7 @@ div.alph-morph {
 }
 
 .alpheios-hint {
+    font-weight: normal;
     color: #4E6476;
     font-style: italic;
     margin-bottom: 1em;

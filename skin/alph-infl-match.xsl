@@ -8,7 +8,6 @@
         <xsl:param name="selected_endings"/>
         <xsl:param name="current_data"/>
         <xsl:param name="match_pofs"/>
-        <xsl:param name="strip_greek_vowel_length"/>
         <xsl:param name="normalize_greek"/>
         <xsl:param name="match_form"/>
         <xsl:param name="infl_constraint"/>
@@ -36,29 +35,16 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:variable name="stripped_match_text">
+                <xsl:variable name="normalized_match_text">
                     <xsl:choose>
-                        <xsl:when test="$strip_greek_vowel_length = true() and not($match_text = '_')">
-                            <xsl:call-template name="uni-strip">
-                                <xsl:with-param name="input" select="$match_text"/>        
-                                <xsl:with-param name="strip-vowels" select="true()"/>
-                                <xsl:with-param name="strip-caps" select="false()"/>
+                        <xsl:when test="$normalize_greek and not($match_text = '_')">
+                            <xsl:call-template name="normalize-greek">
+                                <xsl:with-param name="input" select="$match_text"/>
+                                <xsl:with-param name="strip">/\^_</xsl:with-param>
                             </xsl:call-template>                              
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="$match_text"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="normalized_match_text">
-                    <xsl:choose>
-                        <xsl:when test="$normalize_greek = true() and not($match_text = '_')">
-                            <xsl:call-template name="normalize-greek">
-                                <xsl:with-param name="input" select="$stripped_match_text"/>        
-                            </xsl:call-template>                              
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$stripped_match_text"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>

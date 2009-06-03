@@ -47,11 +47,10 @@
          term suffix (default false)
     -->
     <xsl:param name="match_form" select="false()"/>
-    
-    <!-- strip vowel lengths ?  (default true) -->
-    <xsl:param name="strip_greek_vowel_length" select="true()"/>
-    
+        
     <!-- normalize greek text ? (default false -->
+    <!-- if true, strips vowel lengths and acute and grave accents, and
+         normalizes to precombined unicode -->
     <xsl:param name="normalize_greek" select="false()"/>
     
     <!-- transliterate unicode in the ending tables before matching? (default false) -->

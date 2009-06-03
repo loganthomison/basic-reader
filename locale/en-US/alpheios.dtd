@@ -52,3 +52,4 @@
 <!ENTITY alpheios.panel.trans.opt.inter.trans "Show Interlinear Text">
 <!ENTITY alpheios.help "Help">
 <!ENTITY alpheios.help.tooltip "Open Alpheios User Guide">
+<!ENTITY alpheios.version.string "Alpha Version">

@@ -214,15 +214,23 @@
                                                 <xsl:with-param name="match_form">
                                                     <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
                                                 </xsl:with-param>                                        
-                                                <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                                                 <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                                             </xsl:call-template>
-                                        </xsl:variable>                                                                           
+                                        </xsl:variable>                                     
+                                        <xsl:variable name="text_for_match">
+                                            <xsl:call-template name="text_for_match">
+                                                <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                                                <xsl:with-param name="match_form">
+                                                    <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
+                                                </xsl:with-param>  
+                                                <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
+                                            </xsl:call-template>
+                                        </xsl:variable>
                                         <xsl:call-template name="ending-cell">
                                             <xsl:with-param name="infl-endings" select="infl-endings"/>
                                             <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                                            <xsl:with-param name="text_for_match" select="$text_for_match"/>
                                             <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
-                                            <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                                             <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                                             <xsl:with-param name="selected" select="$selected"/>
                                             <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
@@ -315,16 +323,24 @@
                                 <xsl:with-param name="match_form">
                                     <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
                                 </xsl:with-param>                                
-                                <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                                 <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                             </xsl:call-template>
                         </xsl:variable>
+                        <xsl:variable name="text_for_match">
+                            <xsl:call-template name="text_for_match">
+                                <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                                <xsl:with-param name="match_form">
+                                    <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
+                                </xsl:with-param>  
+                                <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
+                            </xsl:call-template>
+                        </xsl:variable>                
                         <xsl:call-template name="ending-cell">
                             <xsl:with-param name="infl-endings" select="$celldata"/>
                             <xsl:with-param name="selected" select="$selected"/>
                             <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                            <xsl:with-param name="text_for_match" select="$text_for_match"/>
                             <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
-                            <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                             <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
                             <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
                             <xsl:with-param name="match_form" select="$match_form"/>

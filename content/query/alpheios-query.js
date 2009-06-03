@@ -519,10 +519,10 @@ Alph_Quiz =
                 $(".alph-infl-select",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
-                   ending: Alph.convert.normalize_greek($(".alph-infl-set .alph-suff",a_src_node).text() || '-',true), 
+                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-', 
                    attributes: context_list[0],
                    src_node: a_src_node,
-                   convert_text: function (a_text) { return Alph.convert.normalize_greek(a_text,true); } 
+                   convert_obj: Alph.convert 
                 },
                 function() { Alph_Quiz.on_infl_correct(a_src_node) }
             );

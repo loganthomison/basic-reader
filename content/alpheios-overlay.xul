@@ -48,7 +48,8 @@
                      disabled="true"/>
         <broadcaster id="alpheios-pedagogical-status"
                      class="alpheios-pedagogical-notifier"
-                     disabled="true"/>
+                     disabled="true"
+                     hidden="true"/>
         <broadcaster id="alpheios-basic-status"
                      class="alpheios-basic-notifier"
                      disabled="false"
@@ -244,6 +245,7 @@
                 tooltiptext="&alpheios.help.tooltip;"
                 command="alpheios-help-cmd"/>
             <toolbarspring id="alpheios-toolbar-spring"/>
+            <toolbaritem class="alpheios-alpha-text"><label value="&alpheios.version.string;"/></toolbaritem>
             <toolbaritem id="alpheios-toolbar-status">
                 <label id="alpheios-toolbar-status-text"
                        value="&alpheios-tools-status-disabled;"/>

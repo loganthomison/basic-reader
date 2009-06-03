@@ -169,7 +169,6 @@
                         <xsl:with-param name="current_data" select="$celldata" />
                         <xsl:with-param name="selected_endings" select="$selected_endings"/>
                         <xsl:with-param name="match_pofs" select="$match_pofs"/>
-                        <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                     </xsl:call-template>
                 </xsl:variable>
                 <xsl:call-template name="ending-cell">
@@ -177,7 +176,6 @@
                     <xsl:with-param name="selected" select="$selected"/>
                     <xsl:with-param name="selected_endings" select="$selected_endings"/>
                     <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
-                    <xsl:with-param name="strip_greek_vowel_length" select="$strip_greek_vowel_length"/>
                 </xsl:call-template>
             </xsl:for-each>            
         </xsl:for-each>

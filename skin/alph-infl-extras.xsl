@@ -3,6 +3,10 @@
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:exsl="http://exslt.org/common"
     version="1.0">
+    <xsl:import href="beta-uni-util.xsl"/>
+    <xsl:import href="uni2ascii.xsl"/>
+    <xsl:import href="normalize-greek.xsl"/>
+    
     
     <xsl:template name="make_ref_link">
         <xsl:param name="target"/>
@@ -128,7 +132,45 @@
                     <div class="alph-infl-term"><xsl:copy-of select="current()"/></div>    
                 </xsl:for-each>
                 )
+                <xsl:if test="$normalize_greek">
+                <div class="alpheios-hint">Highlighted matches may ignore some vowel accents.</div>
+                </xsl:if>
             </xsl:if>
         </div>
-    </xsl:template>    
+    </xsl:template>
+    
+    <!-- pull the text from the selected endings out for matching -->
+    <xsl:template name="text_for_match">
+        <xsl:param name="selected_endings"/>
+        <xsl:param name="normalize_greek"/>
+        <xsl:param name="match_form"/>
+        <xsl:for-each select="$selected_endings//span[contains(@class,'alph-term')]">
+            <xsl:variable name="to_strip">
+                <xsl:choose>
+                    <xsl:when test="$match_form != ''"><xsl:value-of select="$match_form"/></xsl:when>
+                     <xsl:when test="span[contains(@class,'alph-suff')]/text() != ''">
+                         <xsl:value-of select="span[contains(@class,'alph-suff')]/text()"/>
+                     </xsl:when>
+                     <xsl:otherwise>_</xsl:otherwise>
+                </xsl:choose>                        
+            </xsl:variable>
+            <xsl:text>|</xsl:text>
+            <xsl:choose>
+                <xsl:when test="$normalize_greek and not($to_strip='_')">
+                    <xsl:variable name="normalized">
+                        <xsl:call-template name="normalize-greek">
+                            <xsl:with-param name="input" select="normalize-space($to_strip)"/>
+                            <xsl:with-param name="strip">/\^_</xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:call-template name="normalize-greek">
+                        <xsl:with-param name="input" select="normalize-space($to_strip)"/>
+                        <xsl:with-param name="strip">/\^_</xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise><xsl:value-of select="normalize-space($to_strip)"/></xsl:otherwise>
+            </xsl:choose>
+            <xsl:text>|</xsl:text>
+        </xsl:for-each>
+    </xsl:template>
 </xsl:stylesheet>

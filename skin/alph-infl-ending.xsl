@@ -3,22 +3,18 @@
      type (e.g. regular, irregular). Each type gets its own cell.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-    <xsl:import href="alph-infl-extras.xsl"/>
-    <xsl:import href="beta-uni-util.xsl"/>
-    <xsl:import href="uni2ascii.xsl"/>
-    <xsl:import href="normalize-greek.xsl"/>
-    
+    <xsl:import href="alph-infl-extras.xsl"/>    
     <xsl:template name="ending-cell">
         <xsl:param name="infl-endings"/>
         <xsl:param name="selected_endings"/>
         <xsl:param name="selected"/>
         <xsl:param name="translit_ending_table_match" />
-        <xsl:param name="strip_greek_vowel_length" />
         <xsl:param name="normalize_greek"/>
         <xsl:param name="dedupe_by"/>
         <xsl:param name="show_only_matches"/>
         <xsl:param name="group_by"/>
         <xsl:param name="match_form"/>
+        <xsl:param name="text_for_match"/>
         
         <xsl:variable name="group_att">
             <xsl:choose>
@@ -55,16 +51,6 @@
                                         <xsl:with-param name="input" select="."/>
                                     </xsl:call-template>
                                 </xsl:when>
-                                <!-- if we're not transliterating, we may need to   
-                                    strip greek vowels -->
-                                <xsl:when test="$strip_greek_vowel_length = true()">
-                                    <xsl:call-template name="uni-strip">
-                                        <xsl:with-param name="input" select="."/>
-                                        <xsl:with-param name="strip-vowels" select="true()"/>
-                                        <xsl:with-param name="strip-diaereses" select="false()"/>
-                                        <xsl:with-param name="strip-caps" select="false()"/>
-                                    </xsl:call-template>                              
-                                </xsl:when>
                                 <!-- otherwise use the ending as-is -->
                                 <xsl:otherwise>
                                     <xsl:value-of select="."/>
@@ -80,6 +66,7 @@
                                         <xsl:when test="$normalize_greek">
                                             <xsl:call-template name="normalize-greek">
                                                 <xsl:with-param name="input" select="normalize-space($stripped-ending)"/>
+                                                <xsl:with-param name="strip">\/^_</xsl:with-param>
                                             </xsl:call-template>
                                         </xsl:when>
                                         <xsl:otherwise>
@@ -102,25 +89,7 @@
                                 <!-- otherwise add the class 'matched' to indicate that the ending matches but
                                     the form attributes don't -->
                                 <xsl:otherwise>
-                                    <xsl:choose>
-                                        <xsl:when test="$strip_greek_vowel_length = true()
-                                            and count
-                                            ($selected_endings//span
-                                            [@class='alph-suff' and 
-                                            translate(text(),
-                                            $uni-with-length,
-                                            $uni-without-length) 
-                                            = $ending_match]
-                                            ) &gt; 0">matched</xsl:when>
-                                        <xsl:when test="$strip_greek_vowel_length = false()
-                                            and count
-                                            ($selected_endings//span
-                                            [@class='alph-suff' and 
-                                            text() = $ending_match]
-                                            ) &gt; 0">matched</xsl:when>
-                                        <xsl:when test="$selected_endings//span[@class='alph-term']/span[@class='alph-suff' and not(text())]
-                                            and not($match_form) and $ending_match = '_'">matched</xsl:when>
-                                    </xsl:choose>  
+                                    <xsl:if test="contains($text_for_match,concat('|',$ending_match,'|'))">matched</xsl:if>
                                 </xsl:otherwise>        
                             </xsl:choose>                                                                                
                         </xsl:variable>

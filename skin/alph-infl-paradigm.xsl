@@ -242,7 +242,6 @@
                                                 select="$selected_endings"/>
                                             <xsl:with-param name="current_data" select="."/>
                                             <xsl:with-param name="match_pofs" select="$match_pofs"/>
-                                            <xsl:with-param name="strip_greek_vowel_length" select="false()"/>
                                             <xsl:with-param name="infl_constraint" 
                                                 select="$infl_constraint_data"/>
                                         </xsl:call-template>
