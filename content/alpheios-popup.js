@@ -746,7 +746,7 @@ Alph.xlate = {
                         }
                     }
                     var final_word_set = 
-                        Alph.$(pofs_match_set).parents(".alph-word").clone();
+                        Alph.$(pofs_match_set).parents(".alph-word").clone(true);
                     
                     // remove all the old word elements from the popup
                     Alph.$(".alph-word",popup).remove();

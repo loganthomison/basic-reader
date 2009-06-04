@@ -365,13 +365,39 @@
                                 = $match_elem/constraint[$num]/text()">1
                     </xsl:if>
                 </xsl:when>
+                <!-- pofs may be on inflection set or dict -->
+                <xsl:when test="$att_name = 'alph-pofs'">
+                    <xsl:variable name="match_text_lower" 
+                        select="translate($match_elem/constraint[$num]/text(),
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
+                    <xsl:if test="
+                        ($infl/ancestor::div[@class='alph-infl-set']
+                            /preceding-sibling::*[contains(@class,'alph-dict')]//*
+                                [contains(@class,'alph-pofs')                            
+                                 and 
+                                 contains(
+                                    translate(concat('|',@context,'|'),
+                                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),
+                                    concat('|',$match_text_lower,'|'))
+                                ]
+                         )
+                         or
+                         ($infl/ancestor::div[@class='alph-infl-set']//*
+                           [contains(@class,'alph-pofs') 
+                             and 
+                             contains(
+                                 translate(concat('|',@context,'|'),
+                                 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),
+                                 concat('|',$match_text_lower,'|'))
+                             ]
+                         )">1</xsl:if>
+                </xsl:when>
                 <!-- inflection_set atts -->
                 <xsl:when test="
                     ($att_name = 'alph-stemtype') or 
                     ($att_name = 'alph-derivtype') or
                     ($att_name = 'alph-morphflags') or
-                    ($att_name = 'alph-dial') or
-                    ($att_name = 'alph-pofs')">   
+                    ($att_name = 'alph-dial')">   
                     <xsl:variable name="match_text_lower" 
                         select="translate($match_elem/constraint[$num]/text(),
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
