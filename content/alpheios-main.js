@@ -1010,7 +1010,7 @@ Alph.main =
         {
             return;
         }
-     
+        var lang_tool = this.getLanguageTool();
         var target= new Alph.SourceSelection();
         target.setWord(word);
         target.setWordStart(0);
@@ -1018,28 +1018,28 @@ Alph.main =
         target.setContext(word);
         target.setContextPos(0);
         
-        this.getLanguageTool().handleConversion(target);
+        lang_tool.handleConversion(target);
         Alph.main.panels['alph-morph-panel'].open();
         var doc_array = [];
         Alph.$(".alph-lexicon-output").each(
             function() 
             {
                 var doc = Alph.$(this).get(0).contentDocument
-                Alph.main.getLanguageTool().addStyleSheet(doc);
+                lang_tool.addStyleSheet(doc);
                 Alph.$("#alph-window",doc).css("display","block");
                 doc_array.push(doc);
             }
         );
         
-        this.getLanguageTool().lexiconLookup(
+        lang_tool.lexiconLookup(
             target,
             function(data)
             {
-                Alph.xlate.showTranslation(data,target,doc_array);
+                Alph.xlate.showTranslation(data,target,doc_array,lang_tool);
             },
             function(a_msg)
             {   
-                Alph.xlate.translationError(a_msg,doc_array);
+                Alph.xlate.translationError(a_msg,doc_array,lang_tool);
             }
         );
     },

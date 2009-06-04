@@ -178,7 +178,7 @@
           <!-- process inflected forms -->
           <xsl:if test="$infl_sets != ''">
             <!-- one label for all forms -->
-            <div class="alpheios-label">Form(s):</div>
+            <div class="alpheios-label alpheios-form-label">Form(s):</div>
             <xsl:copy-of select="$infl_sets"/>
           </xsl:if>
           

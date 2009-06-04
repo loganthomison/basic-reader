@@ -1499,3 +1499,52 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
         }
     );
 }
+
+/**
+ * Match a single inflection with only one set of attribute values
+ * against an inflection which may contain multiple possible attribute values
+ * @param {Element} a_match_infl the .alph-infl element to match (single-valued) 
+ * @param {Element} a_infls the .alph-infl element to match against (multi-valued)
+ */
+Alph.LanguageTool.prototype.match_infl = function(a_match_infl, a_infls)
+{
+    var must_match = 0;
+    var matched = 0;
+    var atts = ['num','gend','tense','voice','pers','mood','case'];
+    atts.forEach(
+        function(a_att)
+        {
+            var match_val;
+            match_val = Alph.$('.alph-'+ a_att,a_match_infl).attr('context') ||
+                    Alph.$('.alph-'+ a_att,a_match_infl).text();
+            var possible = Alph.$('.alph-'+ a_att,a_infls);
+            // only check those attributes which are defined in the inflection
+            // we want to match
+            if (match_val)
+            {
+                must_match++;
+                var found_match = false;
+                // iterate through the values found for this attribute
+                // in the element we're matching against and if at least
+                // one instance matches, return a positive match
+                for (var i=0; i<possible.length; i++)
+                {
+                    var poss_val = Alph.$(possible[i]).attr('context') || Alph.$(possible[i]).text();
+                    if (match_val == poss_val)
+                    {
+                       found_match = true;
+                       break;
+                    }
+                }
+                // if at least one matching value for this attribute
+                // was found, increase the matched count
+                if (found_match)
+                {
+                    matched++;
+                }
+            }
+        }
+    );
+    return (matched == must_match);
+}
+
