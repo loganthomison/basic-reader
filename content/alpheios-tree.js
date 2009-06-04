@@ -1117,3 +1117,21 @@ Alph.Tree.highlight_first = function(a_doc, a_id)
             this.setAttribute("first", "yes");
     });
 };
+
+Alph.Tree.pre_open_check = function()
+{
+    if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
+    {
+        var trigger = Alph.main.getXlateTrigger(Alph.main.getCurrentBrowser());
+        var hint_prop = 'alph-tree-trigger-hint-'+ trigger;
+        var lang_tool = Alph.main.getLanguageTool();
+        var lang = lang_tool.source_language;
+        var hint = lang_tool.get_string_or_default(hint_prop,[lang]);
+        alert(hint);
+        return false;
+    }
+    else
+    {
+        Alph.main.panels['alph-tree-panel'].open()
+    }
+};

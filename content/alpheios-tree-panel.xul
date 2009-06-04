@@ -23,7 +23,7 @@
              oncommand="document.getElementById('alph-tree-panel').toggle();"
              observes="alph-tree-status" />
         <command id="alpheios-tree-open-cmd" 
-             oncommand="Alph.main.panels['alph-tree-panel'].open();"
+             oncommand="Alph.Tree.pre_open_check();"
              observes="alph-tree-status" />
     </commandset>
              
