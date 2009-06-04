@@ -283,6 +283,15 @@ div.alph-morph {
     padding: 0;    
 }
 
+#alph-window #alph-word-tools.smallicons {
+    margin: 0;
+    position: relative; 
+    padding: 0;
+    background-color: #ebe9d7;
+    border: 1px inset #9E9C9A;
+    height: 20px;    
+}
+
 .alph-tool-icon {
     display: inline;
     position: relative;
@@ -291,6 +300,14 @@ div.alph-morph {
     width: 40px;
     height: 32px;
 }
+.smallicons .alph-tool-icon {
+    width: 18px;
+    height: 18px;
+    border: 1px solid transparent;
+}
+.smallicons .alpheios-icon-label {
+    display: none;
+} 
 
 .alph-tool-icon img {
     margin: 0 0;

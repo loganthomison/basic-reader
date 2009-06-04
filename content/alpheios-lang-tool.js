@@ -1032,7 +1032,8 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
     return '<div class="alph-tool-icon alpheios-button alph-dict-link" ' +
            'href="#alph-dict" title="' + dict_alt_text + '">' +
            '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
-           'alt="' + dict_alt_text + '"/><div>Define</div></div>';
+           'alt="' + dict_alt_text + '"/>' + 
+           '<div class="alpheios-icon-label">' + dict_alt_text + '</div></div>';
 }
 
 /**
@@ -1343,6 +1344,10 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     var strings = Alph.$("#alpheios-strings").get(0);
 
     var tools_node = Alph.$("#alph-word-tools",a_node);
+    if (Alph.util.getPref('smallicons'))
+    {
+        Alph.$(tools_node).addClass("smallicons");
+    }
     // add diagram link, if appropriate (only add if we have a treebank reference
     // and we're not already on the tree
     if (a_target.getTreebankQuery() &&
@@ -1353,7 +1358,8 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             '<div class="alph-tool-icon alpheios-button alph-diagram-link" ' +
             'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+
             '<img src="chrome://alpheios/skin/icons/diagram_16.png"' +
-            ' alt="' + diagram_alt_text + '" /><div>Diagram</div></div>',a_node)
+            ' alt="' + diagram_alt_text + '" />' + 
+            '<div class="alpheios-icon-label">' + diagram_alt_text + '</div></div>',a_node)
             .appendTo(tools_node);
         Alph.$('#alph-word-tools .alph-diagram-link',a_node).click(
             function(a_e)
@@ -1382,7 +1388,8 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             '<div class="alph-tool-icon alpheios-button alph-inflect-link" ' +
             'href="#alpheios-inflect" title="' + inflect_alt_text + '">' +
             '<img src="chrome://alpheios/skin/icons/inflection_16.png" ' +
-            'alt="' + inflect_alt_text + '"/><div>Inflect</div></div>'
+            'alt="' + inflect_alt_text + '"/>' + 
+            '<div class="alpheios-icon-label">' + inflect_alt_text + '</div></div>'
         );
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
             function(a_e)

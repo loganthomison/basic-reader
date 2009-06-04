@@ -309,12 +309,51 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_
             if (a_on)
             {
                 Alph.$('.alpheios-aligned-word[id="' + ids[i] + '"]',parallel_doc)
-                    .addClass("alpheios-highlight-parallel");
+                    .each(
+                        function(a_i)
+                        {
+                            Alph.$(this).addClass("alpheios-highlight-parallel");
+                            this.scrollIntoView();
+                            var source_refs = this.getAttribute('nrefs');
+                            if (source_refs)
+                            {
+                                source_refs.split(/\s|,/).forEach(
+                                    function(s_id)
+                                    {
+                                        Alph.$('.alpheios-aligned-word[id="' + s_id + '"]',
+                                                a_elem.ownerDocument)
+                                            .addClass("alpheios-highlight-source");
+                                    }
+                                );
+                            }
+                        }
+                    );
+                    
             }
             else
             {
                 Alph.$('.alpheios-aligned-word[id="' + ids[i] + '"]',parallel_doc)
-                    .removeClass("alpheios-highlight-parallel");
+                    .each(
+                        function(a_i)
+                        {
+                            Alph.$(this).removeClass("alpheios-highlight-parallel");
+                            var source_refs = this.getAttribute('nrefs');
+                            if (source_refs)
+                            {
+                                source_refs.split(/\s|,/).forEach(
+                                    function(s_id)
+                                    {
+                                        Alph.$('.alpheios-aligned-word[id="' + s_id + '"]',
+                                                a_elem.ownerDocument)
+                                            .removeClass("alpheios-highlight-source");
+                                    }
+                                );
+                            }
+                            
+                        }
+                    );
+                    
+                    
             }
         }
     }
