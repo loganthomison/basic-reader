@@ -37,7 +37,9 @@ if (typeof Alph == "undefined") {
     Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
           .getService(Components.interfaces.mozIJSSubScriptLoader)
           .loadSubScript("chrome://alpheios/content/jquery-1.2.6-alph.js", Alph);
+
     Alph.$ = jQuery.noConflict(true);
+
     
     // load the transfer state object
     Components.utils.import("resource://alpheios/alpheios-xfer-state.jsm",Alph);
@@ -602,5 +604,93 @@ Alph.util = {
             this.log(e);
         }
         return inflHTML;
+    },
+
+    /**
+     * Scroll a document so that supplied element is visible
+     * if the element is above the fold, the document will scroll just until
+     * it is in view at the top, and if the element is below the fold,
+     * the document will scroll just until it is in view at the bottom
+     * @param {Element} a_el the element which should be in view
+     */
+    scroll_to_element: function(a_el)
+    {
+        var top = a_el.offsetTop;
+        var left = a_el.offsetLeft;
+        var width = a_el.offsetWidth;
+        var height = a_el.offsetHeight;
+
+        while(a_el.offsetParent) {
+            a_el = a_el.offsetParent;
+            top += a_el.offsetTop;
+            left += a_el.offsetLeft;
+        }
+
+        var move_x = 0;
+        var move_y = 0;
+        if (left < a_el.ownerDocument.defaultView.pageXOffset)
+        {
+            move_x = left - a_el.ownerDocument.defaultView.pageYOffset;
+        }
+        else if ((left + width) > 
+                 (a_el.ownerDocument.defaultView.pageXOffset + 
+                  a_el.ownerDocument.defaultView.innerWidth)
+                )
+        {
+            move_x = (left + width) - 
+                 (a_el.ownerDocument.defaultView.pageXOffset + 
+                  a_el.ownerDocument.defaultView.innerWidth);
+        }
+        
+        if (top < a_el.ownerDocument.defaultView.pageYOffset)
+        {
+            move_y = top - a_el.ownerDocument.defaultView.pageYOffset;
+        } 
+        else if ( (top >= a_el.ownerDocument.defaultView.pageYOffset) &&
+                  ((top + height) > 
+                   (a_el.ownerDocument.defaultView.pageYOffset +
+                    a_el.ownerDocument.defaultView.innerHeight)
+                  )
+                )
+        {
+            move_y = 
+                (top + height) - 
+                (a_el.ownerDocument.defaultView.pageYOffset +
+                 a_el.ownerDocument.defaultView.innerHeight);
+        }
+        if (move_x != 0 || move_y != 0)
+        {
+            a_el.ownerDocument.defaultView.scrollBy(move_x,move_y);
+        }
+    },
+    
+    /** 
+     * check to see if the supplied element is in view
+     * @param {Element} a_el the element
+     * @return true if in view, otherwise false
+     * @type Boolean
+     */
+    in_viewport: function(a_el) {
+        var top = a_el.offsetTop;
+        var left = a_el.offsetLeft;
+        var width = a_el.offsetWidth;
+        var height = a_el.offsetHeight;
+
+        while(a_el.offsetParent) {
+            a_el = a_el.offsetParent;
+            top += a_el.offsetTop;
+            left += a_el.offsetLeft;
+        }
+
+        return (
+            top >= a_el.ownerDocument.defaultView.pageYOffset &&
+            left >= a_el.ownerDocument.defaultView.pageXOffset &&
+            (top + height) <= (a_el.ownerDocument.defaultView.pageYOffset + 
+                a_el.ownerDocument.defaultView.innerHeight) &&
+            (left + width) <= (a_el.ownerDocument.defaultView.pageXOffset + 
+                a_el.ownerDocument.defaultView.innerWidth)
+        );
     }
+
+    
 };

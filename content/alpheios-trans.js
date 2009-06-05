@@ -313,7 +313,7 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_
                         function(a_i)
                         {
                             Alph.$(this).addClass("alpheios-highlight-parallel");
-                            this.scrollIntoView();
+                            Alph.util.scroll_to_element(this);
                             var source_refs = this.getAttribute('nrefs');
                             if (source_refs)
                             {
