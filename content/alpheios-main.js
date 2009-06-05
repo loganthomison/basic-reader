@@ -1550,10 +1550,16 @@ Alph.main =
         {
             this.get_state_obj(a_bro).set_var("level",a_mode);
             
+            // update the trigger - hardcoded to dblclick for quiz mode
+            var trigger = a_mode == 
+                this.levels.LEARNER ? 'dblclick' 
+                                    : this.getLanguageTool(a_bro).getpopuptrigger();
+            this.setXlateTrigger(a_bro,trigger);
             // clear out any popup
             Alph.xlate.removePopup(a_bro);    
         }
         var new_mode = this.get_state_obj(a_bro).get_var("level");
+        
         // update the site toolbar
         Alph.site.set_current_mode(a_bro.contentDocument,new_mode);
         // make sure the ff toolbar button has the right state
