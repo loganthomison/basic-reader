@@ -538,9 +538,9 @@ Alph.util = {
         // main content url
         if (typeof url != 'string')
         {
-          url = this.ALPHEIOS_URLS.content + a_loc;   
+            url = this.ALPHEIOS_URLS.content + a_loc; 
         }
-        this.open_new_tab(url);    
+        this.open_new_tab(url);
     },
     
     /**
@@ -559,10 +559,21 @@ Alph.util = {
     {
         var subject =
             Alph.$("#alpheios-strings").get(0).getString('alph-feedback-subject');
-        var win = window.open(
-            this.ALPHEIOS_URLS.support +
-            '?subject=' + subject);          
-        win && win.open && !win.closed && win.close(); 
+        var body = '\n\nInstalled Alpheios Versions:\n';
+        var pkgs = this.getAlpheiosPackages();
+        pkgs.forEach(
+            function(a_pkg)
+            {
+                body = body + a_pkg.name + ': ' + a_pkg.version + '\n';
+            }
+        );
+        subject=encodeURIComponent(subject);
+        body= encodeURIComponent(body);     
+        var url = this.ALPHEIOS_URLS.support + '?subject=' + subject + '&body=' + body;
+        var uriToOpen = this.IO_SVC.newURI(url, null, null);
+        this.CC('@mozilla.org/uriloader/external-protocol-service;1')
+            .getService(this.CI('nsIExternalProtocolService'))
+            .loadURI(uriToOpen, null);
     },
     
     /**
