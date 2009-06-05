@@ -144,3 +144,8 @@ label {
 input[type=radio] {
     margin-right: .5em;
 }
+
+#alph-version-info {
+    float: right;
+    margin: 1em;
+}

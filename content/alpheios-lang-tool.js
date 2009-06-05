@@ -1410,6 +1410,66 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
 }
 
 /**
+ * Copy the tools for the Quiz window from the original source node,
+ * replacing the click handlers with ones which first make sure the
+ * correct tab is current in the browser window, because some of the
+ * tools require that the current browser tab be the same as the one which
+ * did the lookup in the first place
+ * @param {Node} a_node the source node which produced the query display
+ * @return {Element} the Element containing the tools 
+ */
+Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
+{
+    var lang_tool = this;
+    var tools = Alph.$("#alph-word-tools",a_node).clone();
+    Alph.$('.alph-diagram-link',tools).click(
+        function(a_e)
+        {
+            if (Alph.util.select_browser_for_doc(a_node.ownerDocument))
+            {
+                Alph.$("#alpheios-tree-open-cmd").get(0).doCommand(a_e);
+            }
+            else
+            {
+                alert("Unable to locate source browser");
+            }
+            return false;
+        }
+    );
+    
+    Alph.$('.alph-inflect-link',tools).click(
+        function(a_e)
+        {
+            if (Alph.util.select_browser_for_doc(a_node.ownerDocument))
+            {
+                lang_tool.handleInflections(a_e,a_node);
+            }
+            else
+            {
+                alert("Unable to locate source browser");
+            }
+            return false;
+        }
+    );
+    Alph.$('.alph-dict-link',tools).click(
+        function(a_event)
+        {
+            if (Alph.util.select_browser_for_doc(a_node.ownerDocument))
+            {
+                Alph.main.broadcast_ui_event(
+                    Alph.main.events.SHOW_DICT);
+            }
+            else
+            {
+                alert("Unable to locate source browser");
+            }
+            return false;
+        }
+    );
+    return tools;
+}
+
+/**
  * Add language-specific help links to the inflections component of the
  * word lookup output (if any)
  * @paramaters {Node} a_node the node which contains the results

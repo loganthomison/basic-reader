@@ -316,10 +316,11 @@ div.alph-morph {
 }
 
 .alph-tooltip {
-    font-size: small;
-    font-weight: normal;
-    background-color: #5BC8DC;
-    border: 1px solid #B8B7B5;
+    font-size: small !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    background-color: #5BC8DC !important;
+    border: 1px solid #B8B7B5 !important;
     position: absolute;
     top: 20px;
     left: 16px;
@@ -401,4 +402,14 @@ div.alph-morph {
     padding-left: 18px;
     font-family:  Arial, sans-serif;
     background: url(chrome://alpheios/skin/icons/information-16-g.png) 0 0 no-repeat;
+}
+
+.alpheios-link {
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.alpheios-link:hover {
+    color: #5BC8DC;
 }

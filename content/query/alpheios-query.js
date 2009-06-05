@@ -55,6 +55,23 @@ Alph_Quiz =
           .getService(Components.interfaces.mozIJSSubScriptLoader)
           .loadSubScript(template_src,this.query_template);
         this.main_str = params.main_str;
+        var query_doc = $("#alph-query-frame").get(0).contentDocument;
+        // add the version string 
+        $("body",query_doc).prepend('<div id="alph-version-info"></div>');
+        var version_string = 
+            params.lang_tool.get_string_or_default('alph-version-link',[]);
+        if (version_string)
+        {
+            $("#alph-version-info",query_doc)
+                .append('<a href="#" class="alph-version-link alpheios-link">'+ version_string+'</a>')
+                .click(
+                    function()
+                    {
+                        window.opener.Alph.util.open_alpheios_link('release-notes');
+                        return false;
+                    });
+        }
+
         this.load_query_head(params);
         
         this.add_pofs_query(params);
@@ -70,7 +87,7 @@ Alph_Quiz =
         }
         else if (params.type == 'infl_query')
         {
-            var query_doc = $("#alph-query-frame").get(0).contentDocument;
+            query_doc = $("#alph-query-frame").get(0).contentDocument;
             this.load_done();
             this.on_defs_correct(
                 params.aligned_defs.join(' '),
@@ -452,6 +469,14 @@ Alph_Quiz =
     load_query_infl: function(a_src_node)
     {
 
+        var infl_set = $('.alph-infl-set',a_src_node);
+        // don't even both to display the form element of the query
+        // if we don't have an inflection set
+        if (infl_set.length == 0)
+        {
+            this.on_infl_correct(a_src_node);
+            return;
+        }
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
         $('.alph-query-infl',parent_doc).css('display','block');
         var form = $(".alph-word",a_src_node).attr('context');
@@ -464,7 +489,7 @@ Alph_Quiz =
             }
         );
         
-        var infl_set = $('.alph-infl-set',a_src_node);
+        
         
         var context_list = [];
 
@@ -533,6 +558,12 @@ Alph_Quiz =
         }
         else
         {
+            try {
+                var disclaimer = $("#alph-infl-strings").get(0).getString('disclaimer');
+                $("#alph-infl-table",parent_doc)
+                    .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
+            } 
+            catch(a_e){alert(a_e)};
             var text = this.main_str.getFormattedString("alph-query-infl-continue",[form]);
             var infl_hint = '';
                 // look for a part-of-speech specific hint, and if not defined, use
@@ -631,7 +662,12 @@ Alph_Quiz =
         var attr = $(".alph-morph .alph-pofs .alph-attr",entry);
         $(".alph-morph .alph-pofs",entry).html(attr);
         $(".alph-infl-select",parent_doc).prepend(entry);                
+        
+        // add the grammar links handlers and redo the help tooltips
         window.arguments[0].lang_tool.contextHandler(parent_doc);
+        $(".alph-form-end",entry).remove();
+        $(".alph-infl-end",entry).remove();
+        window.arguments[0].lang_tool.add_infl_help(entry);
         this.quiz_done();
         this.resize_window();
     },
@@ -655,7 +691,10 @@ Alph_Quiz =
         /**
          * add further instructions and the word tools to the window
          */
-        var tools = $("#alph-word-tools",params.source_node).clone();
+
+        // get the tools 
+        var tools = params.lang_tool.get_tools_for_query(params.source_node);
+ 
         $(".alph-query-context",query_doc)
             .after('<div class="alph-query-context">' +
                 this.main_str.getFormattedString('alph-query-done-hint',[form]) +
@@ -663,6 +702,4 @@ Alph_Quiz =
             .remove();
         $(".alph-query-instruct",query_doc).append(tools).append('<br/>');
     }
-    
-    
 }

@@ -62,7 +62,8 @@ Alph.interactive = {
             return;
         }
         
-        var lang_tool = Alph.main.getLanguageTool();
+        var browser = Alph.util.browser_for_doc(a_topdoc) || Alph.main.getCurrentBrowser();
+        var lang_tool = Alph.main.getLanguageTool(browser);
         var str = Alph.$("#alpheios-strings").get(0)
         
         var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');

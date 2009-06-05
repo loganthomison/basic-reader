@@ -690,7 +690,31 @@ Alph.util = {
             (left + width) <= (a_el.ownerDocument.defaultView.pageXOffset + 
                 a_el.ownerDocument.defaultView.innerWidth)
         );
-    }
-
+    },
     
+    browser_for_doc: function(a_doc)
+    {
+        return gBrowser.getBrowserForDocument(a_doc);
+    },
+    
+    select_browser_for_doc:function(a_doc)
+    {
+        var bro = gBrowser.getBrowserForDocument(a_doc);
+        var num = gBrowser.browsers.length;
+        var succeeded = false;
+        for (var i = 0; i < num; i++) {
+            var b = gBrowser.getBrowserAtIndex(i);
+            try {
+                if (b == bro)
+                {
+                    gBrowser.tabContainer.selectedIndex = i;
+                    succeeded = true;
+                    break;
+                }
+            } catch(e) {
+                Alph.util.log("Error switch browser tab: " + e);
+            }
+        }
+        return succeeded;
+    }
 };

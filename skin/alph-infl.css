@@ -338,3 +338,6 @@ table#alph-infl-table.nomatch * {
     font-family:  Arial, sans-serif;
     background: url(chrome://alpheios/skin/icons/information-16-g.png) 0 0 no-repeat;
 }
+#alph-version-info {
+    float: right;
+}

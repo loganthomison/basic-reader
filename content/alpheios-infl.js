@@ -275,6 +275,30 @@ Alph.infl = {
         
         var str_props = document.getElementById("alph-infl-strings");
     
+        // add the version string and disclaimer
+        $("body",topdoc).prepend('<div id="alph-version-info"></div>');
+        var version_string = 
+            a_link_target.lang_tool.get_string_or_default('alph-version-link',[]);
+        if (version_string)
+        {
+            $("#alph-version-info",topdoc)
+                .append('<a href="#" class="alph-version-link">'+ version_string+'</a>')
+                .click(
+                    function()
+                    {
+                        window.opener.Alph.util.open_alpheios_link('release-notes');
+                        return false;
+                    });
+        }
+        try {
+            var disclaimer = str_props.getString('disclaimer')
+            $("#alph-infl-table",topdoc)
+                .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
+        } 
+        catch(a_e)
+        { // if it's not defined, then nothing to do 
+        }
+
         // populate the title of the declension table
         var title = '';
         try
