@@ -134,7 +134,7 @@ g rect[first] {
     fill: #E0E0E0;
 }
 g rect[showme="focus"] {
-    fill: yellow;
+    fill: #FFEE77;
 }
 g rect[showme="focus-descendant"] {
     fill: #E0FFE0;
