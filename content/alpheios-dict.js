@@ -489,7 +489,7 @@ Alph.Dict.prototype.init_document = function(a_doc,a_doc_state)
         a_doc_state.contents =
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
         a_doc_state.contents.setAttribute("id", "alph-window");
-        a_doc_state.contents.setAttribute("class", "full-dict-display");
+        a_doc_state.contents.setAttribute("class", "full-dict-display alpheios-ignore");
         a_doc_state.css =
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","link");
         a_doc_state.css.setAttribute("rel", "stylesheet");

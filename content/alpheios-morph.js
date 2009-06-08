@@ -123,6 +123,7 @@ Alph.Morph.prototype.init_document = function(a_doc,a_doc_state)
         var main_div = 
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
         main_div.setAttribute("id", "alph-window");
+        main_div.setAttribute("class", "alpheios-ignore");
         a_doc_state.contents = main_div;
         a_doc_state.css = Alph.$("link[rel=stylesheet]",a_doc).clone();
     }

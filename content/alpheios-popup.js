@@ -839,13 +839,17 @@ Alph.xlate = {
             
             popup = topdoc.createElementNS("http://www.w3.org/1999/xhtml", "div");
             popup.setAttribute("id", "alph-window");
+            popup.setAttribute("class", "alpheios-ignore");
 
             /* cancel the mousemove and dblclick events over the popup */
-            popup.addEventListener("mousemove", this.cancelMouseMove, false);
-            popup.addEventListener("dblclick", this.cancelDoubleClick, false);
+            /* this probably can come out as I've switched to using the 
+             * alpheios-ignore class, but leaving in commented out for now
+             */
+            //popup.addEventListener("mousemove", this.cancelMouseMove, false);
+            //popup.addEventListener("dblclick", this.cancelDoubleClick, false);
             
             Alph.$("body",topdoc).append(popup);
-        
+            
             
             // add a close link 
             Alph.$(popup).append('<div class="alph-title-bar"><div class="alph-close-button">&#160;</div></div>')
@@ -855,7 +859,9 @@ Alph.xlate = {
                     Alph.xlate.hidePopup()
                 }
             );
-                
+            
+            Alph.$('.alph-title-bar',popup).bind('mousedown',Alph.xlate.drag_popup);
+            
             var anchor = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                                  "a");
             anchor.setAttribute("name","alph-window-anchor");
@@ -1379,6 +1385,63 @@ Alph.xlate = {
             // out why and fix, rather than just logging it.
             Alph.util.log("no default view");
         }
-     }
+     },
      
+     /**
+      * handle to initiate drag action for popup
+      * @param {Event} a_event the mousedown event
+      *  ('this' is the object the mouse is over) 
+      */
+     drag_popup: function(a_e)
+     {
+        var data = 
+            { start_x: a_e.pageX,
+              start_y: a_e.pageY
+            };
+        Alph.$(this).parents("body").eq(0).bind(
+            'mouseup.alpheiosdrag',
+            data,
+            Alph.xlate.drop_popup);
+        
+        Alph.$(this).parents("body").eq(0).bind(
+            'mousemove.alpheiosdrag',
+            data,
+            Alph.xlate.move_popup);
+        return false;
+    },
+     
+    /**
+     * mousemove handler for dragging the popup
+     * @param {Event} a_event the mousemove event
+     * ('this' is the object the mouse is moving over) 
+     */
+    move_popup: function(a_e)
+    {
+        var x_m = a_e.pageX - a_e.data.start_x;
+        var y_m = a_e.pageY - a_e.data.start_y;
+        Alph.$("#alph-window",this.ownerDocument).get(0).style.left =
+            (a_e.data.start_x + x_m) + 'px';
+        Alph.$("#alph-window",this.ownerDocument).get(0).style.top = 
+            (a_e.data.start_y + y_m) + 'px';
+        return false;
+    },
+    
+    /**
+     * mouseup handler for dropping the popup
+     * @param {Event} a_event the mouseup event
+     * ('this' is the object the mouse is over) 
+     */
+    drop_popup: function(a_e){
+        Alph.$(this).unbind('.alpheiosdrag');
+        Alph.$(this).parents().unbind('.alpheiosdrag');
+        var x_m = a_e.pageX - a_e.data.start_x;
+        var y_m = a_e.pageY - a_e.data.start_y;
+        Alph.$("#alph-window",this.ownerDocument).get(0).style.left =
+            (a_e.data.start_x + x_m) + 'px';
+        Alph.$("#alph-window",this.ownerDocument).get(0).style.top = 
+            (a_e.data.start_y + y_m) + 'px';    
+    }
+
+     
+    
 };

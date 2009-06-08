@@ -377,6 +377,7 @@ div.alph-morph {
     border: 1px solid #9e9c98;
     background-color: #9e9c9a;
     height: 18px;
+    cursor: pointer;
 }
 
 .alpheios-button {
