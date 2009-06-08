@@ -1394,9 +1394,12 @@ Alph.xlate = {
       */
      drag_popup: function(a_e)
      {
+        var handle_offset = Alph.$(this).offset();;
         var data = 
             { start_x: a_e.pageX,
-              start_y: a_e.pageY
+              start_y: a_e.pageY,
+              handle_x: handle_offset.left - a_e.pageX,
+              handle_y: handle_offset.top - a_e.pageY,
             };
         Alph.$(this).parents("body").eq(0).bind(
             'mouseup.alpheiosdrag',
@@ -1417,6 +1420,11 @@ Alph.xlate = {
      */
     move_popup: function(a_e)
     {
+        // adjust the coordinates of the event
+        // so that the mouse stays in the location
+        // of the original mouse down event
+        a_e.pageX = a_e.pageX + a_e.data.handle_x;
+        a_e.pageY = a_e.pageY + a_e.data.handle_y;
         var x_m = a_e.pageX - a_e.data.start_x;
         var y_m = a_e.pageY - a_e.data.start_y;
         Alph.$("#alph-window",this.ownerDocument).get(0).style.left =
@@ -1434,6 +1442,11 @@ Alph.xlate = {
     drop_popup: function(a_e){
         Alph.$(this).unbind('.alpheiosdrag');
         Alph.$(this).parents().unbind('.alpheiosdrag');
+        // adjust the coordinates of the event
+        // so that the mouse stays in the location
+        // of the original mouse down event
+        a_e.pageX = a_e.pageX + a_e.data.handle_x;
+        a_e.pageY = a_e.pageY + a_e.data.handle_y;
         var x_m = a_e.pageX - a_e.data.start_x;
         var y_m = a_e.pageY - a_e.data.start_y;
         Alph.$("#alph-window",this.ownerDocument).get(0).style.left =
