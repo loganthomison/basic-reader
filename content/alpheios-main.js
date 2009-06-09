@@ -1369,6 +1369,13 @@ Alph.main =
             
         );
         
+        
+        if (ped_site)
+        {
+            Alph.site.update_site_tool_status(bro.contentDocument);        
+        }    
+            
+          
         // Update the panels
         Alph.$("alpheiosPanel").each(
             function()

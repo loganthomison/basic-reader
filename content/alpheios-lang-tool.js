@@ -158,7 +158,15 @@ Alph.LanguageTool.prototype.lexicon_setup = function()
     // for generic lexicon-independent values
     Alph.util.log("Reading params for " + language);
     this.lexiconSearch = Array();
-    var codeList = Alph.util.getPref("dictionaries.full", language);
+    var codeList;
+    try 
+    {
+        codeList = Alph.util.getPref("dictionaries.full", language)
+    }
+    catch(a_e){
+        // the preference might not be defined
+        codeList = null;
+    }
     var codes = (codeList ? codeList.split(',') : Array());
     var defaultBase = "dictionary.full.search.";
     for (var i = 0; i < codes.length; ++i)
@@ -731,7 +739,9 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
     var params = Alph.$.extend(
         {
             target_href: a_target,
-            callback: function() { Alph.xlate.hideLoadingMessage(a_node.ownerDocument) },
+            callback: a_node ? 
+                      function() { Alph.xlate.hideLoadingMessage(a_node.ownerDocument) }
+                      : function() {},
             lang_tool: thisObj
         },
         a_params || {}
@@ -977,16 +987,51 @@ Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
 };
 
 /**
- * Get the name of the current dictionary
- * @return the name of the dictionary or null if none defined
- * @type String
+ * Check to see if one or more full dictionaries are available
+ * @return true if a dictionary is available, false if not
+ * @type Boolean
  */
-Alph.LanguageTool.prototype.getDictionary = function()
+Alph.LanguageTool.prototype.hasDictionary = function()
 {
-    // if no default dictionary is defined for the language, return null
-    var dict_list =
-        Alph.util.getPref("dictionaries.full",this.source_language);
-    return dict_list || null;
+    // if no dictionary is defined for the language, return null
+    var has_dict = false;
+    var codeList;
+    try 
+    {
+        codeList = Alph.util.getPref("dictionaries.full",this.source_language).split(/,/);
+    }
+    catch(a_e){
+        // the preference might not be defined
+        codeList = [];
+    }
+    
+    var remote_disabled = Alph.util.getPref("disable.remote");
+    for (var i=0; i<codeList.length; i++)
+    {
+        var code = codeList[i];
+        // if a dictionary wasn't setup properly
+        // disable the dictionary feature
+        if (typeof this.lexiconSearch[code] == 'undefined')
+        {
+            has_dict = false;
+            break;
+        }
+        // if remote features are disabled and any of  the dictionaries 
+        // uses a remote url, disable the dictionary feature
+        else if ( remote_disabled &&  
+                  ! Alph.util.is_local_url(this.lexiconSearch[code].url)
+                )
+         {
+            has_dict = false;
+            break;        
+         }
+         // otherwise dictionary was setup so feature is enabled
+         else
+         {
+            has_dict = true;  
+         }    
+    }
+    return has_dict;
 }
 
 /**
@@ -1019,7 +1064,7 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
 Alph.LanguageTool.prototype.getDictionaryLink = function()
 {
     var link = '';
-    if (this.getDictionary() != null)
+    if (this.hasDictionary())
     {
         var strings = Alph.$("#alpheios-strings").get(0);
         var dict_alt_text = strings.getString('alph-dictionary-link');
@@ -1052,7 +1097,7 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
     // the dictionary urls for this dictionary, then use it
     // otherwise use the default method
     var dict_method = null;
-    if (this.getDictionary())
+    if (this.hasDictionary())
     {
         dict_method =
             Alph.util.getPrefOrDefault(
@@ -1602,5 +1647,20 @@ Alph.LanguageTool.prototype.match_infl = function(a_match_infl, a_infls)
         }
     );
     return (matched == must_match);
+}
+
+/**
+ * Get the string to be used in the interface for this language
+ * @return the string to be used in the interface for this language
+ * @type String
+ */
+Alph.LanguageTool.prototype.get_language_string = function()
+{
+    var str = this.get_string(this.source_language + '.string');
+    if (str == '')
+    {
+        str = this.source_language;
+    }
+    return str;
 }
 

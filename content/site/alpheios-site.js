@@ -91,16 +91,31 @@ Alph.site = {
         {
             return;
         }
-        Alph.$(".alpheios-toolbar-translation",toolbars).bind(
-            'click',
-            {alpheios_panel_id: 'alph-trans-panel'},
-            this.toggle_panel_handler
-        );
-        Alph.$(".alpheios-toolbar-tree",toolbars).bind(
-            'click',
-            {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
-            this.do_command_handler
-        );
+        if (this.translation_url(a_doc))
+        {
+            Alph.$(".alpheios-toolbar-translation",toolbars).bind(
+                'click',
+                {alpheios_panel_id: 'alph-trans-panel'},
+                this.toggle_panel_handler
+         
+            );
+        }
+        else
+        {
+            Alph.$(".alpheios-toolbar-translation",toolbars).css("display","none");
+        }
+        if (this.treebank_diagram_url(a_doc))
+        {
+            Alph.$(".alpheios-toolbar-tree",toolbars).bind(
+                'click',
+                {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
+                this.do_command_handler
+            );
+        }
+        else
+        {
+            Alph.$(".alpheios-toolbar-tree",toolbars).css("display","none");           
+        }
         Alph.$(".alpheios-toolbar-options",toolbars).bind(
             'click',
             {alpheios_cmd_id: 'alpheios-options-cmd'},
@@ -247,7 +262,7 @@ Alph.site = {
     {
         
         // don't add the toggle if we don't have an aligned translation to use
-        if ( (Alph.$("#alph-trans-url",a_doc).length == 0) ||  
+        if ( ! this.translation_url(a_doc) ||  
                Alph.$(".alpheios-aligned-word",a_doc).length == 0)
         {
             return;
@@ -312,7 +327,7 @@ Alph.site = {
         Alph.$("#alpheios-trans-opt-inter-src").attr('checked',
             checked ? 'true' : 'false');
                
-        var trans_url = Alph.$("#alph-trans-url",toggle_elem.ownerDocument).attr("url");
+        var trans_url = Alph.site.translation_url(toggle_elem.ownerDocument);
         var words = Alph.$(".alpheios-word-wrap",toggle_elem.ownerDocument).get();
         if (checked)
         {
@@ -547,7 +562,7 @@ Alph.site = {
      */
     load_alignment: function(a_src_doc,a_success,a_error)
     {
-        var align_url = Alph.$("#alph-trans-url",a_src_doc).attr("url");
+        var align_url = this.translation_url(a_src_doc);
         var align_doc = null;
         
         // using XMLHttpRequest directly here because the alignment document
@@ -621,10 +636,89 @@ Alph.site = {
     add_trigger_hint: function(a_doc,a_trigger,a_lang_tool)
     {
         var hint_prop = 'alph-trigger-hint-'+a_trigger;
-        var lang = a_lang_tool.source_language;
+        var lang = a_lang_tool.get_language_string();
         var hint = a_lang_tool.get_string_or_default(hint_prop,[lang]);
         Alph.util.log("Hint="+hint);
         Alph.$(".alpheios-trigger-hint",a_doc).html(hint);
-    }
+    },
+    
+    /**
+     * Get the treebank url for the document, if any
+     * @param {Document} a_doc the document
+     * @return the url or null if not defined
+     * @type {String}
+     */
+    treebank_url: function(a_doc)
+    { 
+        var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",a_doc).attr("content");
+        // if the treebank url is defined, but remote features are disabled and
+        // the treebank url is remote, then act as if it's not defined
+        if (treebank_url && Alph.util.getPref("disable.remote") && 
+            ! Alph.util.is_local_url(treebank_url)
+           )
+        {
+           treebank_url = null; 
+        }
+        return treebank_url;
+    },
+    
+    /**
+     * Get the treebank diagram url for the document, if any
+     * @param {Document} a_doc the document
+     * @return the url or null if not defined
+     * @type {String}
+     */
+    treebank_diagram_url: function(a_doc)
+    { 
+        var url = Alph.$("meta[name=alpheios-treebank-diagram-url]",a_doc)
+                      .attr("content");
+        // if the url is defined, but remote features are disabled and
+        // the url is remote, then act as if it's not defined
+        if (url && Alph.util.getPref("disable.remote") && 
+            ! Alph.util.is_local_url(url)
+           )
+        {
+           url = null; 
+        }
+        return url;
+    },
+    
+    /**
+     * Get the aligned translation url for the document, if any
+     * @param {Document} a_doc the document
+     * @return the url or null if not defined
+     * @type {String}
+     */
+    translation_url: function(a_doc)
+    {
+        var trans_url = Alph.$("#alph-trans-url",a_doc).attr("url");
+        // if the translation url is defined, but remote features are disabled and
+        // the translation url is remote, then act as if it's not defined
+        if (trans_url && Alph.util.getPref("disable.remote") && 
+            ! Alph.util.is_local_url(trans_url))
+        {
+            trans_url = null;
+        }
+        return trans_url;
+    },
+    
+    /**
+     * Update the browser elements which correspond to the site tools
+     * @param {Document} a_doc the current document
+     */
+    update_site_tool_status: function(a_doc)
+    {
+        if (! this.translation_url(a_doc))
+        {
+            Alph.$("#alph-trans-status").attr("disabled",true);
+            Alph.$("#alph-trans-status").attr("hidden",true);
+        
+        }
+        if (! this.treebank_diagram_url(a_doc))
+        {
+            Alph.$("#alph-tree-status").attr("disabled",true);
+            Alph.$("#alph-tree-status").attr("hidden",true);
+        }
+    }  
     
 };

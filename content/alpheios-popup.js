@@ -253,16 +253,15 @@ Alph.xlate = {
         }
         if (treebank_ref)
         {
-            var treebank_url = 
-                Alph.$("meta[name=alpheios-treebank-url]",doc).attr("content");
+            var treebank_url = Alph.site.treebank_url(doc); 
+                
             // if we're in the dependency tree diagram, we will have a treebank reference
             // but no treebank_url. get the treebank url from the main browser window
             // in that case.
             if (!treebank_url && is_svg_text )
             {
                 treebank_url = 
-                    Alph.$("meta[name=alpheios-treebank-url]",
-                        Alph.main.getCurrentBrowser().contentDocument).attr("content");
+                    Alph.site.treebank_url(Alph.main.getCurrentBrowser().contentDocument); 
             }
             if (treebank_url)
             {

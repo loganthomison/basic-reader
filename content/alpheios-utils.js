@@ -703,11 +703,23 @@ Alph.util = {
         );
     },
     
+    /**
+     * get the browser owner of a document
+     * @param {Document} a_doc the document
+     * @return the browser
+     * @type Browser
+     */
     browser_for_doc: function(a_doc)
     {
         return gBrowser.getBrowserForDocument(a_doc);
     },
     
+    /**
+     * make the browser owner of a document the current browser tab
+     * @param {Document} a_doc the document
+     * @return true if the browser could be found and selected otherwise false
+     * @type Boolean
+     */
     select_browser_for_doc:function(a_doc)
     {
         var bro = gBrowser.getBrowserForDocument(a_doc);
@@ -727,5 +739,16 @@ Alph.util = {
             }
         }
         return succeeded;
+    },
+    
+    /**
+     * Check to see if a url is a local url
+     * @param {String} a_url the url string
+     * @return true if its a localhost or chrome url otherwise false
+     * @type Boolean
+     */
+    is_local_url: function(a_url)
+    {
+        return (a_url.match(/^http:\/\/localhost/) || a_url.match(/^chrome:/));
     }
 };

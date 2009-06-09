@@ -83,8 +83,7 @@ Alph.Tree.prototype.show = function()
 
     var svgError = "";
 
-    var treebankUrl =
-        Alph.$("meta[name=alpheios-treebank-diagram-url]",bro.contentDocument).attr("content");
+    var treebankUrl = Alph.site.treebank_diagram_url(bro.contentDocument);
 
     var tbref;
     var sentence;
@@ -1125,7 +1124,7 @@ Alph.Tree.pre_open_check = function()
         var trigger = Alph.main.getXlateTrigger(Alph.main.getCurrentBrowser());
         var hint_prop = 'alph-tree-trigger-hint-'+ trigger;
         var lang_tool = Alph.main.getLanguageTool();
-        var lang = lang_tool.source_language;
+        var lang = lang_tool.get_language_string();
         var hint = lang_tool.get_string_or_default(hint_prop,[lang]);
         alert(hint);
         return false;

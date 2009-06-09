@@ -59,14 +59,13 @@ Alph.Translation.prototype.show = function()
     // up from the user's preferences for the basic reader
     
     
-    var trans_url = Alph.$("#alph-trans-url",bro.contentDocument);
+    var trans_url = Alph.site.translation_url(bro.contentDocument);
     if (trans_url)
     {
         Alph.util.log("loading translation from " + Alph.$(trans_url).attr("url"));
         
         var trans_doc = 
-                Alph.$("browser",this.panel_elem).get(0).contentDocument;
-        var trans_url = Alph.$(trans_url).attr("url")  
+                Alph.$("browser",this.panel_elem).get(0).contentDocument;  
         // jQuery can't handle a request to chrome which doesn't return expected
         // http headers --- this is a temporary hack to allow the interlinear
         // prototype to be run locally
