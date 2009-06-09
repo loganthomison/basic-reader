@@ -721,9 +721,11 @@ Alph.xlate = {
                         Alph.$(pofs_match_set).attr("tb-match",true);
                         if (new_infl_node != null)
                         {
+                            var original_form = 
+                                Alph.$(pofs_match_set).parents(".alph-word").attr("context");
                             Alph.$(new_infl_node).clone(true).appendTo(pofs_match_set);
                             Alph.$(".alph-infl",pofs_match_set)
-                                .wrap('<div class="alph-infl-set"></div>',a_doc);
+                                .wrap('<div class="alph-infl-set" context="' + original_form + '"></div>',a_doc);
                         }
                     }
                     // remove any entries which didn't match
