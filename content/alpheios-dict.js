@@ -164,27 +164,6 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     var panel_obj = this;
     var panel_state = this.get_browser_state(a_bro);
 
-    // handle change to the dictionary preferences
-    var new_dict = false;
-    if (a_event_type == Alph.main.events.UPDATE_PREF &&
-        a_event_data.name.indexOf('dictionaries.full.default') != -1)
-    {
-        
-        new_dict = true;
-        // close/hide the panel if it's open and we're switching
-        // to no full defs
-        if (a_event_data.value == null || a_event_data.value == '')
-        {
-            this.update_status(this.hide());
-            return;
-        }
-        // otherwise make sure the browse command is updated
-        else
-        {
-            Alph.Dict.update_dict_browse_cmd();    
-        }
-    }
-
     // if a dictionary link was clicked and the panel/window isn't open
     // then open it. If the panel is detached, the onload handler for the window
     // will result in observe_ui_event being called again with the LOAD_DICT_WINDOW
@@ -516,50 +495,6 @@ Alph.Dict.prototype.init_document = function(a_doc,a_doc_state)
 Alph.Dict.prototype.get_detach_chrome = function()
 {
     return 'chrome://alpheios/content/alpheios-dict-window.xul';
-};
-
-/**
- * Switch the current dictionary
- * (static method as it's invoked from the panel menu)
- * @param {Event} a_ the event which triggered the request
- * @param {String} a_panel_id the id of the originating panel
- */
-Alph.Dict.switch_dictionary = function(a_event,a_panel_id)
-{
-    var menuitem = a_event.explicitOriginalTarget;
-    try
-    {
-        var dict_name = menuitem.getAttribute('id')
-                                .match(/^alpheios-dict-(.+)$/)[1];
-        if (dict_name == null || dict_name == 'none')
-        {
-            dict_name = '';
-        }
-        // calling setDictionary updates the preference
-        // which results in a PREF_CHANGE event being broadcast to the 
-        // panel and observed in observe_ui_event
-        Alph.main.getLanguageTool(a_bro).setDictionary(dict_name);            
-    }
-    catch(a_e)
-    {
-        Alph.util.log("Error switching dictionary: " + a_e);
-    }
-
-}
-
-/**
- * Update the dictionary menu for the current dictionary
- * @param {a_menu}
- */
-Alph.Dict.update_dict_menu = function(a_menu)
-{
-    var dict_name = Alph.main.getLanguageTool().getDictionary();
-    if (dict_name == null)
-    {
-        dict_name = 'none';
-
-    }
-    Alph.$('menuitem#alpheios-dict-'+dict_name,a_menu).attr('checked','true');
 };
 
 /**

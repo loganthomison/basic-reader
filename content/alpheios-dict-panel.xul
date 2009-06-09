@@ -18,10 +18,6 @@
              oncommand="document.getElementById('alph-dict-panel').toggle();"
              observes="alph-dict-status" />
         <command 
-            id="alpheios-dict-switch-cmd" 
-            oncommand="Alph.Dict.switch_dictionary(event,'alph-dict-panel');"
-            observes="alpheios-dict-status"/>
-        <command 
             id="alpheios-dict-browse-cmd" 
             oncommand="Alph.Dict.browse_dictionary(event,'alph-dict-panel');"
             observes="alpheios-dict-status"/>

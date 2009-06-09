@@ -984,21 +984,9 @@ Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
 Alph.LanguageTool.prototype.getDictionary = function()
 {
     // if no default dictionary is defined for the language, return null
-    var default_dict =
-        Alph.util.getPref("dictionaries.full.default",this.source_language);
-    return default_dict || null;
-}
-
-/**
- * Set the name of the default dictionary
- * @param {String} the dictionary name (must be listed in
- *                  extensions.alpheios.<lang>.dictionaries.full)
- */
-Alph.LanguageTool.prototype.setDictionary = function(a_dict_name)
-{
-    Alph.util.setPref("dictionaries.full.default",
-                      a_dict_name,
-                      this.source_language);
+    var dict_list =
+        Alph.util.getPref("dictionaries.full",this.source_language);
+    return dict_list || null;
 }
 
 /**
@@ -1009,14 +997,17 @@ Alph.LanguageTool.prototype.setDictionary = function(a_dict_name)
 Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
 {
     var browse_url = null;
-    var default_dict = this.getDictionary();
-    if (default_dict)
-    {
-        browse_url =
-            Alph.util.getPref(
-                "dictionary.full." + default_dict + ".browse.url",
-                this.source_language);
-    }
+    /**
+     * Not yet implemented
+     * var default_dict = this.getDictionary();
+     * if (default_dict)
+     * {
+     *   browse_url =
+     *       Alph.util.getPref(
+     *           "dictionary.full." + default_dict + ".browse.url",
+     *           this.source_language);
+     *}
+    **/
     return browse_url;
 }
 
@@ -1027,13 +1018,18 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
  */
 Alph.LanguageTool.prototype.getDictionaryLink = function()
 {
-    var strings = Alph.$("#alpheios-strings").get(0);
-    var dict_alt_text = strings.getString('alph-dictionary-link');
-    return '<div class="alph-tool-icon alpheios-button alph-dict-link" ' +
-           'href="#alph-dict" title="' + dict_alt_text + '">' +
-           '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
-           'alt="' + dict_alt_text + '"/>' + 
-           '<div class="alpheios-icon-label">' + dict_alt_text + '</div></div>';
+    var link = '';
+    if (this.getDictionary() != null)
+    {
+        var strings = Alph.$("#alpheios-strings").get(0);
+        var dict_alt_text = strings.getString('alph-dictionary-link');
+        link = '<div class="alph-tool-icon alpheios-button alph-dict-link" ' +
+               'href="#alph-dict" title="' + dict_alt_text + '">' +
+               '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
+               'alt="' + dict_alt_text + '"/>' + 
+               '<div class="alpheios-icon-label">' + dict_alt_text + '</div></div>';
+    }
+    return link;
 }
 
 /**
@@ -1057,13 +1053,6 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
     // otherwise use the default method
     var dict_method = null;
     if (this.getDictionary())
-    {
-        dict_method =
-            Alph.util.getPref(
-                "methods.dictionary.full." + this.getDictionary(),
-                this.source_language);
-    }
-    if (!dict_method || (typeof dict_method == "undefined"))
     {
         dict_method =
             Alph.util.getPrefOrDefault(
