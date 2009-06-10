@@ -155,6 +155,15 @@ Alph.xlate = {
             rngstr = rp.firstChild.nodeValue || 
                 (a_e.explicitOriginalTarget.firstChild ? 
                     a_e.explicitOriginalTarget.firstChild.nodeValue : ""); 
+
+            // svg events seem to have range offset always 1 no matter where you click,
+            // which causes the whitespace test below to ignore one-character words
+            for (; ro > 0; --ro)
+            {
+                var testchar = rngstr.charCodeAt(ro - 1);
+                if (testchar == 32 || testchar == 9 || testchar == 10 || testchar == 160)
+                    break;
+            }
         }
         else
         {
@@ -174,7 +183,7 @@ Alph.xlate = {
         while ( ro < rngstr.length )
         { 
             var testchar = rngstr.charCodeAt(ro);
-            if (testchar == 32 || testchar == 9 || testchar == 10)
+            if (testchar == 32 || testchar == 9 || testchar == 10 || testchar == 160)
             {
                 ++ro;
                 Alph.util.log("Advancing range offset past whitespace.");
