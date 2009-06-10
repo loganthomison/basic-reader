@@ -583,29 +583,6 @@ Alph.infl = {
         str = str.replace(/&nbsp;/g, '***');
         return str;        
     },
-
-        
-    /**
-     * Shift key handler for the window -- hands the event off to the
-     * parent window. Only effective while the mouseover popup is visible.
-     * @param {Event} a_e the the keydown event 
-     * @return true to allow event propogation
-     */
-    onKeyDown: function(a_e) {
-        if (a_e.keyCode == 16) {
-            if (window.opener.Alph.xlate.popupVisible()) {
-                var popup = $("#alph-text", window.opener.content.document).clone();
-                // in this case we DO want to retrieve the current LanguageTool
-                // from the opening window, because if we're in a different tab, 
-                // the current language may be different than the one which opened
-                // the inflection window.  And if Alpheios isn't enabled on the 
-                // current tab, the shift key shouldn't do anything
-                window.opener.Alph.main.getLanguageTool().handleInflections(a_e,popup);
-            }
-        }
-        // return true to allow event propogation if needed
-        return true;
-    },
     
     /**
      * Click handler for changing the table sort order
