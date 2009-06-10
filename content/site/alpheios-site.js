@@ -383,6 +383,10 @@ Alph.site = {
      */
     toggle_alignment: function(a_event,a_elem,a_type,a_on)
     {
+        if (Alph.interactive.enabled())
+        {
+            return;
+        }
         // toggle the selector class for the source text
         if (a_on)
         {
