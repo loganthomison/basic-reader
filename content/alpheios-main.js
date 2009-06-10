@@ -158,6 +158,7 @@ Alph.main =
         gBrowser.mTabContainer
                 .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);
         
+        Alph.main.enable_toolbar();
         Alph.main.enable_tb_lookup(); 
         Alph.main.has_languages = Alph.main.set_languages();
         Alph.main.show_update_help();
@@ -1463,6 +1464,30 @@ Alph.main =
             this.get_state_obj(a_bro).get_var("toggled_by") == Alph.State.USER_ACTION;
         return by_user;
          
+    },
+    
+    /**
+     * enable toolbar per the preference
+     */
+    enable_toolbar: function()
+    {
+        try {
+            if (Alph.util.getPref("enable.toolbar"))
+            {
+                var toolbar = Alph.$("#alpheios-toolbar-template").clone();
+                Alph.$(toolbar).attr("id",'alpheios-toolbar');
+                Alph.$(toolbar).attr("collapsed",false);
+                Alph.$(toolbar).attr("hidden",false);
+                Alph.$("#navigator-toolbox").append(toolbar);
+            }
+            else
+            {
+                Alph.$("#navigator-toolbox #alpheios-toolbar").remove();
+            }
+        } catch(a_e)
+        {
+            Alph.$("#navigator-toolbox #alpheios-toolbar").remove();
+        }
     },
    
     /**

@@ -152,7 +152,11 @@ Alph.util = {
                     Alph.main.setXlateTrigger(bro,a_value);
                 }
             }
-        }     
+        }
+        else if (a_name.search(/enable.toolbar$/) != -1)
+        {
+            Alph.main.enable_toolbar();
+        }
         else if (a_name.search(/toolbar.lookup$/) != -1)
         {
             Alph.main.enable_tb_lookup();
