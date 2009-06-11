@@ -80,6 +80,10 @@ Alph.Tree.prototype.show = function()
     // clear out the prior tree and any error
     Alph.$("#tree-error", treeDoc).empty();
     Alph.$("#dependency-tree", treeDoc).empty();
+    
+    // reset the language-specific stylesheet
+    Alph.$("link.alpheios-language-css",treeDoc).remove();
+    Alph.main.getLanguageTool(bro).addStyleSheet(treeDoc);
 
     var svgError = "";
 
@@ -236,7 +240,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
     try
     {
         Alph.$("#dependency-tree", treeDoc).
-            append(a_svgXML.firstChild.childNodes);
+            html(a_svgXML.firstChild.childNodes);
         var svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
         var treeSize =
                 Alph.Tree.position_tree(
@@ -388,8 +392,10 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                 var panel_error = Alph.$("#tree-error",treeDoc).html();
                 Alph.$("#tree-error",window_doc).html(panel_error);
                 Alph.$("#dependency-tree", window_doc).empty();
+                Alph.$("link.alpheios-lang-css",window_doc).remove();
+                Alph.$("head",window_doc).append(Alph.$("link.alpheios-lang-css",treeDoc).clone());
                 Alph.$("#dependency-tree", window_doc)
-                    .append(Alph.$(panel_tree).children().clone(true));
+                    .html(Alph.$(panel_tree).children().clone(true));
                 Alph.$("#dependency-tree", window_doc)
                     .get(0).setAttribute("width",panel_tree.getAttribute("width"));
                 Alph.$("#dependency-tree", window_doc)

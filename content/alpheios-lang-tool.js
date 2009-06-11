@@ -882,17 +882,18 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc,a_name)
         a_name = chromepkg;
     }
     chromecss = chromecss + a_name + ".css"
-
-    Alph.util.log("adding stylesheet: " + chromecss);
+    
     // only add the stylesheet if it's not already there
     if (Alph.$("link[href='"+ chromecss + "']",a_doc).length == 0)
     {
+        Alph.util.log("adding stylesheet: " + chromecss);
         var css = document.createElementNS(
             "http://www.w3.org/1999/xhtml","link");
         css.setAttribute("rel", "stylesheet");
         css.setAttribute("type", "text/css");
         css.setAttribute("href", chromecss);
         css.setAttribute("id", a_name + "-css");
+        css.setAttribute("class","alpheios-lang-css");
         Alph.$("head",a_doc).append(css);
     }
 };
