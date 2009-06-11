@@ -110,6 +110,12 @@ Alph.Translation.prototype.show = function()
             );
         }
    }
+   else
+   {
+        var doc = 
+        Alph.$("body", Alph.$("browser",this.panel_elem).get(0).contentDocument)
+            .html(Alph.$("#alpheios-strings").get(0).getString("alph-error-notranslation"));
+   }
    return Alph.Panel.STATUS_SHOW;
 };
 

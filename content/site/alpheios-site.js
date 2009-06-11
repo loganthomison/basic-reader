@@ -390,11 +390,20 @@ Alph.site = {
         // toggle the selector class for the source text
         if (a_on)
         {
-            Alph.$(a_elem).addClass('alpheios-highlight-source');    
+            Alph.$(a_elem).addClass('alpheios-highlight-source');
+            var nrefs = Alph.$(a_elem).attr("nrefs");
+            if (nrefs == null || nrefs == '')
+            {
+                Alph.$(a_elem).after(
+                    '<span class="alpheios-aligned-nomatch alpheios-tooltip">' + 
+                    Alph.$("#alpheios-strings").get(0).getString("alph-align-nomatch") +
+                    '</span>');
+            }
         }
         else
         {
             Alph.$(a_elem).removeClass('alpheios-highlight-source');
+            Alph.$(a_elem).next(".alpheios-aligned-nomatch").remove();
         }
         
         
@@ -663,7 +672,7 @@ Alph.site = {
         {
            treebank_url = null; 
         }
-        return treebank_url;
+        return (typeof treebank_url == "undefined" ? null : treebank_url);
     },
     
     /**
@@ -684,7 +693,7 @@ Alph.site = {
         {
            url = null; 
         }
-        return url;
+        return (typeof url == "undefined" ? null : url);
     },
     
     /**
@@ -703,7 +712,7 @@ Alph.site = {
         {
             trans_url = null;
         }
-        return trans_url;
+        return (typeof trans_url == "undefined" ? null : trans_url);
     },
     
     /**
