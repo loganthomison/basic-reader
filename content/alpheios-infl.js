@@ -706,18 +706,18 @@ Alph.infl = {
      */
     replace_string: function(a_elem,a_props)
     {
-        var $text = jQuery.trim($(a_elem).text());
+        var text = jQuery.trim($(a_elem).text());
         try 
         {
-            var $newtext = a_props.getString($text);
-            if ($newtext)
+            var newtext = a_props.getString(text);
+            if (newtext)
             {
-                $(a_elem).text($newtext);        
+                $(a_elem).text(newtext);        
             }
         } 
         catch(e)
         {
-            window.opener.Alph.util.log("Couldn't find string for " + $text);   
+            window.opener.Alph.util.log("Couldn't find string for " + text);   
         }  
     },
     

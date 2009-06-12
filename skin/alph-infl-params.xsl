@@ -29,6 +29,7 @@
     <!-- default order is Number, Case -->
     <xsl:param name="group1" select="'num'"/>
     <xsl:param name="group2" select="'case'"/>
+    <xsl:param name="group3" />
     
     <!-- column groupings -->
     <!-- default order is Declension, Gender, Type-->

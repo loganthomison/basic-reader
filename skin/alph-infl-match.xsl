@@ -178,6 +178,9 @@
                                 '|',
                                 translate($current_data/@*[local-name(.)=$att_name],' ','|'),
                                 '|')"/>
+                        </xsl:variable>
+                        <xsl:variable name="class_name">
+                            <xsl:value-of select="concat('alph-',$att_name)"/>
                         </xsl:variable>                        
                         <xsl:choose>
                             <xsl:when test="$skip_att = '1'">
@@ -189,11 +192,25 @@
                                     <xsl:with-param name="att_pos" select="$att_pos+1"/>
                                 </xsl:call-template>                                
                             </xsl:when>
+                            <!-- conj is on the inflection set's sibling alph-dict entry -->
+                            <xsl:when test="$att_name = 'conj'">                                       
+                                <!-- test on conj assumes morphology only ever outputs
+                                    a single conj for a given form, but that inflection data
+                                    attribute may be multi-valued -->
+                                <xsl:variable name="latest_data"
+                                    select="$filtered_data[ancestor::div[@class='alph-entry']// 
+                                            span[contains(@class,$class_name) and 
+                                            contains(concat('|',$att_value,'|'),concat('|',@context,'|'))]]"/>
+                                <xsl:call-template name="find_infl_match">
+                                    <xsl:with-param name="current_data" select="$current_data"/>
+                                    <xsl:with-param name="filtered_data" 
+                                        select="$latest_data"/>
+                                    <xsl:with-param name="att_pos" select="$att_pos+1"/>
+                                </xsl:call-template>               
+                            </xsl:when>
+                            
                             <!-- stemtype is on the infl-set -->
                             <xsl:when test="$att_name = 'stemtype'">
-                                <xsl:variable name="class_name">
-                                    <xsl:value-of select="concat('alph-',$att_name)"/>
-                                </xsl:variable>
                                 <!-- test on stemtype assumes morpheus output only ever outputs
                                      a single stemtype for a given form, but that inflection data
                                      stemtype attribute may be multi-valued -->
@@ -211,9 +228,6 @@
                                 </xsl:call-template>               
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:variable name="class_name">
-                                    <xsl:value-of select="concat('alph-',$att_name)"/>
-                                </xsl:variable>
                                 <xsl:variable name="latest_data"
                                     select="$filtered_data[(
                                     (contains($att_value,concat('|',span[contains(@class,$class_name)]/text(),'|')))

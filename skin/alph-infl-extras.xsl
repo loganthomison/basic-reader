@@ -4,9 +4,7 @@
     xmlns:exsl="http://exslt.org/common"
     version="1.0">
     <xsl:import href="beta-uni-util.xsl"/>
-    <xsl:import href="uni2ascii.xsl"/>
     <xsl:import href="normalize-greek.xsl"/>
-    
     
     <xsl:template name="make_ref_link">
         <xsl:param name="target"/>
@@ -78,19 +76,19 @@
     <!-- template to produce header for stem header row -->
     <xsl:template name="stem-header">
         <xsl:param name="header"/>
-        <xsl:if test="$header='decl'">
+        <xsl:if test="$header='decl' or $header='conj'">
             <br/><span class="header-text">stem</span>
         </xsl:if>
     </xsl:template>
     
     <!-- template to produce data for stem header row -->
-    <xsl:template name="stem-data" match="order-item[@attname='decl']">
+    <xsl:template name="stem-data" match="order-item[@attname='decl' or @attname='conj']">
         <xsl:call-template name="add-footnote">
             <xsl:with-param name="item" select="."/>
         </xsl:call-template>                                
         <br/>
-        <xsl:variable name="thisdecl" select="text()"/>
-        <xsl:apply-templates select="/infl-data/stem-table/stem[@decl=$thisdecl]"/>
+        <xsl:variable name="thistext" select="text()"/>
+        <xsl:apply-templates select="/infl-data/stem-table/stem[@decl=$thistext or @conj=$thistext]"/>
     </xsl:template>
     
     <xsl:template name="no-sub" match="order-item">
@@ -173,4 +171,5 @@
             <xsl:text>|</xsl:text>
         </xsl:for-each>
     </xsl:template>
+    
 </xsl:stylesheet>

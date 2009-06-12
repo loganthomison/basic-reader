@@ -1,46 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-    Stylesheet for transformation verb conjugation data to HTML
--->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs"
     xmlns:exsl="http://exslt.org/common">
     
     <!--
+        Copyright 2009 Cantus Foundation
+        http://alpheios.net
+        
+        This file is part of Alpheios.
+        
+        Alpheios is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        
+        Alpheios is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    -->
+    
+    <!--
+        Stylesheet for transformation of substantive (noun and adjective) 
+        inflection data to HTML
+        
         This stylesheet groups the data on 3 attributes for the rows, 
         and groups on 3 attributes for the columns.
-        Grouping attributes are supplied as parameters.
-        Grouping parameters are required.
-        A optional verb-ending parameter can be used to identify the verb-ending
-        to be indicated as 'selected' in the HTML table.     
+        
+        Parameters: per alph-infl-params.xsl
     -->
+    <xsl:import href="alph-infl-params.xsl"/>
+    <xsl:import href="alph-infl-ending.xsl"/>
+    <xsl:import href="alph-infl-match.xsl"/>
+    <xsl:import href="alph-infl-extras.xsl"/>
     
     <xsl:output method="html" encoding="UTF-8" indent="yes"/>
     
     <xsl:strip-space elements="*"/>
     
     <xsl:key name="footnotes" match="footnote" use="@id"/>
-                
-    <!-- all parameters may be supplied in transformation -->
-    <!-- row groupings --> 
-    <!-- default order is Tense, Number, Person -->
-    <xsl:param name="group1" select="'tense'"/>
-    <xsl:param name="group2" select="'num'"/>
-    <xsl:param name="group3" select="'pers'"/>
     
-    <!-- column groupings -->
-    <!-- default order is Voice, Conjugation, Mood -->
-    <xsl:param name="group4" select="'voice'"/>
-    <xsl:param name="group5" select="'conj'"/>
-    <xsl:param name="group6" select="'mood'"/>
+    <xsl:output method="html" encoding="UTF-8" indent="yes"/>
     
-    <!-- the following is optional, used to select specific verb-ending(s) -->
-    <xsl:param name="selected_endings" select="/.." />
+    <xsl:strip-space elements="*"/>
     
-    <!-- skip the enclosing html and body tags -->
-    <xsl:param name="fragment" />
-        
+    <xsl:key name="footnotes" match="footnote" use="@id"/>
+                    
     <xsl:template match="/">
         <xsl:choose>
             <xsl:when test="$fragment">
@@ -51,7 +60,7 @@
             <xsl:otherwise>
                 <html>
                     <head>
-                        <link rel="stylesheet" type="text/css" href="alph-verb-conj-group.css"/>
+                        <link rel="stylesheet" type="text/css" href="alph-infl.css"/>
                     </head>
                     <body>
                         <xsl:call-template name="verbtable">
@@ -66,14 +75,13 @@
     <xsl:template name="verbtable">
         <xsl:param name="endings" />
         <table id="alph-infl-table"> <!-- start verb table -->
-            <caption>
-                <xsl:for-each select="$selected_endings//span[@class='alph-term']">
-                    <xsl:if test="position() &gt; 1">
-                        , 
-                    </xsl:if>
-                    <div class="alph-infl-term"><xsl:copy-of select="current()"/></div>    
-                </xsl:for-each>
-            </caption>
+            <!-- add the caption -->
+            <caption>    
+                <xsl:call-template name="form_caption">
+                    <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                    <xsl:with-param name="form" select="$form"/>
+                </xsl:call-template>
+            </caption>            
             <!-- write the colgroup elements -->
             <xsl:call-template name="colgroups">
                 <xsl:with-param name="headerrow1" select="//order-item[@attname=$group4]"/>
@@ -103,8 +111,8 @@
                     <!-- first instance of group1 row so add header row -->
                     <!-- TODO colspan should not be hardcoded -->
                     <tr id="{$lastgroup1}" class="group1row">
-                        <th class="header-text always-visible" colspan="2">
-                            <xsl:value-of select="$lastgroup1"/>
+                        <th class="always-visible" colspan="2">
+                            <span class="header-text"><xsl:value-of select="$lastgroup1"/></span>
                             <xsl:call-template name="add-footnote">
                                 <xsl:with-param name="item"
                                     select="/infl-data/order-table/order-item[@attname=$group1 
@@ -155,8 +163,8 @@
                                             <xsl:when test="position()=1">
                                                 <!-- add row header on left if it's the first row in 
                                                      this grouping -->
-                                                <th class="group2header header-text">
-                                                   <xsl:value-of select="$lastgroup2"/>
+                                                <th class="group2header">
+                                                   <span class="header-text"><xsl:value-of select="$lastgroup2"/></span>
                                                     <xsl:call-template name="add-footnote">
                                                         <xsl:with-param name="item" 
                                                             select="/infl-data/order-table/order-item[@attname=$group2 
@@ -220,41 +228,38 @@
                     </xsl:call-template>
                 </th>
             </xsl:if>
-            <td>
-                <xsl:variable name="verb-endings" select="infl-ending"/>
-                <xsl:for-each select="$verb-endings">
-                    <xsl:variable name="entries" select="count($selected_endings/div[@class='alph-entry'])"/>                    
-                    <xsl:variable name="selected" 
-                        select="$selected_endings
-                            [
-                              (div[@class='alph-dict']//span[@class='alph-conj']/@context = current()/../@conj)
-                              and
-                              (div[@class='alph-infl-set']/
-                              div[
-                              @class='alph-infl' 
-                              and (span[@class='alph-tense']/text() = current()/../@tense)
-                              and (span[@class='alph-voice']/text() = current()/../@voice)
-                              and (span[@class='alph-mood']/@context = current()/../@mood)
-                              and (span[@class='alph-pers']/@context = current()/../@pers)
-                              and (span[@class='alph-num']/@context = current()/../@num)
-                              ])
-                            ]"/>    
-                    <xsl:variable name="selected_class">
-                        <!-- if this ending matches the one supplied in the template params
-                             then add a 'selected' class to the data element -->
-                        <xsl:if test="$selected">selected</xsl:if>    
+                    <xsl:variable name="selected">
+                        <xsl:call-template name="check_infl_sets">
+                            <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                            <xsl:with-param name="current_data" select="." />
+                            <xsl:with-param name="match_pofs" select="$match_pofs"/>
+                            <xsl:with-param name="match_form">
+                                <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
+                            </xsl:with-param>                                        
+                            <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
+                        </xsl:call-template>
                     </xsl:variable>
-                    <xsl:variable name="notfirst">
-                        <xsl:if test="position() &gt; 1">notfirst</xsl:if>
+                    <xsl:variable name="text_for_match">
+                        <xsl:call-template name="text_for_match">
+                            <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                            <xsl:with-param name="match_form">
+                                <xsl:if test="$match_form"><xsl:value-of select="$form"/></xsl:if>
+                            </xsl:with-param>  
+                            <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
+                        </xsl:call-template>
                     </xsl:variable>
-                    <span class="ending {@type} {$selected_class} {$notfirst}">
-                        <xsl:value-of select="."/>
-                    </span>
-                    <xsl:call-template name="add-footnote">
-                        <xsl:with-param name="item" select="."/>
+                    <xsl:call-template name="ending-cell">
+                        <xsl:with-param name="infl-endings" select="."/>
+                        <xsl:with-param name="selected_endings" select="$selected_endings"/>
+                        <xsl:with-param name="text_for_match" select="$text_for_match"/>
+                        <xsl:with-param name="translit_ending_table_match" select="$translit_ending_table_match"/>
+                        <xsl:with-param name="no_grouping" select="true()"/>
+                        <xsl:with-param name="dedupe_by" select="$dedupe_by"/>
+                        <xsl:with-param name="selected" select="$selected"/>
+                        <xsl:with-param name="show_only_matches" select="$show_only_matches"/>
+                        <xsl:with-param name="match_form" select="$match_form"/>
+                        <xsl:with-param name="normalize_greek" select="$normalize_greek"/>
                     </xsl:call-template>
-                </xsl:for-each>    
-            </td>
         </xsl:for-each>        
     </xsl:template>
     
@@ -301,7 +306,7 @@
             </xsl:for-each>
         </tr>
         <tr id="headerrow3">
-            <th colspan="2" class="header-text always-visible">
+            <th colspan="2" class="always-visible">
                 <span class="header-text"><xsl:value-of select="$group6"/></span>
                 <xsl:call-template name="stem-header">
                     <xsl:with-param name="header" select="$group6"/>
@@ -321,30 +326,6 @@
                 </xsl:for-each>
             </xsl:for-each>
         </tr>
-    </xsl:template>
-    
-    <!-- template to produce header for stem header row -->
-    <xsl:template name="stem-header">
-        <xsl:param name="header"/>
-        <xsl:if test="$header='conj'">
-            <br/><span class="header-text">stem</span>
-        </xsl:if>
-    </xsl:template>
-    
-    <!-- template to produce data for stem header row -->
-    <xsl:template name="stem-data" match="order-item[@attname='conj']">        
-        <br/>
-        <xsl:variable name="thisconj" select="text()"/>
-        <xsl:value-of select="/infl-data/stem-table/stem[@conj=$thisconj]"/>
-        <xsl:call-template name="add-footnote">
-            <xsl:with-param name="item" select="."/>
-        </xsl:call-template>                
-    </xsl:template>
-    
-    <xsl:template name="no-sub" match="order-item">
-        <xsl:call-template name="add-footnote">
-            <xsl:with-param name="item" select="."/>
-        </xsl:call-template>        
     </xsl:template>
     
     <!-- template to produce colgroups for the table columns -->
@@ -393,11 +374,4 @@
         </xsl:for-each>       
     </xsl:template>
     
-    <xsl:template name="add-footnote">
-        <xsl:param name="item"/>
-        <xsl:if test="$item/@footnote">
-            <a href="#{$item/@footnote}" class="footnote"><xsl:value-of select="substring-after($item/@footnote,'-')"/></a>
-            <span class="footnote-text"><xsl:value-of select="key('footnotes',$item/@footnote)"/></span>    
-        </xsl:if>
-    </xsl:template>    
 </xsl:stylesheet>

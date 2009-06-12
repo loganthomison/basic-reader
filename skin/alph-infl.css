@@ -18,7 +18,8 @@ a:hover {
 }
 
 #alph-inflect-title {
-    text-align: center; 
+    text-align: center;
+    clear:both; 
 }
 
 .title {
@@ -30,6 +31,7 @@ a:hover {
 div#alph-infl-index-link {
     color: #3E8D9C;
     font-weight: bold;
+    float:left;
 }
 
 div#alph-infl-index-link:hover {
