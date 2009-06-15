@@ -124,6 +124,7 @@
                 <xsl:call-template name="form_caption">
                     <xsl:with-param name="selected_endings" select="$selected_endings"/>
                     <xsl:with-param name="form" select="$form"/>
+                    <xsl:with-param name="has_data" select="not($nomatch)"/>
                 </xsl:call-template>
             </caption>
             <xsl:choose>

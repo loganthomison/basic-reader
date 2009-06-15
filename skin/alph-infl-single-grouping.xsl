@@ -112,6 +112,7 @@
                 <xsl:call-template name="form_caption">
                     <xsl:with-param name="selected_endings" select="$selected_endings"/>
                     <xsl:with-param name="form" select="$form"/>
+                    <xsl:with-param name="has_data" select="count($endings) &gt; 0"/>
                 </xsl:call-template>
             </caption>
             <!-- write the colgroup elements -->

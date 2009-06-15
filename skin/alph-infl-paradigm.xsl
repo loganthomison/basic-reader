@@ -135,6 +135,7 @@
                         <xsl:call-template name="form_caption">
                             <xsl:with-param name="selected_endings" select="$selected_endings"/>
                             <xsl:with-param name="form" select="$form"/>
+                            <xsl:with-param name="has_data" select="$data != ''"/>
                         </xsl:call-template>
                     </div>
                     <xsl:choose>
@@ -154,7 +155,8 @@
                     <xsl:call-template name="paradigms">
                         <xsl:with-param name="paradigms" select="exsl:node-set($data)"/>
                         <xsl:with-param name="infl_constraint_data" select="exsl:node-set($infl_constraint_data)/match_for_infl"/>
-                    </xsl:call-template> 
+                    </xsl:call-template>
+                    <xsl:apply-templates select="//disclaimer"/>
                 </div>
             </xsl:when>
             <xsl:otherwise>
@@ -172,6 +174,7 @@
                             <xsl:call-template name="form_caption">
                                 <xsl:with-param name="selected_endings" select="$selected_endings"/>
                                 <xsl:with-param name="form" select="$form"/>
+                                <xsl:with-param name="has_data" select="$data != ''"/>
                             </xsl:call-template>
                         </div>
                         <xsl:if test="$data=''">

@@ -119,6 +119,7 @@
     <xsl:template name="form_caption">
         <xsl:param name="selected_endings"/>
         <xsl:param name="form"/>
+        <xsl:param name="has_data"/>
         <div class="alph-infl-form">
             <xsl:value-of select="$form"/>
             <xsl:if test="$selected_endings//span[@class='alph-term']">
@@ -130,9 +131,10 @@
                     <div class="alph-infl-term"><xsl:copy-of select="current()"/></div>    
                 </xsl:for-each>
                 )
-                <xsl:if test="$normalize_greek">
+                
+            </xsl:if>
+            <xsl:if test="$has_data and $selected_endings and ($normalize_greek or $translit_ending_table_match)">
                 <div class="alpheios-hint">Highlighted matches may ignore some vowel accents.</div>
-                </xsl:if>
             </xsl:if>
         </div>
     </xsl:template>
@@ -170,6 +172,12 @@
             </xsl:choose>
             <xsl:text>|</xsl:text>
         </xsl:for-each>
+    </xsl:template>
+    
+    <xsl:template match="disclaimer">
+        <div id="alph-infl-disclaimer" class="alpheios-hint">
+            <xsl:apply-templates/>
+        </div>
     </xsl:template>
     
 </xsl:stylesheet>

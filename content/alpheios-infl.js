@@ -290,13 +290,19 @@ Alph.infl = {
                         return false;
                     });
         }
-        try {
-            var disclaimer = str_props.getString('disclaimer')
-            $("#alph-infl-table",topdoc)
-                .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
-        } 
-        catch(a_e)
-        { // if it's not defined, then nothing to do 
+        // only add a disclaimer in the javascript if one wasn't already
+        // present in the data, but only if we have any data to display
+        if ($("#alph-infl-disclaimer",topdoc).length == 0 &&
+            $(".ending",a_tbl).length > 0)
+        {
+            try {
+                var disclaimer = str_props.getString('disclaimer')
+                $("#alph-infl-table",topdoc)
+                    .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
+            } 
+            catch(a_e)
+            { // if it's not defined, then nothing to do 
+            }
         }
 
         // populate the title of the declension table
@@ -667,6 +673,12 @@ Alph.infl = {
         // for now reflink syntax is <link_type>:<link url>
         var link_type_delim = ':';
         var href = $(a_elem).attr("href");
+        // handle external urls
+        if (href.match(/^http:\/\//))
+        {
+            window.opener.Alph.util.open_new_tab(href);
+            return false;
+        }
         // we can't just split on : because it might be used in later components of the
         // url
         var delim_pos = href.indexOf(':')
