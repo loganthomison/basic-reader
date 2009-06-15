@@ -126,6 +126,12 @@ Alph.site = {
             { alpheios_cmd_id: 'alpheios-about-cmd'},
             this.do_command_handler
         );
+        Alph.$(".alpheios-toolbar-feedback",toolbars).bind(
+            'click',
+            { alpheios_cmd_id: 'alpheios-feedback-cmd'},
+            this.do_command_handler
+        );
+
         Alph.$(".alpheios-toolbar-level",toolbars).bind(
             'click',
             function()
@@ -383,7 +389,10 @@ Alph.site = {
      */
     toggle_alignment: function(a_event,a_elem,a_type,a_on)
     {
-        if (Alph.interactive.enabled())
+        // don't do alignment highlighting for quiz mode,
+        // or if the translation panel is not open
+        if (Alph.interactive.enabled() || 
+            ! Alph.main.panels['alph-trans-panel'].is_visible_inline())
         {
             return;
         }
