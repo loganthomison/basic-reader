@@ -381,6 +381,19 @@ Alph.main =
     },
 
     /**
+     * Get the host on which to run the local mhttpd daemon 
+     * from preferences (should be localhost, but some environments
+     * may require something different)
+     * @private
+     * @return the host
+     * @type string
+     */
+    getLocalDaemonHost: function()
+    {
+        return 'http://' + Alph.util.getPref("mhttpd.host");
+    },
+
+    /**
      * Get the port number on which to run the local mhttpd daemon 
      * from preferences.
      * @private
@@ -406,7 +419,7 @@ Alph.main =
                 async: true,
                 dataType: "text",
                 cache: false,
-                url: "http://localhost:" + Alph.main.getLocalDaemonPort() + "/mypid",
+                url: Alph.main.getLocalDaemonHost() + ":" + Alph.main.getLocalDaemonPort() + "/mypid",
                 //timeout: Alph.util.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
                 success: 
                     a_onsuccess,
@@ -422,7 +435,7 @@ Alph.main =
      */
     detachLocalDaemon: function()
     {
-        var detach_url =  "http://localhost:" + Alph.main.getLocalDaemonPort() + "/detach";        
+        var detach_url =  Alph.main.getLocalDaemonHost() + ":"  + Alph.main.getLocalDaemonPort() + "/detach";        
         
         // Add a random number to the url to prevent the browser from
         // caching multiple simultaneous requests -- jquery appends a _=<timestamp>
@@ -593,7 +606,7 @@ Alph.main =
         var daemonPid = daemon_response.replace(/^\s+|\s+$/g, "");
         Alph.util.log("Daemon Pid: " + daemonPid);
         
-        var attach_url = "http://localhost:" + Alph.main.getLocalDaemonPort() + "/attach";
+        var attach_url = Alph.main.getLocalDaemonHost() + ":"  + Alph.main.getLocalDaemonPort() + "/attach";
         
         // add a random number to the url to prevent the browser from
         // caching multiple simultaneous requests -- jquery appends a _=<timestamp>

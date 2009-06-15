@@ -70,8 +70,13 @@
                         type="int"/>
             <preference id="pref-default-language" 
                         name="extensions.alpheios.default_language"
+                        type="string"/>
+            <preference id="pref-mhttpd-host"
+                        name="extensions.alpheios.mhttpd.host"
                         type="string"/> 
-
+            <preference id="pref-mhttpd-port"
+                        name="extensions.alpheios.mhttpd.port"
+                        type="int"/> 
         </preferences>
         <vbox id="alpheios-prefs-adv-set" flex="1">
             <groupbox>
@@ -94,7 +99,16 @@
                  <label value="&alpheios.prefs.dict.full.timeout;" 
                         control="dictionaries-full-timeout"/>
                 <textbox id="dictionaries-full-timeout" 
-                         preference="pref-dictionaries-full-timeout"/>      
+                         preference="pref-dictionaries-full-timeout"/>
+                <label value="&alpheios.prefs.mhttpd.host;" 
+                        control="mhttpd-host"/>
+                <textbox id="mhttpd-host" class="url"
+                         preference="pref-mhttpd-host"/>
+                <label value="&alpheios.prefs.mhttpd.port;" 
+                        control="mhttpd-port"/>
+                <textbox id="mhttpd-port" 
+                         preference="pref-mhttpd-port"/>      
+      
             </groupbox>                
                 
             <hbox>

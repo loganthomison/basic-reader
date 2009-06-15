@@ -50,3 +50,5 @@
 <!ENTITY alpheios.prefs.defaults.misc "Miscellaneous Defaults">
 <!ENTITY alpheios.prefs.dict.full.timeout "Full Dictionary Request Timeout (ms):">
 <!ENTITY alpheios.prefs.smallicons "Use Small Icons in Popup">
+<!ENTITY alpheios.prefs.mhttpd.host "Local mhttpd hostname:">
+<!ENTITY alpheios.prefs.mhttpd.port "Local mhttpd port:">
