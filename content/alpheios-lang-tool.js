@@ -1227,7 +1227,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
                     url,
                     on_success,
                     a_error,
-                    (a_i < a_lemmas.length) ? function(){} : a_complete);
+                    (a_i < (a_lemmas.length - 1)) ? function(){} : a_complete);
 
                 // start a new URL for next lemma
                 url = null;

@@ -175,6 +175,30 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         this.open();
         return;
     }
+    
+    // for now the dictionary panel has only a single browser but
+    // we may eventually want to implement this as a tabbed browser
+    // with one tab/browser per dictionary for multiple dictionaries
+    var bro_id = 'alph-dict-body';
+    var dict_bro = Alph.$("browser#" + bro_id,this.panel_elem).get(0);
+    var doc = dict_bro.contentDocument;
+
+    
+    // if the popup is being closed, clear the contents and state of the panel
+    if (a_event_type == Alph.main.events.REMOVE_POPUP)
+    {
+        Alph.$(".loading",doc).remove();
+        Alph.$(".alph-dict-block",doc).remove();
+        panel_state.last_request = null;
+         // update the panel state with the new contents of the panel
+        panel_state.contents[bro_id] =
+            Alph.$("#alph-window",doc).clone();
+        panel_state.css[bro_id] =
+            Alph.$("link[rel=stylesheet]",doc).clone();
+        this.update_panel_window(panel_state,bro_id);
+        return;
+    }
+    
     // proceed with observing the event and doing the 
     // the dictionary lookup only if one or more
     // of the following conditions is met:
@@ -182,12 +206,10 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     // - dictionary link is clicked (SHOW_DICT event)
     // - this method has been called from a change in panel status, in which
     //   case the event type will be undefined
-    // - the panel or window is visible AND we're switching to a new dictionary
     var do_lookup = 
        (  a_event_type == Alph.main.events.LOAD_DICT_WINDOW ||
           a_event_type == Alph.main.events.SHOW_DICT ||
-          typeof a_event_type == "undefined" ||
-         ((panel_state.status == Alph.Panel.STATUS_SHOW) && new_dict )  
+          typeof a_event_type == "undefined"  
        );
     if (! do_lookup )
     {
@@ -205,13 +227,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     // get a callback to the current dictionary
     var dictionary_callback = language_tool.get_dictionary_callback();
 
-    // for now the dictionary panel has only a single browser but
-    // we may eventually want to implement this as a tabbed browser
-    // with one tab/browser per dictionary for multiple dictionaries
-    var bro_id = 'alph-dict-body';
-    var dict_bro = Alph.$("browser#" + bro_id,this.panel_elem).get(0);
-    var doc = dict_bro.contentDocument;
-
+    
     // if the dictionary browser has the class "alph-lexicon-output"
     // the alph-window element in its content document will be updated
     // with the output of the morphology lookup for the currently selected
@@ -223,7 +239,6 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     Alph.$(".loading",doc).remove();
     Alph.$(".alph-dict-block",doc).remove();
 
-    var panel_state = this.get_browser_state(a_bro);
 
     // pull the new lemmas out of the alph-window lexicon element
     var lemmas = [];
@@ -272,14 +287,18 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             // will populate the panel obj with the dictionary output
 
             // but first add a loading message
+            var lemma_list = Alph.$.map(lemmas,function(a){return a[1]}).join(', ');
+            var request_id = (new Date()).getTime()
+                + encodeURIComponent(lemma_list)
             Alph.$(alph_window).append(
-                    "<div id='alph-dict-loading' class='loading'>"
+                    '<div id="alph-dict-loading" class="loading" ' +
+                        'alph-request-id="' + request_id + '">'
                     + Alph.$("#alpheios-strings").get(0)
                           .getFormattedString("alph-searching-dictionary",
-                            [Alph.$.map(lemmas,function(a){return a[1]}).join(', ')])
+                            [lemma_list])
                     + "</div>");
 
-            var request = { pending: true };
+            var request = { pending: true, id: request_id };
             try
             {
                 // if we still have a request pending, flag
@@ -318,6 +337,11 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
                 request.pending = false;
                 Alph.util.log(
                     "Error calling dictionary: " + a_e);
+                var err_str = '<div class="error">' +
+                                      a_e +
+                              '</div>';
+                panel_obj.display_dictionary(
+                     language_tool,a_bro,doc,err_str,lemmas,'',request);
             }
         }
     }
@@ -400,11 +424,16 @@ Alph.Dict.prototype.display_dictionary = function(
     }
     else
     {
-        // it's not entirely clear what we should do if
-        // the user switched tabs or otherwise reset the state
-        // while we were waiting for the results
-        //alert("Interrupted dictionary requested returned: " + a_html);
         Alph.util.log("State reset while waiting for dictionary");
+        // if the loading message for this request is still showing, replace
+        // it with a request interuppted message
+        Alph.$("#alph-dict-loading[alph-request-id=" + a_request.id + "]",alph_window)
+            .after(
+                '<div class="alpheios-message">' +
+                Alph.$("#alpheios-strings").get(0)
+                    .getString("alph-error-request-interrupt") +
+                '</div>')
+            .remove();
     }
 
 
