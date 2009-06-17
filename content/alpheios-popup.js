@@ -1,33 +1,33 @@
 /**
- * @fileoverview This file contains the Alph.xlate class with generic 
+ * @fileoverview This file contains the Alph.xlate class with generic
  * Mouseover translation functions
- * 
+ *
  * @version $Id$
- * 
+ *
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
- * 
+ *
  * Based upon PeraPera-Kun
  * A modded version of Rikai-Chan by Justin Kovalchuk
  * Original Author: Jonathan Zarate
- * Copyright (C) 2005-2006 
+ * Copyright (C) 2005-2006
  * http://www.polarcloud.com/
- * 
+ *
  * Based on rikaiXUL 0.4 by Todd Rudick
  * http://rikaixul.mozdev.org/
- * 
+ *
  * This file is part of Alpheios.
- * 
+ *
  * Alpheios is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Alpheios is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,7 +38,7 @@
  * @singleton
  */
 Alph.xlate = {
-    
+
     /**
      * An XSLT Processor for the lexicon xml output
      * @private
@@ -93,12 +93,12 @@ Alph.xlate = {
         // Check to see if the user has selected text from within an SVG diagram
         var is_svg_text = (
             rp instanceof SVGElement &&
-            rp.tagName == 'text' && 
-            rp.firstChild && 
+            rp.tagName == 'text' &&
+            rp.firstChild &&
             rp.firstChild.nodeType == 3
         );
         // if no data, nothing to do
-        if (typeof rp == "undefined" || rp == null || 
+        if (typeof rp == "undefined" || rp == null ||
             (! rp.data && ! is_svg_text))
         {
             return;
@@ -106,28 +106,30 @@ Alph.xlate = {
 
         /*
          * This is code originates from peraperakun. It checks to make sure the target
-         * of the event is either an SVG text node, a regular text node (nodeType of 3) 
+         * of the event is either an SVG text node, a regular text node (nodeType of 3)
          * or an element in a form.
          * This prevents the popup from displaying when the mouse moves over whitespace
          * in the enclosing element.
          * The explicitOriginalTarget property of the event is a mozilla-specific
          * property which provides access to the precise node that received the event.
-         * By contrast, in Mozilla the target property always points to the containing 
+         * By contrast, in Mozilla the target property always points to the containing
          * element object whose nodeType will always be 1.
          * See O'Reilly's Dynamic HTML 3rd Edition and also
          * http://developer.mozilla.org/en/docs/DOM:event.explicitOriginalTarget
          * and https://bugzilla.mozilla.org/show_bug.cgi?id=185889
          * However, this does not seem to work the same for the dbleclick event
-         * so this should be limited to use of the mousemove trigger.  
+         * so this should be limited to use of the mousemove trigger.
          */
         if ( Alph.main.getXlateTrigger() == 'mousemove' &&
              ! is_svg_text &&
-             (a_e.explicitOriginalTarget.nodeType != 3) && !("form" in a_e.target)) {
-            this.clearSelection();                
+             (a_e.explicitOriginalTarget.nodeType != 3) &&
+             !("form" in a_e.target))
+        {
+            this.clearSelection();
             return;
         }
 
-        // disable the translate function if and the mouse is over an 
+        // disable the translate function if and the mouse is over an
         // element in a section of the page we've been told to ignore
         // (e.g. web site interface text as opposed to source text)
         if ( Alph.$(a_e.explicitOriginalTarget).hasClass('alpheios-ignore') ||
@@ -149,19 +151,22 @@ Alph.xlate = {
         // when the selected element is an svg text element, retrieve the text from
         // the child textNode directly rather than from the range parent.
         // But when the trigger is dbleclick, the range parent text node is empty
-        // so the text must be retrieved from the explicitOriginalTarget instead.  
+        // so the text must be retrieved from the explicitOriginalTarget instead.
         if (is_svg_text)
         {
-            rngstr = rp.firstChild.nodeValue || 
-                (a_e.explicitOriginalTarget.firstChild ? 
-                    a_e.explicitOriginalTarget.firstChild.nodeValue : ""); 
+            rngstr = rp.firstChild.nodeValue ||
+                (a_e.explicitOriginalTarget.firstChild ?
+                    a_e.explicitOriginalTarget.firstChild.nodeValue : "");
 
             // svg events seem to have range offset always 1 no matter where you click,
             // which causes the whitespace test below to ignore one-character words
             for (; ro > 0; --ro)
             {
                 var testchar = rngstr.charCodeAt(ro - 1);
-                if (testchar == 32 || testchar == 9 || testchar == 10 || testchar == 160)
+                if (testchar == 32 ||
+                    testchar == 9 ||
+                    testchar == 10 ||
+                    testchar == 160)
                     break;
             }
         }
@@ -172,8 +177,8 @@ Alph.xlate = {
         /* detachs the range from the parent document so that DOM no longer tracks it */
         range.detach();
 
-        /* There is apparently a bug in mozilla's handling of the mouse events -- 
-         * if the text in the range string is preceded only by spaces or new lines 
+        /* There is apparently a bug in mozilla's handling of the mouse events --
+         * if the text in the range string is preceded only by spaces or new lines
          * then the the first non-whitepace character is never set as the rangeOffset
          * of the event. This does not seem to affect use of the case for the &nbsp; entity
          * or whitespace in a pre tag, so we should be safe just advancing the range offset
@@ -181,7 +186,7 @@ Alph.xlate = {
          */
         var testchar;
         while ( ro < rngstr.length )
-        { 
+        {
             var testchar = rngstr.charCodeAt(ro);
             if (testchar == 32 || testchar == 9 || testchar == 10 || testchar == 160)
             {
@@ -194,10 +199,10 @@ Alph.xlate = {
             }
         }
 
-        // if we advanced past the end of the string without finding anything 
-        // then it was empty space so just clear the selection and return 
+        // if we advanced past the end of the string without finding anything
+        // then it was empty space so just clear the selection and return
         if (ro >= rngstr.length) {
-            
+
             this.clearSelection();
             return;
         }
@@ -209,12 +214,12 @@ Alph.xlate = {
             this.clearSelection();
             return;
         }
-        
+
         // add the range parent object to the target
         // so that the user's selection can be highlighted
         // again differently after translation, if necessary
         alphtarget.setRangeParent(rp);
-            
+
         // nothing to do if same word as last AND the popup is shown
         // (hidePopup removes the last word from the state variable),
         // unless we're in query  mode and the popup isn't showing,
@@ -238,7 +243,7 @@ Alph.xlate = {
         alph_state.set_var("lastSelection", alphtarget);
 
         // This code fails for an svg element; For now just skip it
-        // but we should eventually also highlight the selection within the svg  
+        // but we should eventually also highlight the selection within the svg
         if (! is_svg_text)
         {
             // Add the range back to the document highlighted as the selected range
@@ -250,11 +255,14 @@ Alph.xlate = {
             sel.removeAllRanges();
             sel.addRange(r);
         }
-        
+
         // do we have a treebank query for this word?
-        var treebank_ref = Alph.$(rp).attr("tbref") || Alph.$(rp).parents().attr("tbref");
-        
-        // if we're in the dependency tree diagram, the treebank reference will 
+        var treebank_ref = Alph.$(rp).attr("tbrefs") ||
+                           Alph.$(rp).parents().attr("tbrefs") ||
+                           Alph.$(rp).attr("tbref") ||
+                           Alph.$(rp).parents().attr("tbref");
+
+        // if we're in the dependency tree diagram, the treebank reference will
         // be in the id attribute of the parent tree-node element
         if (! treebank_ref && is_svg_text)
         {
@@ -262,19 +270,22 @@ Alph.xlate = {
         }
         if (treebank_ref)
         {
-            var treebank_url = Alph.site.treebank_url(doc); 
-                
+            var treebank_url = Alph.site.treebank_url(doc);
+            var treebank_wd = treebank_ref.split(' ')[0];
+
             // if we're in the dependency tree diagram, we will have a treebank reference
             // but no treebank_url. get the treebank url from the main browser window
             // in that case.
             if (!treebank_url && is_svg_text )
             {
-                treebank_url = 
-                    Alph.site.treebank_url(Alph.main.getCurrentBrowser().contentDocument); 
+                treebank_url =
+                    Alph.site.treebank_url(
+                        Alph.main.getCurrentBrowser().contentDocument);
             }
             if (treebank_url)
             {
-                alphtarget.setTreebankQuery(treebank_url.replace(/WORD/,treebank_ref));
+                alphtarget.setTreebankQuery(
+                    treebank_url.replace(/WORD/, treebank_wd));
             }
         }
         // show output
@@ -284,7 +295,7 @@ Alph.xlate = {
 
     /**
      * Displays an error in the popup. Supplied as a callback argument
-     * to the {@link Alph.LanguageTool#lexiconLookup} method. 
+     * to the {@link Alph.LanguageTool#lexiconLookup} method.
      * @param {String} a_msg the error message
      * @param a_doc_array Array of Documents which holds the morphological details
      * @param a_lang_tool the Alph.Language object which initiated the lookup
@@ -298,15 +309,15 @@ Alph.xlate = {
                     "alph-loading-error",
                     [a_msg ]);
         Alph.util.log("Query Response (Error): " + err_msg);
-        //if (Alph.main.useLocalDaemon() && 
+        //if (Alph.main.useLocalDaemon() &&
         //    typeof Alph.main.getCurrentBrowser()
         //                  .alpheios.daemonPid == "undefined")
         //{
-        //    err_msg = err_msg + '<br/>' +  
+        //    err_msg = err_msg + '<br/>' +
         //        document.getElementById("alpheios-strings")
         //                .getString("alph-error-mhttpd-notstarted");
         //}
-        
+
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
 
@@ -314,7 +325,7 @@ Alph.xlate = {
            function(a_doc)
            {
                 Alph.$("#alph-text-loading",a_doc).remove();
-        
+
                 // replace any earlier error
                 Alph.$("#alph-loading-error",a_doc).remove();
 
@@ -330,20 +341,20 @@ Alph.xlate = {
 
     /**
      * Shows the results of the lexicon lookup in the popup.
-     * Supplied as a callback argument to the 
+     * Supplied as a callback argument to the
      * {@link Alph.LanguageTool#lexiconLookup} method.
      * @param {String} a_xml the xml string containing the lexicon response
      * @param {Object} a_alphtarget the details on the target of the event which triggered the popup
      *                 (as returned by {@link Alph.LanguageTool#findSelection})
      * @param a_doc_arry the array of documents which contain the morphological text
-     * @param a_lang_tool the Alph.Language object which initiated the lookup  
+     * @param a_lang_tool the Alph.Language object which initiated the lookup
      */
     showTranslation: function(a_xml,a_alphtarget,a_doc_array,a_lang_tool) {
         Alph.util.log("Query response:" + a_xml);
-        
+
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
-        
+
         var wordHTML = Alph.xlate.transform(a_xml);
         // don't display an empty popup
         if (   (wordHTML == '')
@@ -355,25 +366,27 @@ Alph.xlate = {
             a_doc_array.forEach(
                 function(a_doc)
                 {
-                    Alph.xlate.hidePopup(a_doc);        
+                    Alph.xlate.hidePopup(a_doc);
                 }
-            );            
+            );
         }
-        
-        // add a class to the first word in the response 
+
+        // add a class to the first word in the response
         Alph.$("div.alph-word:first",wordHTML).addClass("alph-word-first");
-        
+
         a_doc_array.forEach(
             function(a_doc)
             {
-        
+
                 Alph.$("#alph-text",a_doc).remove();
             }
         );
 
-        var alphtext_node = 
-            window.content.document.importNode(wordHTML.getElementById("alph-text"),true);
-        
+        var alphtext_node =
+            window.content.document.importNode(
+                                        wordHTML.getElementById("alph-text"),
+                                        true);
+
         var disambiguate_id = null;
         if (a_alphtarget.getTreebankQuery())
         {
@@ -387,33 +400,36 @@ Alph.xlate = {
             {
                 if (disambiguate_id)
                 {
-                    Alph.$("#alph-window",a_doc).attr("alpheios-pending",disambiguate_id);
+                    Alph.$("#alph-window",a_doc).attr("alpheios-pending",
+                                                      disambiguate_id);
                 }
-                Alph.$("#alph-window",a_doc).append(Alph.$(alphtext_node).clone());
+                Alph.$("#alph-window",a_doc).append(
+                                                Alph.$(alphtext_node).clone());
                 // add the key to the language tool to the element
                 Alph.$("#alph-text",a_doc).attr('alph-lang',
                     a_lang_tool.source_language);
                 // add language-specific click handler, if any
                 a_lang_tool.contextHandler(a_doc);
-        
-                Alph.$("#alph-text",a_doc).prepend('<div id="alph-word-tools"/>');
+
+                Alph.$("#alph-text",a_doc).prepend(
+                                                '<div id="alph-word-tools"/>');
                 a_lang_tool.add_word_tools(
                     Alph.$("#alph-text",a_doc),
                     a_alphtarget);
-                
+
                 a_lang_tool.add_infl_help(
                     Alph.$("#alph-text",a_doc),
-                    a_alphtarget);                
+                    a_alphtarget);
             }
         );
 
 
         var rp = a_alphtarget.getRangeParent()
-        
+
         // re-highlight the translated range in the source document
         // This code fails for an svg element; For now just skip it
-        // but we should eventually also highlight the selection within the svg  
-        if (rp && ! rp instanceof SVGElement) 
+        // but we should eventually also highlight the selection within the svg
+        if (rp && ! rp instanceof SVGElement)
         {
             var doc = rp.ownerDocument;
             var r = doc.createRange();
@@ -428,13 +444,14 @@ Alph.xlate = {
         // are going to be invoked (i.e. if a textbox elsewhere is focused, the keydown
         // event listener might be hijacked) See Bug 149.
         Alph.$("#alph-window-anchor",a_topdoc).focus();
-        // TODO - we probably should reposition the popup now that we 
+        // TODO - we probably should reposition the popup now that we
         // know it's final size
-        
+
         // disambiguate if treebank is available
         if (disambiguate_id)
         {
-            Alph.util.log("Disambiguating ..." + a_alphtarget.getTreebankQuery());
+            Alph.util.log("Disambiguating ..." +
+                          a_alphtarget.getTreebankQuery());
             // send asynchronous request to the lexicon service
             Alph.$.ajax(
                 {
@@ -444,32 +461,41 @@ Alph.xlate = {
                     dataType: 'html',
                     error: function(req,textStatus,errorThrown)
                     {
-                        Alph.util.log("Error disambiguating morphology: " + textStatus||errorThrown);
+                        Alph.util.log("Error disambiguating morphology: " +
+                                      textStatus||errorThrown);
                         a_doc_array.forEach(
                             function(a_doc)
                             {
                                 try
                                 {
-                                    Alph.$("#alph-window[alpheios-pending="+disambiguate_id+"]",a_doc)
-                                        .get(0).removeAttribute("alpheios-pending");
+                                    Alph.$("#alph-window[alpheios-pending="+
+                                           disambiguate_id+"]",
+                                           a_doc).get(0).removeAttribute(
+                                                            "alpheios-pending");
                                 }
                                 catch(a_e)
                                 {
-                                    //it's possible that a new request came in and removed the 
-                                    // attribute, so quietly ignore error removing it 
+                                    //it's possible that a new request came in and removed the
+                                    // attribute, so quietly ignore error removing it
                                 }
                             }
                         );
                         Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
                     },
-                    success: function(data, textStatus) 
+                    success: function(data, textStatus)
                     {
-                    
-                        Alph.xlate.updateTranslation(disambiguate_id,data,a_alphtarget,a_doc_array,a_lang_tool);
-                        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
-                        Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
-                    } 
-                }   
+
+                        Alph.xlate.updateTranslation(disambiguate_id,
+                                                     data,
+                                                     a_alphtarget,
+                                                     a_doc_array,
+                                                     a_lang_tool);
+                        Alph.main.broadcast_ui_event(
+                                                Alph.main.events.SHOW_TRANS);
+                        Alph.interactive.openQueryDisplay(
+                                                a_topdoc,a_alphtarget);
+                    }
+                }
             );
         }
         else
@@ -477,8 +503,8 @@ Alph.xlate = {
             Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
             Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
         }
-        
-    },  
+
+    },
     /**
      * Update the results of the lexicon lookup in the popup.
      * @param {String} a_req_id unique identifier for the disambiguate request
@@ -486,12 +512,16 @@ Alph.xlate = {
      * @param {Object} a_alphtarget the details on the target of the event which triggered the popup
      *                 (as returned by {@link Alph.LanguageTool#findSelection})
      * @param a_doc_array the array of Documents which contain the morphological text
-     * @param a_lang_tool the Alph.Language tool which initiated the request  
+     * @param a_lang_tool the Alph.Language tool which initiated the request
      */
-     updateTranslation: function(a_req_id,a_xml,a_alphtarget,a_doc_array,a_lang_tool) 
-     {          
+     updateTranslation: function(a_req_id,
+                                 a_xml,
+                                 a_alphtarget,
+                                 a_doc_array,
+                                 a_lang_tool)
+     {
         Alph.util.log("Query response:" + a_xml);
-        
+
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
 
@@ -501,19 +531,20 @@ Alph.xlate = {
         // note that not all parts of speech include inflection data
         // so we need to check for the presence of a dictionary entry
         if (   (wordHTML == '') ||
-               Alph.$(".alph-dict",wordHTML).length == 0)        
+               Alph.$(".alph-dict",wordHTML).length == 0)
         {
             a_doc_array.forEach(
                 function(a_doc)
                 {
                     try
                     {
-                        Alph.$("#alph-window[alpheios-pending="+a_req_id+"]",a_doc)
-                                    .get(0).removeAttribute("alpheios-pending");
+                        Alph.$("#alph-window[alpheios-pending="+a_req_id+"]",
+                               a_doc).get(0).removeAttribute(
+                                                "alpheios-pending");
                     }
                     catch(a_e){
-                        //it's possible that a new request came in and removed the 
-                        // attribute, so quietly ignore error removing it 
+                        //it's possible that a new request came in and removed the
+                        // attribute, so quietly ignore error removing it
                     }
                 }
             );
@@ -521,23 +552,23 @@ Alph.xlate = {
         }
         else
         {
-            
-            var new_text_node = 
+
+            var new_text_node =
                     window.content.document.importNode(
                     Alph.$("#alph-text",wordHTML).get(0),true);
 
             a_lang_tool.postTransform(new_text_node);
             a_lang_tool.contextHandler(new_text_node);
             a_lang_tool.add_infl_help(
-                    new_text_node,a_alphtarget);        
-            
+                    new_text_node,a_alphtarget);
+
             var new_entry = Alph.$(".alph-entry",new_text_node);
             var new_dict = Alph.$(".alph-dict",new_entry);
             var new_hdwd = Alph.$(new_dict).attr("lemma-key");
-            var new_infl_node = 
+            var new_infl_node =
                     Alph.$(".alph-infl",new_entry).get(0);
-            var new_pofs = Alph.$('.alph-pofs',new_entry).attr('context');                    
-            
+            var new_pofs = Alph.$('.alph-pofs',new_entry).attr('context');
+
             // iterate through the documents containing the morphology results
             // merging the disambiguated output into the original results
             // in each document
@@ -548,23 +579,23 @@ Alph.xlate = {
                 // to the disambiguation requestion, the alpheios-pending attribute
                 // won't match and we will just discard the disabmiguation
                 // results rather than trying to merge them into a new words' results
-                var popup = 
-                        Alph.$("#alph-window[alpheios-pending=" + a_req_id + 
+                var popup =
+                        Alph.$("#alph-window[alpheios-pending=" + a_req_id +
                                 "] #alph-text",a_doc);
                 if (popup.length == 0)
                 {
                     Alph.util.log("Discarding disamibuguation " + a_req_id);
                     continue;
                 }
-                    
+
                 // remove the old word tool icons from the popup, we need to refresh
                 // them with new tools after we incorporate the disambiguated output
                 Alph.$("#alph-word-tools",popup).remove();
-        
-                // try to find an entry with the same lemma and replace the 
-                // contents of the first inflection set for that entry 
+
+                // try to find an entry with the same lemma and replace the
+                // contents of the first inflection set for that entry
                 // with the treebank output
-                var lemma_match_set = 
+                var lemma_match_set =
                     Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
                     .parents(".alph-entry");
 
@@ -575,8 +606,8 @@ Alph.xlate = {
                 {
                     new_hdwd = new_hdwd.replace(/1$/,'');
                 }
-                
-                lemma_match_set = 
+
+                lemma_match_set =
                     Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
                     .parents(".alph-entry");
                 var pofs_match_set = [];
@@ -612,7 +643,7 @@ Alph.xlate = {
                 {
                     var good_entries = 0;
                     // if we still have multiple matching entries at this point,
-                    // which seems unlikely, we may keep both if inflection 
+                    // which seems unlikely, we may keep both if inflection
                     // details match in both; iterate through them
                     // looking for the matching inflection
                     for (var i=0; i<pofs_match_set.length; i++)
@@ -621,11 +652,11 @@ Alph.xlate = {
                         var morph_pofs =
                             Alph.$('.alph-dict .alph-pofs',entry_match)
                                 .attr('context');
-                
+
                         // if the part of speech indicated by the
                         // treebank differs from the original
                         // replace the entire dictionary section
-                        // (conj and declension will likely also be wrong 
+                        // (conj and declension will likely also be wrong
                         // - but these aren't identified by the treebank)
                         if (morph_pofs != new_pofs)
                         {
@@ -635,18 +666,18 @@ Alph.xlate = {
                         }
                         var infl_set_possible = Alph.$(".alph-infl-set",entry_match);
                         var infl_set_matches = [];
-                
+
                         for (var i=0; i<infl_set_possible.length;i++)
                         {
                             var infl_set = infl_set_possible[i];
-                            // insert the new inflection only into 
-                            // an inflection set of the same part of speech 
-                            // as the new entry 
-                             var infl_pofs = 
+                            // insert the new inflection only into
+                            // an inflection set of the same part of speech
+                            // as the new entry
+                             var infl_pofs =
                                 Alph.$(".alph-pofs",infl_set)
                                     .attr('context')
                                 || morph_pofs;
-                            if (infl_pofs == 
+                            if (infl_pofs ==
                                 Alph.$('.alph-pofs',new_entry).attr('context'))
                             {
                                 infl_set_matches.push(i);
@@ -671,11 +702,11 @@ Alph.xlate = {
                         // if we have multiple matching inflection sets,
                         // prefer one which contains an matching inflection
                         else if (infl_set_matches.length >1)
-                        {   
+                        {
                             var merge_sets = [];
                             for (var i=0; i<infl_set_matches.length;i++)
                             {
-                                merge_sets.push(  
+                                merge_sets.push(
                                     Alph.$(infl_set_possible).eq(infl_set_matches[i])
                                     .clone(true));
                             }
@@ -693,7 +724,7 @@ Alph.xlate = {
                                             if (a_lang_tool.match_infl(new_infl_node,this))
                                             {
                                                 matches++;
-                                            }                           
+                                            }
                                         }
                                     );
                                     if (matches > 0)
@@ -705,7 +736,7 @@ Alph.xlate = {
                                         good_entries++;
                                         Alph.$(entry_match).attr("tb-match",true);
                                     }
-                                }  
+                                }
                             );
                         }
                         else
@@ -715,7 +746,7 @@ Alph.xlate = {
                             Alph.$(infl_set_possible).remove();
                         }
                     } // end iteration through matching entries
-                    
+
                     if (good_entries == 0)
                     {
                         // if we couldn't find any matching inflection sets, then
@@ -725,11 +756,11 @@ Alph.xlate = {
                         {
                             pofs_match_set[i].remove();
                         }
-                        pofs_match_set = pofs_match_set.eq(0);    
+                        pofs_match_set = pofs_match_set.eq(0);
                         Alph.$(pofs_match_set).attr("tb-match",true);
                         if (new_infl_node != null)
                         {
-                            var original_form = 
+                            var original_form =
                                 Alph.$(pofs_match_set).parents(".alph-word").attr("context");
                             Alph.$(new_infl_node).clone(true).appendTo(pofs_match_set);
                             Alph.$(".alph-infl",pofs_match_set)
@@ -738,34 +769,34 @@ Alph.xlate = {
                     }
                     // remove any entries which didn't match
                     Alph.$(".alph-entry:not([tb-match])",popup).remove();
-                       
+
                     for (var i=0; i<pofs_match_set.length; i++)
                     {
                        var entry_match = pofs_match_set[i];
-                      
+
                        // remove any pofs on the inflection set because
-                       // disambiguated output will always list the pofs 
+                       // disambiguated output will always list the pofs
                        // of the dictionary entry as the pofs of the inflection set
                        Alph.$(".alph-infl-set .alph-pofs",entry_match).remove();
 
                        if (Alph.$(".alph-infl-set",entry_match).length == 0)
-                       { 
+                       {
                             // if we don't have any inflection set at all, make
                             // sure we remove the form label from the popup too
                             Alph.$(".alpheios-form-label",entry_match).remove();
                         }
                     }
-                    var final_word_set = 
+                    var final_word_set =
                         Alph.$(pofs_match_set).parents(".alph-word").clone(true);
-                    
+
                     // remove all the old word elements from the popup
                     Alph.$(".alph-word",popup).remove();
-                    // iterate through the final word elements, adding them 
+                    // iterate through the final word elements, adding them
                     // back into the popup
                     for (var i=0; i<final_word_set.length; i++)
                     {
                         var word = final_word_set[i];
-                        if (i == 0)    
+                        if (i == 0)
                         {
                             Alph.$(word).addClass("alph-word-first");
                         }
@@ -781,20 +812,20 @@ Alph.xlate = {
                 // popup
                 try
                 {
-                    Alph.$("#alph-window[alpheios-pending=" + a_req_id + 
+                    Alph.$("#alph-window[alpheios-pending=" + a_req_id +
                             "]",a_doc).get(0).removeAttribute("alpheios-pending");
-                } 
+                }
                 catch(a_e)
                 {
-                    //it's possible that a new request came in and removed the 
-                    // attribute, so quietly ignore error removing it 
+                    //it's possible that a new request came in and removed the
+                    // attribute, so quietly ignore error removing it
                 }
             }
         }
-                
+
         Alph.$("#alph-window-anchor",a_topdoc).focus();
     },
-        
+
     /**
      * Determines whether or not the popup should be displayed in response
      * to the trigger event. Called by the {@link #doMouseMoveOverText} event handler.
@@ -805,7 +836,7 @@ Alph.xlate = {
      */
     showPopup: function(a_e, a_alphtarget)
     {
-    
+
         var a_elem = a_e.target;
         var a_x = a_e.screenX;
         var a_y = a_e.screenY;
@@ -815,7 +846,7 @@ Alph.xlate = {
         const topdoc = a_elem.ownerDocument;
         var alph_state = Alph.main.get_state_obj();
         var popup;
-        // check the alpheios state object for the prior element 
+        // check the alpheios state object for the prior element
         if (alph_state.get_var("lastElem"))
         {
             popup = Alph.$("#alph-window",alph_state.get_var("lastElem").ownerDocument).get(0);
@@ -827,7 +858,7 @@ Alph.xlate = {
             this.removePopup(Alph.main.getCurrentBrowser());
             popup = null;
         }
-                        
+
         // popup element not found or removed, so create a new one
         if (!popup)
         {
@@ -842,26 +873,26 @@ Alph.xlate = {
             var css_os = Alph.$(css).clone()
                 .attr("href","chrome://alpheios/skin/alpheios-os.css");
             Alph.$("head",topdoc).append(css_os);
-            
+
 
             // add any language-specific stylesheet
             lang_tool.addStyleSheet(topdoc);
-            
+
             popup = topdoc.createElementNS("http://www.w3.org/1999/xhtml", "div");
             popup.setAttribute("id", "alph-window");
             popup.setAttribute("class", "alpheios-ignore");
 
             /* cancel the mousemove and dblclick events over the popup */
-            /* this probably can come out as I've switched to using the 
+            /* this probably can come out as I've switched to using the
              * alpheios-ignore class, but leaving in commented out for now
              */
             //popup.addEventListener("mousemove", this.cancelMouseMove, false);
             //popup.addEventListener("dblclick", this.cancelDoubleClick, false);
-            
+
             Alph.$("body",topdoc).append(popup);
-            
-            
-            // add a close link 
+
+
+            // add a close link
             Alph.$(popup).append('<div class="alph-title-bar"><div class="alph-close-button">&#160;</div></div>')
             Alph.$(".alph-close-button",topdoc).bind("click",
                 function()
@@ -869,9 +900,9 @@ Alph.xlate = {
                     Alph.xlate.hidePopup()
                 }
             );
-            
+
             Alph.$('.alph-title-bar',popup).bind('mousedown',Alph.xlate.drag_popup);
-            
+
             var anchor = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                                  "a");
             anchor.setAttribute("name","alph-window-anchor");
@@ -893,11 +924,11 @@ Alph.xlate = {
         // element is in a frame
         if (a_elem.ownerDocument.defaultView.frameElement != null)
         {
-            try 
+            try
             {
                 frame_offset = Alph.$(a_elem.ownerDocument.defaultView.frameElement).offset();
                 frame_scroll = {};
-                var frame_body = Alph.$("body",topdoc).get(0);                       
+                var frame_body = Alph.$("body",topdoc).get(0);
                 frame_scroll.left = frame_body.scrollLeft;
                 frame_scroll.top = frame_body.scrollTop;
             }
@@ -924,7 +955,7 @@ Alph.xlate = {
         );
 
         // move the popup to just below the mouse coordinates
-        // (using height of current element isn't reliable because it might 
+        // (using height of current element isn't reliable because it might
         //  a single element which contains a large block of text)
         if (a_elem)
         {
@@ -941,7 +972,7 @@ Alph.xlate = {
 
         var doc_array = [topdoc];
         Alph.$(".alph-lexicon-output").each(
-            function() 
+            function()
             {
                 var doc = Alph.$(this).get(0).contentDocument
                 lang_tool.addStyleSheet(doc);
@@ -951,7 +982,7 @@ Alph.xlate = {
         );
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
-        // the popup and any other lexicon 
+        // the popup and any other lexicon
         // output browsers (i.e. in the morph panel)
         // with the results on success,
         // and a call back to translationError to populate
@@ -964,14 +995,14 @@ Alph.xlate = {
 
             },
             function(a_msg)
-            {   
+            {
                 Alph.xlate.translationError(a_msg,doc_array,lang_tool);
             }
         );
     },
 
     /**
-     * Hides the popup and removes the alpheios stylesheets from the 
+     * Hides the popup and removes the alpheios stylesheets from the
      * browser content document.
      * @param {Node} a_node - the node which contains the popup
      */
@@ -984,10 +1015,10 @@ Alph.xlate = {
         // remove the last word from the state
         var alph_state = Alph.main.get_state_obj();
         if (alph_state.get_var("enabled"))
-        { 
+        {
             alph_state.set_var("lastWord", null);
             alph_state.set_var("lastSelection",null);
-        
+
         }
         Alph.main.broadcast_ui_event(Alph.main.events.HIDE_POPUP);
         // keep the last element in the state, so that we can find
@@ -1013,7 +1044,7 @@ Alph.xlate = {
     {
         a_e.stopPropagation();
     },
-    
+
     /**
      * Closes any secondary windows opened by the extension.
      * @param a_bro the current browser
@@ -1051,7 +1082,7 @@ Alph.xlate = {
      *                              a_start_call callback
      *  @param {function} a_load_call optional callback to be installed as an
      *                                onload event handler in the new window
-     *  @return the window 
+     *  @return the window
      */
     openSecondaryWindow: function(
         a_name,
@@ -1069,27 +1100,27 @@ Alph.xlate = {
         // it doesn't seem possible to reset the window.arguments
         // so if arguments are being passed to the new window,
         // just proceed as if opening a new window
-        var windows = 
+        var windows =
             Alph.main.get_state_obj(Alph.main.getCurrentBrowser())
             .get_var("windows");
-        
+
         var a_window = windows[a_name];
-                
+
         // if the window exists already, is open, has the same location
-        // and an update_args_callback property has been added to 
+        // and an update_args_callback property has been added to
         // the window arguments, just call that with the new arguments
-        // rather than reloading the window 
+        // rather than reloading the window
         if (a_window &&
             ! a_window.closed &&
             a_window.location.href == a_url &&
-            a_window.arguments && 
+            a_window.arguments &&
             a_window.arguments[0].update_args_callback != null)
         {
             Alph.util.log("Calling update_args_callback for window " + a_name);
             a_window.arguments[0].update_args_callback(a_window_args);
         }
         // if the window doesn't exist, or is closed, or has arguments
-        // and didn't meet the prior condition, 
+        // and didn't meet the prior condition,
         // reload it with the new arguments
         else if (a_window == null || a_window.closed || a_window_args)
         {
@@ -1241,7 +1272,7 @@ Alph.xlate = {
             {
                 Alph.util.log("Replacing location with " + a_url);
                 a_window.location = a_url;
-                
+
             }
 
         }
@@ -1254,17 +1285,17 @@ Alph.xlate = {
 
     /**
      * Callback to hide the loading message in the popup.
-     * @param {Document} document which contains the loading message 
+     * @param {Document} document which contains the loading message
      */
     hideLoadingMessage: function(a_doc)
     {
-        
-        var topdoc = a_doc || Alph.xlate.getLastDoc(); 
+
+        var topdoc = a_doc || Alph.xlate.getLastDoc();
         try {
-            // we can't use the event target, because the event is 
+            // we can't use the event target, because the event is
             // in the 2ndary window not the one showing the message
             Alph.$("#alph-secondary-loading",topdoc).remove();
-            
+
             // also check the morphology and dictionary windows
             Alph.main.panels['alph-morph-panel'].get_current_doc().forEach
             (
@@ -1273,7 +1304,7 @@ Alph.xlate = {
                     Alph.$("#alph-secondary-loading",a_doc).remove();
                 }
             );
-            Alph.$(".alph-lexicon-output").each( 
+            Alph.$(".alph-lexicon-output").each(
                 function() {
                     var doc = Alph.$(this).get(0).contentDocument;
                     Alph.$("#alph-secondary-loading",doc).remove();
@@ -1300,12 +1331,12 @@ Alph.xlate = {
                 '<div id="alph-secondary-loading">' + args[1] + '</div>');
         }
     },
-    
-    
+
+
     /**
      * Remove the alph-window element and related css from the
      * browser content document
-     * @param a_bro the browser 
+     * @param a_bro the browser
      * @param a_lang_tool the LanguageTool which last populated the alpheios
      *                    elements in the browser (optional - if not supplied
      *                    the current tool will be used)
@@ -1315,20 +1346,20 @@ Alph.xlate = {
         var last_doc = this.getLastDoc();
         // remove the main alpheios stylesheet
         Alph.$(".alpheios-css",last_doc).remove();
-        
+
         if (typeof a_lang_tool == "undefined")
         {
             a_lang_tool = Alph.main.getLanguageTool();
         }
         if (a_lang_tool)
-        {   
+        {
             a_lang_tool.removeStyleSheet(last_doc);
         }
         // remove the alpheios window element
         Alph.$("#alph-window",last_doc).remove();
-        
+
         // also clear the morphology and dictionary panels
-        Alph.$(".alph-lexicon-output").each( 
+        Alph.$(".alph-lexicon-output").each(
             function() {
                 var doc = Alph.$(this).get(0).contentDocument;
                 Alph.$("#alph-window",doc).html("");
@@ -1341,9 +1372,9 @@ Alph.xlate = {
         Alph.main.broadcast_ui_event(Alph.main.events.REMOVE_POPUP);
 
      },
-     
+
      /**
-      * Determines if the popup is currently being displayed, 
+      * Determines if the popup is currently being displayed,
       * based upon the lastElem object in the alpheios state variable
       * @return true if it was found and visible, otherwise false
       * @type Boolean
@@ -1353,7 +1384,7 @@ Alph.xlate = {
         var topdoc = this.getLastDoc();
         return Alph.$("#alph-window",topdoc).is(':visible');
      },
-     
+
      /**
       * get the document object for the last shown popup
       * @return the Document object
@@ -1366,7 +1397,7 @@ Alph.xlate = {
         if ( lastElem != null )
         {
             lastdoc = lastElem.ownerDocument;
-        } 
+        }
         if (typeof lastdoc == "undefined" || lastdoc == null)
         {
             // default to the window content document which is the majority case
@@ -1374,10 +1405,10 @@ Alph.xlate = {
         }
         return lastdoc;
      },
-    
+
      /**
      * Clears the last selection
-     * @param {Document} a_doc the source document 
+     * @param {Document} a_doc the source document
      */
      clearSelection: function(a_doc)
      {
@@ -1385,10 +1416,10 @@ Alph.xlate = {
         {
             a_doc = this.getLastDoc();
         }
-    
+
         try {
             a_doc.defaultView.getSelection().removeAllRanges();
-        } 
+        }
         catch(a_e)
         {
             //TODO sometimes we get a null defaultView. Need to figure
@@ -1396,16 +1427,16 @@ Alph.xlate = {
             Alph.util.log("no default view");
         }
      },
-     
+
      /**
       * handle to initiate drag action for popup
       * @param {Event} a_event the mousedown event
-      *  ('this' is the object the mouse is over) 
+      *  ('this' is the object the mouse is over)
       */
      drag_popup: function(a_e)
      {
         var handle_offset = Alph.$(this).offset();;
-        var data = 
+        var data =
             { start_x: a_e.pageX,
               start_y: a_e.pageY,
               handle_x: handle_offset.left - a_e.pageX,
@@ -1415,18 +1446,18 @@ Alph.xlate = {
             'mouseup.alpheiosdrag',
             data,
             Alph.xlate.drop_popup);
-        
+
         Alph.$(this).parents("body").eq(0).bind(
             'mousemove.alpheiosdrag',
             data,
             Alph.xlate.move_popup);
         return false;
     },
-     
+
     /**
      * mousemove handler for dragging the popup
      * @param {Event} a_event the mousemove event
-     * ('this' is the object the mouse is moving over) 
+     * ('this' is the object the mouse is moving over)
      */
     move_popup: function(a_e)
     {
@@ -1439,15 +1470,15 @@ Alph.xlate = {
         var y_m = a_e.pageY - a_e.data.start_y;
         Alph.$("#alph-window",this.ownerDocument).get(0).style.left =
             (a_e.data.start_x + x_m) + 'px';
-        Alph.$("#alph-window",this.ownerDocument).get(0).style.top = 
+        Alph.$("#alph-window",this.ownerDocument).get(0).style.top =
             (a_e.data.start_y + y_m) + 'px';
         return false;
     },
-    
+
     /**
      * mouseup handler for dropping the popup
      * @param {Event} a_event the mouseup event
-     * ('this' is the object the mouse is over) 
+     * ('this' is the object the mouse is over)
      */
     drop_popup: function(a_e){
         Alph.$(this).unbind('.alpheiosdrag');
@@ -1461,10 +1492,7 @@ Alph.xlate = {
         var y_m = a_e.pageY - a_e.data.start_y;
         Alph.$("#alph-window",this.ownerDocument).get(0).style.left =
             (a_e.data.start_x + x_m) + 'px';
-        Alph.$("#alph-window",this.ownerDocument).get(0).style.top = 
-            (a_e.data.start_y + y_m) + 'px';    
+        Alph.$("#alph-window",this.ownerDocument).get(0).style.top =
+            (a_e.data.start_y + y_m) + 'px';
     }
-
-     
-    
 };

@@ -89,7 +89,7 @@ Alph.Tree.prototype.show = function()
 
     var treebankUrl = Alph.site.treebank_diagram_url(bro.contentDocument);
 
-    var tbref;
+    var tbrefs;
     var sentence;
     var word;
     if (! treebankUrl)
@@ -103,7 +103,8 @@ Alph.Tree.prototype.show = function()
     {
         // Just add the default message to the display
         Alph.$("#tree-error",treeDoc).html(
-                Alph.$("#alpheios-strings").get(0).getString("alph-info-tree-select")
+                Alph.$("#alpheios-strings").get(0).
+                                            getString("alph-info-tree-select")
         );
         this.update_panel_window({},'alph-tree-body');
     }
@@ -112,14 +113,18 @@ Alph.Tree.prototype.show = function()
         try
         {
             var last_elem = Alph.main.get_state_obj(bro).get_var("lastElem");
-            tbref = Alph.$(last_elem).attr("tbref");
-            // if the selected element doesn't have a tbref attribute,
+            tbrefs = Alph.$(last_elem).attr("tbrefs");
+            // if the selected element doesn't have a tbrefs attribute,
             // look for the first parent element that does
-            if (! tbref)
-            {
-                tbref = Alph.$(last_elem).parents('[tbref]').attr("tbref");
-            }
-            var parts = tbref.split(/-/);
+            if (!tbrefs)
+                tbrefs = Alph.$(last_elem).parents('[tbrefs]').attr("tbrefs");
+            if (!tbrefs)
+                tbrefs = Alph.$(last_elem).attr("tbref");
+            if (!tbrefs)
+                tbrefs = Alph.$(last_elem).parents('[tbref]').attr("tbref");
+            if (tbrefs)
+                tbrefs = tbrefs.split(' ');
+            var parts = tbrefs[0].split(/-/);
             sentence = parts[0];
             word = parts[1];
         }
@@ -160,7 +165,7 @@ Alph.Tree.prototype.show = function()
                     },
                     success: function(data, textStatus)
                     {
-                        panel_obj.parse_tree(data, tbref);
+                        panel_obj.parse_tree(data, tbrefs);
                         panel_obj.update_panel_window({},'alph-tree-body');
                     }
                 }
@@ -169,7 +174,6 @@ Alph.Tree.prototype.show = function()
     }
 
     return Alph.Panel.STATUS_SHOW;
-
 };
 
 
@@ -229,9 +233,9 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
 /**
  * Parse and display SVG-encoded tree
  * @param a_svgXML SVG representation of the tree
- * @param {String} a_id id of focus word in the tree
+ * @param {Array} a_ids ids of initial words in the tree
  */
-Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
+Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
 {
     var marginLeft = 10;
     var marginTop = 0;
@@ -261,8 +265,8 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_id)
                                helpSize,
                                fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
-        Alph.Tree.highlight_first(treeDoc, a_id);
-        Alph.Tree.highlight_word(treeDoc, a_id);
+        Alph.Tree.highlight_first(treeDoc, a_ids);
+        Alph.Tree.highlight_word(treeDoc, a_ids[0]);
 //        Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
@@ -1097,30 +1101,36 @@ Alph.Tree.highlight_text_word = function(a_doc, a_id, a_focus)
  * Highlight initial word in the tree
  *
  * @param a_doc the document
- * @param {String} a_id id of word in tree
+ * @param {Array} a_ids ids of words in tree
  */
-Alph.Tree.highlight_first = function(a_doc, a_id)
+Alph.Tree.highlight_first = function(a_doc, a_ids)
 {
-    // find node of interest
-    var focusNode = Alph.$("#" + a_id, a_doc);
-
-    // if no id or bad id
-    if (focusNode.size() == 0)
-        return;
-
-    // set attribute in tree
-    focusNode.children("text:first").each(
-        function() { this.setAttribute("first", "yes"); });
-    focusNode.children("rect").each(
-        function() { this.setAttribute("first", "yes"); });
-
-    // set attribute in text
-    Alph.$("rect", a_doc).each(
-    function()
+    // for each id
+    for (i in a_ids)
     {
-        if (this.getAttribute('tbref') == a_id)
-            this.setAttribute("first", "yes");
-    });
+        var id = a_ids[i];
+
+        // find node of interest
+        var focusNode = Alph.$("#" + id, a_doc);
+
+        // if no id or bad id
+        if (focusNode.size() == 0)
+            return;
+
+        // set attribute in tree
+        focusNode.children("text:first").each(
+            function() { this.setAttribute("first", "yes"); });
+        focusNode.children("rect").each(
+            function() { this.setAttribute("first", "yes"); });
+
+        // set attribute in text
+        Alph.$("rect", a_doc).each(
+        function()
+        {
+            if (this.getAttribute('tbref') == id)
+                this.setAttribute("first", "yes");
+        });
+    }
 };
 
 Alph.Tree.pre_open_check = function()
