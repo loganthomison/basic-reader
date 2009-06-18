@@ -340,6 +340,12 @@ div.alph-morph {
     clear: both;
 }
 
+.alph-dict .alph-dict-source {
+    font-size: small;
+    color: #4E6476;
+    font-style: italic;
+}
+
 .alph-dial {
     font-size: smaller;
 }
@@ -380,6 +386,10 @@ div.alph-morph {
     cursor: pointer;
 }
 
+.alpheios-enhanced .alph-title-bar {
+    background-color: #73cdd3;
+}
+
 .alpheios-button {
     background-color: #ebe9d7;
     border-width: 1px;
@@ -413,4 +423,18 @@ div.alph-morph {
 
 .alpheios-link:hover {
     color: #5BC8DC;
+}
+
+#alph-morph-credits {
+    font-size: small;
+    font-weight: normal;
+    color: #4E6476;
+    font-style: italic;
+    margin-bottom: 1em;
+    padding-left: .5em;
+    font-family:  Arial, sans-serif;
+}
+
+.alph-source-title {
+    text-decoration: underline;
 }

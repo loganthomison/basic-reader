@@ -356,6 +356,7 @@ Alph.xlate = {
         var a_topdoc = a_doc_array[0];
 
         var wordHTML = Alph.xlate.transform(a_xml);
+
         // don't display an empty popup
         if (   (wordHTML == '')
             || (   (Alph.$(".alph-entry",wordHTML).size() == 0)
@@ -386,7 +387,6 @@ Alph.xlate = {
             window.content.document.importNode(
                                         wordHTML.getElementById("alph-text"),
                                         true);
-
         var disambiguate_id = null;
         if (a_alphtarget.getTreebankQuery())
         {
@@ -632,7 +632,7 @@ Alph.xlate = {
                 {
                     Alph.util.log("Can't find entry matching treebank");
                     Alph.$(".alph-word",popup).remove();
-                    Alph.$(popup).prepend(
+                    Alph.$('#alph-morph-credits',popup).before(
                             Alph.$(".alph-word",new_text_node).clone(true)
                                 .addClass("tb-morph-word")
                                 .addClass("alph-word-first")
@@ -800,13 +800,16 @@ Alph.xlate = {
                             Alph.$(word).addClass("alph-word-first");
                         }
                         Alph.$(word).addClass("tb-morph-word")
-                        Alph.$(popup).append(word);
+                        Alph.$('#alph-morph-credits',popup).before(word);
                     }
                 }
                 Alph.$(popup).prepend('<div id="alph-word-tools"/>');
-                Alph.main.getLanguageTool().add_word_tools(
-                    Alph.$(popup),a_alphtarget);
-
+                a_lang_tool.add_word_tools(Alph.$(popup),a_alphtarget);
+                // add the treebank credits
+                var tb_credit = a_lang_tool.get_string("treebank.credits");
+                Alph.$("#alph-morph-credits",popup).append('<div id="alph-treebank-credits">' +
+                        tb_credit + '</div>');
+                    
                 // we're finally done, so get rid of the pending status on the
                 // popup
                 try
@@ -876,10 +879,13 @@ Alph.xlate = {
 
             // add any language-specific stylesheet
             lang_tool.addStyleSheet(topdoc);
-
+            
+            // flag the popup if we're on an enhanced text site
+            var enhanced_class = Alph.site.is_ped_site(topdoc) ? ' alpheios-enhanced' : '';
+            
             popup = topdoc.createElementNS("http://www.w3.org/1999/xhtml", "div");
             popup.setAttribute("id", "alph-window");
-            popup.setAttribute("class", "alpheios-ignore");
+            popup.setAttribute("class", "alpheios-ignore" + enhanced_class);
 
             /* cancel the mousemove and dblclick events over the popup */
             /* this probably can come out as I've switched to using the

@@ -41,6 +41,7 @@
       <body>
         <div id="alph-text">
           <xsl:apply-templates select="//word|//error|//unknown"/>
+          <div id="alph-morph-credits"></div>
         </div>
       </body>
     </html>
