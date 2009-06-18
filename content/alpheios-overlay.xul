@@ -56,8 +56,8 @@
                      hidden="false"/>
         <broadcaster id="alpheios-auto-enable-status"
                      class="alpheios-auto-enable-notifier"
-                     disabled="false"
-                     hidden="false"/>                     
+                     disabled="true"
+                     hidden="true"/>                     
         <broadcaster id="alpheios-lookup-enabled"
                      hidden="true"/>
         <broadcaster id="alpheios-learner-disabled"
@@ -72,7 +72,7 @@
                  observes="alpheios-auto-enable-status" />
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value,true);"
-                 observes="alpheios-basic-status"/>
+                 observes="alpheios-auto-enable-status"/>
         <command id="alpheios-lookup-cmd" 
                  oncommand="Alph.main.do_tb_lookup();"/>
         <command 

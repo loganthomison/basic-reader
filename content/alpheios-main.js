@@ -1313,7 +1313,8 @@ Alph.main =
         else
         {
             auto_lang=Alph.site.is_basic_site(Alph.util.IO_SVC.newURI(bro.contentDocument.location,null,null));
-        }    
+        }   
+         
         if (auto_lang && Alph.Languages.has_lang(auto_lang)) 
         {
             
@@ -1387,9 +1388,9 @@ Alph.main =
         Alph.$("broadcaster.alpheios-auto-enable-notifier").each(
             function()
             {
-                if (! auto_lang)
+                if (auto_lang && this.is_enabled(bro))
                 {
-                    Alph.$(this).attr("disabled",true)
+                    Alph.$(this).attr("disabled",true);
                     if (Alph.$(this).attr("hidden") != null)
                     {
                         Alph.$(this).attr("hidden",true);
@@ -1414,7 +1415,7 @@ Alph.main =
             {
                 if (! ped_site)
                 {
-                    Alph.$(this).attr("disabled",true)
+                    Alph.$(this).attr("disabled",true);
                     if (Alph.$(this).attr("hidden") != null)
                     {
                         Alph.$(this).attr("hidden",true);
