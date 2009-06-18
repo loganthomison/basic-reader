@@ -418,4 +418,11 @@
         </xsl:for-each>       
     </xsl:template>
     
+    <xsl:template name="check_att">
+        <xsl:param name="att_name"/>
+        <xsl:param name="data"/>
+        <!-- no need to repeat test on filtered attribute when matching inflections -->
+        <xsl:if test="$att_name = $filter_key">1</xsl:if>
+    </xsl:template>
+    
 </xsl:stylesheet>
