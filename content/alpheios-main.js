@@ -1388,7 +1388,7 @@ Alph.main =
         Alph.$("broadcaster.alpheios-auto-enable-notifier").each(
             function()
             {
-                if (auto_lang && this.is_enabled(bro))
+                if (auto_lang && Alph.main.is_enabled(bro))
                 {
                     Alph.$(this).attr("disabled",true);
                     if (Alph.$(this).attr("hidden") != null)
