@@ -561,7 +561,6 @@ Alph.xlate = {
             a_lang_tool.contextHandler(new_text_node);
             a_lang_tool.add_infl_help(
                     new_text_node,a_alphtarget);
-
             var new_entry = Alph.$(".alph-entry",new_text_node);
             var new_dict = Alph.$(".alph-dict",new_entry);
             var new_hdwd = Alph.$(new_dict).attr("lemma-key");
@@ -667,9 +666,9 @@ Alph.xlate = {
                         var infl_set_possible = Alph.$(".alph-infl-set",entry_match);
                         var infl_set_matches = [];
 
-                        for (var i=0; i<infl_set_possible.length;i++)
+                        for (var k=0; k<infl_set_possible.length;k++)
                         {
-                            var infl_set = infl_set_possible[i];
+                            var infl_set = infl_set_possible[k];
                             // insert the new inflection only into
                             // an inflection set of the same part of speech
                             // as the new entry
@@ -680,7 +679,7 @@ Alph.xlate = {
                             if (infl_pofs ==
                                 Alph.$('.alph-pofs',new_entry).attr('context'))
                             {
-                                infl_set_matches.push(i);
+                                infl_set_matches.push(k);
                             }
                         }
                         // if we found a single matching inflection set, let's
@@ -704,10 +703,10 @@ Alph.xlate = {
                         else if (infl_set_matches.length >1)
                         {
                             var merge_sets = [];
-                            for (var i=0; i<infl_set_matches.length;i++)
+                            for (var k=0; k<infl_set_matches.length;k++)
                             {
                                 merge_sets.push(
-                                    Alph.$(infl_set_possible).eq(infl_set_matches[i])
+                                    Alph.$(infl_set_possible).eq(infl_set_matches[k])
                                     .clone(true));
                             }
                             // remove all the old inflection sets, we're going
@@ -754,7 +753,7 @@ Alph.xlate = {
                         // inflection set
                         for (var i=1; i<pofs_match_set.length; i++)
                         {
-                            pofs_match_set[i].remove();
+                            Alph.$(pofs_match_set[i]).remove();
                         }
                         pofs_match_set = pofs_match_set.eq(0);
                         Alph.$(pofs_match_set).attr("tb-match",true);
