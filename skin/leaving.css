@@ -1,0 +1,21 @@
+dialog {
+    font-family: Arial, sans-serif; 
+    font-size: larger;
+}
+
+label.site-link {
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+label.site-link:hover {
+    color: #5BC8DC;
+}
+
+image#alpheios-icon {
+   list-style-image: url("chrome://alpheios/skin/icons/alpheios_16.png");
+   max-height: 16px;
+   max-width: 16px;
+}

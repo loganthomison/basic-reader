@@ -28,7 +28,7 @@
     </commandset>
              
     <!-- overlay the alpheios toolbar-->
-      <toolbar id="alpheios-toolbar"> 
+      <toolbar id="alpheios-toolbar-template"> 
         <toolbarbutton
             id="alpheios-tree-toggle"
             hidden="true"

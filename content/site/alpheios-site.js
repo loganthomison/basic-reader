@@ -30,7 +30,10 @@
 Alph.site = {
     
     /**
-     * 
+     * Check to see if this site supports the pedagogical functionality
+     * @param {Document} a_doc the content document for the site
+     * @return true if the site supports the pedagogical functionality, false if not
+     * @type Boolean
      */
     is_ped_site: function(a_doc)
     {             
@@ -38,6 +41,74 @@ Alph.site = {
                 ? true : false);
       
     },
+    
+    /**
+     * Check to see if the site is one we have registered automatic
+     * support for
+     * @param nsIURI a_url the url object
+     * @return the language we have registered for this site, or null if it
+     *         is not registered
+     * @type String
+     */
+    is_basic_site: function(a_url)
+    {
+        var lang_list = Alph.Languages.get_lang_list();
+        var allowed_lang = null;
+        for (var i=0; i<lang_list.length; i++)
+        {
+            var lang = lang_list[i];
+            if (Alph.PermissionMgr.testPermission(a_url,'alpheios-auto-enable-'+lang)
+                == Alph.PermissionMgr.ALLOW_ACTION)
+            {
+                // just return the first language registered for this iste for now
+                // eventually need to support multiple languages per site?
+                allowed_lang = lang;
+                break;
+            }
+        }
+        return allowed_lang;
+    },
+    
+    /**
+     * register sites for automatic support
+     */
+    register_sites: function()
+    {
+        var lang_list = Alph.Languages.get_lang_list();
+        var allowed_lang = null;
+        // iterate through the supported languages, registering any sites
+        // which haven't yet been registered for this language
+        for (var i=0; i<lang_list.length; i++)
+        {
+            var lang = lang_list[i];
+            try 
+            {
+                var key = 'alpheios-auto-enable-'+lang;
+                var sites = Alph.util.getPref('sites.autoenable',lang).split(',');
+                Alph.util.log("Registering sites for " + lang + ":" + sites);
+                sites.forEach(
+                    function(a_url)
+                    {
+                        var uri = 
+                            Alph.util.IO_SVC.newURI(a_url,"UTF-8",null);
+                        if (Alph.PermissionMgr.testPermission(uri,key)
+                            == Alph.PermissionMgr.UNKNOWN_ACTION)
+                        {
+                            Alph.util.log("Registering " + a_url);
+                            Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION)
+                        }
+                    }
+                );
+            }
+            catch(a_e)
+            {
+                Alph.util.log("Not registering sites for " + lang + ":"+ a_e);
+                // quiety ignore missing preference
+            }
+        }
+        
+    },
+    
     /**
      * injects the browser content document with Alpheios pedagogical
      * functionality

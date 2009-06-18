@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://alpheios/skin/prefs/alpheios-prefs.css" type="text/css"?>
+<prefwindow id="alpheios-site-prefs-dlg" 
+    type="child"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    title="&alpheios.prefs.sites;"
+    dlgbuttons="accept,cancel">
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />
+    <stringbundleset id="alpheios-prefs-stringbundleset">
+      <stringbundle id="alpheios-prefs-strings" 
+                      src="chrome://alpheios/locale/alpheios-prefs.properties"/>
+    </stringbundleset>    
+    <prefpane id="alpheios-prefs-sites" 
+          label="&alpheios.prefs.sites;" 
+          onpaneload="Alph.prefs.init_site_prefs();">
+        <preferences/>
+        <tabbox id="site-prefs">
+            <tabs id="site-prefs-language-tabs"/>
+            <tabpanels id="site-prefs-language-details"/>
+        </tabbox>
+    </prefpane>
+</prefwindow>

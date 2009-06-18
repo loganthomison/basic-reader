@@ -29,6 +29,10 @@
 Alph.prefs = {
 
     _selected_dict_item: null,
+    _selected_site_item:  null,
+    _IO_SVC: Components.classes["@mozilla.org/network/io-service;1"]
+                      .getService(Components.interfaces.nsIIOService),
+        
     
     init: function()
     {
@@ -641,7 +645,194 @@ Alph.prefs = {
         var preference = Alph.$("#" + list.getAttribute("preference")).get(0);
         preference.value = string;
         //Alph.prefs.read_dict_list(list.id.match(/dict-order-(.*?)-/)[1],button_id[1]);
-    }
+    },
+   
+    /**
+     * Initialize the site preferences screen
+     * populates the language-specific tabs in the Dictionary
+     * preferences pane with the default dictionary preference 
+     * elements for the language. 
+     */
+    init_site_prefs: function()
+    {
+        var strings = document.getElementById("alpheios-prefs-strings");
+        var prefs = Alph.$("#alpheios-prefs-sites preferences").get(0);
+        // iterate through the languages which have containers for the
+        // site preferences defined
+        Alph.$("[id^=site-prefs-language-details-]").each(
+            function() {
+                var lang_parent = this;
+                var lang = this.id.match(/site-prefs-language-details-(.+)$/)[1];
+                if (lang != null && typeof lang != "undefined")
+                {
+                    var lang_strings = document.getElementById("alpheios-prefs-strings-"+lang);
+                    
+                    prefs.appendChild(
+                                Alph.util.makePref(
+                                    'pref-' + lang + '-autoenable-sites',
+                                    'extensions.alpheios.' + lang + '.sites.autoenable',
+                                    'string')
+                                );
+                    var grid = Alph.util.makeXUL(
+                        'grid',
+                        'alph-site-grid-'+lang,
+                        [],[]
+                    );
+                    var cols = Alph.util.makeXUL('columns',null,[],[]);
+                    cols.appendChild(Alph.util.makeXUL('column',null,['flex'],['1']));
+                    cols.appendChild(Alph.util.makeXUL('column',null,[],[]));
+                    grid.appendChild(cols);
+                    var rows = Alph.util.makeXUL('rows',null,[],[]);
+                    var row = Alph.util.makeXUL('row',null,[],[])
+                    var lb_ordered = Alph.util.makeXUL('listbox',
+                        'site-list-autoenable-'+lang,
+                        ['seltype','preference','onsyncfrompreference'],
+                        ['single','pref-' + lang + '-autoenable-sites',
+                        'Alph.prefs.read_site_list("' + lang + '");' 
+                    ]);
+                    var button_box = Alph.util.makeXUL('vbox',null,[],[]);
+                    button_box.appendChild(
+                        Alph.util.makeXUL(
+                        'button',
+                        'disable-site',
+                        ['label','disabled'],
+                        [strings.getString('sites.buttons.disable'),'true'])
+                    );
+                    button_box.appendChild(
+                        Alph.util.makeXUL(
+                        'button',
+                        'enable-site',
+                        ['label','disabled'],
+                        [strings.getString('sites.buttons.enable'),'true'])
+                    );
+                    Alph.$(lb_ordered).select(Alph.prefs.on_site_select); 
+                    row.appendChild(lb_ordered);
+                    row.appendChild(button_box);
+                    rows.appendChild(row);
+                    grid.appendChild(cols);
+                    grid.appendChild(rows);
+                    var label = Alph.util.makeXUL(
+                        'label',
+                        null,
+                        ['value'],
+                        [strings.getString('site.labels.autoenable')]);
+                        lang_parent.appendChild(label);
+                        lang_parent.appendChild(grid);
+                    Alph.$("button",lang_parent).click(Alph.prefs.toggle_site);
+                }
+                
+            }
+        );
+    },
+    
+    /**
+     * Populates the site list from preferences
+     * @param {String} a_lang the language 
+     * Adapted from chrome://browser/content/preferences/languages.js
+     */
+    read_site_list: function(a_lang)
+    {
+        var lang_strings = document.getElementById("alpheios-prefs-strings-"+a_lang);
+        var site_list = 
+            Alph.$("#pref-" + a_lang + '-autoenable-sites').get(0).value;
+        
+        var listbox = Alph.$("#site-list-autoenable-" + a_lang).get(0);
+        // clear out any current contents of the list box
+        while (listbox.hasChildNodes())
+            listbox.removeChild(listbox.firstChild);
+        var selected_index=0;
+        
+        var key = 'alpheios-auto-enable-'+a_lang;
+        site_list.split(/,/).forEach(
+            function(a_site,a_i)
+            {
+      
+                var uri = Alph.prefs._IO_SVC.newURI(a_site,"UTF-8",null);
+                var perm = Alph.PermissionMgr.testPermission(uri,key);
+                var status = perm == Alph.PermissionMgr.ALLOW_ACTION ? 'site-enabled' : 'site-disabled';
+      
+                var item_id = a_lang + '-autoenable-' + a_i;
+                listbox.appendChild(
+                    Alph.util.makeXUL(
+                    'listitem',
+                    item_id,
+                    ['label','class'],[a_site,status])
+                );   
+                if (item_id == Alph.prefs._selected_site_item)
+                {
+                    selected_index = a_i;    
+                }
+            }
+        );
+        listbox.selectedIndex = selected_index || 0;
+    },
+    
+    /**
+     * Handler which responds to a click on one of the action buttons
+     * for enabling/disabling an autoenabled site
+     * 'this' is the button element which was clicked
+     * Adapted from chrome://browser/content/preferences/languages.js
+     */
+    toggle_site: function()
+    {
+        var button_id = this.id;
+        var list = Alph.$(this).parent().prev().get(0);
+        var selectedItem = list.selectedItems[0];
+        var lang = selectedItem.id.match(/^(\w+)-/)[1];
+        var key = 'alpheios-auto-enable-'+lang;
+        var selectedURL = selectedItem.getAttribute('label');
+        var uri = Alph.prefs._IO_SVC.newURI(selectedURL,"UTF-8",null); 
+        if (button_id == 'enable-site')
+        {
+            Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION);
+        }
+        else
+        {
+            Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.DENY_ACTION);
+        }
+        Alph.prefs._selected_site_item = selectedItem.id;
+        // update the site list                     
+        Alph.prefs.read_site_list(lang);
+    },
+   
+    
+    /**
+     * handler which responds to selection of a site name
+     * in the autoenable site listboxes
+     * 'this' is the listbox element
+     * Adapted from chrome://browser/content/preferences/languages.js
+     */
+    on_site_select: function()
+    {
+        var button_col = Alph.$(this).next().get(0);
+        var lang = this.id.match(/-(\w+)$/)[1];
+        var key = 'alpheios-auto-enable-'+lang;
+        var selectedItem = this.selectedItem;
+        if (this.selectedItem)
+        {
+            var selectedURL = selectedItem.getAttribute('label');
+            var uri = Alph.prefs._IO_SVC.newURI(selectedURL,"UTF-8",null);
+            var perm = Alph.PermissionMgr.testPermission(uri,key);
+            if (button_col)
+            {
+                var enableButton = Alph.$("button#enable-site",button_col).get(0);
+                var disableButton = Alph.$("button#disable-site",button_col).get(0);
+                switch (perm) {
+                    case Alph.PermissionMgr.ALLOW_ACTION:
+                      enableButton.disabled = true;
+                      disableButton.disabled = false;
+                      break;
+                    case Alph.PermissionMgr.DENY_ACTION:
+                      enableButton.disabled = false;
+                      disableButton.disabled = true;
+                      break;
+                    default:
+                      enableButton.disabled = true;
+                      disableButton.disabled = true;            
+                    }
+            }
+        }
+    },
 };
 
 Alph.prefs.init();

@@ -54,6 +54,10 @@
                      class="alpheios-basic-notifier"
                      disabled="false"
                      hidden="false"/>
+        <broadcaster id="alpheios-auto-enable-status"
+                     class="alpheios-auto-enable-notifier"
+                     disabled="false"
+                     hidden="false"/>                     
         <broadcaster id="alpheios-lookup-enabled"
                      hidden="true"/>
         <broadcaster id="alpheios-learner-disabled"
@@ -65,7 +69,7 @@
 	<commandset id="mainCommandSet">
 		<command id="alpheios-toggle-cmd" 
                  oncommand="Alph.main.alph_inlineToggle();"
-                 observes="alpheios-basic-status" />
+                 observes="alpheios-auto-enable-status" />
         <command id="alpheios-lang-cmd" 
                  oncommand="Alph.main.select_language(event.target.value,true);"
                  observes="alpheios-basic-status"/>
@@ -262,6 +266,8 @@
                 tooltiptext="&alpheios.help.tooltip;"
                 command="alpheios-help-cmd"/>
             <toolbarspring id="alpheios-toolbar-spring"/>
+            <toolbaritem><label id="alpheios-toolbar-hint" value=""/></toolbaritem>
+            <toolbarspring/>
             <toolbaritem class="alpheios-alpha-text"><label value="&alpheios.version.string;"/></toolbaritem>
             <toolbaritem id="alpheios-toolbar-status">
                 <label id="alpheios-toolbar-status-text"

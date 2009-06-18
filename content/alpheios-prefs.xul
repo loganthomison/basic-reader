@@ -116,6 +116,10 @@
                     label="&alpheios.prefs.windows.label;"
                     accesskey="&advanced.accesskey;"
                     oncommand="document.documentElement.openSubDialog('chrome://alpheios/content/alpheios-panel-prefs.xul','',null)"/>
+                <button id="alpheios-prefs-sites-button"
+                    label="&alpheios.prefs.sites.label;"
+                    accesskey="&sites.accesskey;"
+                    oncommand="document.documentElement.openSubDialog('chrome://alpheios/content/alpheios-site-prefs.xul','',null)"/>
             </hbox>
         </vbox>
     </prefpane>

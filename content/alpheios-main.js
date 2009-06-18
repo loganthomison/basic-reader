@@ -158,9 +158,10 @@ Alph.main =
         gBrowser.mTabContainer
                 .addEventListener("TabClose", function(e) { Alph.main.onTabClose(e); }, false);
         
-        Alph.main.enable_toolbar();
-        Alph.main.enable_tb_lookup(); 
+        Alph.main.toggle_toolbar(); 
         Alph.main.has_languages = Alph.main.set_languages();
+        // register any new auto-enable sites
+        Alph.site.register_sites();
         Alph.main.show_update_help();
     },
      
@@ -574,6 +575,7 @@ Alph.main =
         Alph.$("#alpheios-toggle-tm").attr("label",tmenu_text);
         Alph.$("#alpheios-toggle-mm").attr("label",tmenu_text);
         Alph.$("#alpheios-toolbar-status-text").attr("value",status_text);
+        this.set_tb_hints();
         
         // uncheck the previously checked language
         Alph.$("#alpheios-lang-popup-tm menuitem[checked='true']")
@@ -924,6 +926,28 @@ Alph.main =
     },
     
     /**
+     * Set the hints to be displayed on the FF toolbar
+     */
+    set_tb_hints: function()
+    {
+        var bro = this.getCurrentBrowser();
+        // if the tools are enabled, add the trigger hint to the ff toolbar, otherwise remove it
+        if (this.is_enabled(bro))
+        {
+            var hint_prop = 'alph-trigger-hint-'+this.getXlateTrigger(bro);
+            var lang_tool = this.getLanguageTool(bro);
+            var lang = lang_tool.get_language_string();
+            var hint = lang_tool.get_string_or_default(hint_prop,[lang]);
+            Alph.$("#alpheios-toolbar-hint").attr("value",hint);
+        }
+        else
+        {
+            Alph.$("#alpheios-toolbar-hint").attr("value",'');
+        }
+    
+    },
+    
+    /**
      * set the popup trigger state variable and event listener 
      * for the browser. Can also be used to switch the browser 
      * from one trigger to another
@@ -937,6 +961,7 @@ Alph.main =
         
         a_bro.addEventListener(a_trigger, this.doXlateText, false);
         this.get_state_obj(a_bro).set_var("xlate_trigger",a_trigger);
+        this.set_tb_hints();
         this.broadcast_ui_event(Alph.main.events.UPDATE_XLATE_TRIGGER,
             {new_trigger: a_trigger,
              old_trigger: old_trigger
@@ -1268,51 +1293,71 @@ Alph.main =
         
         var ped_site = 
             Alph.site.is_ped_site(bro.contentDocument);
-            
+        var auto_lang = null;
+        
+        var cur_lang = this.get_state_obj(bro).get_var("current_language");
         if (ped_site)
-        { 
-            this.set_mode(bro);
-            
+        {     
             // retrieve the language from the html element of the content document
-            var ped_lang = bro.contentDocument.documentElement.getAttribute("xml:lang")
+            auto_lang = bro.contentDocument.documentElement.getAttribute("xml:lang")
                             || bro.contentDocument.documentElement.getAttribute("lang");
             
             // for backwards compatibility, 
             // if the document itself doesn't specify the language, then check the 
             // translation url div
-            if (ped_lang == null)
+            if (auto_lang == null)
             {
-                ped_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
-            }
-            var cur_lang = this.get_state_obj(bro).get_var("current_language");
-            
-            // if we support this language automatically setup the extension for it
-            if (Alph.Languages.has_lang(ped_lang))
-            {
-                
-                // if Alpheios is not enabled, auto-enable it
-                if (! this.is_enabled(bro))
-                {
-                    Alph.util.log("Auto-enabling alpheios for " + ped_lang);
-                    this.autoToggle(bro,ped_lang);
-                    return;
-                }
-                // if alpheios is enabled set to the right language for the prototype
-                else if (this.is_enabled(bro) && cur_lang != ped_lang)
-                {
-                    Alph.util.log("Auto-switching alpheios to " + ped_lang);
-                    Alph.main.select_language(ped_lang,true);
-                    // select_language calls onTabSelect which will re-call reset_state
-                    return;  
-                }
-                        
+                auto_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
             }
         }
-        // if we're not on a pedagogical site but were and system automatically enabled 
+        else
+        {
+            auto_lang=Alph.site.is_basic_site(Alph.util.IO_SVC.newURI(bro.contentDocument.location,null,null));
+        }    
+        if (auto_lang && Alph.Languages.has_lang(auto_lang)) 
+        {
+            
+            // if we support this language and site automatically setup the extension for it
+            // if Alpheios is not enabled, auto-enable it
+            if (! this.is_enabled(bro))
+            {
+                Alph.util.log("Auto-enabling alpheios for " + auto_lang);
+                this.autoToggle(bro,auto_lang);
+                return;
+            }
+            // if alpheios is enabled set to the right language for the prototype
+            else if (this.is_enabled(bro) && cur_lang != auto_lang)
+            {
+                Alph.util.log("Auto-switching alpheios to " + auto_lang);
+                Alph.main.select_language(auto_lang,true);
+                // select_language calls onTabSelect which will re-call reset_state
+                return;  
+            }
+            // enable the ff toolbar 
+            // TODO - we may only want to enable this for basic sites
+            this.toggle_toolbar(true);
+            // if we're not on an enhanced site
+            // and make sure the mode is set to READER
+            if (! ped_site)
+            {
+                this.set_mode(bro,Alph.main.levels.READER);
+            }
+            // if we're on an enhanced site,  
+            // reset the mode to whatever the default is
+            else
+            {   
+                this.set_mode(bro);
+            }
+       
+        }
+        // if we're not on a supported site but were and the system automatically enabled 
         // the extension, then disable it again
         else if (this.is_enabled(bro) && ! this.toggled_by_user(bro))
         {
             this.autoToggle(bro);
+            // reset the toolbar status
+            this.toggle_toolbar();
+            this.show_leaving_site();
             return;
         }
         else if (this.is_enabled(bro))
@@ -1320,6 +1365,11 @@ Alph.main =
             // if we're on a basic site, and the extension is enabled,
             // the set the mode to READER
             this.set_mode(bro,Alph.main.levels.READER);
+        }
+        else
+        {
+            //reset the toolbar status
+            this.toggle_toolbar();
         }
         
         if (ped_site)
@@ -1332,6 +1382,31 @@ Alph.main =
             Alph.site.setup_page(bro.contentDocument,
                 Alph.Translation.INTERLINEAR_TARGET_SRC);
         }
+        
+        // notify the auto-enable observers
+        Alph.$("broadcaster.alpheios-auto-enable-notifier").each(
+            function()
+            {
+                if (! auto_lang)
+                {
+                    Alph.$(this).attr("disabled",true)
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden",true);
+                    }
+                }
+                else
+                {
+                    Alph.$(this).attr("disabled",false);
+                    if (Alph.$(this).attr("hidden") != null)
+                    {
+                        Alph.$(this).attr("hidden",false);
+                    }
+                }
+            }
+            
+        );
+      
                 
         // notify the pedagogical reader observers
         Alph.$("broadcaster.alpheios-pedagogical-notifier").each(
@@ -1480,24 +1555,37 @@ Alph.main =
     },
     
     /**
-     * enable toolbar per the preference
+     * toggle the ff toolbar
+     * @param {Boolean} a_on true if toolbar should be turned on, false if not 
      */
-    enable_toolbar: function()
+    toggle_toolbar: function(a_on)
     {
-        try {
-            if (Alph.util.getPref("enable.toolbar"))
+        if (typeof a_on == "undefined")
+        {
+            a_on = false;
+            try {
+                a_on = Alph.util.getPref("enable.toolbar");
+            }
+            catch(a_e)
+            {
+                // the toolbar defaults to off
+                a_on = false;
+            }
+        }
+        if (a_on)
+        {
+            //only add the toolbar if it's not already there
+            if (Alph.$('#alpheios-toolbar').length == 0)
             {
                 var toolbar = Alph.$("#alpheios-toolbar-template").clone();
                 Alph.$(toolbar).attr("id",'alpheios-toolbar');
                 Alph.$(toolbar).attr("collapsed",false);
                 Alph.$(toolbar).attr("hidden",false);
                 Alph.$("#navigator-toolbox").append(toolbar);
+                Alph.main.enable_tb_lookup();
             }
-            else
-            {
-                Alph.$("#navigator-toolbox #alpheios-toolbar").remove();
-            }
-        } catch(a_e)
+        }
+        else
         {
             Alph.$("#navigator-toolbox #alpheios-toolbar").remove();
         }
@@ -1518,6 +1606,17 @@ Alph.main =
         }
     },
     
+    /**
+     * open the leaving site dialog
+     */
+    show_leaving_site: function()
+    {
+        window.openDialog(
+            'chrome://alpheios/content/site/leaving-site.xul', 
+            'alpheios-leaving-dialog', 
+            'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
+        );   
+    },
     /**
      * open the about dialog
      */

@@ -43,6 +43,7 @@ if (typeof Alph == "undefined") {
     
     // load the transfer state object
     Components.utils.import("resource://alpheios/alpheios-xfer-state.jsm",Alph);
+    Components.utils.import("resource://alpheios/alpheios-site-permissions.jsm",Alph);
 }
 
 /**
@@ -155,7 +156,7 @@ Alph.util = {
         }
         else if (a_name.search(/enable.toolbar$/) != -1)
         {
-            Alph.main.enable_toolbar();
+            Alph.main.toggle_toolbar(a_value);
         }
         else if (a_name.search(/toolbar.lookup$/) != -1)
         {

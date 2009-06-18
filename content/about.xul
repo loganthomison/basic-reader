@@ -10,7 +10,7 @@
 %alphDTD;
 ]>
 
-<dialog id="alpheiosAbout"
+<dialog id="alpheios-about-dialog"
         title="&alpheios-about-title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         buttons="accept" onload="Alph.about.load_about();" onaccept="this.close();">
@@ -25,7 +25,6 @@
 
   <vbox flex="1">
     <hbox>
-        <image id="alpheios-icon"/>
         <label class="site-link" id="alpheios-site-link" 
                onclick="window.opener.Alph.util.open_alpheios_link('main');"/>
     </hbox>

@@ -30,3 +30,7 @@ textbox.param {
 label.cbxlabel {
     margin-left: 0; 
 }
+
+.site-enabled {
+    font-weight: bold;
+}
