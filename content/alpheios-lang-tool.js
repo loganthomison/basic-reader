@@ -1665,3 +1665,31 @@ Alph.LanguageTool.prototype.get_language_string = function()
     return str;
 }
 
+/**
+ * Check to see if the supplied language code is supported by this tool
+ * @param {String} a_code the language code
+ * @return true if supported false if not
+ * @type Boolean
+ */
+Alph.LanguageTool.prototype.supports_language = function(a_lang)
+{
+    var supported = false;
+    try
+    {
+        var codes = Alph.util.getPref("languagecode",this.source_language).split(',');  
+        for (var i=0; i<codes.length; i++)
+        {
+            if (a_lang == codes[i])
+            {
+                supported = true;
+                break;
+            }
+        }
+    }
+    catch(a_e)
+    {
+        Alph.util.log("No language codes registered for " + this.source_language);
+        supported = false;
+    }
+    return supported;
+}

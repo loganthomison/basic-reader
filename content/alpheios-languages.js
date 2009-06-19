@@ -63,6 +63,28 @@ Alph.Languages =
             this[a_lang] = a_lang_tool;
             this.lang_list.push(a_lang);
         }
+    },
+    
+    /**
+     * Get the key in to the Languages object for the supplied language_code
+     * @param {String} a_code the language code
+     * @return the key in to the Languages object for this code, or '' if none found 
+     */
+    map_language: function(a_code)
+    {
+        var lang_key = '';
+        for (var i=0; i<this.lang_list.length;i++)
+        {
+            var lang_tool = this.get_lang_tool(this.lang_list[i]);
+            if (a_code == this.lang_list[i] ||
+                lang_tool.supports_language(a_code)
+            )
+            {
+                lang_key = this.lang_list[i];
+                break;
+            }
+        }
+        return lang_key;
     }
 };
 

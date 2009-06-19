@@ -118,7 +118,9 @@ Alph.main =
      */
     onLoad: function()
     {
-        
+        // register the uninstaller for the installed Alpheios packages
+        Alph.Uninstaller.register_observer(
+            Alph.$.map(Alph.util.getAlpheiosPackages(),function(a){return a.id}));
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
         gBrowser
             .addEventListener("DOMContentLoaded", function(event) { Alph.main.first_load(event) }, false);
@@ -463,6 +465,7 @@ Alph.main =
                     }
             }
         );
+        
     },
 
     /**
@@ -1314,7 +1317,9 @@ Alph.main =
         {
             auto_lang=Alph.site.is_basic_site(Alph.util.IO_SVC.newURI(bro.contentDocument.location,null,null));
         }   
-         
+        
+        auto_lang = Alph.Languages.map_language(auto_lang);
+        
         if (auto_lang && Alph.Languages.has_lang(auto_lang)) 
         {
             
@@ -1876,7 +1881,8 @@ Alph.main =
             );
         }
 
-    }
+    },
+    
 };
 
 Alph.main.init();

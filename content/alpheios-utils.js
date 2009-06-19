@@ -41,9 +41,10 @@ if (typeof Alph == "undefined") {
     Alph.$ = jQuery.noConflict(true);
 
     
-    // load the transfer state object
+    // load the modules
     Components.utils.import("resource://alpheios/alpheios-xfer-state.jsm",Alph);
     Components.utils.import("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+    Components.utils.import("resource://alpheios/alpheios-uninstaller.jsm",Alph);
 }
 
 /**

@@ -109,25 +109,35 @@ PermissionMgr =
      */
     testPermission: function(a_uri,a_key)
     {
-        var host = a_uri.host;
-        var path = a_uri.path;
-        if (!path || path == '')
-        {
-            path = '/';
-        }
         var permission = this.UNKNOWN_ACTION;
-        if (typeof this.m_sites[a_key] != "undefined" && typeof this.m_sites[a_key][host] != "undefined")
-        {
-            for (var i=0; i<this.m_sites[a_key][host].length; i++)
+        try {
+            var host = a_uri.host;
+            var path = a_uri.path;
+            if (!path || path == '')
             {
-                var r_path_obj = this.m_sites[a_key][host][i];
-                var regex = new RegExp('^'+r_path_obj[0])
-                if (regex.exec(path))
+                path = '/';
+            }
+            
+            if (typeof this.m_sites[a_key] != "undefined" && typeof this.m_sites[a_key][host] != "undefined")
+            {
+                for (var i=0; i<this.m_sites[a_key][host].length; i++)
                 {
-                    permission = r_path_obj[1];
-                    break;
+                    var r_path_obj = this.m_sites[a_key][host][i];
+                    var regex = new RegExp('^'+r_path_obj[0])
+                    if (regex.exec(path))
+                    {
+                        permission = r_path_obj[1];
+                        break;
+                    }
                 }
             }
+        }
+        catch(a_e)
+        {
+            Components.classes["@mozilla.org/consoleservice;1"]
+                      .getService(Components.interfaces.nsIConsoleService)
+                      .logStringMessage('alpheios: failure testing permissions for host ' 
+                        + a_uri.spec + ' : ' + a_e);
         }
         return permission;
     },
