@@ -225,6 +225,7 @@
                 <xsl:sort select="@order" data-type="number"/>
                 <xsl:variable name="lastgroup4" select="."/>
                 <xsl:for-each select="$headerrow2">
+                    <xsl:sort select="@order" data-type="number"/>
                     <xsl:element name="th">
                         <xsl:attribute name="colspan">
                             <xsl:value-of select="1"/>

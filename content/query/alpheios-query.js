@@ -77,7 +77,8 @@ Alph_Quiz =
         this.add_pofs_query(params);
         this.add_defs_query(params);
 
-        if (params.type == 'full_query')
+        // only present the translation query if the word has an aligned translation
+        if (params.type == 'full_query' && params.source_align.length > 0)
         {
             // need to initiate the load of the contextual definitions
             // in a separate thread, after the on load handler has had a 
@@ -85,12 +86,14 @@ Alph_Quiz =
             // of doing this, but I haven't been able to find it.
             setTimeout("Alph_Quiz.load_query_context_defs()",500);
         }
-        else if (params.type == 'infl_query')
+        else
         {
             query_doc = $("#alph-query-frame").get(0).contentDocument;
             this.load_done();
+            var translation = params.source_align.length > 0 ? params.aligned_defs.join(' ')
+                                                             : params.lang_tool.get_string_or_default('alph-align-nomatch',[]);
             this.on_defs_correct(
-                params.aligned_defs.join(' '),
+                translation,
                 params.source_node,$(".alph-query-element",query_doc));
             
         }
@@ -263,7 +266,8 @@ Alph_Quiz =
         $(".alph-query-dict",a_query_parent).append(
                 '<div class="alpheios-label">' + short_def_label + '</div>',
                 $(".alph-hdwd",a_src_node).clone(true),
-                $(".alph-mean",a_src_node).clone(true));
+                $(".alph-mean",a_src_node).clone(true),
+                $(".alph-dict-source",a_src_node).clone(true));
     },
     
     /**
@@ -659,6 +663,7 @@ Alph_Quiz =
         $(".alph-hdwd",entry).remove();
         $(".alpheios-label",entry).remove();
         $(".alph-mean",entry).remove();
+        $(".alph-dict-source",entry).remove();
         var attr = $(".alph-morph .alph-pofs .alph-attr",entry);
         $(".alph-morph .alph-pofs",entry).html(attr);
         $(".alph-infl-select",parent_doc).prepend(entry);                

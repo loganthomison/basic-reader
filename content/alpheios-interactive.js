@@ -84,33 +84,45 @@ Alph.interactive = {
         // of definitions, unless the dependency tree display was the source of the
         // selection
         if (Alph.main.panels['alph-trans-panel'].is_visible_inline()
-            && Alph.$("#dependency-tree",a_topdoc).length == 0 )
+            && Alph.$("#dependency-tree",a_topdoc).length == 0)
         {
-            var selected_word = Alph.$(".alph-word",a_topdoc).attr("context");
-            var src_lang = lang_tool.source_language; 
-            Alph.$("#alph-window",a_topdoc).addClass("alpheios-inline-query");
-            Alph.$("#alph-window #alph-text",a_topdoc).append(
-                '<div id="alph-inline-query-instruct">' +
-                str.getFormattedString("alph-inline-query-instruct",[selected_word]) +
-                '</div>' +
-                '<div id="alph-align-answer-prompt"/>' + 
-                '<div id="alph-inline-query-correct">'+
-                '<span class="alph-inline-query-heading">' +
-                str.getString("alph-inline-query-correct") +
-                '</span>' +
-                '</div>' +
-                '<div id="alph-inline-query-incorrect">'+
-                '<span class="alph-inline-query-heading">' +
-                str.getString("alph-inline-query-incorrect") +
-                '</span>' +
-                '</div>'
-            );
-
-            params.type = 'infl_query';
-            params.aligned_ids = [];
-            params.aligned_defs = [];
-            Alph.main.panels['alph-trans-panel'].enable_interactive_query(params);
+            if (source_align.length > 0)
+            {
+                var selected_word = Alph.$(".alph-word",a_topdoc).attr("context");
+                var src_lang = lang_tool.source_language; 
+                Alph.$("#alph-window",a_topdoc).addClass("alpheios-inline-query");
+                Alph.$("#alph-window #alph-text",a_topdoc).append(
+                    '<div id="alph-inline-query-instruct">' +
+                    str.getFormattedString("alph-inline-query-instruct",[selected_word]) +
+                    '</div>' +
+                    '<div id="alph-align-answer-prompt"/>' + 
+                    '<div id="alph-inline-query-correct">'+
+                    '<span class="alph-inline-query-heading">' +
+                    str.getString("alph-inline-query-correct") +
+                    '</span>' +
+                    '</div>' +
+                    '<div id="alph-inline-query-incorrect">'+
+                    '<span class="alph-inline-query-heading">' +
+                    str.getString("alph-inline-query-incorrect") +
+                    '</span>' +
+                    '</div>'
+                );
             
+                params.type = 'infl_query';
+                params.aligned_ids = [];
+                params.aligned_defs = [];
+                Alph.main.panels['alph-trans-panel'].enable_interactive_query(params);
+            }
+            // if the word isn't aligned, just display the query window
+            else
+            {
+                // hide the popup - but don't call hidePopup because that resets
+                // state which we might need
+                Alph.$("#alph-window",a_topdoc).css("display","none");
+                params.type = 'infl_query';    
+                params.target= a_target;
+                this.openQueryWindow(params);
+            }
         }
         else
         {

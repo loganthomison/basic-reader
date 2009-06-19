@@ -340,7 +340,7 @@ div.alph-morph {
     clear: both;
 }
 
-.alph-dict .alph-dict-source {
+.alph-dict-source {
     font-size: small;
     color: #4E6476;
     font-style: italic;
