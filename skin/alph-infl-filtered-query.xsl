@@ -173,14 +173,16 @@
                             <!-- TODO colspan should not be hardcoded -->
                             <tr id="header-{$lastgroup1}" class="group1row">
                                 <xsl:element name="th">
-                                    <xsl:attribute name="class">header-text always-visible</xsl:attribute>
+                                    <xsl:attribute name="class">always-visible</xsl:attribute>
                                     <xsl:attribute name="colspan">2</xsl:attribute>
                                     <xsl:attribute name="context"><xsl:value-of select="$group1"/></xsl:attribute>
                                     <xsl:attribute name="{concat('alph-',$group1)}">
                                         <xsl:value-of select="
                                             concat('|',translate($lastgroup1,' ','|'),'|')"/>
                                     </xsl:attribute>
-                                    <xsl:value-of select="$lastgroup1"/>
+                                    <span class="header-text">
+                                        <xsl:value-of select="$lastgroup1"/>
+                                    </span>
                                     <!--xsl:call-template name="add-footnote">
                                         <xsl:with-param name="item" select="/infl-data/order-table/order-item[@attname=$groupheader]"/>
                                     </xsl:call-template-->
@@ -261,13 +263,15 @@
                                                         <!-- add row header on left if it's the first row in 
                                                             this grouping -->
                                                         <xsl:element name="th">
-                                                            <xsl:attribute name="class">group2header header-text</xsl:attribute>
+                                                            <xsl:attribute name="class">group2header</xsl:attribute>
                                                             <xsl:attribute name="context"><xsl:value-of select="$group2"/></xsl:attribute>
                                                             <xsl:attribute name="{concat('alph-',$group2)}">
                                                                 <xsl:value-of select="
                                                                     concat('|',translate($lastgroup2,' ','|'),'|')"/>
                                                             </xsl:attribute>
-                                                            <xsl:value-of select="$lastgroup2"/>
+                                                            <span class="header-text">
+                                                                <xsl:value-of select="$lastgroup2"/>
+                                                            </span>
                                                             <!--xsl:call-template name="add-footnote">
                                                                 <xsl:with-param name="item" select="/infl-data/order-table/order-item[@attname=$groupheader]"/>
                                                                 </xsl:call-template-->
@@ -330,13 +334,15 @@
                 <!-- add the row header cell if it's the first cell in 
                 the row -->
                 <xsl:element name="th">
-                    <xsl:attribute name="class">rowgroupheader header-text</xsl:attribute>
+                    <xsl:attribute name="class">rowgroupheader</xsl:attribute>
                     <xsl:attribute name="context"><xsl:value-of select="$context"/></xsl:attribute>
                     <xsl:attribute name="{concat('alph-',$context)}">
                         <xsl:value-of select="
                             concat('|',translate($groupheader,' ','|'),'|')"/>
                     </xsl:attribute>
-                    <xsl:value-of select="$groupheader"/>
+                    <span class="header-text">
+                        <xsl:value-of select="$groupheader"/>
+                    </span>
                     <!--xsl:call-template name="add-footnote">
                         <xsl:with-param name="item" select="/infl-data/order-table/order-item[@attname=$groupheader]"/>
                     </xsl:call-template-->
