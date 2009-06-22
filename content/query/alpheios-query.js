@@ -189,7 +189,7 @@ Alph_Quiz =
                 select_pofs = select_pofs 
                     + "<label>" 
                     + '<input type="radio" name="alph-select-pofs" value="' + a + '" />' 
-                    + a
+                    + a.replace(/_/,' ')
                     + "</label><br/>";
             }
         );
@@ -548,10 +548,11 @@ Alph_Quiz =
                 $(".alph-infl-select",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
-                   ending: $(".alph-infl-set .alph-suff",a_src_node).text() || '-', 
+                   ending: $(".alph-infl-set .alph-suff",a_src_node).eq(0).text() || '-', 
                    attributes: context_list[0],
                    src_node: a_src_node,
-                   convert_obj: Alph.convert 
+                   convert_obj: Alph.convert,
+                   lang_tool: window.arguments[0].lang_tool, 
                 },
                 function() { Alph_Quiz.on_infl_correct(a_src_node) }
             );
@@ -622,6 +623,13 @@ Alph_Quiz =
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
         var height = $(".alph-query-element",parent_doc).height();
         var width = $(".alph-query-element",parent_doc).width();
+        // take the bigger width of the main query element or the inflection element ..
+        // the floated inflection element won't factor into the parent element's width
+        var infl_width = $(".alph-infl-select",parent_doc).width();
+        if (infl_width > width)
+        {
+            width = infl_width;
+        }
         
         var min_height = 800;
         var min_width = 800;

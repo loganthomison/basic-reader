@@ -48,19 +48,19 @@
     
     <xsl:template match="/infl-data">
         <xsl:variable name="table-notes">
-            <xsl:if test="@footnote">
+            <!--xsl:if test="@footnote">
                 <div id="table-notes">
                     <xsl:call-template name="add-footnote">
                         <xsl:with-param name="item" select="."/>
                     </xsl:call-template>
                 </div>
-            </xsl:if>    
+            </xsl:if-->    
         </xsl:variable>        
         <xsl:choose>
             <xsl:when test="$fragment">
                 <xsl:copy-of select="$table-notes"/>
                 <xsl:call-template name="infltable">
-                    <xsl:with-param name="endings" select="//infl-ending-set[contains($decl,@decl)]"/>
+                    <xsl:with-param name="endings" select="//infl-ending-set[contains($decl,@decl) or contains(@decl,$decl)]"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -70,7 +70,7 @@
                     <body>
                         <xsl:copy-of select="$table-notes"/>
                         <xsl:call-template name="infltable">
-                            <xsl:with-param name="endings" select="//infl-ending-set[contains($decl,@decl)]"/>
+                            <xsl:with-param name="endings" select="//infl-ending-set[contains($decl,@decl) or contains(@decl,$decl)]"/>
                         </xsl:call-template>                     
                     </body>
                 </html>                
@@ -152,9 +152,9 @@
                             concat('|',translate($groupheader,' ','|'),'|')"/>
                     </xsl:attribute>
                     <xsl:value-of select="$groupheader"/>
-                    <xsl:call-template name="add-footnote">
+                    <!--xsl:call-template name="add-footnote">
                         <xsl:with-param name="item" select="/infl-data/order-table/order-item[@attname=$groupheader]"/>
-                    </xsl:call-template>
+                    </xsl:call-template-->
                 </xsl:element>
             </xsl:if>
             <xsl:for-each select="$group5_vals">
@@ -210,7 +210,7 @@
                             concat('|',translate(.,' ','|'),'|')"/>
                     </xsl:attribute>
                     <span class="header-text"><xsl:value-of select="."/></span>
-                    <xsl:apply-templates select="."/>
+                    <!--xsl:apply-templates select="."/-->
                 </xsl:element>
             </xsl:for-each>            
         </tr>
@@ -243,7 +243,7 @@
                         </xsl:attribute>
                         
                         <span class="header-text"><xsl:value-of select="."/></span>
-                        <xsl:apply-templates select="."/>
+                        <!--xsl:apply-templates select="."/-->
                     </xsl:element>
                 </xsl:for-each>
             </xsl:for-each>            
