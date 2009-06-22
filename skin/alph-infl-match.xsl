@@ -40,7 +40,7 @@
                         <xsl:when test="$normalize_greek and not($match_text = '_')">
                             <xsl:call-template name="normalize-greek">
                                 <xsl:with-param name="input" select="$match_text"/>
-                                <xsl:with-param name="strip">/\^_</xsl:with-param>
+                                <xsl:with-param name="strip">/\^_=</xsl:with-param>
                             </xsl:call-template>                              
                         </xsl:when>
                         <xsl:otherwise>

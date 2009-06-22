@@ -118,7 +118,7 @@
                         <xsl:when test="$normalize_greek">
                             <xsl:call-template name="normalize-greek">
                                 <xsl:with-param name="input" select="normalize-space($stripped-ending)"/>
-                                <xsl:with-param name="strip">\/^_</xsl:with-param>
+                                <xsl:with-param name="strip">\/^_=</xsl:with-param>
                             </xsl:call-template>
                         </xsl:when>
                         <xsl:otherwise>

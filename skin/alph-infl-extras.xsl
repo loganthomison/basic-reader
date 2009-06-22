@@ -157,15 +157,9 @@
             <xsl:text>|</xsl:text>
             <xsl:choose>
                 <xsl:when test="$normalize_greek and not($to_strip='_')">
-                    <xsl:variable name="normalized">
-                        <xsl:call-template name="normalize-greek">
-                            <xsl:with-param name="input" select="normalize-space($to_strip)"/>
-                            <xsl:with-param name="strip">/\^_</xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:variable>
                     <xsl:call-template name="normalize-greek">
                         <xsl:with-param name="input" select="normalize-space($to_strip)"/>
-                        <xsl:with-param name="strip">/\^_</xsl:with-param>
+                        <xsl:with-param name="strip">/\^_=</xsl:with-param>
                     </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise><xsl:value-of select="normalize-space($to_strip)"/></xsl:otherwise>
