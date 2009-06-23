@@ -285,7 +285,7 @@ Alph.xlate = {
             if (treebank_url)
             {
                 alphtarget.setTreebankQuery(
-                    treebank_url.replace(/WORD/, treebank_wd));
+                    treebank_url.replace(/WORD/, encodeURIComponent(treebank_wd)));
             }
         }
         // show output
