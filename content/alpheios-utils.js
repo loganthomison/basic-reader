@@ -45,6 +45,7 @@ if (typeof Alph == "undefined") {
     Components.utils.import("resource://alpheios/alpheios-xfer-state.jsm",Alph);
     Components.utils.import("resource://alpheios/alpheios-site-permissions.jsm",Alph);
     Components.utils.import("resource://alpheios/alpheios-uninstaller.jsm",Alph);
+    Components.utils.import("resource://alpheios/alpheios-upgrade-observer.jsm",Alph);
 }
 
 /**

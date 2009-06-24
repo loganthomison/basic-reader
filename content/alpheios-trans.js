@@ -112,9 +112,10 @@ Alph.Translation.prototype.show = function()
    }
    else
    {
-        var doc = 
-        Alph.$("body", Alph.$("browser",this.panel_elem).get(0).contentDocument)
-            .html(Alph.$("#alpheios-strings").get(0).getString("alph-error-notranslation"));
+        Alph.Translation.handle_error(
+            Alph.$("#alpheios-strings").get(0).getString("alph-error-notranslation"),
+            Alph.$("browser",this.panel_elem).get(0).contentDocument
+        );
    }
    return Alph.Panel.STATUS_SHOW;
 };
@@ -124,7 +125,8 @@ Alph.Translation.prototype.show = function()
  */
 Alph.Translation.handle_error = function(a_error,a_trans_doc)
 {
-    Alph.$("body",a_trans_doc).html(a_error);
+    Alph.$("body",a_trans_doc).html(
+        '<div id="alph-trans-error" class="alpheios-hint">' + a_error + '</div>');
 }
 
 /**
@@ -150,6 +152,29 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
     Alph.Translation.set_interlinear_toggle(disable_interlinear);                       
 },
 
+
+/**
+ * Translation panel specific implementation of 
+ * {@link Alph.Panel#handle_refresh}
+ * Loads the external url per the state of the current browser
+ * @param {Object} a_panel_state the current panel state
+ */
+Alph.Translation.prototype.handle_refresh = function(a_bro)
+{
+    var panel_state = this.get_browser_state(a_bro);
+    var doc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    Alph.util.log("handling refresh in trans panel");
+    // if the translation panel is showing and the the previous load
+    // was interrupted, we'll have an error in the document.  if the page
+    // is refreshed, we should try to load the document again. See bug 309.
+    if (panel_state.status == Alph.Panel.STATUS_SHOW && 
+        Alph.$("#alph-trans-error",doc).length > 0)
+    {
+        var msg = Alph.$("#alpheios-strings").get(0).getString("alph-trans-reload");
+        Alph.Translation.handle_error(msg,doc);
+        this.reset_state();
+    }
+}
 
 /**
  * Translation panel specific implementation of 

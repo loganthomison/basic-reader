@@ -121,6 +121,15 @@ Alph.main =
         // register the uninstaller for the installed Alpheios packages
         Alph.Uninstaller.register_observer(
             Alph.$.map(Alph.util.getAlpheiosPackages(),function(a){return a.id}));
+        // register an upgrade observer for this package ---
+        // if we're upgrading the basic libraries, we need to make sure to kill the 
+        // mhttpd daemon before the browser restarts. Bug 308.
+        Alph.Upgrader.register_observer(
+            [{id: Alph.main.extensionGUID, 
+              callback: Alph.main.killLocalDaemon
+             }
+            ]);
+
         window.addEventListener("unload", function(e) { Alph.main.onUnLoad(e); },false);
         gBrowser
             .addEventListener("DOMContentLoaded", function(event) { Alph.main.first_load(event) }, false);
@@ -467,6 +476,43 @@ Alph.main =
         );
         
     },
+    
+     /**
+     * Kill the local httpd daemon process.
+     * @private
+     */
+    killLocalDaemon: function()
+    {
+        var kill_url =  Alph.main.getLocalDaemonHost() + ":"  + Alph.main.getLocalDaemonPort() + "/kill";        
+        
+        // Add a random number to the url to prevent the browser from
+        // caching multiple simultaneous requests -- jquery appends a _=<timestamp>
+        // parameter when cache is set to false, but this doesn't prevent
+        // the caching when multiple requests come in at exactly the same time
+        // as happens when the browser is issuing the onTabClose event for multiple tabs
+        // in a window when the when the window is closed.
+        // Using POST would also prevent caching but mhttpd doesn't support POSTS
+        var rand_num = Math.floor(Math.random()* 100000000)
+        kill_url = detach_url + "?_r=" + rand_num;
+        Alph.util.log("kill daemon at " + detach_url);
+        
+        Alph.$.ajax(
+            {
+                type: "GET",   
+                async: true, 
+                dataType: "text",
+                cache: false,
+                url: kill_url,
+                error: 
+                    function(req,text,error) 
+                    {
+                        Alph.util.log("Error killing daemon : " + error);
+                    }
+            }
+        );
+        
+    },
+
 
     /**
      * Get the current browser window
@@ -1807,6 +1853,23 @@ Alph.main =
                         Alph.site.setup_page(doc,Alph.Translation.INTERLINEAR_TARGET_SRC);
                         var mode = Alph.main.get_state_obj(bro).get_var("level");
                         Alph.site.set_current_mode(doc,mode);
+                        // check to see if we need to refresh the state of any panels
+                        
+                        Alph.$("alpheiosPanel").each(
+                            function()
+                            {
+                                var panel_id = Alph.$(this).attr("id");
+                                try 
+                                {
+                                    var panel_obj = Alph.main.panels[panel_id];
+                                    panel_obj.handle_refresh(bro);    
+                                } 
+                                catch (e)
+                                {   
+                                    Alph.util.log("Unable to refresh state for panel " + panel_id + ":" + e);
+                                }
+                            }
+                        );
                     }
                 }
                 else if(this.handle_load) 

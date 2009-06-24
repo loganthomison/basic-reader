@@ -152,6 +152,14 @@ Alph.Panel.prototype.reset_state = function(a_bro)
     
 };
 
+/** 
+ * Responds to a page refresh 
+ */
+Alph.Panel.prototype.handle_refresh = function(a_bro)
+{
+    // default does nothing
+}
+
 /**
  * Updates the interface to a new panel status and 
  * stores the new status to the panel state object
