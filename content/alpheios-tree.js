@@ -251,9 +251,6 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                     Alph.$(svgXML).children("g:first").children("g:first"),
                     fontSize)[0];
         var maxWidth = treeSize[0];
-        var helpSize = Alph.Tree.position_help(treeDoc, fontSize);
-        if (helpSize[0] > maxWidth)
-            maxWidth = helpSize[0];
         var keySize = Alph.Tree.position_key(treeDoc, fontSize);
         if (keySize[0] > maxWidth)
             maxWidth = keySize[0];
@@ -262,7 +259,6 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                                treeSize,
                                textSize,
                                keySize,
-                               helpSize,
                                fontSize);
 //      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         Alph.Tree.highlight_first(treeDoc, a_ids);
@@ -676,64 +672,6 @@ Alph.Tree.position_text = function(a_doc, a_width, a_fontSize)
 };
 
 /**
- * Position help elements:
- *
- * @param a_doc the document
- * @param {int} a_fontSize size of font in pixels
- * @return size of help
- * @type Array
- */
-Alph.Tree.position_help = function(a_doc, a_fontSize)
-{
-    var trig = Alph.main.getLanguageTool().getpopuptrigger();
-    var helpGroup;
-
-    // find help
-    Alph.$("#dependency-tree", a_doc).children("g").each(
-    function()
-    {
-        if (this.getAttribute("class").split(' ')[0] == "help")
-        {
-            // for each help group
-            Alph.$(this).children("g").each(
-            function()
-            {
-                // if this is the one for the current trigger, remember it
-                if (this.getAttribute("class") == ("help-" + trig))
-                    helpGroup = Alph.$(this);
-                // otherwise, hide it
-                else
-                    this.setAttribute("visibility", "hidden");
-            });
-        }
-    });
-
-    // find width of help text
-    var texts = helpGroup.children("text");
-    var width = 0;
-    for (var i = 0; i < texts.size(); ++i)
-    {
-        var thisWidth = texts.get(i).getComputedTextLength();
-        if (thisWidth > width)
-            width = thisWidth;
-    }
-
-    // position entries
-    var y = 0;
-    var textHeight = (5 * a_fontSize) / 4;
-    for (var i = 0; i < texts.size(); ++i)
-    {
-        // position text
-        var thisText = texts.get(i);
-        thisText.setAttribute("x", 0);
-        thisText.setAttribute("y", y + a_fontSize);
-        y += textHeight;
-    }
-
-    return Array(width + a_fontSize, y + a_fontSize);
-};
-
-/**
  * Position key elements:
  *
  * The keys and definitions are each arranged vertically.
@@ -825,11 +763,10 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
  * @param {Array} a_treeSize width and height of tree
  * @param {Array} a_textSize width and height of text
  * @param {Array} a_keySize width and height of key
- * @param {Array} a_helpSize width and height of help text
  * @param {int} a_fontSize size of font in pixels
  */
 Alph.Tree.position_all =
-function(a_doc, a_treeSize, a_textSize, a_keySize, a_helpSize, a_fontSize)
+function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
 {
     Alph.$("#dependency-tree", a_doc).children("g").each(
     function()
@@ -839,30 +776,23 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_helpSize, a_fontSize)
         if (thisClass)
             thisClass = thisClass.split(' ')[0];
         var thisTransform = "";
-        if (thisClass == "help")
+        if (thisClass == "text")
         {
-            // position text at top left
+            // position text at top 
             thisTransform = "translate(0)";
-        }
-        else if (thisClass == "text")
-        {
-            // position text at left, below help
-            thisTransform = "translate(0," + a_helpSize[1] + ")";
         }
         else if (thisClass == "tree")
         {
             // position tree below text
             thisTransform =
-                "translate(" + a_fontSize + "," +
-                               (a_helpSize[1] + a_textSize[1]) + ")";
+                "translate(" + a_fontSize + "," + a_textSize[1] + ")";
         }
         else if (thisClass == "key")
         {
             // position key below tree, slightly indented
             thisTransform =
                 "translate(" + a_fontSize + "," +
-                               (a_helpSize[1] +
-                                a_textSize[1] +
+                               (a_textSize[1] +
                                 a_treeSize[1]) + ")";
         }
         this.setAttribute("transform", thisTransform);
@@ -874,9 +804,7 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_helpSize, a_fontSize)
         width = a_treeSize[0];
     if (a_keySize[0] > width)
         width = a_keySize[0];
-    if (a_helpSize[0] > width)
-        width = a_helpSize[0];
-    var height = a_textSize[1] + a_treeSize[1] + a_keySize[1] + a_helpSize[1];
+    var height = a_textSize[1] + a_treeSize[1] + a_keySize[1];
     Alph.$("#dependency-tree", a_doc).get(0).setAttribute("width", width);
     Alph.$("#dependency-tree", a_doc).get(0).setAttribute("height", height);
 };
