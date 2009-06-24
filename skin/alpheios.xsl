@@ -717,6 +717,7 @@
       <xsl:value-of select="."/>
       <xsl:if
         test="(../pofs='pronoun' or
+               ../pofs='numeral' or
                ../pofs='adjective' or
                ../pofs='article' or
                ../pofs='supine' or
