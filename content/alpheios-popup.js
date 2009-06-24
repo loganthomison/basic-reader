@@ -227,15 +227,15 @@ Alph.xlate = {
         // again should act like a reset
         var alph_state = Alph.main.get_state_obj();
         var lastSelection = alph_state.get_var("lastSelection");
-        if (alphtarget.equals(lastSelection))
+        if (alphtarget.equals(lastSelection) )
         {
-            if (Alph.interactive.enabled() && (! this.popupVisible()) )
-            {
-                Alph.interactive.closeQueryDisplay(Alph.main.getCurrentBrowser());
-            }
-            else
+            if (this.popupVisible())
             {
                 return;
+            }
+            else if (Alph.interactive.enabled())
+            {
+                Alph.interactive.closeQueryDisplay(Alph.main.getCurrentBrowser());
             }
         }
 
