@@ -577,12 +577,8 @@ Alph.xlate = {
             a_lang_tool.contextHandler(new_text_node);
             a_lang_tool.add_infl_help(
                     new_text_node,a_alphtarget);
-            var new_entry = Alph.$(".alph-entry",new_text_node);
-            var new_dict = Alph.$(".alph-dict",new_entry);
-            var new_hdwd = Alph.$(new_dict).attr("lemma-key");
-            var new_infl_node =
-                    Alph.$(".alph-infl",new_entry).get(0);
-            var new_pofs = Alph.$('.alph-pofs',new_entry).attr('context');
+            var new_entries = Alph.$(".alph-entry",new_text_node);
+            
 
             // iterate through the documents containing the morphology results
             // merging the disambiguated output into the original results
@@ -590,6 +586,7 @@ Alph.xlate = {
             for (var j=0; j<a_doc_array.length;j++)
             {
                 var a_doc = a_doc_array[j];
+                
                 // if a request for a new word came in while waiting for the response
                 // to the disambiguation requestion, the alpheios-pending attribute
                 // won't match and we will just discard the disabmiguation
@@ -606,218 +603,233 @@ Alph.xlate = {
                 // remove the old word tool icons from the popup, we need to refresh
                 // them with new tools after we incorporate the disambiguated output
                 Alph.$("#alph-word-tools",popup).remove();
+                var final_word_set = [];
 
-                // try to find an entry with the same lemma and replace the
-                // contents of the first inflection set for that entry
-                // with the treebank output
-                var lemma_match_set =
-                    Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
-                    .parents(".alph-entry");
-
-                // if we didn't have a match, and the treebank lemma has a 1
-                // at the end of it (which means 1st sense in the dictionary entry)
-                // drop the 1 and try again
-                if (lemma_match_set.length == 0 && new_hdwd.match(/1$/))
+                for (var e_index=0; e_index < new_entries.length; e_index++)
                 {
-                    new_hdwd = new_hdwd.replace(/1$/,'');
-                }
-
-                lemma_match_set =
-                    Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
-                    .parents(".alph-entry");
-                var pofs_match_set = [];
-                if (lemma_match_set.length >0)
-                {
-                    pofs_match_set =
-                        Alph.$('.alph-dict .alph-pofs[context='+new_pofs+']',lemma_match_set)
-                            .parents('.alph-entry');
-                    // if no matching lemma entries with matching part of speech
-                    // at the dictionary level were found, check the pofs at the
-                    // inflection set level
-                    if (pofs_match_set.length == 0)
+                    var new_entry = new_entries.eq(e_index);
+                    var new_dict = Alph.$(".alph-dict",new_entry);
+                    var new_hdwd = Alph.$(new_dict).attr("lemma-key");
+                    var new_infl_node =
+                        Alph.$(".alph-infl",new_entry).get(0);
+                    var new_pofs = Alph.$('.alph-pofs',new_entry).attr('context');
+                    // try to find an entry with the same lemma and replace the
+                    // contents of the first inflection set for that entry
+                    // with the treebank output
+                    var lemma_match_set =
+                        Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
+                        .parents(".alph-entry");
+    
+                    // if we didn't have a match, and the treebank lemma has a 1
+                    // at the end of it (which means 1st sense in the dictionary entry)
+                    // drop the 1 and try again
+                    if (lemma_match_set.length == 0 && new_hdwd.match(/1$/))
+                    {
+                        new_hdwd = new_hdwd.replace(/1$/,'');
+                    }
+    
+                    lemma_match_set =
+                        Alph.$(".alph-dict[lemma-key=" + new_hdwd +"]",popup)
+                        .parents(".alph-entry");
+                    var pofs_match_set = [];
+                    if (lemma_match_set.length >0)
                     {
                         pofs_match_set =
-                            Alph.$('.alph-infl-set .alph-pofs[context='+new_pofs+']',
-                                lemma_match_set).parents('.alph-entry');
+                            Alph.$('.alph-dict .alph-pofs[context='+new_pofs+']',lemma_match_set)
+                                .parents('.alph-entry');
+                        // if no matching lemma entries with matching part of speech
+                        // at the dictionary level were found, check the pofs at the
+                        // inflection set level
+                        if (pofs_match_set.length == 0)
+                        {
+                            pofs_match_set =
+                                Alph.$('.alph-infl-set .alph-pofs[context='+new_pofs+']',
+                                    lemma_match_set).parents('.alph-entry');
+                        }
                     }
-                }
-                // if entries with matching part of speech and lemma were
-                // found, just use the new entry -- we'll lose details
-                // on the inflection but they wouldn't be right anyway
-                if (pofs_match_set.length == 0)
-                {
-                    Alph.util.log("Can't find entry matching treebank");
-                    Alph.$(".alph-word",popup).remove();
-                    Alph.$('#alph-morph-credits',popup).before(
-                            Alph.$(".alph-word",new_text_node).clone(true)
-                                .addClass("tb-morph-word")
-                                .addClass("alph-word-first")
-                    );
-                }
-                else
-                {
-                    var good_entries = 0;
-                    // if we still have multiple matching entries at this point,
-                    // which seems unlikely, we may keep both if inflection
-                    // details match in both; iterate through them
-                    // looking for the matching inflection
-                    for (var i=0; i<pofs_match_set.length; i++)
+                    else
                     {
-                        var entry_match = pofs_match_set[i];
-                        var morph_pofs =
-                            Alph.$('.alph-dict .alph-pofs',entry_match)
-                                .attr('context');
-
-                        // if the part of speech indicated by the
-                        // treebank differs from the original
-                        // replace the entire dictionary section
-                        // (conj and declension will likely also be wrong
-                        // - but these aren't identified by the treebank)
-                        if (morph_pofs != new_pofs)
+                        Alph.util.log("Can't find entry matching treebank lemma: " + new_hdwd);
+                    }
+                    // if entries with matching part of speech and lemma were
+                    // found, just use the new entry -- we'll lose details
+                    // on the inflection but they wouldn't be right anyway
+                    if (pofs_match_set.length == 0)
+                    {
+                        Alph.util.log("Can't find entry matching treebank lemma: " + new_hdwd
+                            + " and pofs: " + new_pofs);
+                        final_word_set.push(
+                            Alph.$(new_entry).parent(".alph-word").clone(true));
+                    }
+                    else
+                    {
+                        var good_entries = 0;
+                        // if we still have multiple matching entries at this point,
+                        // which seems unlikely, we may keep both if inflection
+                        // details match in both; iterate through them
+                        // looking for the matching inflection
+                        for (var i=0; i<pofs_match_set.length; i++)
                         {
-                            Alph.$('.alph-dict',entry_match)
-                                .before(Alph.$(new_dict).clone(true))
-                                .remove();
-                        }
-                        var infl_set_possible = Alph.$(".alph-infl-set",entry_match);
-                        var infl_set_matches = [];
-
-                        for (var k=0; k<infl_set_possible.length;k++)
-                        {
-                            var infl_set = infl_set_possible[k];
-                            // insert the new inflection only into
-                            // an inflection set of the same part of speech
-                            // as the new entry
-                             var infl_pofs =
-                                Alph.$(".alph-pofs",infl_set)
-                                    .attr('context')
-                                || morph_pofs;
-                            if (infl_pofs ==
-                                Alph.$('.alph-pofs',new_entry).attr('context'))
+                            var entry_match = pofs_match_set[i];
+                            var morph_pofs =
+                                Alph.$('.alph-dict .alph-pofs',entry_match)
+                                    .attr('context');
+    
+                            // if the part of speech indicated by the
+                            // treebank differs from the original
+                            // replace the entire dictionary section
+                            // (conj and declension will likely also be wrong
+                            // - but these aren't identified by the treebank)
+                            if (morph_pofs != new_pofs)
                             {
-                                infl_set_matches.push(k);
+                                Alph.$('.alph-dict',entry_match)
+                                    .before(Alph.$(new_dict).clone(true))
+                                    .remove();
                             }
-                        }
-                        // if we found a single matching inflection set, let's
-                        // just use it - chances are it is right
-                        if (infl_set_matches.length == 1)
+                            var infl_set_possible = Alph.$(".alph-infl-set",entry_match);
+                            var infl_set_matches = [];
+    
+                            for (var k=0; k<infl_set_possible.length;k++)
+                            {
+                                var infl_set = infl_set_possible[k];
+                                // insert the new inflection only into
+                                // an inflection set of the same part of speech
+                                // as the new entry
+                                 var infl_pofs =
+                                    Alph.$(".alph-pofs",infl_set)
+                                        .attr('context')
+                                    || morph_pofs;
+                                if (infl_pofs ==
+                                    Alph.$('.alph-pofs',new_entry).attr('context'))
+                                {
+                                    infl_set_matches.push(k);
+                                }
+                            }
+                            // if we found a single matching inflection set, let's
+                            // just use it - chances are it is right
+                            if (infl_set_matches.length == 1)
+                            {
+                                var matched_infl_set =
+                                    Alph.$(infl_set_possible).eq(infl_set_matches[0]);
+                                Alph.$('.alph-infl',matched_infl_set).remove();
+                                if (new_infl_node != null)
+                                {
+                                    Alph.$(matched_infl_set)
+                                        .append(Alph.$(new_infl_node).clone(true));
+                                }
+                                Alph.$(matched_infl_set).siblings(".alph-infl-set").remove();
+                                good_entries = 1;
+                                Alph.$(entry_match).attr("tb-match",true);
+                            }
+                            // if we have multiple matching inflection sets,
+                            // prefer one which contains an matching inflection
+                            else if (infl_set_matches.length >1)
+                            {
+                                var merge_sets = [];
+                                for (var k=0; k<infl_set_matches.length;k++)
+                                {
+                                    merge_sets.push(
+                                        Alph.$(infl_set_possible).eq(infl_set_matches[k])
+                                        .clone(true));
+                                }
+                                // remove all the old inflection sets, we're going
+                                // to replace them with only inflection sets with
+                                // matching inflections
+                                Alph.$(infl_set_possible).remove();
+                                merge_sets.forEach(
+                                    function(a_infl_set)
+                                    {
+                                        var matches = 0;
+                                        Alph.$(".alph-infl",a_infl_set).each(
+                                            function(a_i)
+                                            {
+                                                if (a_lang_tool.match_infl(new_infl_node,this))
+                                                {
+                                                    matches++;
+                                                }
+                                            }
+                                        );
+                                        if (matches > 0)
+                                        {
+                                            Alph.$('.alph-infl',a_infl_set).remove();
+                                            Alph.$(a_infl_set)
+                                                .append(Alph.$(new_infl_node).clone(true));
+                                            Alph.$(entry_match).append(a_infl_set);
+                                            good_entries++;
+                                            Alph.$(entry_match).attr("tb-match",true);
+                                        }
+                                    }
+                                );
+                            }
+                            else
+                            {
+                                // if we don't have any matching inflection sets
+                                // just drop them all .. we'll create a new one
+                                Alph.$(infl_set_possible).remove();
+                            }
+                        } // end iteration through matching entries
+    
+                        if (good_entries == 0)
                         {
-                            var matched_infl_set =
-                                Alph.$(infl_set_possible).eq(infl_set_matches[0]);
-                            Alph.$('.alph-infl',matched_infl_set).remove();
+                            // if we couldn't find any matching inflection sets, then
+                            // just use the first matching entry, and create a new
+                            // inflection set
+                            for (var i=1; i<pofs_match_set.length; i++)
+                            {
+                                Alph.$(pofs_match_set[i]).remove();
+                            }
+                            pofs_match_set = pofs_match_set.eq(0);
+                            Alph.$(pofs_match_set).attr("tb-match",true);
                             if (new_infl_node != null)
                             {
-                                Alph.$(matched_infl_set)
-                                    .append(Alph.$(new_infl_node).clone(true));
+                                var original_form =
+                                    Alph.$(pofs_match_set).parents(".alph-word").attr("context");
+                                Alph.$(new_infl_node).clone(true).appendTo(pofs_match_set);
+                                Alph.$(".alph-infl",pofs_match_set)
+                                    .wrap('<div class="alph-infl-set" context="' + original_form + '"></div>',a_doc);
                             }
-                            Alph.$(matched_infl_set).siblings(".alph-infl-set").remove();
-                            good_entries = 1;
-                            Alph.$(entry_match).attr("tb-match",true);
                         }
-                        // if we have multiple matching inflection sets,
-                        // prefer one which contains an matching inflection
-                        else if (infl_set_matches.length >1)
+                        // remove any entries which didn't match
+                        Alph.$(".alph-entry:not([tb-match])",popup).remove();
+    
+                        for (var i=0; i<pofs_match_set.length; i++)
                         {
-                            var merge_sets = [];
-                            for (var k=0; k<infl_set_matches.length;k++)
-                            {
-                                merge_sets.push(
-                                    Alph.$(infl_set_possible).eq(infl_set_matches[k])
-                                    .clone(true));
+                           var entry_match = pofs_match_set[i];
+    
+                           // remove any pofs on the inflection set because
+                           // disambiguated output will always list the pofs
+                           // of the dictionary entry as the pofs of the inflection set
+                           Alph.$(".alph-infl-set .alph-pofs",entry_match).remove();
+    
+                           if (Alph.$(".alph-infl-set",entry_match).length == 0)
+                           {
+                                // if we don't have any inflection set at all, make
+                                // sure we remove the form label from the popup too
+                                Alph.$(".alpheios-form-label",entry_match).remove();
                             }
-                            // remove all the old inflection sets, we're going
-                            // to replace them with only inflection sets with
-                            // matching inflections
-                            Alph.$(infl_set_possible).remove();
-                            merge_sets.forEach(
-                                function(a_infl_set)
-                                {
-                                    var matches = 0;
-                                    Alph.$(".alph-infl",a_infl_set).each(
-                                        function(a_i)
-                                        {
-                                            if (a_lang_tool.match_infl(new_infl_node,this))
-                                            {
-                                                matches++;
-                                            }
-                                        }
-                                    );
-                                    if (matches > 0)
-                                    {
-                                        Alph.$('.alph-infl',a_infl_set).remove();
-                                        Alph.$(a_infl_set)
-                                            .append(Alph.$(new_infl_node).clone(true));
-                                        Alph.$(entry_match).append(a_infl_set);
-                                        good_entries++;
-                                        Alph.$(entry_match).attr("tb-match",true);
-                                    }
-                                }
-                            );
                         }
-                        else
-                        {
-                            // if we don't have any matching inflection sets
-                            // just drop them all .. we'll create a new one
-                            Alph.$(infl_set_possible).remove();
-                        }
-                    } // end iteration through matching entries
-
-                    if (good_entries == 0)
-                    {
-                        // if we couldn't find any matching inflection sets, then
-                        // just use the first matching entry, and create a new
-                        // inflection set
-                        for (var i=1; i<pofs_match_set.length; i++)
-                        {
-                            Alph.$(pofs_match_set[i]).remove();
-                        }
-                        pofs_match_set = pofs_match_set.eq(0);
-                        Alph.$(pofs_match_set).attr("tb-match",true);
-                        if (new_infl_node != null)
-                        {
-                            var original_form =
-                                Alph.$(pofs_match_set).parents(".alph-word").attr("context");
-                            Alph.$(new_infl_node).clone(true).appendTo(pofs_match_set);
-                            Alph.$(".alph-infl",pofs_match_set)
-                                .wrap('<div class="alph-infl-set" context="' + original_form + '"></div>',a_doc);
-                        }
+                        final_word_set.push(
+                            Alph.$(pofs_match_set).parents(".alph-word").clone(true));
                     }
-                    // remove any entries which didn't match
-                    Alph.$(".alph-entry:not([tb-match])",popup).remove();
 
-                    for (var i=0; i<pofs_match_set.length; i++)
+                }
+                // remove all the old word elements from the popup
+                Alph.$(".alph-word",popup).remove();
+                // iterate through the final word elements, adding them
+                // back into the popup
+                for (var i=0; i<final_word_set.length; i++)
+                {
+                    var word = final_word_set[i];
+                    if (i == 0)
                     {
-                       var entry_match = pofs_match_set[i];
-
-                       // remove any pofs on the inflection set because
-                       // disambiguated output will always list the pofs
-                       // of the dictionary entry as the pofs of the inflection set
-                       Alph.$(".alph-infl-set .alph-pofs",entry_match).remove();
-
-                       if (Alph.$(".alph-infl-set",entry_match).length == 0)
-                       {
-                            // if we don't have any inflection set at all, make
-                            // sure we remove the form label from the popup too
-                            Alph.$(".alpheios-form-label",entry_match).remove();
-                        }
+                        Alph.$(word).addClass("alph-word-first");
                     }
-                    var final_word_set =
-                        Alph.$(pofs_match_set).parents(".alph-word").clone(true);
-
-                    // remove all the old word elements from the popup
-                    Alph.$(".alph-word",popup).remove();
-                    // iterate through the final word elements, adding them
-                    // back into the popup
-                    for (var i=0; i<final_word_set.length; i++)
+                    else
                     {
-                        var word = final_word_set[i];
-                        if (i == 0)
-                        {
-                            Alph.$(word).addClass("alph-word-first");
-                        }
-                        Alph.$(word).addClass("tb-morph-word")
-                        Alph.$('#alph-morph-credits',popup).before(word);
+                        Alph.$(word).removeClass("alph-word-first");
                     }
+                    Alph.$(word).addClass("tb-morph-word")
+                    Alph.$('#alph-morph-credits',popup).before(word);
                 }
                 Alph.$(popup).prepend('<div id="alph-word-tools"/>');
                 a_lang_tool.add_word_tools(Alph.$(popup),a_alphtarget);

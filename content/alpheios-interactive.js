@@ -66,6 +66,14 @@ Alph.interactive = {
         var lang_tool = Alph.main.getLanguageTool(browser);
         var str = Alph.$("#alpheios-strings").get(0)
         
+        // quiz for multiple words at once is not yet supported
+        if (Alph.$("#alph-window #alph-text .alph-word",a_topdoc).length != 1)
+        {
+            Alph.$("#alph-window",a_topdoc).removeClass("alpheios-inline-query");
+            Alph.$("#alph-window #alph-text",a_topdoc).prepend(
+                ('<div class="alpheios-hint">' + str.getString('alph-query-notsupported') + '</div>'));
+            return;
+        }
         var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');
         if (source_align)
         {

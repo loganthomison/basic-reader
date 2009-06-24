@@ -219,7 +219,7 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         {
             pw_bro.addEventListener(new_trigger, Alph.main.doXlateText,false);
         }
-        Alph.tree.update_hint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
+        Alph.Tree.update_hint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
     }
     else if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW)
     {

@@ -156,7 +156,9 @@
                         <xsl:with-param name="paradigms" select="exsl:node-set($data)"/>
                         <xsl:with-param name="infl_constraint_data" select="exsl:node-set($infl_constraint_data)/match_for_infl"/>
                     </xsl:call-template>
-                    <xsl:apply-templates select="//disclaimer"/>
+                    <xsl:if test="$data != ''">
+                        <xsl:apply-templates select="//disclaimer"/>
+                    </xsl:if>
                 </div>
             </xsl:when>
             <xsl:otherwise>
