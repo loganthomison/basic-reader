@@ -79,11 +79,13 @@ Alph.Tree.prototype.show = function()
 
     // clear out the prior tree and any error
     Alph.$("#tree-error", treeDoc).empty();
+    Alph.$("#tree-hint", treeDoc).empty();
     Alph.$("#dependency-tree", treeDoc).empty();
     
     // reset the language-specific stylesheet
     Alph.$("link.alpheios-language-css",treeDoc).remove();
-    Alph.main.getLanguageTool(bro).addStyleSheet(treeDoc);
+    var lang_tool = Alph.main.getLanguageTool(bro);
+    lang_tool.addStyleSheet(treeDoc);
 
     var svgError = "";
 
@@ -165,6 +167,7 @@ Alph.Tree.prototype.show = function()
                     },
                     success: function(data, textStatus)
                     {
+                        Alph.Tree.update_hint(panel_obj,bro,lang_tool,false);
                         panel_obj.parse_tree(data, tbrefs);
                         panel_obj.update_panel_window({},'alph-tree-body');
                     }
@@ -216,8 +219,9 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         {
             pw_bro.addEventListener(new_trigger, Alph.main.doXlateText,false);
         }
+        Alph.tree.update_hint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
     }
-    if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW)
+    else if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW)
     {
         this.open();
         var trigger = Alph.main.getXlateTrigger();
@@ -226,6 +230,7 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             .get(0)
             .addEventListener(trigger, Alph.main.doXlateText,false);
     }
+    
     return;
 };
 
@@ -390,7 +395,9 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                 var window_doc = pw_bro.contentDocument;
                 var panel_tree = Alph.$("#dependency-tree", treeDoc).get(0);
                 var panel_error = Alph.$("#tree-error",treeDoc).html();
+                var panel_hint = Alph.$("#tree-hint",treeDoc).html();
                 Alph.$("#tree-error",window_doc).html(panel_error);
+                Alph.$("#tree-hint",window_doc).html(panel_hint);
                 Alph.$("#dependency-tree", window_doc).empty();
                 Alph.$("link.alpheios-lang-css",window_doc).remove();
                 Alph.$("head",window_doc).append(Alph.$("link.alpheios-lang-css",treeDoc).clone());
@@ -1078,3 +1085,26 @@ Alph.Tree.pre_open_check = function()
         Alph.main.panels['alph-tree-panel'].open()
     }
 };
+
+/**
+ * update the hint at the top of the tree diagram
+ * @param {Panel} a_panel_obj the panel object
+ * @param {Browser} a_bro the current browser
+ * @param {Alph.LanguageTool} a_lang_tool the current language tool
+ * @param {Boolean} a_update_window flag to indicate whether the panel window should be updated too 
+ */
+Alph.Tree.update_hint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
+{
+    var treeDoc = Alph.$("browser",a_panel_obj.panel_elem).get(0).contentDocument;
+    var trigger = Alph.main.getXlateTrigger(a_bro);
+    var mode = Alph.main.get_state_obj(a_bro).get_var("level");
+    var tree_hint = a_lang_tool.get_string_or_default('alph-tree-hint',[]);
+    var trigger_hint_prop = 'alph-trigger-hint-'+ trigger + '-'+mode;
+    var lang = a_lang_tool.get_language_string();
+    var trigger_hint = a_lang_tool.get_string_or_default(trigger_hint_prop,[lang]);
+    Alph.$("#tree-hint",treeDoc).html(tree_hint + trigger_hint);
+    if (a_update_window)
+    {
+        a_panel_obj.update_panel_window({},'alph-tree-body');
+    }
+}

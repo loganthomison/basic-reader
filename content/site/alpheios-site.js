@@ -145,7 +145,7 @@ Alph.site = {
         this.enable_toolbar(a_doc);
         var bro = Alph.main.getCurrentBrowser();
         var trigger = Alph.main.getXlateTrigger(bro);
-        this.add_trigger_hint(a_doc,trigger,Alph.main.getLanguageTool(bro));
+        this.add_trigger_hint(bro,a_doc,trigger,Alph.main.getLanguageTool(bro));
     },
     
     /**
@@ -708,7 +708,7 @@ Alph.site = {
         if (a_event_type == Alph.main.events.UPDATE_XLATE_TRIGGER)
         {
             this.add_trigger_hint(
-                doc,a_event_data.new_trigger,Alph.main.getLanguageTool(a_bro));
+                a_bro,doc,a_event_data.new_trigger,Alph.main.getLanguageTool(a_bro));
         }
         // observe change to config setting which enables interlinear
         else if (a_event_type == Alph.main.events.UPDATE_PREF 
@@ -721,17 +721,18 @@ Alph.site = {
     
     /**
      * Add trigger hint
+     * @param {Browser} a_bro the browser
      * @param {Document} a_doc the document
      * @param {String} a_trigger the current trigger
      * @pram {Alp.LanguageTool} a_lang_tool the current language tool 
      * 
      */
-    add_trigger_hint: function(a_doc,a_trigger,a_lang_tool)
+    add_trigger_hint: function(a_bro,a_doc,a_trigger,a_lang_tool)
     {
-        var hint_prop = 'alph-trigger-hint-'+a_trigger;
+        var mode = Alph.main.get_state_obj(a_bro).get_var("level");
+        var hint_prop = 'alph-trigger-hint-'+a_trigger+'-'+mode;
         var lang = a_lang_tool.get_language_string();
         var hint = a_lang_tool.get_string_or_default(hint_prop,[lang]);
-        Alph.util.log("Hint="+hint);
         Alph.$(".alpheios-trigger-hint",a_doc).html(hint);
     },
     

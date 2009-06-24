@@ -937,7 +937,8 @@ Alph.main =
         // if the tools are enabled, add the trigger hint to the ff toolbar, otherwise remove it
         if (this.is_enabled(bro))
         {
-            var hint_prop = 'alph-trigger-hint-'+this.getXlateTrigger(bro);
+            var mode = this.get_state_obj(bro).get_var("level");
+            var hint_prop = 'alph-trigger-hint-'+this.getXlateTrigger(bro) + '-'+mode;
             var lang_tool = this.getLanguageTool(bro);
             var lang = lang_tool.get_language_string();
             var hint = lang_tool.get_string_or_default(hint_prop,[lang]);

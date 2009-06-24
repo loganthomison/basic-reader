@@ -271,7 +271,7 @@ Alph.xlate = {
         if (treebank_ref)
         {
             var treebank_url = Alph.site.treebank_url(doc);
-            var treebank_wd = treebank_ref.split(' ')[0];
+            var treebank_wds = treebank_ref.split(' ');
 
             // if we're in the dependency tree diagram, we will have a treebank reference
             // but no treebank_url. get the treebank url from the main browser window
@@ -284,8 +284,24 @@ Alph.xlate = {
             }
             if (treebank_url)
             {
+                var word_param = treebank_url.match(/[\?&;]([^\|&|;|=]+)=WORD/);
+                if (word_param)
+                {
+                    word_param = word_param[1];
+                }
+                var wds = '';
+                treebank_wds.forEach(
+                    function(a_word,a_i)
+                    {
+                        if (a_i > 0)
+                        {
+                            wds = wds + '&' + word_param + '=';
+                        }
+                        wds = wds + encodeURIComponent(a_word);
+                    }
+                );
                 alphtarget.setTreebankQuery(
-                    treebank_url.replace(/WORD/, encodeURIComponent(treebank_wd)));
+                    treebank_url.replace(/WORD/,wds));
             }
         }
         // show output

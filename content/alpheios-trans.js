@@ -62,7 +62,7 @@ Alph.Translation.prototype.show = function()
     var trans_url = Alph.site.translation_url(bro.contentDocument);
     if (trans_url)
     {
-        Alph.util.log("loading translation from " + Alph.$(trans_url).attr("url"));
+        Alph.util.log("loading translation from " + trans_url);
         
         var trans_doc = 
                 Alph.$("browser",this.panel_elem).get(0).contentDocument;  
