@@ -1514,7 +1514,14 @@ Alph.main =
         
         if (ped_site)
         {
-            Alph.site.update_site_tool_status(bro.contentDocument);        
+            Alph.site.update_site_tool_status(bro.contentDocument);
+            // if we're in quiz mode, and the popup is still showing for a
+            // previous selection, clear it because the alignment click handler
+            // needs to be reset
+            if (Alph.interactive.enabled() && Alph.xlate.popupVisible(bro))
+            {
+                Alph.xlate.removePopup(bro);
+            }
         }    
             
           
