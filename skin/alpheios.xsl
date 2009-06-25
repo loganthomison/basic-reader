@@ -716,13 +716,7 @@
       alph-num="{$num}" alph-gend="{$gend}" alph-pofs="{translate($pofs,' ','_')}">
       <xsl:value-of select="."/>
       <xsl:if
-        test="(../pofs='pronoun' or
-               ../pofs='numeral' or
-               ../pofs='adjective' or
-               ../pofs='article' or
-               ../pofs='supine' or
-               ../pofs='verb participle' or
-               ((../pofs='noun') and (../gend!=../../dict/gend))) and ../gend">
+        test="$gend and not($gend = '') and not($gend = ../../dict/gend)">
         <xsl:choose>
           <xsl:when test="$gend='masculine'">
             <xsl:text> (m)</xsl:text>
