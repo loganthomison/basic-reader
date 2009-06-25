@@ -264,10 +264,17 @@ Alph_Quiz =
         var short_def_label = this.main_str.getString("alph-short-definition");
         $(".alph-query-defs",a_query_parent).append('<div class="alph-query-dict"/>');
         $(".alph-query-dict",a_query_parent).append(
-                '<div class="alpheios-label">' + short_def_label + '</div>',
-                $(".alph-hdwd",a_src_node).clone(true),
-                $(".alph-mean",a_src_node).clone(true),
-                $(".alph-dict-source",a_src_node).clone(true));
+            '<div class="alpheios-label">' + short_def_label + '</div>');
+         // it's possible to have multiple meanings for a single form
+        $(".alph-entry",a_src_node).each(
+            function()
+            {
+                $(".alph-query-dict",a_query_parent).append(
+                    $(".alph-hdwd",this).clone(true),
+                    $(".alph-mean",this).clone(true),
+                    $(".alph-dict-source",this).clone(true));
+            }
+        );
     },
     
     /**

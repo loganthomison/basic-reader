@@ -65,19 +65,36 @@ Alph.interactive = {
         var browser = Alph.util.browser_for_doc(a_topdoc) || Alph.main.getCurrentBrowser();
         var lang_tool = Alph.main.getLanguageTool(browser);
         var str = Alph.$("#alpheios-strings").get(0)
-        
+        var pofs_list = lang_tool.getpofs();
+        var valid_pofs = Alph.$('#alph-window #alph-text .alph-pofs',a_topdoc).attr('context');
+        var has_pofs = false;
+        for (var p_i = 0; p_i < pofs_list.length; p_i++)
+        {
+            if (pofs_list[p_i] == valid_pofs)
+            {
+                has_pofs = true;
+                break;
+            }
+        }
+   
         // quiz for multiple words at once is not yet supported
-        if (Alph.$("#alph-window #alph-text .alph-word",a_topdoc).length != 1)
+        // and don't do quiz if we don't know about the selected word's part of speech
+        if (Alph.$("#alph-window #alph-text .alph-word",a_topdoc).length != 1
+            || ! has_pofs)
         {
             Alph.$("#alph-window",a_topdoc).removeClass("alpheios-inline-query");
-            Alph.$("#alph-window #alph-text",a_topdoc).prepend(
-                ('<div class="alpheios-hint">' + str.getString('alph-query-notsupported') + '</div>'));
+            Alph.$("#alph-window .alph-word-first",a_topdoc)
+                .prepend('<div class="alpheios-hint">' + str.getString('alph-query-notsupported') + '</div>');
             return;
         }
         var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');
         if (source_align)
         {
             source_align = source_align.split(/\s|,/);
+        }
+        else
+        {
+            source_align = [];
         }
         var params =
         {

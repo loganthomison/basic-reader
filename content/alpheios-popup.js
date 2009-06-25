@@ -686,6 +686,7 @@ Alph.xlate = {
                                     .before(Alph.$(new_dict).clone(true))
                                     .remove();
                             }
+                            
                             var infl_set_possible = Alph.$(".alph-infl-set",entry_match);
                             var infl_set_matches = [];
     
@@ -704,6 +705,7 @@ Alph.xlate = {
                                 {
                                     infl_set_matches.push(k);
                                 }
+                                // TODO we should test gender here too....
                             }
                             // if we found a single matching inflection set, let's
                             // just use it - chances are it is right
