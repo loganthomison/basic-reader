@@ -1457,6 +1457,10 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
 {
     var lang_tool = this;
     var tools = Alph.$("#alph-word-tools",a_node).clone();
+    // if the node is from the dependency tree diagram, the call to select_browser_for_doc
+    // will fail, but it should be unnecessary in this case, because the tree won't be available
+    // if the browser that originated it isn't selected
+    var from_tree = Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length > 0;
     Alph.$('.alph-diagram-link',tools).click(
         function(a_e)
         {
@@ -1475,7 +1479,7 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
     Alph.$('.alph-inflect-link',tools).click(
         function(a_e)
         {
-            if (Alph.util.select_browser_for_doc(a_node.ownerDocument))
+            if (Alph.util.select_browser_for_doc(a_node.ownerDocument) || from_tree)
             {
                 lang_tool.handleInflections(a_e,a_node);
             }
@@ -1489,7 +1493,7 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
     Alph.$('.alph-dict-link',tools).click(
         function(a_event)
         {
-            if (Alph.util.select_browser_for_doc(a_node.ownerDocument))
+            if (Alph.util.select_browser_for_doc(a_node.ownerDocument) || from_tree)
             {
                 Alph.main.broadcast_ui_event(
                     Alph.main.events.SHOW_DICT);

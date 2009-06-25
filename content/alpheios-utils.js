@@ -57,7 +57,7 @@ Alph.util = {
     ALPHEIOS_URLS:
     {
         main: 'http://alpheios.net',
-        help:  'http://alpheios.net/content/firefox-extensions',
+        help:  'http://alpheios.net/content/release-notes',
         support: 'mailto:support@alpheios.net',
         content: 'http://alpheios.net/content/',
     },
