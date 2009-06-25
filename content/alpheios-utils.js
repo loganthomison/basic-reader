@@ -711,6 +711,48 @@ Alph.util = {
     },
     
     /**
+     * check to see if the supplied element is 'below the fold'
+     * of the viewport 
+     * @param {Element} a_el the element
+     * @return the # of pixels out of view
+     * @type Boolean
+     */
+    below_the_fold: function(a_el) {
+        var top = a_el.offsetTop;
+        var height = a_el.offsetHeight;
+
+        while(a_el.offsetParent) {
+            a_el = a_el.offsetParent;
+            top += a_el.offsetTop;
+        }
+
+        return(
+            (top + height) - (a_el.ownerDocument.defaultView.pageYOffset + 
+                a_el.ownerDocument.defaultView.innerHeight));
+    },
+    
+    /**
+     * check to see if the supplied element is 'right of screen'
+     * of the viewport 
+     * @param {Element} a_el the element
+     * @return the # of pixels out of view
+     * @type int
+     */
+    right_of_screen: function(a_el) {
+        var left = a_el.offsetLeft;
+        var width = a_el.offsetWidth;
+
+        while(a_el.offsetParent) {
+            a_el = a_el.offsetParent;
+            left += a_el.offsetLeft;
+        }
+
+        return(
+            (left + width) - (a_el.ownerDocument.defaultView.pageXOffset + 
+                a_el.ownerDocument.defaultView.innerWidth));
+    },
+    
+    /**
      * get the browser owner of a document
      * @param {Document} a_doc the document
      * @return the browser
@@ -757,5 +799,38 @@ Alph.util = {
     is_local_url: function(a_url)
     {
         return (a_url.match(/^http:\/\/localhost/) || a_url.match(/^chrome:/));
+    },
+    
+    /**
+     * load the leaving site popup
+     */
+    load_leaving_site: function()
+    {
+        // add the survey link if there is one
+        var survey = '';
+        try 
+        {   
+            survey = Components.classes["@mozilla.org/preferences-service;1"]
+                              .getService(Components.interfaces.nsIPrefService)
+                              .getBranch("extensions.alpheios.")
+                              .QueryInterface(Components.interfaces.nsIPrefBranch2)
+                              .getCharPref('survey.url');
+        }
+        catch(a_e)
+        {
+            survey = null;
+        }
+        if (survey && survey != '')
+        {
+            Alph.$("#survey-link").click(
+                function()
+                {
+                    window.opener.gBrowser.selectedTab = window.opener.gBrowser.addTab(survey);
+                }
+            ).attr("hidden",false);            
+            
+        }
+        // set the focus on the ok button
+        Alph.$('#alpheios-leaving-dialog').get(0).getButton('accept').focus()
     }
 };

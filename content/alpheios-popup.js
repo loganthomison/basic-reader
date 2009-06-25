@@ -436,11 +436,12 @@ Alph.xlate = {
                 a_lang_tool.add_infl_help(
                     Alph.$("#alph-text",a_doc),
                     a_alphtarget);
+                Alph.xlate.reposition_popup(Alph.$("#alph-window",a_doc));
             }
         );
 
 
-        var rp = a_alphtarget.getRangeParent()
+        var rp = a_alphtarget.getRangeParent();
 
         // re-highlight the translated range in the source document
         // This code fails for an svg element; For now just skip it
@@ -846,6 +847,7 @@ Alph.xlate = {
                 {
                     Alph.$("#alph-window[alpheios-pending=" + a_req_id +
                             "]",a_doc).get(0).removeAttribute("alpheios-pending");
+                    Alph.xlate.reposition_popup(Alph.$("#alph-window",a_doc));
                 }
                 catch(a_e)
                 {
@@ -992,15 +994,17 @@ Alph.xlate = {
         // move the popup to just below the mouse coordinates
         // (using height of current element isn't reliable because it might
         //  a single element which contains a large block of text)
+        var buffer = 12;
         if (a_elem)
         {
-            pageY = pageY + 12;
+            pageY = pageY + buffer;
         }
 
         popup.style.left = pageX + "px";
         popup.style.top = pageY + "px";
         popup.style.display = "";
-
+        Alph.$(popup).attr("alph-orig-y",pageY-buffer);
+        this.reposition_popup(popup);
         // add the original word to the browser's alpheios object so that the
         // other functions can access it
         alph_state.set_var("word",a_alphtarget.getWord());
@@ -1529,5 +1533,43 @@ Alph.xlate = {
             (a_e.data.start_x + x_m) + 'px';
         Alph.$("#alph-window",this.ownerDocument).get(0).style.top =
             (a_e.data.start_y + y_m) + 'px';
+    },
+    
+    /**
+     * reposition the popup to be in the viewport
+     * @param {Element} a_popup the popup element
+     */
+    reposition_popup: function(a_popup)
+    {
+        var popup_elem = Alph.$(a_popup).get(0);
+        if (popup_elem.ownerDocument != this.getLastDoc())
+        {
+            // only reposition for the popup in the original browser window,
+            // not the alph-window elements in the various panels
+            return;
+        }
+        var current_offset = Alph.$(a_popup).offset();
+        // when calculating the starting y position for the popup
+        // always start from the original location of the mouse click
+        var floor = Alph.$(a_popup).attr("alph-orig-y");
+        if (typeof floor == "undefined" || floor == null)
+        {
+            floor = current_offset.top;
+        }
+        // move the floor up a little bit to try to clear the selected
+        // word -- unfortunately calculating the height of the selected word is not reliable
+        floor = floor - 12;
+ 
+        var below_the_fold = Alph.util.below_the_fold(popup_elem);
+        var right_of_screen = Alph.util.right_of_screen(popup_elem);
+        if (below_the_fold > 0)
+        {
+            popup_elem.style.top = (floor - Alph.$(a_popup).height()) + 'px'; 
+        }
+        if (right_of_screen > 0)
+        {
+            popup_elem.style.left = (current_offset.left - right_of_screen) + 'px'; 
+        }
     }
+
 };

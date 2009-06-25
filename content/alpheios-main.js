@@ -1410,7 +1410,16 @@ Alph.main =
             this.autoToggle(bro);
             // reset the toolbar status
             this.toggle_toolbar();
-            this.show_leaving_site();
+            // show the leaving site popup, unless we're returning to the alpheios site
+            try
+            {
+                var new_host = bro.contentDocument.location.host;
+                if (! new_host.match(/alpheios\.(net|org)/))
+                {
+                    this.show_leaving_site();
+                }
+            }
+            catch(a_e){}
             return;
         }
         else if (this.is_enabled(bro))

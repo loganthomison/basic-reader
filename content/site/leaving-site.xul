@@ -14,18 +14,21 @@
         title="&alpheios.leaving.title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         buttons="accept" 
-        onload="document.getElementById('alpheios-leaving-dialog').getButton('accept').focus();" 
-        onaccept="this.close();">  
+        onload="Alph.util.load_leaving_site();" 
+        onaccept="this.close();">
+   <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />  
   <vbox flex="1">
     <description value="&alpheios.leaving.text;"/>
     <description value="&alpheios.leaving.thankyou;"/>
     <hbox flex="1">
         <description value="&alpheios.leaving.feedback.text;"/>
-        <label class="site-link" id="alpheios-feedback-link"
+    </hbox>
+    <hbox flex="1">
+    <label class="site-link" id="alpheios-feedback-link"
             onclick="window.opener.Alph.util.send_feedback();"
             value="&alpheios.menu.feedback;"/>
+        <label id="survey-link" class="site-link" value="&alpheios.leaving.do.survey;" hidden="true"/>
     </hbox>
-
   </vbox>
 </dialog>
 
