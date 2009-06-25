@@ -66,6 +66,14 @@
     display: none;
 }
 
+#alph-window.alpheios-inline-query .alph-title-bar {
+    display: block;
+}
+
+#alph-window.alpheios-inline-query .alph-close-button {
+    display: block;
+}
+
 #alph-window.alpheios-inline-query #alph-text, 
 #alph-window.alpheios-inline-query #alph-align-answer-prompt {
    display: block;

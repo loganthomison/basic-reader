@@ -1549,26 +1549,42 @@ Alph.xlate = {
             return;
         }
         var current_offset = Alph.$(a_popup).offset();
-        // when calculating the starting y position for the popup
-        // always start from the original location of the mouse click
-        var floor = Alph.$(a_popup).attr("alph-orig-y");
-        if (typeof floor == "undefined" || floor == null)
-        {
-            floor = current_offset.top;
-        }
-        // move the floor up a little bit to try to clear the selected
-        // word -- unfortunately calculating the height of the selected word is not reliable
-        floor = floor - 12;
- 
+        
         var below_the_fold = Alph.util.below_the_fold(popup_elem);
         var right_of_screen = Alph.util.right_of_screen(popup_elem);
+        
         if (below_the_fold > 0)
         {
-            popup_elem.style.top = (floor - Alph.$(a_popup).height()) + 'px'; 
+            // when calculating the starting y position for the popup
+            // always start from the original location of the mouse click
+            var floor = Alph.$(a_popup).attr("alph-orig-y");
+            if (typeof floor == "undefined" || floor == null)
+            {
+                floor = current_offset.top;
+            }
+            // move the floor up a little bit to try to clear the selected
+            // word -- unfortunately calculating the height of the selected word is not reliable
+            floor = floor - 12;
+     
+            // ceiling is the top of the viewport
+            var ceiling = popup_elem.ownerDocument.defaultView.pageYOffset;
+            
+            var new_top = floor - Alph.$(a_popup).height();
+            if (new_top < ceiling)
+            {
+                new_top = ceiling;
+            }
+            
+            popup_elem.style.top = new_top + 'px'; 
         }
         if (right_of_screen > 0)
         {
-            popup_elem.style.left = (current_offset.left - right_of_screen) + 'px'; 
+            var new_left = current_offset.left - right_of_screen;
+            if (new_left < 0)
+            {
+                new_left = 0;
+            }
+            popup_elem.style.left = new_left + 'px'; 
         }
     }
 

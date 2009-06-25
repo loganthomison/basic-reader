@@ -132,6 +132,7 @@ Alph.interactive = {
                     '</span>' +
                     '</div>'
                 );
+                Alph.xlate.reposition_popup(Alph.$("#alph-window",a_topdoc));
             
                 params.type = 'infl_query';
                 params.aligned_ids = [];

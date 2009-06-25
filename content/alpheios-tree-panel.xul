@@ -28,7 +28,7 @@
     </commandset>
              
     <!-- overlay the alpheios toolbar-->
-      <toolbar id="alpheios-toolbar-template"> 
+      <!--toolbar id="alpheios-toolbar-template"> 
         <toolbarbutton
             id="alpheios-tree-toggle"
             hidden="true"
@@ -37,7 +37,7 @@
             command="alpheios-tree-open-cmd"
             tooltiptext="&alpheios-tools-tree-tooltip;"
             class="toolbarbutton-icon" />
-      </toolbar>
+      </toolbar-->
 
     <!-- overlay the bottom panel -->
     <hbox id="alph-tree-box">
