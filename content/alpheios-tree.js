@@ -807,10 +807,10 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
 
     // set width and height
     var width = a_textSize[0];
-    if (a_treeSize[0] > width)
-        width = a_treeSize[0];
-    if (a_keySize[0] > width)
-        width = a_keySize[0];
+    if (a_fontSize + a_treeSize[0] > width)
+        width = a_fontSize + a_treeSize[0];
+    if (a_fontSize + a_keySize[0] > width)
+        width = a_fontSize + a_keySize[0];
     var height = a_textSize[1] + a_treeSize[1] + a_keySize[1];
     Alph.$("#dependency-tree", a_doc).get(0).setAttribute("width", width);
     Alph.$("#dependency-tree", a_doc).get(0).setAttribute("height", height);
