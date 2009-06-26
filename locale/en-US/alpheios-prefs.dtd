@@ -24,7 +24,7 @@
 <!ENTITY alpheios.prefs.panels.restore.defaults "Restore Defaults">
 <!ENTITY alpheios.prefs.panels.sticky "Interface Changes Sticky">
 <!ENTITY alpheios.prefs.panel.name "Panel Name">
-<!ENTITY alpheios.prefs.panel.ped "Pedagogical">
+<!ENTITY alpheios.prefs.panel.ped "Enhanced">
 <!ENTITY alpheios.prefs.panel.basic "Basic">
 <!ENTITY alpheios.prefs.panel.morph "Morphology Panel">
 <!ENTITY alpheios.prefs.panel.dict "Dictionary Panel">

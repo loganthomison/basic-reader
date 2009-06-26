@@ -1,5 +1,5 @@
 <!ENTITY alpheios.leaving.title "Thank You for Using Alpheios">
-<!ENTITY alpheios.leaving.thankyou "Thank you for participating in the Alpha release of Alpheios.">
-<!ENTITY alpheios.leaving.text "You have left an Alpheios-enabled site, and Alpheios has been turned off.">
-<!ENTITY alpheios.leaving.feedback.text "We are eager to receive your comments.">
+<!ENTITY alpheios.leaving.thankyou "Thank you for participating in the Alpha release.">
+<!ENTITY alpheios.leaving.text "You have left an enabled site, and Alpheios has been turned off.">
+<!ENTITY alpheios.leaving.feedback.text "">
 <!ENTITY alpheios.leaving.do.survey "Answer Survey">

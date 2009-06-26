@@ -18,11 +18,8 @@
         onaccept="this.close();">
    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />  
   <vbox flex="1">
-    <description value="&alpheios.leaving.text;"/>
-    <description value="&alpheios.leaving.thankyou;"/>
-    <hbox flex="1">
-        <description value="&alpheios.leaving.feedback.text;"/>
-    </hbox>
+    <label value="&alpheios.leaving.text;"/>
+    <label value="&alpheios.leaving.thankyou;"/>
     <hbox flex="1">
     <label class="site-link" id="alpheios-feedback-link"
             onclick="window.opener.Alph.util.send_feedback();"
