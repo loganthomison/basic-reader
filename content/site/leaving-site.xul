@@ -21,10 +21,11 @@
     <label value="&alpheios.leaving.text;"/>
     <label value="&alpheios.leaving.thankyou;"/>
     <hbox flex="1">
-    <label class="site-link" id="alpheios-feedback-link"
+        <label class="site-link" id="alpheios-feedback-link"
             onclick="window.opener.Alph.util.send_feedback();"
             value="&alpheios.menu.feedback;"/>
-        <label id="survey-link" class="site-link" value="&alpheios.leaving.do.survey;" hidden="true"/>
+        <spacer width="30px"/> 
+        <label id="survey-link" class="site-link" value="&alpheios.leaving.do.survey;" hidden="true" align="right"/>
     </hbox>
   </vbox>
 </dialog>
