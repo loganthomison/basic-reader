@@ -740,7 +740,7 @@ Alph.prefs = {
         // clear out any current contents of the list box
         while (listbox.hasChildNodes())
             listbox.removeChild(listbox.firstChild);
-        var selected_index=0;
+        var selected_index=-1;
         
         var key = 'alpheios-auto-enable-'+a_lang;
         site_list.split(/,/).forEach(
@@ -764,7 +764,7 @@ Alph.prefs = {
                 }
             }
         );
-        listbox.selectedIndex = selected_index || 0;
+        listbox.selectedIndex = selected_index;
     },
     
     /**
