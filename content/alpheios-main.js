@@ -1006,6 +1006,12 @@ Alph.main =
      */
     setXlateTrigger: function(a_bro, a_trigger)
     {
+        // trigger is hard-coded to dble-click in quiz mode
+        if (a_trigger == 'mousemove' && this.get_state_obj(a_bro).get_var("level") == this.levels.LEARNER)
+        {
+            alert(Alph.$("#alpheios-strings").get(0).getString('alph-trigger-force-dbleclick'));
+            return;
+        }
         // first, remove the old one, if any
         var old_trigger = this.removeXlateTrigger(a_bro);
         
