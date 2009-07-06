@@ -253,7 +253,7 @@
                 label="&alpheios-tools-grammar-label;"
                 command="alpheios-grammar-cmd"
                 tooltiptext="&alpheios-tools-grammar-tooltip;"/>
-            <toolbaritem id="alpheios-lookup-text-tbitem">
+            <toolbaritem id="alpheios-lookup-text-tbitem" observes="alpheios-learner-disabled">
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"
                     onkeypress="Alph.main.do_tb_lookup(event);"
