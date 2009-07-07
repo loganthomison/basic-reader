@@ -80,23 +80,20 @@
           <xsl:for-each select="infl[not(dial)]">
             <xsl:sort select="term/stem"/>
             <xsl:sort select="pofs/@order" data-type="number" order="descending"/>
-            <xsl:variable name="last-stem" select="term/stem"/>
-            <xsl:variable name="last-pofs" select="pofs"/>
-            <xsl:variable name="last-comp" select="comp"/>
             <xsl:variable name="preceding"
-              select="preceding-sibling::infl[(term/stem=$last-stem) and
-                                              (pofs=$last-pofs) and
-                                              ((not(comp) and not($last-comp)) or
-                                               (comp=$last-comp)) and
+              select="preceding-sibling::infl[(term/stem=current()/term/stem) and
+                                              (pofs=current()/pofs) and
+                                              ((not(comp) and not(current()/comp)) or
+                                               (comp=current()/comp)) and
                                                not(dial)]"/>
             <xsl:if test="count($preceding) = 0">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
-                <xsl:with-param name="inflections"
-                  select="../infl[(term/stem=$last-stem) and
-                                  (pofs=$last-pofs) and
-                                  ((not(comp) and not($last-comp)) or
-                                  (comp=$last-comp)) and
+                <xsl:with-param name="in"
+                  select="../infl[(term/stem=current()/term/stem) and
+                                  (pofs=current()/pofs) and
+                                  ((not(comp) and not(current()/comp)) or
+                                  (comp=current()/comp)) and
                                   not(dial)]"
                 />
               </xsl:call-template>
@@ -104,7 +101,7 @@
           </xsl:for-each>
           <!-- handle any forms that have no dialect and no stem or part of speech-->
           <xsl:call-template name="inflection-set">
-            <xsl:with-param name="inflections"
+            <xsl:with-param name="in"
               select="infl[not(dial) and (not(term/stem) or not(pofs))]"/>
           </xsl:call-template>
           <!-- process all forms having dialect -->
@@ -112,27 +109,23 @@
             <xsl:sort select="term/stem"/>
             <xsl:sort select="pofs/@order" data-type="number" order="descending"/>
             <xsl:sort select="dial"/>
-            <xsl:variable name="last-stem" select="term/stem"/>
-            <xsl:variable name="last-pofs" select="pofs"/>
-            <xsl:variable name="last-dial" select="dial"/>
-            <xsl:variable name="last-comp" select="comp"/>
             <xsl:variable name="preceding"
-              select="preceding-sibling::infl[(term/stem=$last-stem) and
-                                              (pofs=$last-pofs) and
-                                              (dial=$last-dial) and
-                                              ((not(comp) and not($last-comp)) or
-                                               (comp=$last-comp)) and
+              select="preceding-sibling::infl[(term/stem=current()/term/stem) and
+                                              (pofs=current()/pofs) and
+                                              (dial=current()/dial) and
+                                              ((not(comp) and not(current()/comp)) or
+                                               (comp=current()/comp)) and
                                               dial]">
             </xsl:variable>
             <xsl:if test="count($preceding) = 0">
               <!-- process all inflections having this form (stem and part-of-speech) -->
               <xsl:call-template name="inflection-set">
-                <xsl:with-param name="inflections"
-                  select="../infl[(term/stem=$last-stem) and
-                                  (pofs=$last-pofs) and
-                                  (dial=$last-dial) and
-                                  ((not(comp) and not($last-comp)) or
-                                   (comp=$last-comp)) and
+                <xsl:with-param name="in"
+                  select="../infl[(term/stem=current()/term/stem) and
+                                  (pofs=current()/pofs) and
+                                  (dial=current()/dial) and
+                                  ((not(comp) and not(current()/comp)) or
+                                   (comp=current()/comp)) and
                                   dial]"/>
               </xsl:call-template>
             </xsl:if>
@@ -140,20 +133,18 @@
           <!-- handle any forms that have dialect and no stem or part of speech-->
           <xsl:for-each select="infl[dial and (not(term/stem) or not(pofs))]">
             <xsl:sort select="dial"/>
-            <xsl:variable name="last-dial" select="dial"/>
-            <xsl:variable name="last-comp" select="comp"/>
             <xsl:variable name="preceding"
-              select="preceding-sibling::infl[(dial=$last-dial) and
-                                              ((not(comp) and not($last-comp)) or
-                                               (comp=$last-comp)) and
+              select="preceding-sibling::infl[(dial=current()/dial) and
+                                              ((not(comp) and not(current()/comp)) or
+                                               (comp=current()/comp)) and
                                               dial and
                                               (not(term/stem) or not(pofs))]"/>
             <xsl:if test="count($preceding) = 0">
               <xsl:call-template name="inflection-set">
-                <xsl:with-param name="inflections"
-                  select="../infl[(dial=$last-dial) and
-                                  ((not(comp) and not($last-comp)) or
-                                   (comp=$last-comp)) and
+                <xsl:with-param name="in"
+                  select="../infl[(dial=current()/dial) and
+                                  ((not(comp) and not(current()/comp)) or
+                                   (comp=current()/comp)) and
                                    dial and
                                    (not(term/stem) or not(pofs))]"/>
               </xsl:call-template>
@@ -405,305 +396,123 @@
   </xsl:template>
 
   <xsl:template name="inflection-set">
-    <xsl:param name="inflections"/>
-    <xsl:variable name="pofs" select="$inflections[1]/pofs"/>
+    <xsl:param name="in"/>
+    <xsl:variable name="pofs" select="$in[1]/pofs"/>
 
     <!-- if non-empty set -->
     <!-- ignore various parts of speech for which -->
     <!-- inflection adds nothing to dict info -->
     <xsl:if
-      test="$inflections and
-                  (not($pofs) or
-                   (($pofs != 'conjunction') and
-                    ($pofs != 'preposition') and
-                    ($pofs != 'interjection') and
-                    ($pofs != 'particle')))">
+      test="$in and
+           (not($pofs) or
+            (($pofs != 'conjunction') and
+             ($pofs != 'preposition') and
+             ($pofs != 'interjection') and
+             ($pofs != 'particle')))">
       <!-- add the term as the value of the context attribute for the
                  inflection set -->
-      <xsl:variable name="term" select="$inflections[1]/term"/>
-      <xsl:variable name="comp" select="$inflections[1]/comp"/>
+      <xsl:variable name="comp" select="$in[1]/comp"/>
       <div class="alph-infl-set">
         <xsl:attribute name="context">
           <xsl:call-template name="convert-text">
-            <xsl:with-param name="item" select="$inflections[1]/term"/>
+            <xsl:with-param name="item" select="$in[1]/term"/>
           </xsl:call-template>
         </xsl:attribute>
-        <xsl:apply-templates select="$term"/>
-        <xsl:if test="$inflections[1]/pofs != $inflections[1]/../dict[1]/pofs">
+        <xsl:apply-templates select="$in[1]/term"/>
+        <xsl:if test="$in[1]/pofs != $in[1]/../dict[1]/pofs">
           <xsl:call-template name="parenthesize">
-            <xsl:with-param name="items" select="$inflections[1]/pofs"/>
+            <xsl:with-param name="items" select="$in[1]/pofs"/>
             <xsl:with-param name="span-name">pofs</xsl:with-param>
-            <xsl:with-param name="span-context" select="$inflections[1]/pofs"/>
+            <xsl:with-param name="span-context" select="$in[1]/pofs"/>
           </xsl:call-template>
         </xsl:if>
         <xsl:call-template name="parenthesize">
-          <xsl:with-param name="items" select="$inflections[1]/dial"/>
+          <xsl:with-param name="items" select="$in[1]/dial"/>
           <xsl:with-param name="span-name">dial</xsl:with-param>
-          <xsl:with-param name="span-context" select="$inflections[1]/dial"/>
+          <xsl:with-param name="span-context" select="$in[1]/dial"/>
         </xsl:call-template>
+        <!-- extra info for matching, not displayed -->
+        <xsl:if test="$in[1]/derivtype">
+          <span>
+            <xsl:attribute name="class">alph-nopad alph-derivtype</xsl:attribute>
+            <xsl:attribute name="context">
+              <xsl:value-of select="$in[1]/derivtype"/>
+            </xsl:attribute>
+          </span>
+        </xsl:if>
+        <xsl:if test="$in[1]/stemtype">
+          <span>
+            <xsl:attribute name="class">alph-nopad alph-stemtype</xsl:attribute>
+            <xsl:attribute name="context">
+              <xsl:value-of select="$in[1]/stemtype"/>
+            </xsl:attribute>
+          </span>
+        </xsl:if>
+        <xsl:if test="$in[1]/morph">
+          <span>
+            <xsl:attribute name="class">alph-nopad alph-morphflags</xsl:attribute>
+            <xsl:attribute name="context">
+              <xsl:value-of select="$in[1]/morph"/>
+            </xsl:attribute>
+          </span>
+        </xsl:if>
 
         <!-- decide how to display form based on structure -->
         <xsl:choose>
 
           <!-- if inflections have case -->
-          <xsl:when test="$inflections/case">
-            <!-- process singular case list -->
-            <xsl:if test="count($inflections[num = 'singular']/case)">
-              <div class="alph-infl">
-                <xsl:text>Singular: </xsl:text>
-                <xsl:for-each select="$inflections[num = 'singular' and case]">
-                  <xsl:sort select="case/@order" data-type="number"
-                    order="descending"/>
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:apply-templates select="case"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <!--handle voice and tense -->
-                <xsl:for-each select="$inflections[num = 'singular' and tense]">
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:call-template name="item-plus-text-plus-context">
-                      <xsl:with-param name="item" select="tense"/>
-                    </xsl:call-template>
-                    <xsl:apply-templates select="voice"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <!-- handle comparative -->
-                <xsl:if test="$comp and ($comp != 'positive')">
-                  <xsl:apply-templates select="$inflections[1]/comp"/>
+          <xsl:when test="$in/case">
+            <!-- possible number values and captions -->
+            <xsl:variable name="values">
+              <value>
+                <xsl:attribute name="string">singular</xsl:attribute>
+                <xsl:attribute name="caption">Singular</xsl:attribute>
+              </value>
+              <value>
+                <xsl:attribute name="string">dual</xsl:attribute>
+                <xsl:attribute name="caption">Dual</xsl:attribute>
+              </value>
+              <value>
+                <xsl:attribute name="string">plural</xsl:attribute>
+                <xsl:attribute name="caption">Plural</xsl:attribute>
+              </value>
+              <value>
+                <xsl:attribute name="caption">Case</xsl:attribute>
+              </value>
+            </xsl:variable>
+            <!-- for each possible number value -->
+            <xsl:for-each select="exsl:node-set($values)/value">
+              <xsl:if test="@string">
+                <xsl:variable name="test" select="string(@string)"/>
+                <xsl:call-template name="case-inflection-set">
+                  <xsl:with-param
+                    name="in"
+                    select="$in[num = $test and (case|tense)]"/>
+                  <xsl:with-param name="caption" select="@caption"/>
+                </xsl:call-template>
+                <xsl:if test="not(@string)">
+                  <xsl:call-template name="case-inflection-set">
+                    <xsl:with-param
+                      name="in"
+                      select="$in[not(num) and (case|tense)]"/>
+                    <xsl:with-param name="caption" select="@caption"/>
+                  </xsl:call-template>
                 </xsl:if>
-              </div>
-            </xsl:if>
-
-            <!-- process dual case list -->
-            <xsl:if test="count($inflections[num = 'dual']/case)">
-              <div class="alph-infl">
-                <xsl:text>Dual: </xsl:text>
-                <xsl:for-each select="$inflections[num = 'dual' and case]">
-                  <xsl:sort select="case/@order" data-type="number"
-                    order="descending"/>
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:apply-templates select="case"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <!--handle voice and tense -->
-                <xsl:for-each select="$inflections[ num = 'dual' and tense]">
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:call-template name="item-plus-text-plus-context">
-                      <xsl:with-param name="item" select="tense"/>
-                    </xsl:call-template>
-                    <xsl:apply-templates select="voice"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <!-- handle comparative -->
-                <xsl:if test="$comp and ($comp != 'positive')">
-                  <xsl:apply-templates select="$inflections[1]/comp"/>
-                </xsl:if>
-
-              </div>
-            </xsl:if>
-
-            <!-- process plural case list -->
-            <xsl:if test="count($inflections[num = 'plural']/case)">
-              <div class="alph-infl">
-                <xsl:text>Plural: </xsl:text>
-                <xsl:for-each select="$inflections[num = 'plural' and case]">
-                  <xsl:sort select="case/@order" data-type="number"
-                    order="descending"/>
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:apply-templates select="case"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <xsl:for-each select="$inflections[ num = 'plural' and tense]">
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:call-template name="item-plus-text-plus-context">
-                      <xsl:with-param name="item" select="tense"/>
-                    </xsl:call-template>
-                    <xsl:apply-templates select="voice"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <!-- handle comparative -->
-                <xsl:if test="$comp and ($comp != 'positive')">
-                  <xsl:apply-templates select="$inflections[1]/comp"/>
-                </xsl:if>
-
-              </div>
-            </xsl:if>
-
-            <!-- process other case list -->
-            <xsl:if test="count($inflections[not(num)]/case)">
-              <div class="alph-infl">
-                <xsl:text>Case: </xsl:text>
-                <xsl:for-each select="$inflections[not(num) and case]">
-                  <xsl:sort select="case/@order" data-type="number"
-                    order="descending"/>
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:apply-templates select="case"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <xsl:for-each select="$inflections[ not(num) and tense]">
-                  <xsl:if test="count(preceding-sibling::infl[
-                    (string(current()/term/stem) = string(./term/stem)) and
-                    (string(current()/term/suff) = string(./term/suff)) and
-                    (string(current()/pofs) = string(./pofs)) and
-                    (string(current()/case) = string(./case)) and
-                    (string(current()/comp) = string(./comp)) and
-                    (string(current()/gend) = string(./gend)) and
-                    (string(current()/num) = string(./num)) and
-                    (string(current()/pers) = string(./pers)) and
-                    (string(current()/mood) = string(./mood)) and
-                    (string(current()/sort) = string(./sort)) and
-                    (string(current()/tense) = string(./tense)) and
-                    (string(current()/voice) = string(./voice))]) = 0">
-                    <xsl:call-template name="item-plus-text-plus-context">
-                      <xsl:with-param name="item" select="tense"/>
-                    </xsl:call-template>
-                    <xsl:apply-templates select="voice"/>
-                  </xsl:if>
-                </xsl:for-each>
-
-                <!-- handle comparative -->
-                <xsl:if test="$comp and ($comp != 'positive')">
-                  <xsl:apply-templates select="$inflections[1]/comp"/>
-                </xsl:if>
-
-              </div>
-            </xsl:if>
-
+              </xsl:if>
+            </xsl:for-each>
           </xsl:when>
           <!-- end when inflections have case -->
 
           <!-- verb inflection -->
           <!-- verbs with tense -->
-          <xsl:when test="$inflections/tense">
-            <xsl:for-each select="$inflections[tense]">
-              <xsl:if test="count(preceding-sibling::infl[
-                (string(current()/term/stem) = string(./term/stem)) and
-                (string(current()/term/suff) = string(./term/suff)) and
-                (string(current()/pofs) = string(./pofs)) and
-                (string(current()/case) = string(./case)) and
-                (string(current()/comp) = string(./comp)) and
-                (string(current()/gend) = string(./gend)) and
-                (string(current()/num) = string(./num)) and
-                (string(current()/pers) = string(./pers)) and
-                (string(current()/mood) = string(./mood)) and
-                (string(current()/sort) = string(./sort)) and
-                (string(current()/tense) = string(./tense)) and
-                (string(current()/voice) = string(./voice))]) = 0">
-                <div class="alph-infl">
-                  <xsl:call-template name="item-plus-text-plus-context">
-                    <xsl:with-param name="item" select="pers"/>
-                    <xsl:with-param name="suffix" select="' person'"/>
-                  </xsl:call-template>
-                  <xsl:call-template name="item-plus-text-plus-context">
-                    <xsl:with-param name="item" select="num"/>
-                    <xsl:with-param name="suffix" select="';'"/>
-                  </xsl:call-template>
-                  <xsl:call-template name="item-plus-text-plus-context">
-                    <xsl:with-param name="item" select="tense"/>
-                  </xsl:call-template>
-                  <xsl:call-template name="item-plus-text-plus-context">
-                    <xsl:with-param name="item" select="mood"/>
-                    <xsl:with-param name="suffix" select="';'"/>
-                  </xsl:call-template>
-                  <xsl:apply-templates select="voice"/>
-                </div>
-              </xsl:if>
-            </xsl:for-each>
+          <xsl:when test="$in/tense">
+            <xsl:call-template name="verb-inflection-set">
+              <xsl:with-param name="in" select="$in[tense]"/>
+            </xsl:call-template>
           </xsl:when>
 
           <!-- verbs with no tense -->
-          <xsl:when test="$inflections[1]/pofs = 'verb'">
+          <xsl:when test="$in[1]/pofs = 'verb'">
             <div class="alph-infl">
               <xsl:call-template name="item-plus-text-plus-context">
                 <xsl:with-param name="item" select="pers"/>
@@ -723,8 +532,8 @@
           <!-- end verb inflection -->
 
           <!-- adverb inflection -->
-          <xsl:when test="$inflections[1]/pofs = 'adverb'">
-            <xsl:if test="comp and (comp != 'positive')">
+          <xsl:when test="$in[1]/pofs = 'adverb'">
+            <xsl:if test="$comp and ($comp != 'positive')">
               <div class="alph-infl">
                 <xsl:apply-templates select="comp"/>
               </div>
@@ -736,7 +545,7 @@
           <xsl:otherwise>
             <div class="alph-infl">
               <xsl:apply-templates select="gend"/>
-              <xsl:if test="comp and (comp != 'positive')">
+              <xsl:if test="$comp and ($comp != 'positive')">
                 <xsl:apply-templates select="comp"/>
               </xsl:if>
             </div>
@@ -744,6 +553,159 @@
         </xsl:choose>
       </div>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="case-inflection-set">
+    <xsl:param name="in"/>
+    <xsl:param name="caption"/>
+
+    <xsl:for-each select="$in">
+      <xsl:sort select="case/@order" data-type="number" order="descending"/>
+      <xsl:variable name="cur-pos" select="position()"/>
+      <xsl:variable name="cur-key" select="concat(tense, '|', voice)"/>
+      <xsl:variable name="test">
+        <xsl:for-each select="$in">
+          <xsl:sort select="case/@order" data-type="number" order="descending"/>
+          <!-- if this is preceding inflection -->
+          <xsl:if test="$cur-pos > position()">
+            <xsl:variable name="key" select="concat(tense, '|', voice)"/>
+            <!-- and same tense/voice -->
+            <xsl:if test="$cur-key = $key">
+              <!-- flag it -->
+              <xsl:text>1</xsl:text>
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      <!-- if this is tense/voice combo we haven't seen yet -->
+      <xsl:if test="string-length($test) = 0">
+        <div class="alph-infl">
+          <!-- put out heading -->
+          <xsl:value-of select="$caption"/>
+          <xsl:if test="tense">
+            <xsl:text> </xsl:text>
+            <xsl:call-template name="item-plus-text-plus-context">
+              <xsl:with-param name="item" select="tense"/>
+              <xsl:with-param name="nopad" select="true()"/>
+            </xsl:call-template>
+          </xsl:if>
+          <xsl:if test="voice">
+            <xsl:text> </xsl:text>
+            <xsl:apply-templates select="voice">
+              <xsl:with-param name="nopad" select="true()"/>
+            </xsl:apply-templates>
+          </xsl:if>
+          <xsl:text>: </xsl:text>
+          <xsl:call-template name="tense-voice-inflection-set">
+            <xsl:with-param
+              name="in"
+              select="$in[concat(tense, '|', voice) = $cur-key]"/>
+          </xsl:call-template>
+        </div>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="tense-voice-inflection-set">
+    <xsl:param name="in"/>
+    <xsl:for-each select="$in">
+      <xsl:sort select="case/@order" data-type="number" order="descending"/>
+      <xsl:variable name="cur-pos" select="position()"/>
+      <xsl:variable name="cur-key" select="
+        concat(term/stem, '|',
+               term/suff, '|',
+               case, '|',
+               comp, '|',
+               gend, '|',
+               num, '|',
+               pers, '|',
+               mood, '|',
+               sort)"/>
+      <xsl:variable name="test">
+        <xsl:for-each select="$in">
+          <xsl:sort select="case/@order" data-type="number" order="descending"/>
+          <!-- if this is preceding inflection -->
+          <xsl:if test="$cur-pos > position()">
+            <xsl:variable name="key" select="
+              concat(term/stem, '|',
+                     term/suff, '|',
+                     case, '|',
+                     comp, '|',
+                     gend, '|',
+                     num, '|',
+                     pers, '|',
+                     mood, '|',
+                     sort)"/>
+            <!-- and same values -->
+            <xsl:if test="$cur-key = $key">
+              <!-- flag it -->
+              <xsl:text>1</xsl:text>
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      <!-- if this is inflection we haven't seen yet -->
+      <xsl:if test="string-length($test) = 0">
+        <xsl:if test="case">
+          <xsl:apply-templates select="case"/>
+        </xsl:if>
+        <xsl:if test="comp and (comp != 'positive')">
+          <xsl:apply-templates select="comp"/>
+        </xsl:if>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="verb-inflection-set">
+    <xsl:param name="in"/>
+    <xsl:for-each select="$in">
+      <xsl:variable name="cur-pos" select="position()"/>
+      <xsl:variable name="test">
+        <xsl:for-each select="$in">
+          <!-- if this is preceding inflection -->
+          <xsl:if test="$cur-pos > position()">
+            <!-- and same values -->
+            <xsl:if test="
+              (string($in[$cur-pos]/term/stem) = string(./term/stem)) and
+              (string($in[$cur-pos]/term/suff) = string(./term/suff)) and
+              (string($in[$cur-pos]/pofs) = string(./pofs)) and
+              (string($in[$cur-pos]/case) = string(./case)) and
+              (string($in[$cur-pos]/comp) = string(./comp)) and
+              (string($in[$cur-pos]/gend) = string(./gend)) and
+              (string($in[$cur-pos]/num) = string(./num)) and
+              (string($in[$cur-pos]/pers) = string(./pers)) and
+              (string($in[$cur-pos]/mood) = string(./mood)) and
+              (string($in[$cur-pos]/sort) = string(./sort)) and
+              (string($in[$cur-pos]/tense) = string(./tense)) and
+              (string($in[$cur-pos]/voice) = string(./voice))">
+              <!-- flag it -->
+              <xsl:text>1</xsl:text>
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      <!-- if this is inflection we haven't seen yet -->
+      <xsl:if test="string-length($test) = 0">
+        <div class="alph-infl">
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="pers"/>
+            <xsl:with-param name="suffix" select="' person'"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="num"/>
+            <xsl:with-param name="suffix" select="';'"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="tense"/>
+          </xsl:call-template>
+          <xsl:call-template name="item-plus-text-plus-context">
+            <xsl:with-param name="item" select="mood"/>
+            <xsl:with-param name="suffix" select="';'"/>
+          </xsl:call-template>
+          <xsl:apply-templates select="voice"/>
+        </div>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="term">
@@ -767,7 +729,16 @@
 
   <!--  Templates to handle simple text elements -->
   <xsl:template match="*">
-    <span class="alph-{name(.)}">
+    <xsl:param name="nopad" select="false()"/>
+    <span>
+      <xsl:attribute name="class">
+        <xsl:if test="$nopad">
+          <xsl:value-of select="concat('alph-nopad alph-', name(.))"/>
+        </xsl:if>
+        <xsl:if test="not($nopad)">
+          <xsl:value-of select="concat('alph-', name(.))"/>
+        </xsl:if>
+      </xsl:attribute>
       <xsl:value-of select="."/>
     </span>
   </xsl:template>
@@ -884,6 +855,8 @@
     <xsl:param name="suffix" select="''"/>
     <xsl:param name="context-prefix" select="''"/>
     <xsl:param name="context-suffix" select="''"/>
+    <xsl:param name="nopad" select="false()"/>
+
     <xsl:for-each select="$item">
       <xsl:variable name="item-name">
         <xsl:choose>
@@ -898,8 +871,18 @@
       <xsl:variable name="item-context">
         <xsl:value-of select="concat($context-prefix, ., $context-suffix)"/>
       </xsl:variable>
-      <span class="alph-{$item-name}"
-            context="{translate($item-context,' ','_')}">
+      <span>
+        <xsl:attribute name="class">
+          <xsl:if test="$nopad">
+            <xsl:value-of select="concat('alph-nopad alph-', $item-name)"/>
+          </xsl:if>
+          <xsl:if test="not($nopad)">
+            <xsl:value-of select="concat('alph-', $item-name)"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="context">
+          <xsl:value-of select="translate($item-context,' ','_')"/>
+        </xsl:attribute>
         <xsl:value-of select="$prefix"/>
         <xsl:value-of select="."/>
         <xsl:value-of select="$suffix"/>
