@@ -648,7 +648,7 @@ Alph.util = {
         var move_y = 0;
         if (left < a_el.ownerDocument.defaultView.pageXOffset)
         {
-            move_x = left - a_el.ownerDocument.defaultView.pageYOffset;
+            move_x = left - a_el.ownerDocument.defaultView.pageXOffset;
         }
         else if ((left + width) > 
                  (a_el.ownerDocument.defaultView.pageXOffset + 

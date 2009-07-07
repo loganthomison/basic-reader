@@ -265,9 +265,10 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                                textSize,
                                keySize,
                                fontSize);
-//      Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+        //Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         Alph.Tree.highlight_first(treeDoc, a_ids);
         Alph.Tree.highlight_word(treeDoc, a_ids[0]);
+        Alph.Tree.scroll_to_focus(treeDoc);
 //        Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
@@ -414,6 +415,7 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                     var w = parseInt(panel_tree.getAttribute("width"));
                     var h = parseInt(panel_tree.getAttribute("height"));
                     this.resize_panel_window(w,h);
+                    Alph.Tree.scroll_to_focus(window_doc);
                 }
                 catch(a_e)
                 {
@@ -841,7 +843,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
 {
     // find node of interest
     var focusNode = Alph.$("#" + a_id, a_doc);
-
+    
     // if no id or bad id
     if (focusNode.size() == 0)
     {
@@ -875,6 +877,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
         return;
     }
 
+    focusNode.get(0).setAttribute("focus-node",true);
     // gray everything out in tree
     Alph.$("#dependency-tree", a_doc).children("g").each(
     function()
@@ -1108,3 +1111,102 @@ Alph.Tree.update_hint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
         a_panel_obj.update_panel_window({},'alph-tree-body');
     }
 }
+    /**
+     * Scroll a document so that focus node is visible
+     * @param {Document} a_document the document containing the SVG diagram
+     */
+Alph.Tree.scroll_to_focus= function(a_doc)
+{
+    var focus_node = Alph.$("g[focus-node]",a_doc).get(0);
+    if (! focus_node)
+    {
+        return;
+    }
+    var top = 0;
+    var left = 0;
+    var width = 0;
+    var height = 0;
+    Alph.$(focus_node).parents("g").andSelf().each(
+        function()
+        {
+            
+            var transform = this.getAttribute("transform");
+            if (transform)
+            {
+                var coords = transform.match(/translate\(([\d|\.]+),\s*([\d|\.]+)\)/);
+                if (coords)
+                {
+                    try {
+                        
+                        left = left + parseInt(coords[1]);
+                        top = top + parseInt(coords[2]);
+                    }
+                    catch (a_e)
+                    {
+                        Alph.util.log("Invalid coordinates: " + a_e);
+                    }
+                }
+            }
+        }
+    );
+    Alph.$(focus_node).children().each(
+        function()
+        {
+            try {
+                var w = parseInt(this.getAttribute("width"));
+                var h = parseInt(this.getAttribute("height"));
+                if (w > width)
+                {
+                    width = w;
+                }
+                if (h > height)
+                {
+                    height = h;
+                }
+            }
+            catch (a_e){}
+        }
+    );
+    var move_x = 0;
+    var move_y = 0;
+    if (left < a_doc.defaultView.pageXOffset)
+    {
+        move_x = left - a_doc.defaultView.pageXOffset;
+    }
+    else if ((left + width) > 
+             (a_doc.defaultView.pageXOffset + 
+              a_doc.defaultView.innerWidth)
+            )
+    {
+        move_x = (left + width) - 
+             (a_doc.defaultView.pageXOffset + 
+              a_doc.defaultView.innerWidth);
+    }
+    
+    if (top < a_doc.defaultView.pageYOffset)
+    {
+        move_y = top - a_doc.defaultView.pageYOffset;
+    } 
+    else if ( (top >= a_doc.defaultView.pageYOffset) &&
+              ((top + height) > 
+               (a_doc.defaultView.pageYOffset +
+                a_doc.defaultView.innerHeight)
+              )
+            )
+    {
+        move_y = 
+            (top + height) - 
+            (a_doc.defaultView.pageYOffset +
+             a_doc.defaultView.innerHeight);
+    }
+    if (move_x != 0 || move_y != 0)
+    {
+        // we ought to be able to scroll by only the required amount to show the focus element
+        // but the calculation appears to be off, and I'm not sure why. Scrolling directly
+        // to the coordinates of the element does seem to bring it into focus fairly
+        // reliably.
+        a_doc.defaultView.scrollTo(left,top);
+    }
+};
+    
+    
