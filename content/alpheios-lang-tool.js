@@ -1133,10 +1133,11 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
     function(a_lemmas, a_success, a_error, a_complete)
 {
     var lang_obj = this;
+    var lastLemma = -1;
 
     // see if we can add any ids
-    Alph.$.map(a_lemmas,
-        function(a_lemma)
+    a_lemmas.forEach(
+        function(a_lemma, a_i)
         {
             // if no id found yet
             if (!a_lemma[0])
@@ -1154,16 +1155,30 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
             }
 
             // convert any lemma that has no id
-            if (!a_lemma[0] && a_lemma[1])
+            if (!a_lemma[0] && a_lemma[1] && a_lemma[3])
             {
                 // if conversion method specified, apply it
                 var cvt = lang_obj.lexiconSearch[a_lemma[3]]["convert"];
                 if (cvt)
                     a_lemma[1] = Alph.convert[cvt](a_lemma[1]);
             }
+
+            // remember last lemma with a lexicon
+            if (a_lemma[3])
+                lastLemma = a_i;
         });
     // TODO: What if no language is specified?
     // Should we handle multiple languages?
+
+    // remove any trailing unusable lemmas and check for empty set
+    a_lemmas.splice(lastLemma + 1, a_lemmas.length - (lastLemma + 1));
+    if (a_lemmas.length == 0)
+    {
+        // call error and completion routines
+        a_error("No results found", "");
+        a_complete();
+        return;
+    }
 
     // for each lemma
     var url = null;
@@ -1171,6 +1186,8 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
         function(a_lemma, a_i)
         {
             var code = a_lemma[3];
+            if (!code)
+                return;
 
             // build URL with id if available else lemma
             if (!url)
@@ -1223,7 +1240,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
                 // but only use real completion for last item
                 Alph.util.log("Calling dictionary at " + url);
                 lang_obj.do_default_dictionary_lookup(
-                    a_lemma[3],
+                    code,
                     url,
                     on_success,
                     a_error,
