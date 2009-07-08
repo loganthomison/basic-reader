@@ -1405,15 +1405,29 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
         );
     }
     // add language-specific dictionary link, if any
-    Alph.$("#alph-word-tools",a_node).append(this.getDictionaryLink());
-    // TODO the dictionary handler should be dinfed in Alph.Dict
-    // rather than here. also doesn't work from a detached window yet.
-    Alph.$('#alph-word-tools .alph-dict-link',a_node).click(
-        function(a_event)
+    var lemmaCount = 0;
+    Alph.$(".alph-dict",a_node).each(
+        function()
         {
-            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
+            if (this.getAttribute("lemma-key") ||
+                this.getAttribute("lemma-id"))
+            {
+                ++lemmaCount;
+            }
         }
     );
+    if (lemmaCount > 0)
+    {
+        Alph.$("#alph-word-tools",a_node).append(this.getDictionaryLink());
+        // TODO the dictionary handler should be defined in Alph.Dict
+        // rather than here. also doesn't work from a detached window yet.
+        Alph.$('#alph-word-tools .alph-dict-link',a_node).click(
+            function(a_event)
+            {
+                Alph.main.broadcast_ui_event(Alph.main.events.SHOW_DICT);
+            }
+        );
+    }
 
     // add the inflection tool, if any
     if (this.getFeature('alpheios-inflect') && this.canInflect(a_node))
