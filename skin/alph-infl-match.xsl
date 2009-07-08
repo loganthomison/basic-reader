@@ -132,6 +132,24 @@
                             '|')"/>
                     </xsl:if>
                 </xsl:variable>
+                <xsl:variable name="match_voice">
+                    <xsl:if test="$current_data/@voice">
+                        <xsl:value-of select="
+                            concat(
+                            '|',
+                            translate($current_data/@voice,' ','|'),
+                            '|')"/>
+                    </xsl:if>
+                </xsl:variable>
+                <xsl:variable name="match_tense">
+                    <xsl:if test="$current_data/@tense">
+                        <xsl:value-of select="
+                            concat(
+                            '|',
+                            translate($current_data/@tense,' ','|'),
+                            '|')"/>
+                    </xsl:if>
+                </xsl:variable>
                 <xsl:choose>
                     <xsl:when test="not($current_data/@decl) or
                             ($filtered_data/../..//span[contains(@class,'alph-decl') 
@@ -148,6 +166,10 @@
                                 contains($match_gend,concat('|',@alph-gend,'|'))
                                 or @alph-gend = 'all')
                             and ($match_num = '' or contains($match_num,concat('|',@alph-num,'|')))
+                            and ($match_voice = '' or (preceding-sibling::span[contains(@class,'alph-voice') and 
+                            contains($match_voice,concat('|',text(),'|'))]))
+                            and ($match_tense = '' or (preceding-sibling::span[contains(@class,'alph-tense')and 
+                            contains($match_tense,concat('|',@context,'|'))]))
                             ])"/>        
                     </xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
