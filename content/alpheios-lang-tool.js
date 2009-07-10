@@ -786,8 +786,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
                 "chrome://"
                 + this.getchromepkg()
                 + "/content/inflections/alph-infl-index.xml";
-        params.xslt_url =
-                "chrome://alpheios/skin/alph-infl-index.xsl";
+        params.xslt_processor = Alph.util.get_xslt_processor('alpheios','alph-infl-index.xsl');
     }
     params.source_node = a_node;
 

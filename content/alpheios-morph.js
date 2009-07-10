@@ -146,7 +146,7 @@ Alph.Morph.prototype.init_document = function(a_doc,a_doc_state)
 Alph.Morph.prototype.update_panel_window =
     function(a_panel_state,a_browser_id,a_browser_index)
 {
-    if (this.panel_window != null && ! this.panel_window.closed)
+    if (this.window_open())
     {
         var pw_bro =
             this.panel_window

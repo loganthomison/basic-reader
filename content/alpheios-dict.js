@@ -451,7 +451,7 @@ Alph.Dict.prototype.display_dictionary = function(
 Alph.Dict.prototype.update_panel_window =
     function(a_panel_state,a_browser_id,a_browser_index)
 {
-    if (this.panel_window != null && ! this.panel_window.closed)
+    if (this.window_open())
     {
         try
         {

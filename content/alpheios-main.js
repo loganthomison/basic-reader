@@ -1114,18 +1114,25 @@ Alph.main =
         target.setContextPos(0);
         
         lang_tool.handleConversion(target);
-        Alph.main.panels['alph-morph-panel'].open();
         var doc_array = [];
-        Alph.$(".alph-lexicon-output").each(
-            function() 
+        Alph.main.panels['alph-morph-panel'].get_current_doc().forEach(
+            function(a_doc)
             {
-                var doc = Alph.$(this).get(0).contentDocument
-                lang_tool.addStyleSheet(doc);
-                Alph.$("#alph-window",doc).css("display","block");
-                doc_array.push(doc);
+                lang_tool.addStyleSheet(a_doc);
+                Alph.$("#alph-window",a_doc).css("display","block");
+                doc_array.push(a_doc);
             }
         );
-        
+        Alph.main.panels['alph-dict-panel'].get_current_doc().forEach(
+            function(a_doc)
+            {
+                lang_tool.addStyleSheet(a_doc);
+                Alph.$("#alph-window",a_doc).css("display","block");
+                doc_array.push(a_doc);
+            }
+        );
+        Alph.main.panels['alph-morph-panel'].open();
+
         lang_tool.lexiconLookup(
             target,
             function(data)

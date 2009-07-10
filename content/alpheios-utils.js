@@ -584,47 +584,6 @@ Alph.util = {
     },
     
     /**
-     * Transforms an xml document, sending supplied parameters
-     * to the stylesheet
-     * @param {Node} a_target
-     * @return an Node containing the transformed text
-     * @type Node
-     */
-    transform: function(a_target)
-    {
-        this.xsltProcessor = new XSLTProcessor();
-        var p = new XMLHttpRequest();      
-        p.open("GET", a_target.xslt_url, false);
-        p.send(null);
-        var xslRef = p.responseXML;
-        this.xsltProcessor.importStylesheet(xslRef)
-        
-        p.open("GET",a_target.xml_url,false);
-        p.send(null);
-        var xmlRef = p.responseXML;
-        
-        var inflHTML = '';
-        try
-        {
-            // add the xslt parameters
-            for (var param in a_target.xslt_params)
-            {
-                this.xsltProcessor.setParameter("",param,a_target.xslt_params[param]);
-            }
-            var start = (new Date()).getTime();
-            inflHTML = this.xsltProcessor.transformToDocument(xmlRef);
-            var end = (new Date()).getTime();
-            this.log("Transformation time: " + (end-start));
-
-        }
-        catch (e)
-        {
-            this.log(e);
-        }
-        return inflHTML;
-    },
-
-    /**
      * Scroll a document so that supplied element is visible
      * if the element is above the fold, the document will scroll just until
      * it is in view at the top, and if the element is below the fold,
@@ -832,5 +791,51 @@ Alph.util = {
         }
         // set the focus on the ok button
         Alph.$('#alpheios-leaving-dialog').get(0).getButton('accept').focus()
+    },
+    
+    /**
+     * get xslt processor
+     * @param {String} a_ext_name the name of the extension
+     * @param {String} a_filename the name of the xslt file to import
+     * @return a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
+     * @type XSLTProcessor
+     */
+     get_xslt_processor: function(a_ext,a_filename)
+    {
+        var xsltProcessor = new XSLTProcessor();
+        
+        // first try to load and import using a chrome url
+        try
+        {
+            var chrome_url = 'chrome://'+ a_ext + '/content/xslt/' + a_filename;
+            var xmlDoc = document.implementation.createDocument("", "", null);
+            xmlDoc.async = false;
+            Alph.util.log("Loading xslt at " + chrome_url);
+            xmlDoc.load(chrome_url);
+            xsltProcessor.importStylesheet(xmlDoc);
+        }
+        catch(a_e)
+        {
+          // if that fails, try loading directly from the filesystem using XMLHttpRequest   
+          // see https://bugzilla.mozilla.org/show_bug.cgi?id=422502
+            try
+            {
+                var pkg_path = this.getExtensionBasePath(a_ext);
+                pkg_path.append('xslt');
+                pkg_path.append(a_filename);
+                var path_url = 'file:///' + pkg_path.path;
+                Alph.util.log("XHR Loading xslt at " + path_url);
+                var p = new XMLHttpRequest();      
+                p.open("GET", path_url, false);
+                p.send(null);
+                xsltProcessor.importStylesheet(p.responseXML);
+            }
+            catch(a_ee)
+            {
+                // if that fails, we're out of luck
+                Alph.util.log("Unable to load stylesheet " + a_filename + " in " + a_ext + " : " + a_e + "," + a_ee);
+            }
+        }
+        return xsltProcessor;
     }
 };

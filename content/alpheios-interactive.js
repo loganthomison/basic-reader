@@ -36,7 +36,16 @@ Alph.interactive = {
     {
         var query_win =
             Alph.main.get_state_obj(a_bro).get_var("windows")['alph-query-window'];
-        return (query_win != null && ! query_win.closed);
+        var window_open = false;
+        try 
+        {
+            window_open = (query_win != null && ! query_win.closed);
+        }
+        catch(a_e)
+        {
+            // FF 3.5 throws an error checking the .closed property of a closed chrome window
+        }
+        return window_open;
     },
     
     /**

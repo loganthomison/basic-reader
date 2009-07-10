@@ -47,16 +47,12 @@ Alph.infl = {
      */
     transform: function(a_target)
     {
-        this.xsltProcessor = new XSLTProcessor();
-        var p = new XMLHttpRequest();      
-        p.open("GET", a_target.xslt_url, false);
-        p.send(null);
-        var xslRef = p.responseXML;
-        this.xsltProcessor.importStylesheet(xslRef)
+        this.xsltProcessor = a_target.xslt_processor;
         
         var xmlRef;
         if (a_target.xml_url)
         {
+            var p = new XMLHttpRequest();
             p.open("GET",a_target.xml_url,false);
             p.send(null);
             xmlRef = p.responseXML;
@@ -147,7 +143,7 @@ Alph.infl = {
                 function() 
                 {
 
-                    if ((link_target.xml_url || link_target.xml_obj) && link_target.xslt_url)
+                    if ((link_target.xml_url || link_target.xml_obj) && link_target.xslt_processor)
                     {
                         var infl_html = Alph.infl.transform(link_target);
                         var infl_node = 

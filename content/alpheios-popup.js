@@ -59,11 +59,7 @@ Alph.xlate = {
         /* initialze the xsltProcessor if we haven't done so already */
         if (this.xsltProcessor == null)
         {
-            var xmlDoc = document.implementation.createDocument("", "", null);
-            xmlDoc.async = false;
-            xmlDoc.load("chrome://alpheios/skin/alpheios.xsl");
-            this.xsltProcessor = new XSLTProcessor();
-            this.xsltProcessor.importStylesheet(xmlDoc);
+            this.xsltProcessor = Alph.util.get_xslt_processor('alpheios','alpheios.xsl');
         }
         var wordHTML = '';
         try
@@ -1010,15 +1006,25 @@ Alph.xlate = {
         alph_state.set_var("word",a_alphtarget.getWord());
 
         var doc_array = [topdoc];
-        Alph.$(".alph-lexicon-output").each(
-            function()
+        
+        Alph.main.panels['alph-morph-panel'].get_current_doc().forEach(
+            function(a_doc)
             {
-                var doc = Alph.$(this).get(0).contentDocument
-                lang_tool.addStyleSheet(doc);
-                Alph.$("#alph-window",doc).css("display","block");
-                doc_array.push(doc);
+                lang_tool.addStyleSheet(a_doc);
+                Alph.$("#alph-window",a_doc).css("display","block");
+                doc_array.push(a_doc);
             }
         );
+        Alph.main.panels['alph-dict-panel'].get_current_doc().forEach(
+            function(a_doc)
+            {
+                lang_tool.addStyleSheet(a_doc);
+                Alph.$("#alph-window",a_doc).css("display","block");
+                doc_array.push(a_doc);
+            }
+        );
+
+       
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
         // the popup and any other lexicon
@@ -1099,9 +1105,15 @@ Alph.xlate = {
         for (var win in windows)
         {
             Alph.util.log("Checking status of window " + win);
-            if (windows[win] != null && ! windows[win].closed)
+            try {
+                if (typeof windows[win] != "undefined" && windows[win] != null && ! windows[win].closed)
+                {
+                    windows[win].close();
+                    windows[win] = null;
+                }
+            } catch(a_e)
             {
-                windows[win].close();
+                Alph.util.log("Error closing window " + win + " : " + a_e);
                 windows[win] = null;
             }
         }
@@ -1144,16 +1156,42 @@ Alph.xlate = {
             .get_var("windows");
 
         var a_window = windows[a_name];
+        
+        var update_args  = false;
+        var open_new_window = true;
+        try {
+            // if the window exists already, is open, has the same location
+            // and an update_args_callback property has been added to
+            // the window arguments, just call that with the new arguments
+            // rather than reloading the window
+            update_args = ( 
+                typeof a_window != "undefined" &&
+                a_window != null &&
+                ! a_window.closed &&
+                a_window.location.href == a_url &&
+                a_window.arguments &&
+                a_window.arguments[0].update_args_callback != null); 
+        }
+        catch (a_e)
+        {
+            Alph.util.log("Error checking window status for " + a_name + " : " + a_e);
+        }
+        try {
+            open_new_window = (typeof a_window == "undefined" || 
+                                a_window == null || 
+                                a_window.closed || 
+                                a_window_args);
+        }
+        catch (a_e)
+        {
+            Alph.util.log("Error checking open window status for " + a_name + " : " + a_e);
+        }
 
         // if the window exists already, is open, has the same location
         // and an update_args_callback property has been added to
         // the window arguments, just call that with the new arguments
         // rather than reloading the window
-        if (a_window &&
-            ! a_window.closed &&
-            a_window.location.href == a_url &&
-            a_window.arguments &&
-            a_window.arguments[0].update_args_callback != null)
+        if (update_args)
         {
             Alph.util.log("Calling update_args_callback for window " + a_name);
             a_window.arguments[0].update_args_callback(a_window_args);
@@ -1161,7 +1199,7 @@ Alph.xlate = {
         // if the window doesn't exist, or is closed, or has arguments
         // and didn't meet the prior condition,
         // reload it with the new arguments
-        else if (a_window == null || a_window.closed || a_window_args)
+        else if (open_new_window)
         {
 
             Alph.util.log("Opening new window named: " + a_name);
@@ -1335,7 +1373,8 @@ Alph.xlate = {
             // in the 2ndary window not the one showing the message
             Alph.$("#alph-secondary-loading",topdoc).remove();
 
-            // also check the morphology and dictionary windows
+            // also check the morphology panel (dictionary window doesn't 
+            // contain any links to new windows)
             Alph.main.panels['alph-morph-panel'].get_current_doc().forEach
             (
                 function(a_doc)
@@ -1343,12 +1382,7 @@ Alph.xlate = {
                     Alph.$("#alph-secondary-loading",a_doc).remove();
                 }
             );
-            Alph.$(".alph-lexicon-output").each(
-                function() {
-                    var doc = Alph.$(this).get(0).contentDocument;
-                    Alph.$("#alph-secondary-loading",doc).remove();
-                }
-            );
+           
         }
         catch(e)
         {
@@ -1398,16 +1432,27 @@ Alph.xlate = {
         Alph.$("#alph-window",last_doc).remove();
 
         // also clear the morphology and dictionary panels
-        Alph.$(".alph-lexicon-output").each(
-            function() {
-                var doc = Alph.$(this).get(0).contentDocument;
-                Alph.$("#alph-window",doc).html("");
+        Alph.main.panels['alph-morph-panel'].get_current_doc().forEach(
+            function(a_doc)
+            {
+                Alph.$("#alph-window",a_doc).html("");
                 if (a_lang_tool)
                 {
-                    a_lang_tool.removeStyleSheet(doc);
-                }
+                    a_lang_tool.removeStyleSheet(a_doc);
+                }            
             }
         );
+        Alph.main.panels['alph-dict-panel'].get_current_doc().forEach(
+            function(a_doc)
+            {
+                Alph.$("#alph-window",a_doc).html("");
+                if (a_lang_tool)
+                {
+                    a_lang_tool.removeStyleSheet(a_doc);
+                } 
+            }
+        );
+
         Alph.main.broadcast_ui_event(Alph.main.events.REMOVE_POPUP);
 
      },
@@ -1542,7 +1587,7 @@ Alph.xlate = {
     reposition_popup: function(a_popup)
     {
         var popup_elem = Alph.$(a_popup).get(0);
-        if (popup_elem.ownerDocument != this.getLastDoc())
+        if (!popup_elem || popup_elem.ownerDocument != this.getLastDoc())
         {
             // only reposition for the popup in the original browser window,
             // not the alph-window elements in the various panels

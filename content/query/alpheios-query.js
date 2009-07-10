@@ -44,6 +44,7 @@ Alph_Quiz =
      */
      load_query_window: function()
      {
+        Alph.util.init();
         this.query_template = {};
         
         var params = window.arguments[0];

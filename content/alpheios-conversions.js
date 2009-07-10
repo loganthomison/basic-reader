@@ -130,11 +130,7 @@ Alph.convert = {
         /* initialize the XSLT converter if we haven't done so already */
         if (this.u2bConverter == null)
         {
-            var xmlDoc = document.implementation.createDocument("", "", null);
-            xmlDoc.async = false;
-            xmlDoc.load("chrome://alpheios/skin/alpheios-uni2betacode.xsl");
-            this.u2bConverter = new XSLTProcessor();
-            this.u2bConverter.importStylesheet(xmlDoc);
+            this.u2bConverter = Alph.util.get_xslt_processor('alpheios','alpheios-uni2betacode.xsl');
         }
         var betaText = '';
         try
@@ -169,11 +165,7 @@ Alph.convert = {
         /* initialize the XSLT converter if we haven't done so already */
         if (this.uNormalizer == null)
         {
-            var xmlDoc = document.implementation.createDocument("", "", null);
-            xmlDoc.async = false;
-            xmlDoc.load("chrome://alpheios/skin/alpheios-normalize-greek.xsl");
-            this.uNormalizer = new XSLTProcessor();
-            this.uNormalizer.importStylesheet(xmlDoc);
+            this.uNormalizer = Alph.util.get_xslt_processor('alpheios','alpheios-normalize-greek.xsl');
         }
 
         // set defaults for missing params

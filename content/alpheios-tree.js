@@ -196,7 +196,7 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         var new_trigger = a_event_data.new_trigger;
         var old_trigger = a_event_data.old_trigger;
         var pw_bro = null;
-        if (this.panel_window != null && ! this.panel_window.closed)
+        if (this.window_open())
         {
             pw_bro =
                 this.panel_window
@@ -382,7 +382,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
 Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_browser_index)
 {
     // make sure to update the detached window document too...
-    if (this.panel_window != null && ! this.panel_window.closed)
+    if (this.window_open())
     {
         var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
         try

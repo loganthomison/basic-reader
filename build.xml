@@ -18,7 +18,7 @@
 	<property name="release.id" value="1.0alpha1" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
 	<property name="package" value="${app.name}-${release.id}.xpi"/>
-	<property name="extras" value="mhttpd,xsl,align_css,align_img"/>
+	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 	
@@ -109,6 +109,7 @@
 				<include name="install.rdf" />
 				<include name="defaults/**" />
 				<include name="modules/**" />
+				<include name="xslt/**" />
 				<include name="**/platform/**" />
 				<exclude name="**/.*" />
 			</fileset>

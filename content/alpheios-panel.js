@@ -279,10 +279,17 @@ Alph.Panel.prototype.update_status = function(a_status)
                 Alph.$(notifier).attr("checked", "false");
             }
             // if the panel is detached, close it 
-            if (this.panel_window != null && ! this.panel_window.closed )
+            if (this.window_open())
             {
-                this.panel_window.close();
-                this.panel_window = null;
+                try 
+                {
+                    this.panel_window.close();
+                    this.panel_window = null;
+                }
+                catch(a_e)
+                {
+                    Alph.util.log("Error closing window " + a_e)
+                }
                 // TODO - need to figure out how we want to handle detached panels
                 // across multiple tabs
             }
@@ -381,13 +388,10 @@ Alph.Panel.prototype.detach = function()
 Alph.Panel.prototype.restore = function()
 {
     // Close the window if it's not already
-    if (this.panel_window != null)
+    if (this.window_open())
     {
-        if (! this.panel_window.closed) 
-        { 
-            this.panel_window.close();
-        }
-        this.panel_window = null;          
+        this.panel_window.close();
+        this.panel_window = null;
     }
     
     var panel_state = this.get_browser_state(Alph.main.getCurrentBrowser());
@@ -424,9 +428,17 @@ Alph.Panel.prototype.hide = function(a_autoflag)
     // panel cleanup code.
     // a_autoflag can be used to distinguish between
     // when the user hides the panel vs. when the app does
-    if (this.panel_window != null && this.panel_window.closed)
+    if (this.panel_window != null)
     {
-        this.panel_window = null;    
+        var closed = true;
+        try {
+            closed = this.panel_window.closed;
+        } catch(a_e){ // in FF 3.5 the closed property isn't available for a closed chrome window
+        }
+        if (closed)
+        {
+            this.panel_window = null;
+        }
     }
     if (a_autoflag != null && a_autoflag)
     {
@@ -447,7 +459,7 @@ Alph.Panel.prototype.hide = function(a_autoflag)
 Alph.Panel.prototype.open = function()
 {    
     if (Alph.util.getPref('panels.inline.'+this.panel_id)
-        || (this.panel_window != null && ! this.panel_window.closed))
+        || (this.window_open()))
     {
         return this.update_status(this.show());
     }
@@ -666,7 +678,7 @@ Alph.Panel.prototype.is_visible_inline = function(a_bro)
 
 /**
  * Get the current document shown in the panel
- * @return the array of content document of the currently visible panel
+ * @return the array of content documents for the panel and panel_window
  * @type Array{Document}
  */
 Alph.Panel.prototype.get_current_doc = function(a_bro)
@@ -674,29 +686,23 @@ Alph.Panel.prototype.get_current_doc = function(a_bro)
     var panel_obj = this;
     var panel_state = this.get_browser_state(a_bro);
     var docs = [];
-    if (panel_state.status == Alph.Panel.STATUS_SHOW)
-    {
-        Alph.$("browser",panel_obj.panel_elem).each(
-            function()
+    Alph.$("browser",panel_obj.panel_elem).each(
+        function()
+        {
+            docs.push(this.contentDocument);
+            if (panel_obj.window_open())
             {
-                if (panel_obj.panel_window != null && ! panel_obj.panel_window.closed)
+                var pw_bro =
+                    panel_obj.panel_window
+                        .Alph.$("#" + panel_obj.panel_id + " browser#"+this.id)
+                        .get(0);
+                if (pw_bro)
                 {
-                    var pw_bro =
-                        panel_obj.panel_window
-                            .Alph.$("#" + panel_obj.panel_id + " browser#"+this.id)
-                            .get(0);
-                    if (pw_bro)
-                    {
-                        docs.push(pw_bro.contentDocument);
-                    }
-                }
-                else
-                {
-                    docs.push(this.contentDocument);
+                    docs.push(pw_bro.contentDocument);
                 }
             }
-        );
-    }
+        }
+    );
     return docs;
 }
 
@@ -747,7 +753,7 @@ Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
     
     // if the panel is detached, need to jump through some hoops
     // to get the correct language tool from the opener window
-    if (panel_obj.panel_window != null && ! panel_obj.panel_window.closed)
+    if (panel_obj.window_open())
     {
         Alph.$("browser",panel_obj.panel_elem).each(
             function()
@@ -778,6 +784,23 @@ Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
     {
         Alph.main.execute_lang_command(a_event);
     }
+};
+
+/**
+ * Check to see if the detached panel window is open
+ */
+Alph.Panel.prototype.window_open = function()
+{
+    var open = false;
+    try 
+    {
+        open = (this.panel_window != null && ! this.panel_window.closed );
+    }
+    catch (a_e)
+    {
+        // FF 3.5 throws an error checking properties on closed window objects   
+    }
+    return open;
 };
 
 
