@@ -65,9 +65,11 @@ Alph.interactive = {
       */
      openQueryDisplay: function(a_topdoc,a_target)
      {
+        var popup = a_topdoc.getElementById('alph-window');
         if (! this.enabled())
         {
             // don't do anything if the interactive features aren't enabled
+            Alph.$(popup).removeClass("query-pending");
             return;
         }
         
@@ -75,7 +77,7 @@ Alph.interactive = {
         var lang_tool = Alph.main.getLanguageTool(browser);
         var str = Alph.$("#alpheios-strings").get(0)
         var pofs_list = lang_tool.getpofs();
-        var valid_pofs = Alph.$('#alph-window #alph-text .alph-pofs',a_topdoc).attr('context');
+        var valid_pofs = Alph.$('#alph-text .alph-pofs',popup).attr('context');
         var has_pofs = false;
         for (var p_i = 0; p_i < pofs_list.length; p_i++)
         {
@@ -88,11 +90,11 @@ Alph.interactive = {
    
         // quiz for multiple words at once is not yet supported
         // and don't do quiz if we don't know about the selected word's part of speech
-        if (Alph.$("#alph-window #alph-text .alph-word",a_topdoc).length != 1
+        if (Alph.$("#alph-text .alph-word",popup).length != 1
             || ! has_pofs)
         {
-            Alph.$("#alph-window",a_topdoc).removeClass("alpheios-inline-query");
-            Alph.$("#alph-window .alph-word-first",a_topdoc)
+            Alph.$(popup).removeClass("alpheios-inline-query").removeClass("query-pending");
+            Alph.$(".alph-word-first",popup)
                 .prepend('<div class="alpheios-hint">' + str.getString('alph-query-notsupported') + '</div>');
             return;
         }
@@ -109,7 +111,7 @@ Alph.interactive = {
         {
             lang_tool: lang_tool,
             main_str: str,
-            source_node: Alph.$("#alph-window #alph-text",a_topdoc).get(0),
+            source_node: Alph.$("#alph-text",popup).get(0),
             source_align: source_align || [],
             transform: Alph.xlate.transform,
 
@@ -122,10 +124,10 @@ Alph.interactive = {
         {
             if (source_align.length > 0)
             {
-                var selected_word = Alph.$(".alph-word",a_topdoc).attr("context");
+                var selected_word = Alph.$(".alph-word",popup).attr("context");
                 var src_lang = lang_tool.source_language; 
-                Alph.$("#alph-window",a_topdoc).addClass("alpheios-inline-query");
-                Alph.$("#alph-window #alph-text",a_topdoc).append(
+                Alph.$(popup).addClass("alpheios-inline-query");
+                Alph.$("#alph-text",popup).append(
                     '<div id="alph-inline-query-instruct">' +
                     str.getFormattedString("alph-inline-query-instruct",[selected_word]) +
                     '</div>' +
@@ -141,7 +143,7 @@ Alph.interactive = {
                     '</span>' +
                     '</div>'
                 );
-                Alph.xlate.reposition_popup(Alph.$("#alph-window",a_topdoc));
+                Alph.xlate.reposition_popup(Alph.$(popup).removeClass("query-pending"));
             
                 params.type = 'infl_query';
                 params.aligned_ids = [];
@@ -153,7 +155,7 @@ Alph.interactive = {
             {
                 // hide the popup - but don't call hidePopup because that resets
                 // state which we might need
-                Alph.$("#alph-window",a_topdoc).css("display","none");
+                Alph.$(popup).css("display","none").removeClass("query-pending");
                 params.type = 'infl_query';    
                 params.target= a_target;
                 this.openQueryWindow(params);
@@ -163,7 +165,7 @@ Alph.interactive = {
         {
             // hide the popup - but don't call hidePopup because that resets
             // state which we might need
-            Alph.$("#alph-window",a_topdoc).css("display","none");
+            Alph.$(popup).css("display","none").removeClass("query-pending");
             params.type = 'full_query';    
             params.target= a_target;
             this.openQueryWindow(params);

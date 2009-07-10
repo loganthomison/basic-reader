@@ -1456,6 +1456,14 @@ Alph.main =
             // inject the pedagogical site with the alpheios-specific elements
             Alph.site.setup_page(bro.contentDocument,
                 Alph.Translation.INTERLINEAR_TARGET_SRC);
+            
+            // if we're in quiz mode, and the popup is still showing for a
+            // previous selection, clear it because the alignment click handler
+            // needs to be reset
+            if (Alph.interactive.enabled() && Alph.xlate.popupVisible(bro))
+            {
+                Alph.xlate.hidePopup();
+            }
         }
         
         // notify the auto-enable observers
@@ -1537,13 +1545,6 @@ Alph.main =
         if (ped_site)
         {
             Alph.site.update_site_tool_status(bro.contentDocument);
-            // if we're in quiz mode, and the popup is still showing for a
-            // previous selection, clear it because the alignment click handler
-            // needs to be reset
-            if (Alph.interactive.enabled() && Alph.xlate.popupVisible(bro))
-            {
-                Alph.xlate.removePopup(bro);
-            }
         }    
             
           

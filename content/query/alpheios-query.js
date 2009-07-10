@@ -111,6 +111,7 @@ Alph_Quiz =
         $(".alph-query-element .loading",doc).remove();
         $(".alph-select-pofs",doc).css("display","block");
         $(".alph-defs-select,",doc).css("display","block");
+        window.focus();
      },
      
      load_query_head: function(a_params)

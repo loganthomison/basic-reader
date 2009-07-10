@@ -407,32 +407,38 @@ Alph.xlate = {
                 + encodeURIComponent(a_alphtarget.getWord());
         }
         a_lang_tool.postTransform(alphtext_node);
+        if (Alph.interactive.enabled())
+        {
+            Alph.$("#alph-window",a_topdoc).addClass("query-pending");
+        }
+
         a_doc_array.forEach(
             function(a_doc)
             {
+                var alph_node = Alph.$("#alph-window",a_doc);
                 if (disambiguate_id)
                 {
-                    Alph.$("#alph-window",a_doc).attr("alpheios-pending",
+                    alph_node.attr("alpheios-pending",
                                                       disambiguate_id);
                 }
-                Alph.$("#alph-window",a_doc).append(
+                alph_node.append(
                                                 Alph.$(alphtext_node).clone());
                 // add the key to the language tool to the element
-                Alph.$("#alph-text",a_doc).attr('alph-lang',
+                Alph.$("#alph-text",alph_node).attr('alph-lang',
                     a_lang_tool.source_language);
                 // add language-specific click handler, if any
                 a_lang_tool.contextHandler(a_doc);
 
-                Alph.$("#alph-text",a_doc).prepend(
+                Alph.$("#alph-text",alph_node).prepend(
                                                 '<div id="alph-word-tools"/>');
                 a_lang_tool.add_word_tools(
-                    Alph.$("#alph-text",a_doc),
+                    Alph.$("#alph-text",alph_node),
                     a_alphtarget);
 
                 a_lang_tool.add_infl_help(
-                    Alph.$("#alph-text",a_doc),
+                    Alph.$("#alph-text",alph_node),
                     a_alphtarget);
-                Alph.xlate.reposition_popup(Alph.$("#alph-window",a_doc));
+                Alph.xlate.reposition_popup(alph_node);
             }
         );
 
@@ -503,10 +509,6 @@ Alph.xlate = {
                                                      a_alphtarget,
                                                      a_doc_array,
                                                      a_lang_tool);
-                        Alph.main.broadcast_ui_event(
-                                                Alph.main.events.SHOW_TRANS);
-                        Alph.interactive.openQueryDisplay(
-                                                a_topdoc,a_alphtarget);
                     }
                 }
             );
@@ -552,8 +554,7 @@ Alph.xlate = {
                     try
                     {
                         Alph.$("#alph-window[alpheios-pending="+a_req_id+"]",
-                               a_doc).get(0).removeAttribute(
-                                                "alpheios-pending");
+                                   a_doc).get(0).removeAttribute("alpheios-pending");
                     }
                     catch(a_e){
                         //it's possible that a new request came in and removed the
@@ -841,9 +842,10 @@ Alph.xlate = {
                 // popup
                 try
                 {
-                    Alph.$("#alph-window[alpheios-pending=" + a_req_id +
-                            "]",a_doc).get(0).removeAttribute("alpheios-pending");
+                    Alph.$("#alph-window[alpheios-pending="+a_req_id+"]",
+                               a_doc).get(0).removeAttribute("alpheios-pending");
                     Alph.xlate.reposition_popup(Alph.$("#alph-window",a_doc));
+                    
                 }
                 catch(a_e)
                 {
@@ -854,6 +856,8 @@ Alph.xlate = {
         }
 
         Alph.$("#alph-window-anchor",a_topdoc).focus();
+        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);            
+        Alph.interactive.openQueryDisplay(a_doc_array[0],a_alphtarget);
     },
 
     /**
