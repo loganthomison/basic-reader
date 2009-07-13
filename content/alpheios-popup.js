@@ -1386,7 +1386,13 @@ Alph.xlate = {
                     Alph.$("#alph-secondary-loading",a_doc).remove();
                 }
             );
-           
+            
+            // and the query window
+            var qdoc = Alph.interactive.getQueryDoc();
+            if (qdoc)
+            {
+                    Alph.$("#alph-secondary-loading",qdoc).remove();
+            }
         }
         catch(e)
         {

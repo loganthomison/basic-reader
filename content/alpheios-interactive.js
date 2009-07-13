@@ -405,5 +405,21 @@ Alph.interactive = {
         {
             Alph.main.get_state_obj(a_bro).get_var("windows")['alph-query-window'].close();
         }
+     },
+     
+     /**
+      * get the query document
+      * @return the query document
+      * @type Document
+      */
+     getQueryDoc: function()
+     {
+        var doc = null;
+        if (this.query_visible())
+        {
+            var win = Alph.main.get_state_obj().get_var("windows")['alph-query-window'];
+            doc = win.$("#alph-query-frame").get(0).contentDocument;
+        }
+        return doc;
      }
 }

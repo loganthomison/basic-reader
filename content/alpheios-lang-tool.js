@@ -1530,6 +1530,8 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
         {
             if (Alph.util.select_browser_for_doc(a_node.ownerDocument) || from_tree)
             {
+                var loading_msg = document.getElementById("alpheios-strings").getString("alph-loading-inflect");
+                Alph.xlate.showLoadingMessage([tools,loading_msg]);
                 lang_tool.handleInflections(a_e,a_node);
             }
             else
