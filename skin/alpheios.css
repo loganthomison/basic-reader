@@ -176,7 +176,7 @@ div.alph-morph {
     color: #0E2233;
 }
 
-.alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs {
+.alph-case,.alph-mood,.alph-decl,.alph-conj,.alph-pofs,.alph-pofs-extra {
 	color:#3E8D9C;
 	font-weight: bold;
 	cursor: pointer;
@@ -197,7 +197,11 @@ div.alph-morph {
 
 .alph-infl-set .alph-pofs,
 .alph-infl-set .alph-decl,
-.alph-infl-set .alph-text {
+.alph-infl-set .alph-formatting {
+    font-size: smaller;
+}
+
+.alph-mean .alph-mean-extra {
     font-size: smaller;
 }
 
