@@ -822,7 +822,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         params.callback = function() {};
         loading_node = {};
     }
-        
+     
     Alph.xlate.openSecondaryWindow(
                     "alph-infl-table",
                     "chrome://alpheios/content/alpheios-infl.xul",
@@ -1473,9 +1473,11 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             'alt="' + inflect_alt_text + '"/>' + 
             '<div class="alpheios-icon-label">' + inflect_alt_text + '</div></div>'
         );
+        var loading_msg = document.getElementById("alpheios-strings").getString("alph-loading-inflect");
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
             function(a_e)
             {
+                Alph.xlate.showLoadingMessage([tools_node,loading_msg]);
                 lang_tool.handleInflections(a_e,a_node);
                 return false;
             }
