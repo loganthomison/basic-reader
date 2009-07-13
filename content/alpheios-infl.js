@@ -90,6 +90,12 @@ Alph.infl = {
     onLoad: function() {
         var link_target = window.arguments[0];
 
+        // if a callback function was passed in in the window
+        // arguments, execute it
+        if (link_target && typeof link_target.callback == 'function') {
+            link_target.callback();
+        }
+        
         var infl_browser = $("#alph-infl-browser");
         
         // if we don't have a requested part of speech, show the index

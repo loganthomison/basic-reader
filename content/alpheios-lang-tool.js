@@ -808,12 +808,29 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         height:"620",
         screen: Alph.util.getPref("shift.window.loc"),
     }
+    // add a callback to hide the loading message
+    var loading_msg = document.getElementById("alpheios-strings").getString("alph-loading-inflect");
+
+    var loading_node;
+    if (Alph.$(a_node).length >0)
+    {
+        params.callback = function() { Alph.xlate.hideLoadingMessage(a_node.ownerDocument) };
+        loading_node = Alph.$("#alph-word-tools",a_node).get(0);
+    }
+    else
+    {
+        params.callback = function() {};
+        loading_node = {};
+    }
+        
     Alph.xlate.openSecondaryWindow(
                     "alph-infl-table",
                     "chrome://alpheios/content/alpheios-infl.xul",
                     features,
-                    params);
-        Alph.util.log("Inflections window should have focus with "
+                    params,
+                    Alph.xlate.showLoadingMessage,[loading_node,loading_msg]
+    );
+    Alph.util.log("Inflections window should have focus with "
             + Alph.main.get_state_obj().get_var("word"));
 }
 
