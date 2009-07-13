@@ -491,7 +491,7 @@ Alph_Quiz =
             return;
         }
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
-        $('.alph-query-infl',parent_doc).css('display','block');
+        $('.alph-query-infl',parent_doc).css('display','block').children('.alph-infl-select').addClass("loading");
         var form = $(".alph-word",a_src_node).attr('context');
         var pofs = $('.alph-pofs',a_src_node).attr('context');
         var decls = [];
@@ -565,6 +565,7 @@ Alph_Quiz =
                 },
                 function() { Alph_Quiz.on_infl_correct(a_src_node) }
             );
+        $('.alph-infl-select',parent_doc).removeClass("loading");
         if (! has_infl_query)
         {
             this.on_infl_correct(a_src_node,
