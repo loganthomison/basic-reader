@@ -195,7 +195,9 @@ div.alph-morph {
     content: ";";
 }
 
-.alph-infl-set .alph-pofs {
+.alph-infl-set .alph-pofs,
+.alph-infl-set .alph-decl,
+.alph-infl-set .alph-text {
     font-size: smaller;
 }
 
