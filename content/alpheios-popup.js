@@ -799,8 +799,33 @@ Alph.xlate = {
                            // remove any pofs on the inflection set because
                            // disambiguated output will always list the pofs
                            // of the dictionary entry as the pofs of the inflection set
-                           Alph.$(".alph-infl-set .alph-pofs",entry_match).remove();
-    
+                            Alph.$(".alph-infl-set .alph-pofs",entry_match).each(
+                                function()
+                                {
+                                    var next = Alph.$(this).next('.alph-formatting');
+                                    var prev = Alph.$(this).prev('.alph-formatting');
+                                    var next_comma = next.text().match(/,/);
+                                    var prev_comma = prev.text().match(/,/);
+                                    if ((next_comma && prev_comma) || next_comma)
+                                    {
+                                        // if at the beginning or middle of a list, remove only the comma which follows
+                                        Alph.$(next).remove();
+                                    }
+                                    else if (prev_comma)
+                                    {
+                                        // if it's 2nd in the list, remove the preceeding comma
+                                        Alph.$(prev).remove();
+                                    }
+                                    else
+                                    {
+                                        // it's the only thing in the list, so remove surrounding parens
+                                        Alph.$(next).remove();
+                                        Alph.$(prev).remove();
+                                    }
+                                    Alph.$(this).remove();
+                                }
+                            );
+                           
                            if (Alph.$(".alph-infl-set",entry_match).length == 0)
                            {
                                 // if we don't have any inflection set at all, make

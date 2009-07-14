@@ -182,7 +182,7 @@ div.alph-morph {
 	cursor: pointer;
 }
 
-.alph-case:hover,.alph-mood:hover,.alph-decl:hover,.alph-conj:hover,.alph-pofs:hover {
+.alph-case:hover,.alph-mood:hover,.alph-decl:hover,.alph-conj:hover,.alph-pofs:hover,.alph-pofs-extra:hover {
     color: #5BC8DC !important;
 }
 
