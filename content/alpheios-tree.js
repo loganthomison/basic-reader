@@ -314,34 +314,6 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                     }
                 );
             }
-            // if this is an arc label
-            else if (className == 'arc-label')
-            {
-                // highlight the word while hovering
-                var id = thisNode.parent().get(0).getAttribute('id');
-                thisNode.bind(
-                    'mouseenter',
-                    function()
-                    {
-                        Alph.$('text', Alph.$(this)).each(
-                        function()
-                        {
-                            this.style.visibility = "visible";
-                        });
-                    }
-                );
-                thisNode.bind(
-                    'mouseleave',
-                    function()
-                    {
-                        Alph.$('text', Alph.$(this)).each(
-                        function()
-                        {
-                            this.style.visibility = "hidden";
-                        });
-                    }
-                );
-            }
         });
         // for each group
         Alph.$("g",treeDoc).each(
@@ -443,11 +415,17 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
 Alph.Tree.position_tree = function(a_container, a_fontSize)
 {
     // get various pieces of tree
+    // childNodes contains arc labels followed by subtrees
     var rectNode = a_container.children("rect");
     var textNode = a_container.children("text:first");
-    var arcLabelNodes = a_container.children("text");
     var arcLineNodes = a_container.children("line");
     var childNodes = a_container.children("g");
+    var numChildren = arcLineNodes.size();
+    if (childNodes.size() != 2 * numChildren)
+    {
+        Alph.util.log("Bad tree count: " + numChildren +
+                      "/" + childNodes.size());
+    }
 
     // calculate size of tree
     var textHeight = (5 * a_fontSize) / 4;
@@ -459,8 +437,12 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
     var childReturn = Array();
     var size = Array(0, 0);
     childNodes.each(
-    function()
+    function(i)
     {
+        // skip labels
+        if (i < numChildren)
+            return;
+
         // get size, center, and root width of child
         var thisReturn = Alph.Tree.position_tree(Alph.$(this), a_fontSize);
         var thisSize = thisReturn[0];
@@ -483,7 +465,7 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
     var adjust = 0;
     var treeEdge = 0;
     size[0] = 0;
-    for (var i = 0; i < childReturn.length; ++i)
+    for (var i = 0; i < numChildren; ++i)
     {
         // adjust positions
         childStart[i] -= adjust;
@@ -491,16 +473,17 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
 
         // if this subtree has root node only
         // it's a candidate to tighten up
-        if (childNodes.eq(i).children("g").size() == 0)
+        var ic = i + numChildren;
+        if (childNodes.eq(ic).children("g").size() == 0)
         {
             // can we move closer to preceding subtree?
-            if ((i > 0) && (childNodes.eq(i-1).children("g").size() > 0))
+            if ((i > 0) && (childNodes.eq(ic - 1).children("g").size() > 0))
             {
                 // difference between right edge of preceding subtree and
                 // right edge of preceding root
                 var newAdjust =
-                    (childStart[i-1] + childReturn[i-1][0][0]) -
-                    (childCenter[i-1] + childReturn[i-1][2] / 2);
+                    (childStart[i - 1] + childReturn[i - 1][0][0]) -
+                    (childCenter[i - 1] + childReturn[i - 1][2] / 2);
                 if (newAdjust > 0)
                 {
                     childStart[i] -= newAdjust;
@@ -509,20 +492,20 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
                 }
             }
             // can we move closer to following subtree?
-            if ((i+1 < childReturn.length) &&
-                (childNodes.eq(i+1).children("g").size() > 0))
+            if ((i + 1 < numChildren) &&
+                (childNodes.eq(ic + 1).children("g").size() > 0))
             {
                 // difference between left edge of following root and
                 // left edge of following subtree
                 var newAdjust = (childCenter[i+1] - childReturn[i+1][2] / 2) -
-                                childStart[i+1];
+                                 childStart[i+1];
                 if (newAdjust > 0)
                     adjust += newAdjust;
 
                 // if following tree would overlap preceding
                 // make sure we don't
-                if (childStart[i+1] - adjust < treeEdge)
-                    adjust -= treeEdge - (childStart[i+1] - adjust);
+                if (childStart[i + 1] - adjust < treeEdge)
+                    adjust -= treeEdge - (childStart[i + 1] - adjust);
             }
         }
 
@@ -530,7 +513,7 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
         var edge = childStart[i] + childReturn[i][0][0] + childSeparation;
         if (edge > size[0])
             size[0] = edge;
-        if ((childNodes.eq(i).children("g").size() > 0) && (edge > treeEdge))
+        if ((childNodes.eq(ic).children("g").size() > 0) && (edge > treeEdge))
             treeEdge = edge;
     }
 
@@ -546,9 +529,9 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
     var y2 = y1 + a_fontSize * 3;
     size[0] += 2 * xExcess;
     size[1] += y2;
-    for (var i = 0; i < childNodes.size(); ++i)
+    for (var i = 0; i < numChildren; ++i)
     {
-        childNodes.get(i).
+        childNodes.get(i + numChildren).
             setAttribute(
                 "transform",
                 "translate(" + (xExcess + childStart[i]) + "," + y2 + ")");
@@ -558,7 +541,8 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
         arc.setAttribute("y1", y1);
         arc.setAttribute("x2", x2);
         arc.setAttribute("y2", y2);
-        var label = arcLabelNodes.get(i + 1);
+        var labelGroup = childNodes.eq(i);
+        var label = labelGroup.children("text:first").get(0);
         var width = label.getComputedTextLength();
         var xl = (2 * x2 + xCenter)/3;
         if (x2 <= xCenter)
@@ -579,15 +563,19 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
 
         // set up help text for arc label
         var dyl = 3 * a_fontSize / 4;
-        Alph.$('text', Alph.$(label)).each(
-        function()
+        Alph.$('text', Alph.$(labelGroup)).each(
+        function(i)
         {
-            this.setAttribute("text-anchor", "start");
-            this.setAttribute("x", (x2 <= xCenter) ? xl - width : xl);
-            if (this.getAttribute("class") == "arc-label-help-up")
-                this.setAttribute("y", yl - dyl);
-            else
-                this.setAttribute("y", yl + dyl);
+            // skip first text child, which is arc label itself
+            if (i > 0)
+            {
+                this.setAttribute("text-anchor", "start");
+                this.setAttribute("x", (x2 <= xCenter) ? xl - width : xl);
+                if (this.getAttribute("class") == "arc-label-help-up")
+                    this.setAttribute("y", yl - dyl);
+                else
+                    this.setAttribute("y", yl + dyl);
+            }
         });
     }
 
@@ -836,14 +824,14 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
 //  testing of attribute values.  Hence, the expressions below
 //  are sometimes a bit contorted.  The assumption is made
 //  that the text element of class "node-label" immediately precedes the
-//  text element of class "arc-label", and that the top-level group of class
+//  group element of class "arc-label", and that the top-level group of class
 //  "tree" immediately precedes the group of class "text".
 //
 Alph.Tree.highlight_word = function(a_doc, a_id)
 {
     // find node of interest
     var focusNode = Alph.$("#" + a_id, a_doc);
-    
+
     // if no id or bad id
     if (focusNode.size() == 0)
     {
@@ -915,10 +903,11 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     //   text node itself and label on line to dependent words
     //   rectangle around node
     //   lines to dependent words
-    focusNode.children("text").each(
+    focusNode.children("g").children("text").each(
         function()
         {
-            this.setAttribute("showme", "focus-child");
+            if (this.getAttribute("class") == "arc-label-text")
+                this.setAttribute("showme", "focus-child");
         }
     );
     focusNode.children("text:first").each(
@@ -978,20 +967,23 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     //   line and label from parent word
     if (focusNode.parent().get(0).getAttribute("class") == "tree-node")
     {
-        focusNode.parent().children("text:first").each(
-            function()
-            {
-                this.setAttribute("showme", "focus-parent");
-            }
-        );
+        focusNode.parent().children("text:first").get(0).
+                           setAttribute("showme", "focus-parent");
 
         focusNode.parent().children("rect").each(
-            function() { this.setAttribute("showme", "focus-parent"); }
-        );
-        focusNode.parent().children().each(
         function()
         {
-            if (this.getAttribute("idref") == a_id)
+            this.setAttribute("showme", "focus-parent");
+        });
+        focusNode.parent().children("line").each(
+        function()
+        {
+            this.setAttribute("showme", "focus-parent");
+        });
+        focusNode.parent().children("g").children("text").each(
+        function()
+        {
+            if (this.getAttribute("class") == "arc-label-text")
                 this.setAttribute("showme", "focus-parent");
         });
     }
@@ -1025,6 +1017,10 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
  */
 Alph.Tree.highlight_text_word = function(a_doc, a_id, a_focus)
 {
+    // do nothing if no id specified
+    if ((a_id == null) || (a_id.length == 0))
+        return;
+
     Alph.$("rect", a_doc).each(
     function()
     {
@@ -1111,6 +1107,7 @@ Alph.Tree.update_hint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
         a_panel_obj.update_panel_window({},'alph-tree-body');
     }
 }
+    
     /**
      * Scroll a document so that focus node is visible
      * @param {Document} a_document the document containing the SVG diagram
@@ -1208,5 +1205,3 @@ Alph.Tree.scroll_to_focus= function(a_doc)
         a_doc.defaultView.scrollTo(left,top);
     }
 };
-    
-    

@@ -26,9 +26,14 @@ g text.node-label {
     cursor: pointer;
 }
 
-g text.arc-label {
+g text.arc-label-text {
     font-size: 11px;
     fill: black;
+}
+
+g .arc-label:hover text.arc-label-help-up,
+g .arc-label:hover text.arc-label-help-dn {
+	visibility: visible;
 }
 
 g text.arc-label-help-up {
