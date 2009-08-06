@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+ 
 /**
  * @class Alph.Panel defines the base class for Panel objects which represent
  * a usage of the alpheiosPanel tag in the interface.  This class is intended
@@ -91,13 +91,13 @@ Alph.Panel.prototype.reset_to_default = function()
     var lang = Alph.main.get_state_obj().get_var("current_language");
     var status;
     // use the global prefs unless we're overriding for this language
-    if (Alph.util.getPref("panels.use.defaults",lang))
+    if (Alph.MozUtils.getPref("panels.use.defaults",lang))
     {
-        status = Alph.util.getPref(status_pref);
+        status = Alph.MozUtils.getPref(status_pref);
     }
     else
     {
-        status = Alph.util.getPref(status_pref,lang);
+        status = Alph.MozUtils.getPref(status_pref,lang);
     }
     
     if (typeof status != "undefined" && status == Alph.Panel.STATUS_SHOW)
@@ -288,7 +288,7 @@ Alph.Panel.prototype.update_status = function(a_status)
                 }
                 catch(a_e)
                 {
-                    Alph.util.log("Error closing window " + a_e)
+                    Alph.MozUtils.log("Error closing window " + a_e)
                 }
                 // TODO - need to figure out how we want to handle detached panels
                 // across multiple tabs
@@ -307,7 +307,7 @@ Alph.Panel.prototype.update_status = function(a_status)
     // if we're responding to a user request, and panel changes
     // are sticky, store the new status as the default status for the panel
     if (a_status != Alph.Panel.STATUS_AUTOHIDE 
-        && Alph.util.getPref("panels.sticky")
+        && Alph.MozUtils.getPref("panels.sticky")
         )
 
     {
@@ -317,13 +317,13 @@ Alph.Panel.prototype.update_status = function(a_status)
         {
             // if we're using the defaults, store to defaults
             // otherwise store to the language 
-            if (Alph.util.getPref("panels.use.defaults",lang))
+            if (Alph.MozUtils.getPref("panels.use.defaults",lang))
             {
-                Alph.util.setPref(this.get_status_pref_setting(),a_status);
+                Alph.MozUtils.setPref(this.get_status_pref_setting(),a_status);
             }
             else
             {
-                Alph.util.setPref(this.get_status_pref_setting(),a_status,lang)
+                Alph.MozUtils.setPref(this.get_status_pref_setting(),a_status,lang)
                 
             }
         }
@@ -376,7 +376,7 @@ Alph.Panel.prototype.detach = function()
             );
     } catch(a_e) 
     {
-        Alph.util.log("Error detaching panel: " + a_e);
+        Alph.MozUtils.log("Error detaching panel: " + a_e);
     }
   
     return this.update_status(Alph.Panel.STATUS_SHOW);
@@ -458,7 +458,7 @@ Alph.Panel.prototype.hide = function(a_autoflag)
  */
 Alph.Panel.prototype.open = function()
 {    
-    if (Alph.util.getPref('panels.inline.'+this.panel_id)
+    if (Alph.MozUtils.getPref('panels.inline.'+this.panel_id)
         || (this.window_open()))
     {
         return this.update_status(this.show());
@@ -517,7 +517,7 @@ Alph.Panel.prototype.reset_contents = function(a_panel_state,a_old_state)
  * TODO - ultimately this should be redone using an Observer service -
  * may make sense to wait until we can use a JS module for this (with FF3)
  * @param {Browser} a_bro the current browser
- * @param a_event_type the event type (one of @link Alph.main.events)
+ * @param a_event_type the event type (one of @link Alph.Constants.events)
  * @param a_event_data optional event data object
  */
 Alph.Panel.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
@@ -693,9 +693,7 @@ Alph.Panel.prototype.get_current_doc = function(a_bro)
             if (panel_obj.window_open())
             {
                 var pw_bro =
-                    panel_obj.panel_window
-                        .Alph.$("#" + panel_obj.panel_id + " browser#"+this.id)
-                        .get(0);
+                    panel_obj.panel_window.document.getElementById(this.id);
                 if (pw_bro)
                 {
                     docs.push(pw_bro.contentDocument);
@@ -798,6 +796,7 @@ Alph.Panel.prototype.window_open = function()
     }
     catch (a_e)
     {
+        Alph.MozUtils.log("Error checking panel window " + a_e);
         // FF 3.5 throws an error checking properties on closed window objects   
     }
     return open;

@@ -23,11 +23,6 @@
 
  */
  
-// Make sure the Alph namespace is defined
-if (typeof Alph == "undefined") {
-    Alph = {};
-}
-
 /**
  * @singleton
  */
@@ -51,8 +46,7 @@ Alph.convert = {
      * @type nsIScriptableUnicodeConverter
      */
     unicode_conv: 
-        Components.classes['@mozilla.org/intl/scriptableunicodeconverter']
-        .getService(Components.interfaces.nsIScriptableUnicodeConverter),
+        Alph.MozSvc.get_svc('UnicodeConverter'),
         
     /**
      * latin ascii transliteration 
@@ -141,7 +135,7 @@ Alph.convert = {
         }
         catch (e)
         {
-            Alph.util.log(e);
+            Alph.MozUtils.log(e);
         }
         return betaText;
     },
@@ -188,7 +182,7 @@ Alph.convert = {
         }
         catch (e)
         {
-            Alph.util.log(e);
+            Alph.MozUtils.log(e);
         }
         return normText;
     }

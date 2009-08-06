@@ -21,18 +21,16 @@
                       src="chrome://alpheios/locale/alpheios.properties"/>
     </stringbundleset>
 
-    
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-main.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-languages.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-state.js" />
-	<script type="application/x-javascript" src="chrome://alpheios/content/alpheios-main.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-popup.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-lang-tool.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-lang-tool.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-src-select.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-linking.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-prototype.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-datafile.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-interactive.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/site/alpheios-site.js" />
@@ -84,15 +82,21 @@
             oncommand="Alph.main.execute_lang_command(event);" 
             observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
-            oncommand="Alph.main.show_options();"/>
+            oncommand="Alph.MozUtils.open_dialog(
+                window,
+                'chrome://alpheios/content/alpheios-prefs.xul', 
+                'alpheios-options-dialog');"/>
         <command id="alpheios-feedback-cmd"
             oncommand="Alph.util.send_feedback();"/>
         <command id="alpheios-help-cmd"
-            oncommand="Alph.util.open_alpheios_link('help');"/>
+            oncommand="Alph.util.open_alpheios_link(window,'help');"/>
         <command id="alpheios-about-cmd"
-            oncommand="Alph.main.show_about();"/>
+            oncommand="Alph.MozUtils.open_dialog(
+                window,
+                'chrome://alpheios/content/dialogs/about.xul', 
+                'alpheios-about-dialog');"/>
     	<command id="alpheios-site-cmd"
-            oncommand="Alph.util.open_alpheios_link('main');"/>
+            oncommand="Alph.util.open_alpheios_link(window,'main');"/>
         <command id="alpheios-level-learner-cmd"
             oncommand="Alph.main.set_mode(null,'learner');"/>
         <command id="alpheios-level-reader-cmd"

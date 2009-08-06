@@ -45,7 +45,7 @@
                 id="alph-morph-body"
                 flex="1"
                 type="content"
-                src="chrome://alpheios/content/alph-morph.html"
+                src="chrome://alpheios/content/html/alph-morph.html"
                 class="alph-lexicon-output"/>
         </alpheiosPanel>
     </hbox>

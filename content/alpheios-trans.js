@@ -62,7 +62,7 @@ Alph.Translation.prototype.show = function()
     var trans_url = Alph.site.translation_url(bro.contentDocument);
     if (trans_url)
     {
-        Alph.util.log("loading translation from " + trans_url);
+        Alph.MozUtils.log("loading translation from " + trans_url);
         
         var trans_doc = 
                 Alph.$("browser",this.panel_elem).get(0).contentDocument;  
@@ -80,8 +80,7 @@ Alph.Translation.prototype.show = function()
                 }
                 else 
                 {
-                    Alph.Translation.handle_error(
-                        Alph.$("#alpheios-strings").get(0).getString("alph-loading-misc")
+                    Alph.Translation.handle_error(Alph.main.get_string("alph-loading-misc")
                         ,trans_doc);
                 }
             }
@@ -113,7 +112,7 @@ Alph.Translation.prototype.show = function()
    else
    {
         Alph.Translation.handle_error(
-            Alph.$("#alpheios-strings").get(0).getString("alph-error-notranslation"),
+            Alph.main.get_string("alph-error-notranslation"),
             Alph.$("browser",this.panel_elem).get(0).contentDocument
         );
    }
@@ -144,7 +143,7 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
                         
     var disable_interlinear = true;
     if ( (Alph.$(".alpheios-aligned-word",a_trans_doc).length > 0) &&
-          Alph.util.getPref("features.alpheios-interlinear"))
+          Alph.MozUtils.getPref("features.alpheios-interlinear"))
     {
         disable_interlinear = false;
         
@@ -163,14 +162,14 @@ Alph.Translation.prototype.handle_refresh = function(a_bro)
 {
     var panel_state = this.get_browser_state(a_bro);
     var doc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
-    Alph.util.log("handling refresh in trans panel");
+    Alph.MozUtils.log("handling refresh in trans panel");
     // if the translation panel is showing and the the previous load
     // was interrupted, we'll have an error in the document.  if the page
     // is refreshed, we should try to load the document again. See bug 309.
     if (panel_state.status == Alph.Panel.STATUS_SHOW && 
         Alph.$("#alph-trans-error",doc).length > 0)
     {
-        var msg = Alph.$("#alpheios-strings").get(0).getString("alph-trans-reload");
+        var msg = Alph.main.get_string("alph-trans-reload");
         Alph.Translation.handle_error(msg,doc);
         this.reset_state();
     }
@@ -209,12 +208,12 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
  * Translation specific implementation of
  * {@link Alph.Panel.observe_ui_event}
  * @param {Browser} a_bro the current browser
- * @param a_event_type the event type (one of @link Alph.main.events)
+ * @param a_event_type the event type (one of @link Alph.Constants.events)
  * @param a_event_data optional event data object
  */
 Alph.Translation.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
 {
-    if (a_event_type == Alph.main.events.UPDATE_PREF 
+    if (a_event_type == Alph.Constants.events.UPDATE_PREF 
         && a_event_data.name.indexOf('features.alpheios-interlinear') >= 0)
     {
         Alph.Translation.set_interlinear_toggle(! a_event_data.value);             
@@ -296,7 +295,7 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
     }
     catch(e)
     {
-        Alph.util.log("Unable to update trans panel state with external url: " + e);
+        Alph.MozUtils.log("Unable to update trans panel state with external url: " + e);
     }
     
     // clear the value from the url bar if it's set to "about:blank"

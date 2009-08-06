@@ -87,14 +87,3 @@ Alph.Languages =
         return lang_key;
     }
 };
-
-/**
- * @singleton
- * 
- * The Alph.LanguageToolSet object holds
- * language-specific prototypes derived from the 
- * base {@link Alph.LanguageTool} class.
- * It is populated by code in the external  
- * language-specific extensions, which are dependent upon Alpheios
- */
-Alph.LanguageToolSet = {};

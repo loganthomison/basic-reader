@@ -96,18 +96,14 @@ Alph.Tree.prototype.show = function()
     var word;
     if (! treebankUrl)
     {
-        Alph.$("#tree-error",treeDoc).html(
-                Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
+        Alph.$("#tree-error",treeDoc).html(Alph.main.get_string("alph-error-tree-notree")
         );
         this.update_panel_window({},'alph-tree-body');
     }
     else if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
     {
         // Just add the default message to the display
-        Alph.$("#tree-error",treeDoc).html(
-                Alph.$("#alpheios-strings").get(0).
-                                            getString("alph-info-tree-select")
-        );
+        Alph.$("#tree-error",treeDoc).html(Alph.main.get_string("alph-info-tree-select"));
         this.update_panel_window({},'alph-tree-body');
     }
     else
@@ -132,7 +128,7 @@ Alph.Tree.prototype.show = function()
         }
         catch(a_e)
         {
-            Alph.util.log("Error identifying sentence and id: " + a_e);
+            Alph.MozUtils.log("Error identifying sentence and id: " + a_e);
         }
 
         //var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
@@ -140,9 +136,7 @@ Alph.Tree.prototype.show = function()
         if (! sentence )
         {
             // Just add the default message to the display
-            Alph.$("#tree-error",treeDoc).html(
-                    Alph.$("#alpheios-strings").get(0).getString("alph-error-tree-notree")
-              );
+            Alph.$("#tree-error",treeDoc).html(Alph.main.get_string("alph-error-tree-notree"));
             this.update_panel_window({},'alph-tree-body');
         }
         else
@@ -153,15 +147,14 @@ Alph.Tree.prototype.show = function()
                 {
                     type: "GET",
                     url: treebankUrl,
-                    timeout: Alph.util.getPref("url.treebank.timeout") || 5000,
+                    timeout: Alph.MozUtils.getPref("url.treebank.timeout") || 5000,
                     dataType: 'xml',
                     error: function(req,textStatus,errorThrown)
                     {
                         Alph.$("#tree-error",treeDoc).html(
-                            Alph.$("#alpheios-strings")
-                                .get(0).getString("alph-error-tree-notree")
+                            Alph.main.get_string("alph-error-tree-notree")
                         );
-                        Alph.util.log("Error retrieving treebank diagram: "
+                        Alph.MozUtils.log("Error retrieving treebank diagram: "
                             + textStatus ||errorThrown);
                         panel_obj.update_panel_window({},'alph-tree-body');
                     },
@@ -184,15 +177,15 @@ Alph.Tree.prototype.show = function()
  * Tree specific implementation of
  * {@link Alph.Panel.observe_ui_event}
  * @param {Browser} a_bro the current browser
- * @param a_event_type the event type (one of @link Alph.main.events)
+ * @param a_event_type the event type (one of @link Alph.Constants.events)
  * @param a_event_data optional event data object
  */
 Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
 {
     // listen for the window and the xlate trigger change events
-    if (a_event_type == Alph.main.events.UPDATE_XLATE_TRIGGER)
+    if (a_event_type == Alph.Constants.events.UPDATE_XLATE_TRIGGER)
     {
-        Alph.util.log("Tree panel handling event " + a_event_type);
+        Alph.MozUtils.log("Tree panel handling event " + a_event_type);
         var new_trigger = a_event_data.new_trigger;
         var old_trigger = a_event_data.old_trigger;
         var pw_bro = null;
@@ -221,7 +214,7 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         }
         Alph.Tree.update_hint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
     }
-    else if (a_event_type == Alph.main.events.LOAD_TREE_WINDOW)
+    else if (a_event_type == Alph.Constants.events.LOAD_TREE_WINDOW)
     {
         this.open();
         var trigger = Alph.main.getXlateTrigger();
@@ -265,11 +258,11 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                                textSize,
                                keySize,
                                fontSize);
-        //Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+        //Alph.MozUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         Alph.Tree.highlight_first(treeDoc, a_ids);
         Alph.Tree.highlight_word(treeDoc, a_ids[0]);
         Alph.Tree.scroll_to_focus(treeDoc);
-//        Alph.util.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+//        Alph.MozUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
         // or attribute, so just get by tag name and retrieve the attribute
@@ -338,7 +331,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
     }
     catch(e)
     {
-        Alph.util.log(e);
+        Alph.MozUtils.log(e);
     }
 
 
@@ -391,7 +384,7 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                 }
                 catch(a_e)
                 {
-                    Alph.util.log("Error parsing window size: " + a_e);
+                    Alph.MozUtils.log("Error parsing window size: " + a_e);
                 }
 
                 this.panel_window.focus();
@@ -423,7 +416,7 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
     var numChildren = arcLineNodes.size();
     if (childNodes.size() != 2 * numChildren)
     {
-        Alph.util.log("Bad tree count: " + numChildren +
+        Alph.MozUtils.log("Bad tree count: " + numChildren +
                       "/" + childNodes.size());
     }
 
@@ -1140,7 +1133,7 @@ Alph.Tree.scroll_to_focus= function(a_doc)
                     }
                     catch (a_e)
                     {
-                        Alph.util.log("Invalid coordinates: " + a_e);
+                        Alph.MozUtils.log("Invalid coordinates: " + a_e);
                     }
                 }
             }

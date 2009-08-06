@@ -50,12 +50,12 @@ Alph.interactive = {
     
     /**
      * Check to see if interactive features are enabled
-     * @return true if the current level is Alph.main.levels.LEARNER, otherwise false
+     * @return true if the current level is Alph.Constants.levels.LEARNER, otherwise false
      * @type boolean
      */
     enabled: function(a_bro)
     {
-        return Alph.main.get_mode() == Alph.main.levels.LEARNER;
+        return Alph.main.get_mode() == Alph.Constants.levels.LEARNER;
 
     },
     
@@ -73,9 +73,8 @@ Alph.interactive = {
             return;
         }
         
-        var browser = Alph.util.browser_for_doc(a_topdoc) || Alph.main.getCurrentBrowser();
+        var browser = Alph.MozUtils.browser_for_doc(window,a_topdoc) || Alph.main.getCurrentBrowser();
         var lang_tool = Alph.main.getLanguageTool(browser);
-        var str = Alph.$("#alpheios-strings").get(0)
         var pofs_list = lang_tool.getpofs();
         var valid_pofs = Alph.$('#alph-text .alph-pofs',popup).attr('context');
         var has_pofs = false;
@@ -95,7 +94,7 @@ Alph.interactive = {
         {
             Alph.$(popup).removeClass("alpheios-inline-query").removeClass("query-pending");
             Alph.$(".alph-word-first",popup)
-                .prepend('<div class="alpheios-hint">' + str.getString('alph-query-notsupported') + '</div>');
+                .prepend('<div class="alpheios-hint">' + Alph.main.get_string('alph-query-notsupported') + '</div>');
             return;
         }
         var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');
@@ -110,7 +109,7 @@ Alph.interactive = {
         var params =
         {
             lang_tool: lang_tool,
-            main_str: str,
+            main_str: Alph.main.string_bundle,
             source_node: Alph.$("#alph-text",popup).get(0),
             source_align: source_align || [],
             transform: Alph.xlate.transform,
@@ -129,17 +128,17 @@ Alph.interactive = {
                 Alph.$(popup).addClass("alpheios-inline-query");
                 Alph.$("#alph-text",popup).append(
                     '<div id="alph-inline-query-instruct">' +
-                    str.getFormattedString("alph-inline-query-instruct",[selected_word]) +
+                    Alph.main.get_string("alph-inline-query-instruct",[selected_word]) +
                     '</div>' +
                     '<div id="alph-align-answer-prompt"/>' + 
                     '<div id="alph-inline-query-correct">'+
                     '<span class="alph-inline-query-heading">' +
-                    str.getString("alph-inline-query-correct") +
+                    Alph.main.get_string("alph-inline-query-correct") +
                     '</span>' +
                     '</div>' +
                     '<div id="alph-inline-query-incorrect">'+
                     '<span class="alph-inline-query-heading">' +
-                    str.getString("alph-inline-query-incorrect") +
+                    Alph.main.get_string("alph-inline-query-incorrect") +
                     '</span>' +
                     '</div>'
                 );
@@ -227,12 +226,12 @@ Alph.interactive = {
         if (! matched)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(Alph.$("#alpheios-strings").get(0).getString("alph-query-incorrect"));
+                .html(Alph.main.get_string("alph-query-incorrect"));
         }
         else if (params.aligned_ids.length < params.source_align.length)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(Alph.$("#alpheios-strings").get(0).getString("alph-query-more"));
+                .html(Alph.main.get_string("alph-query-more"));
         }
         
         if (params.aligned_ids.length == params.source_align.length)
@@ -373,7 +372,7 @@ Alph.interactive = {
         }
         if (correct)
         {
-            alert(Alph.$("#alpheios-strings").get(0).getString("alph-query-correct"));
+            alert(Alph.main.get_string("alph-query-correct"));
             Alph.$('.alph-decl',
                 a_params.query_parent).css('display','inline');
             Alph.$('.alph-conj',
@@ -389,7 +388,7 @@ Alph.interactive = {
         }
         else
         {
-            alert(Alph.$("#alpheios-strings").get(0).getString("alph-query-incorrect"));
+            alert(Alph.main.get_string("alph-query-incorrect"));
             Alph.$(a_ending).addClass('incorrect');
             return false;
         }    

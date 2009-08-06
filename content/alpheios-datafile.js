@@ -29,38 +29,13 @@
  */
 Alph.Datafile = function(a_url, a_charset)
 {
-    Alph.util.log("Loading file " + a_url);
-
     // save parameters for possible future reload
     this.url = a_url;
     this.charset = a_charset;
     this.separator = '|';
     this.specialFlag = '@';
 
-    var ios = Components.classes["@mozilla.org/network/io-service;1"]
-                        .getService(Components.interfaces.nsIIOService);
-    var ss = Components.classes["@mozilla.org/scriptableinputstream;1"]
-                       .getService(Components.interfaces
-                                             .nsIScriptableInputStream);
-    var ch = ios.newChannel(this.url, null, null);
-    var inp = ch.open();
-    ss.init(inp);
-    if (!this.charset)
-    {
-        this.data = ss.read(inp.available());
-    }
-    else
-    {
-        var conv =
-            Components.classes['@mozilla.org/intl/scriptableunicodeconverter']
-                      .createInstance(Components.interfaces
-                                                .nsIScriptableUnicodeConverter);
-        conv.charset = this.charset;
-        var buffer = ss.read(inp.available());
-        this.data = conv.ConvertToUnicode(buffer);
-    }
-    ss.close();
-    inp.close();
+    this.data = Alph.MozUtils.read_file(a_url,a_charset);
 
     // make sure file ends with newline
     if (this.data[this.data.length - 1] != '\n')

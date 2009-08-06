@@ -48,7 +48,7 @@ Alph.Morph.prototype = new Alph.Panel();
  */
 Alph.Morph.prototype.init = function(a_panel_state)
 {
-    Alph.util.log("morph panel init");
+    Alph.MozUtils.log("morph panel init");
     // initialize the contents array
     a_panel_state.contents = {};
     a_panel_state.css = {};
@@ -177,9 +177,9 @@ Alph.Morph.prototype.observe_ui_event = function(a_bro,a_event_type)
     // only respond to events which affect the contents of the popup
     if (typeof a_event_type == "undefined"
         ||
-        (a_event_type != Alph.main.events.SHOW_TRANS && 
-         a_event_type != Alph.main.events.HIDE_POPUP &&
-         a_event_type != Alph.main.events.SHOW_POPUP))
+        (a_event_type != Alph.Constants.events.SHOW_TRANS && 
+         a_event_type != Alph.Constants.events.HIDE_POPUP &&
+         a_event_type != Alph.Constants.events.SHOW_POPUP))
     {
         return;
     }

@@ -20,13 +20,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-// initialize the Alph namespace
-if (typeof Alph == "undefined") {
-    Alph = {};
-}
- 
-
 Alph.tei_grammar = {
 
     /**

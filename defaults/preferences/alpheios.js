@@ -16,7 +16,6 @@ pref("extensions.alpheios.features.alpheios-interlinear",false);
 pref("extensions.alpheios.cmds.alpheios-inflect-cmd","handleInflections");
 pref("extensions.alpheios.cmds.alpheios-morph-inflect-cmd","handleInflectionsForMorphWindow");
 pref("extensions.alpheios.cmds.alpheios-grammar-cmd","openGrammar");
-pref("extensions.alpheios.ped-prototype-match","file:.*Perseus.text.1999.01.0133|http:\/\/dev.alpheios.net:8020\/(alpheios_proto)|(hopper\/alpheios\/text-alph.jsp)");
 pref("extensions.alpheios.panels.sticky",true);
 pref("extensions.alpheios.panels.inline.alph-dict-panel",false);
 pref("extensions.alpheios.panels.inline.alph-tree-panel",false);

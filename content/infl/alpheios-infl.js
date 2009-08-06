@@ -21,11 +21,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// initialize the Alph namespace
-if (typeof Alph == "undefined") {
-    Alph = {};
-}
-
 /**
  * @singleton
  */
@@ -73,12 +68,12 @@ Alph.infl = {
             var start = (new Date()).getTime();
             inflHTML = this.xsltProcessor.transformToDocument(xmlRef);
             var end = (new Date()).getTime();
-            window.opener.Alph.util.log("Transformation time: " + (end-start));
+            Alph.MozUtils.log("Transformation time: " + (end-start));
 
         }
         catch (e)
         {
-            window.opener.Alph.util.log(e);
+            Alph.MozUtils.log(e);
         }
         return inflHTML;
     },
@@ -288,7 +283,7 @@ Alph.infl = {
                 .click(
                     function()
                     {
-                        window.opener.Alph.util.open_alpheios_link('release-notes');
+                        Alph.util.open_alpheios_link(window.opener,'release-notes');
                         return false;
                     });
         }
@@ -298,7 +293,7 @@ Alph.infl = {
             $(".ending",a_tbl).length > 0)
         {
             try {
-                var disclaimer = str_props.getString('disclaimer')
+                var disclaimer = Alph.MozUtils.get_string(str_props,'disclaimer')
                 $("#alph-infl-table",topdoc)
                     .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
             } 
@@ -313,24 +308,24 @@ Alph.infl = {
         {
             if (typeof a_link_target.title == 'undefined')
             {
-                title = str_props.getString('alph-infl-title-'+showpofs);
+                title = Alph.MozUtils.get_string(str_props,'alph-infl-title-'+showpofs);
             }
             else
             {   
-                title = str_props.getString(a_link_target.title);
+                title = Alph.MozUtils.get_string(str_props,a_link_target.title);
             }
         
         }
         catch(a_e)
         {
-            window.opener.Alph.util.log("No title string defined for " + showpofs);
+            Alph.MozUtils.log("No title string defined for " + showpofs);
         }
         $("#alph-inflect-title span.title",topdoc).html(title);
         
         // add a link to the index
         $("body",topdoc).prepend(
             "<div id='alph-infl-index-link'>"
-            + str_props.getString("alph-infl-index-link") 
+            + Alph.MozUtils.get_string(str_props,"alph-infl-index-link") 
             + '</div>');
             
         $("#alph-infl-index-link",topdoc).click(
@@ -348,7 +343,7 @@ Alph.infl = {
             function(e) { Alph.infl.replace_string(this,str_props) } );
         
         var end = (new Date()).getTime();
-        window.opener.Alph.util.log("Translation time: " + (end-start));
+        Alph.MozUtils.log("Translation time: " + (end-start));
 
         // for each ending in the table, highlight it if there's a matching suffix
         // in the link source but only if we haven't been asked not to look for matches
@@ -358,7 +353,7 @@ Alph.infl = {
         var all_cols = $("col",a_tbl);
         
         end = (new Date()).getTime();
-        window.opener.Alph.util.log("Endings Processed: " + (end-start));
+        Alph.MozUtils.log("Endings Processed: " + (end-start));
         start=end;
         
         if (  ! a_link_target.suppress_match) {
@@ -381,7 +376,7 @@ Alph.infl = {
             
             );
             end = (new Date()).getTime();
-            window.opener.Alph.util.log("Endings Highlighted: " + (end-start));
+            Alph.MozUtils.log("Endings Highlighted: " + (end-start));
             start=end;
             
             var sib_cols = Alph.infl.find_sib_cols(col_parents,all_cols);
@@ -413,7 +408,7 @@ Alph.infl = {
             Alph.infl.expand_table(a_tbl,topdoc);            
         }
         end = (new Date()).getTime();
-        window.opener.Alph.util.log("Selected Endings Displayed: " + (end-start));
+        Alph.MozUtils.log("Selected Endings Displayed: " + (end-start));
         start=end;
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted
@@ -429,7 +424,7 @@ Alph.infl = {
         // if we have any additional inflection links, show them
         if ($("select#infl-links-select option",topdoc).length > 1)
         {
-            var label = str_props.getString("alph-infl-links-label"); 
+            var label = Alph.MozUtils.get_string(str_props,"alph-infl-links-label"); 
             $("#infl-links-label",topdoc).text(label);
             $("#infl-links",topdoc).css("display","block");
             
@@ -467,7 +462,7 @@ Alph.infl = {
         );
 
         end = (new Date()).getTime();
-        window.opener.Alph.util.log("Handlers Added: " + (end-start));
+        Alph.MozUtils.log("Handlers Added: " + (end-start));
         start=end;
         
         var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props,a_link_target);
@@ -478,7 +473,7 @@ Alph.infl = {
         this.hide_empty_cols(a_tbl,all_cols);
         
         var end = (new Date()).getTime();
-        window.opener.Alph.util.log("Hiding time: " + (end-start));
+        Alph.MozUtils.log("Hiding time: " + (end-start));
     },
     
     /**
@@ -622,7 +617,7 @@ Alph.infl = {
     {
         $(".loading",a_doc).show();
         var newpofs = $(":selected",a_elem).val();
-        window.opener.Alph.util.log("Switching to " + newpofs);
+        Alph.MozUtils.log("Switching to " + newpofs);
         a_lang_tool.
             handleInflections(a_e,a_node,{showpofs: newpofs});
     },
@@ -678,7 +673,7 @@ Alph.infl = {
         // handle external urls
         if (href.match(/^http:\/\//))
         {
-            window.opener.Alph.util.open_new_tab(href);
+            Alph.MozUtils.open_new_tab(window.opener,href);
             return false;
         }
         // we can't just split on : because it might be used in later components of the
@@ -723,7 +718,7 @@ Alph.infl = {
         var text = jQuery.trim($(a_elem).text());
         try 
         {
-            var newtext = a_props.getString(text);
+            var newtext = Alph.MozUtils.get_string(a_props,text);
             if (newtext)
             {
                 $(a_elem).text(newtext);        
@@ -731,7 +726,7 @@ Alph.infl = {
         } 
         catch(e)
         {
-            window.opener.Alph.util.log("Couldn't find string for " + text);   
+            Alph.MozUtils.log("Couldn't find string for " + text);   
         }  
     },
     
@@ -849,7 +844,7 @@ Alph.infl = {
                 link.setAttribute("value",a_pofs_set[i]);
                 try 
                 {
-                    link.innerHTML = a_str_props.getFormattedString(
+                    link.innerHTML = Alph.MozUtils.get_string(a_str_props,
                         "alph-infl-link-"+linktype, [linkname]);
                 }
                 catch(e)
@@ -878,8 +873,8 @@ Alph.infl = {
             // just return if we don't have any collapsed cells
             return;
         }
-        var expand = a_str_props.getString("alph-infl-expand");
-        var expand_tip = a_str_props.getString("alph-infl-expand-tooltip");
+        var expand = Alph.MozUtils.get_string(a_str_props,"alph-infl-expand");
+        var expand_tip = Alph.MozUtils.get_string(a_str_props,"alph-infl-expand-tooltip");
 
         // iterate through the table header cells of the row
         // which should contain the expand control, adding a toggle
@@ -922,10 +917,10 @@ Alph.infl = {
         // action is in progress
         $(a_elem).addClass("reloading");
         var str_props = document.getElementById("alph-infl-strings");
-        var expand = str_props.getString("alph-infl-expand");
-        var collapse = str_props.getString("alph-infl-collapse");
-        var expand_tip = str_props.getString("alph-infl-expand-tooltip");
-        var collapse_tip = str_props.getString("alph-infl-collapse-tooltip");
+        var expand = Alph.MozUtils.get_string(str_props,"alph-infl-expand");
+        var collapse = Alph.MozUtils.get_string(str_props,"alph-infl-collapse");
+        var expand_tip = Alph.MozUtils.get_string(str_props,"alph-infl-expand-tooltip");
+        var collapse_tip = Alph.MozUtils.get_string(str_props,"alph-infl-collapse-tooltip");
 
         var toggle_elem = $(".endings-toggle",a_elem);
         var toggle = $(toggle_elem).html();
@@ -1041,7 +1036,7 @@ Alph.infl = {
                         }
                         catch(e)
                         {
-                            window.opener.Alph.util.log("Invalid colspan");
+                            Alph.MozUtils.log("Invalid colspan");
                         }
                         
                         if (typeof realIndex != "undefined" && 

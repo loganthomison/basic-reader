@@ -69,7 +69,7 @@ Alph.xlate = {
         }
         catch (e)
         {
-            Alph.util.log(e);
+            Alph.MozUtils.log(e);
         }
         return wordHTML;
     },
@@ -187,7 +187,7 @@ Alph.xlate = {
             if (testchar == 32 || testchar == 9 || testchar == 10 || testchar == 160)
             {
                 ++ro;
-                Alph.util.log("Advancing range offset past whitespace.");
+                Alph.MozUtils.log("Advancing range offset past whitespace.");
             }
             else
             {
@@ -314,20 +314,13 @@ Alph.xlate = {
      */
     translationError: function (a_msg,a_doc_array)
     {
-        var err_msg =
-            document
-                .getElementById("alpheios-strings")
-                .getFormattedString(
-                    "alph-loading-error",
-                    [a_msg ]);
-        Alph.util.log("Query Response (Error): " + err_msg);
+        var err_msg = Alph.main.get_string("alph-loading-error",[a_msg ]);
+        Alph.MozUtils.log("Query Response (Error): " + err_msg);
         //if (Alph.main.useLocalDaemon() &&
         //    typeof Alph.main.getCurrentBrowser()
         //                  .alpheios.daemonPid == "undefined")
         //{
-        //    err_msg = err_msg + '<br/>' +
-        //        document.getElementById("alpheios-strings")
-        //                .getString("alph-error-mhttpd-notstarted");
+        //    err_msg = err_msg + '<br/>' + Alph.main.get_string("alph-error-mhttpd-notstarted");
         //}
 
         // the first document in the array is the main one
@@ -348,7 +341,7 @@ Alph.xlate = {
                 );
            }
        );
-       Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+       Alph.main.broadcast_ui_event(Alph.Constants.events.SHOW_TRANS);
     },
 
     /**
@@ -362,7 +355,7 @@ Alph.xlate = {
      * @param a_lang_tool the Alph.Language object which initiated the lookup
      */
     showTranslation: function(a_xml,a_alphtarget,a_doc_array,a_lang_tool) {
-        Alph.util.log("Query response:" + a_xml);
+        Alph.MozUtils.log("Query response:" + a_xml);
 
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
@@ -375,7 +368,7 @@ Alph.xlate = {
                 && (Alph.$(".alph-unknown",wordHTML).size() == 0)
                 && (Alph.$(".alph-error",wordHTML).size() == 0)))
         {
-            Alph.util.log("No valid entries to display.");
+            Alph.MozUtils.log("No valid entries to display.");
             a_doc_array.forEach(
                 function(a_doc)
                 {
@@ -469,18 +462,18 @@ Alph.xlate = {
         // disambiguate if treebank is available
         if (disambiguate_id)
         {
-            Alph.util.log("Disambiguating ..." +
+            Alph.MozUtils.log("Disambiguating ..." +
                           a_alphtarget.getTreebankQuery());
             // send asynchronous request to the lexicon service
             Alph.$.ajax(
                 {
                     type: "GET",
                     url: a_alphtarget.getTreebankQuery(),
-                    timeout: Alph.util.getPref("url.treebank.timeout") || 5000,
+                    timeout: Alph.MozUtils.getPref("url.treebank.timeout") || 5000,
                     dataType: 'html',
                     error: function(req,textStatus,errorThrown)
                     {
-                        Alph.util.log("Error disambiguating morphology: " +
+                        Alph.MozUtils.log("Error disambiguating morphology: " +
                                       textStatus||errorThrown);
                         a_doc_array.forEach(
                             function(a_doc)
@@ -499,7 +492,7 @@ Alph.xlate = {
                                 }
                             }
                         );
-                        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+                        Alph.main.broadcast_ui_event(Alph.Constants.events.SHOW_TRANS);
                     },
                     success: function(data, textStatus)
                     {
@@ -515,7 +508,7 @@ Alph.xlate = {
         }
         else
         {
-            Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);
+            Alph.main.broadcast_ui_event(Alph.Constants.events.SHOW_TRANS);
             Alph.interactive.openQueryDisplay(a_topdoc,a_alphtarget);
         }
 
@@ -535,7 +528,7 @@ Alph.xlate = {
                                  a_doc_array,
                                  a_lang_tool)
      {
-        Alph.util.log("Query response:" + a_xml);
+        Alph.MozUtils.log("Query response:" + a_xml);
 
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
@@ -562,7 +555,7 @@ Alph.xlate = {
                     }
                 }
             );
-            Alph.util.log("No treebank entries to display.");
+            Alph.MozUtils.log("No treebank entries to display.");
         }
         else
         {
@@ -594,7 +587,7 @@ Alph.xlate = {
                                 "] #alph-text",a_doc);
                 if (popup.length == 0)
                 {
-                    Alph.util.log("Discarding disamibuguation " + a_req_id);
+                    Alph.MozUtils.log("Discarding disamibuguation " + a_req_id);
                     continue;
                 }
 
@@ -647,14 +640,14 @@ Alph.xlate = {
                     }
                     else
                     {
-                        Alph.util.log("Can't find entry matching treebank lemma: " + new_hdwd);
+                        Alph.MozUtils.log("Can't find entry matching treebank lemma: " + new_hdwd);
                     }
                     // if entries with matching part of speech and lemma were
                     // found, just use the new entry -- we'll lose details
                     // on the inflection but they wouldn't be right anyway
                     if (pofs_match_set.length == 0)
                     {
-                        Alph.util.log("Can't find entry matching treebank lemma: " + new_hdwd
+                        Alph.MozUtils.log("Can't find entry matching treebank lemma: " + new_hdwd
                             + " and pofs: " + new_pofs);
                         final_word_set.push(
                             Alph.$(new_entry).parent(".alph-word").clone(true));
@@ -881,7 +874,7 @@ Alph.xlate = {
         }
 
         Alph.$("#alph-window-anchor",a_topdoc).focus();
-        Alph.main.broadcast_ui_event(Alph.main.events.SHOW_TRANS);            
+        Alph.main.broadcast_ui_event(Alph.Constants.events.SHOW_TRANS);            
         Alph.interactive.openQueryDisplay(a_doc_array[0],a_alphtarget);
     },
 
@@ -996,7 +989,7 @@ Alph.xlate = {
             }
             catch(e)
             {
-                Alph.util.log("Error getting frame coords: " + e);
+                Alph.MozUtils.log("Error getting frame coords: " + e);
             }
         }
 
@@ -1004,10 +997,7 @@ Alph.xlate = {
         popup.style.maxWidth = "600px";
 
         /* reset the contents of the popup */
-        var xlate_loading =
-            document
-                .getElementById("alpheios-strings")
-                .getFormattedString("alph-loading-translation",[a_alphtarget.getWord()]);
+        var xlate_loading = Alph.main.get_string("alph-loading-translation",[a_alphtarget.getWord()]);
         Alph.$("#alph-text",popup).remove();
         Alph.$("#alph-window",topdoc).get(0).removeAttribute("alpheios-pending");
         Alph.$("#alph-window",topdoc).append(
@@ -1094,7 +1084,7 @@ Alph.xlate = {
             alph_state.set_var("lastSelection",null);
 
         }
-        Alph.main.broadcast_ui_event(Alph.main.events.HIDE_POPUP);
+        Alph.main.broadcast_ui_event(Alph.Constants.events.HIDE_POPUP);
         // keep the last element in the state, so that we can find
         // the popup (and stylesheets) again
     },
@@ -1133,7 +1123,7 @@ Alph.xlate = {
         var windows = Alph.main.get_state_obj(a_bro).get_var("windows");
         for (var win in windows)
         {
-            Alph.util.log("Checking status of window " + win);
+            Alph.MozUtils.log("Checking status of window " + win);
             try {
                 if (typeof windows[win] != "undefined" && windows[win] != null && ! windows[win].closed)
                 {
@@ -1142,7 +1132,7 @@ Alph.xlate = {
                 }
             } catch(a_e)
             {
-                Alph.util.log("Error closing window " + win + " : " + a_e);
+                Alph.MozUtils.log("Error closing window " + win + " : " + a_e);
                 windows[win] = null;
             }
         }
@@ -1203,7 +1193,7 @@ Alph.xlate = {
         }
         catch (a_e)
         {
-            Alph.util.log("Error checking window status for " + a_name + " : " + a_e);
+            Alph.MozUtils.log("Error checking window status for " + a_name + " : " + a_e);
         }
         try {
             open_new_window = (typeof a_window == "undefined" || 
@@ -1213,7 +1203,7 @@ Alph.xlate = {
         }
         catch (a_e)
         {
-            Alph.util.log("Error checking open window status for " + a_name + " : " + a_e);
+            Alph.MozUtils.log("Error checking open window status for " + a_name + " : " + a_e);
         }
 
         // if the window exists already, is open, has the same location
@@ -1222,7 +1212,7 @@ Alph.xlate = {
         // rather than reloading the window
         if (update_args)
         {
-            Alph.util.log("Calling update_args_callback for window " + a_name);
+            Alph.MozUtils.log("Calling update_args_callback for window " + a_name);
             a_window.arguments[0].update_args_callback(a_window_args);
         }
         // if the window doesn't exist, or is closed, or has arguments
@@ -1231,7 +1221,7 @@ Alph.xlate = {
         else if (open_new_window)
         {
 
-            Alph.util.log("Opening new window named: " + a_name);
+            Alph.MozUtils.log("Opening new window named: " + a_name);
             // add a loading message to notify the user we're loading
             // the grammar - really this should come from a
             // stringbundle if we're going to keep it
@@ -1286,7 +1276,7 @@ Alph.xlate = {
                     if ( bottom_y < 0 ){
                         bottom_y = window.screenY;
                     }
-                    Alph.util.log("Screen: " + a_features[prop]);
+                    Alph.MozUtils.log("Screen: " + a_features[prop]);
                     switch(a_features[prop])
                     {
                         case "topright":
@@ -1327,7 +1317,6 @@ Alph.xlate = {
                     prop + "=" + features[prop]);
             }
 
-            Alph.util.log("Features: " + feature_list.join(","));
             a_window = window.openDialog(
                 a_url,
                 a_name,
@@ -1367,7 +1356,7 @@ Alph.xlate = {
                 a_window.location.hash != ''
                 )
             {
-                Alph.util.log("Replacing location hash with " + target_hash);
+                Alph.MozUtils.log("Replacing location hash with " + target_hash);
                 a_window.location.hash = target_hash;
             }
             // otherwise, just replace the location and allow the window
@@ -1376,7 +1365,7 @@ Alph.xlate = {
             // shouldn't be necessary
             else
             {
-                Alph.util.log("Replacing location with " + a_url);
+                Alph.MozUtils.log("Replacing location with " + a_url);
                 a_window.location = a_url;
 
             }
@@ -1384,7 +1373,7 @@ Alph.xlate = {
         }
         // now focus the window
         a_window.focus();
-        Alph.util.log("Secondary window should have focus at "+ a_url);
+        Alph.MozUtils.log("Secondary window should have focus at "+ a_url);
         windows[a_name] = a_window;
         return a_window;
     },
@@ -1421,7 +1410,7 @@ Alph.xlate = {
         }
         catch(e)
         {
-            Alph.util.log("Error hiding loading message: " + e);
+            Alph.MozUtils.log("Error hiding loading message: " + e);
         }
     },
 
@@ -1488,7 +1477,7 @@ Alph.xlate = {
             }
         );
 
-        Alph.main.broadcast_ui_event(Alph.main.events.REMOVE_POPUP);
+        Alph.main.broadcast_ui_event(Alph.Constants.events.REMOVE_POPUP);
 
      },
 
@@ -1543,7 +1532,7 @@ Alph.xlate = {
         {
             //TODO sometimes we get a null defaultView. Need to figure
             // out why and fix, rather than just logging it.
-            Alph.util.log("no default view");
+            Alph.MozUtils.log("no default view");
         }
      },
 

@@ -23,6 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+
  /**
  * @singleton
  */
@@ -30,18 +32,7 @@ Alph.prefs = {
 
     _selected_dict_item: null,
     _selected_site_item:  null,
-    _IO_SVC: Components.classes["@mozilla.org/network/io-service;1"]
-                      .getService(Components.interfaces.nsIIOService),
-        
-    
-    init: function()
-    {
-        this._PREFS = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService)
-                      .getBranch("extensions.alpheios."),
-        this._PREFS.QueryInterface(Components.interfaces.nsIPrefBranch2);
-    },
-   
+           
     /**
      * Initializes the panel preferences on the window preferences pane
      * - copies the main panel preferences grid to the language-specific
@@ -257,13 +248,13 @@ Alph.prefs = {
                     var full_list = null;
                     try
                     {
-                        short_list = Alph.prefs._PREFS.getCharPref(lang + '.dictionaries.short');
+                        short_list = Alph.MozUtils.getPref('dictionaries.short',lang);
                         short_list = short_list.split(/,/).sort().join(',');
                     }
                     catch(a_e){}
                     try 
                     {
-                        full_list = Alph.prefs._PREFS.getCharPref(lang + '.dictionaries.full');
+                        full_list = Alph.MozUtils.getPref('dictionaries.full',lang);
                         full_list = full_list.split(/,/).sort().join(',');
                     }
                     catch(a_e){}
@@ -747,7 +738,7 @@ Alph.prefs = {
             function(a_site,a_i)
             {
       
-                var uri = Alph.prefs._IO_SVC.newURI(a_site,"UTF-8",null);
+                var uri = Alph.MozSvc.get_svc('IO').newURI(a_site,"UTF-8",null);
                 var perm = Alph.PermissionMgr.testPermission(uri,key);
                 var status = perm == Alph.PermissionMgr.ALLOW_ACTION ? 'site-enabled' : 'site-disabled';
       
@@ -781,7 +772,7 @@ Alph.prefs = {
         var lang = selectedItem.id.match(/^(\w+)-/)[1];
         var key = 'alpheios-auto-enable-'+lang;
         var selectedURL = selectedItem.getAttribute('label');
-        var uri = Alph.prefs._IO_SVC.newURI(selectedURL,"UTF-8",null); 
+        var uri = Alph.MozSvc.get_svc('IO').newURI(selectedURL,"UTF-8",null); 
         if (button_id == 'enable-site')
         {
             Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION);
@@ -811,7 +802,7 @@ Alph.prefs = {
         if (this.selectedItem)
         {
             var selectedURL = selectedItem.getAttribute('label');
-            var uri = Alph.prefs._IO_SVC.newURI(selectedURL,"UTF-8",null);
+            var uri = Alph.MozSvc.get_svc('IO').newURI(selectedURL,"UTF-8",null);
             var perm = Alph.PermissionMgr.testPermission(uri,key);
             if (button_col)
             {
@@ -834,5 +825,3 @@ Alph.prefs = {
         }
     },
 };
-
-Alph.prefs.init();

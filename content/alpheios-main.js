@@ -1,8 +1,6 @@
 /**
- * @fileoverview This file contains the definition of the Alph namespace
- * and the Alph.main class. 
- * The Alph.main class is the main controller for 
- * the Alpheios functionality.
+ * @fileoverview This file contains the definition of the Alph.main class. 
+ * The Alph.main class is the main controller for the Alpheios functionality.
  * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
@@ -32,7 +30,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-          
+ 
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-constants.jsm",Alph);
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-xfer-state.jsm",Alph);
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-uninstaller.jsm",Alph);
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-upgrade-observer.jsm",Alph);
+Alph.MozUtils.import_resource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
+
 /**
  * @singleton
  */
@@ -70,44 +75,40 @@ Alph.main =
     panels: { },
 
     /**
-     * holds the Event types
-     */
-    events: 
-        {
-            SHOW_TRANS: 100,
-            HIDE_POPUP: 200,
-            REMOVE_POPUP: 300,
-            SHOW_DICT: 400,
-            UPDATE_PREF: 500,
-            LOAD_DICT_WINDOW: 600,
-            LOAD_TREE_WINDOW: 700,
-            UPDATE_XLATE_TRIGGER: 800
-        },
-
-    /**
-     * holds the levels
-     */
-    levels: 
-    {
-        LEARNER: 'learner',
-        READER: 'reader',
-    },
-    
-    /**
      * flag to indicate if the languages were successfully set
      */
     has_languages: false,
+
+    /**
+     * observer object for preference changes
+     */
+    prefs_observer:     
+    {
+        observe: function(a_subject, a_topic, a_data)
+        {
+            if (a_topic != "nsPref:changed") {
+                return;
+            }
+            var name = a_data;
+            var value = Alph.MozUtils.getPref(name);
+            Alph.main.updatePref(name, value);
+        }
+    },
+    
+    /**
+     * main string bundle for the application (initialized on load)
+     * @private
+     */
+    string_bundle: null,
     
     /**
      * Initialize function for the class. Adds the onLoad event listener to the window
-     * and calls the {@link Alph.util#init} method
+     * add adds a preferences observer on the alpheios preferences
      */
     init: function()
-    {
+    { 
         window.addEventListener("load", this.onLoad, false);
-
-        Alph.util.init();
-       
+        Alph.MozSvc.get_svc('AlphPrefs').addObserver("", this.prefs_observer,false);
     },
 
     /**
@@ -118,9 +119,10 @@ Alph.main =
      */
     onLoad: function()
     {
+        Alph.main.string_bundle = Alph.$("#alpheios-strings").get(0);
         // register the uninstaller for the installed Alpheios packages
         Alph.Uninstaller.register_observer(
-            Alph.$.map(Alph.util.getAlpheiosPackages(),function(a){return a.id}));
+            Alph.$.map(Alph.MozUtils.getAlpheiosPackages(),function(a){return a.id}));
         // register an upgrade observer for this package ---
         // if we're upgrading the basic libraries, we need to make sure to kill the 
         // mhttpd daemon before the browser restarts. Bug 308.
@@ -149,8 +151,8 @@ Alph.main =
         for (var i = 0; i<names.length; i++)
         {
             var name = names[i];
-            var keychar = Alph.util.getPref("keys." + name);
-            var mod = Alph.util.getPref("keymodifiers." + name);
+            var keychar = Alph.MozUtils.getPref("keys." + name);
+            var mod = Alph.MozUtils.getPref("keymodifiers." + name);
             if (keychar.length > 0)
             {
                 var key = document.createElementNS(
@@ -184,7 +186,7 @@ Alph.main =
      */
     onUnLoad: function(a_event)
     {
-        Alph.util.log("Unloading window");
+        Alph.MozUtils.log("Unloading window");
  
         // iterate through the open tabs calling onTabClose on each
         // to make sure to cleanup the resources used by that tab
@@ -193,10 +195,10 @@ Alph.main =
         for (var i = 0; i < num; i++) {
             var bro = gBrowser.getBrowserAtIndex(i);
             try {
-                Alph.util.log("Closing tab " + bro.currentURI.spec);
+                Alph.MozUtils.log("Closing tab " + bro.currentURI.spec);
                 this.onTabClose(a_event,bro);
             } catch(e) {
-                Alph.util.log(e);
+                Alph.MozUtils.log(e);
             }
         }
         gBrowser.mTabContainer
@@ -204,8 +206,7 @@ Alph.main =
         gBrowser.mTabContainer
             .removeEventListener("TabClose", this.onTabClose, false);
         gBrowser.removeProgressListener(Alph.main.loc_listener);
-        
-        Alph.util.shutdown();    
+        Alph.MozSvc.get_svc('AlphPrefs').removeObserver("", this.prefs_observer);
     },
 
     /**
@@ -226,7 +227,7 @@ Alph.main =
      */
     onTabClose: function(a_event,a_bro)
     {
-        Alph.util.log("in onTabClose");
+        Alph.MozUtils.log("in onTabClose");
         if (typeof a_bro == "undefined")
         {
             // get the browser associated with the tab
@@ -292,13 +293,10 @@ Alph.main =
     {        
         this.mouseButtons = 0;
         
-        a_bro.addEventListener("keydown", this.onKeyDown, true);
         this.get_state_obj(a_bro).set_var("enabled",true);
         if (! this.has_languages)
         {
-            var err_msg = 
-                document.getElementById("alpheios-strings")
-                        .getString("alph-error-nolanguages");
+            var err_msg = this.get_string("alph-error-nolanguages");
             alert(err_msg);
             this.inlineDisable(a_bro);
             return;
@@ -335,7 +333,6 @@ Alph.main =
             return;
         }
         var old_trigger = this.removeXlateTrigger(a_bro);
-        a_bro.removeEventListener("keydown", this.onKeyDown, true);
 
         Alph.xlate.removePopup(a_bro);
 
@@ -402,7 +399,7 @@ Alph.main =
      */
     getLocalDaemonHost: function()
     {
-        return 'http://' + Alph.util.getPref("mhttpd.host");
+        return 'http://' + Alph.MozUtils.getPref("mhttpd.host");
     },
 
     /**
@@ -414,7 +411,7 @@ Alph.main =
      */
     getLocalDaemonPort: function()
     {
-        return Alph.util.getPref("mhttpd.port");
+        return Alph.MozUtils.getPref("mhttpd.port");
     },
 
     /**
@@ -432,7 +429,7 @@ Alph.main =
                 dataType: "text",
                 cache: false,
                 url: Alph.main.getLocalDaemonHost() + ":" + Alph.main.getLocalDaemonPort() + "/mypid",
-                //timeout: Alph.util.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
+                //timeout: Alph.MozUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
                 success: 
                     a_onsuccess,
                 error:
@@ -458,7 +455,7 @@ Alph.main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000)
         detach_url = detach_url + "?_r=" + rand_num;
-        Alph.util.log("detach daemon at " + detach_url);
+        Alph.MozUtils.log("detach daemon at " + detach_url);
         
         Alph.$.ajax(
             {
@@ -470,7 +467,7 @@ Alph.main =
                 error: 
                     function(req,text,error) 
                     {
-                        Alph.util.log("Error detaching Daemon : " + error);
+                        Alph.MozUtils.log("Error detaching Daemon : " + error);
                     }
             }
         );
@@ -494,7 +491,7 @@ Alph.main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000)
         kill_url = detach_url + "?_r=" + rand_num;
-        Alph.util.log("kill daemon at " + detach_url);
+        Alph.MozUtils.log("kill daemon at " + detach_url);
         
         Alph.$.ajax(
             {
@@ -506,7 +503,7 @@ Alph.main =
                 error: 
                     function(req,text,error) 
                     {
-                        Alph.util.log("Error killing daemon : " + error);
+                        Alph.MozUtils.log("Error killing daemon : " + error);
                     }
             }
         );
@@ -529,7 +526,7 @@ Alph.main =
         return gBrowser.mCurrentBrowser;
         
     },
-
+    
     /**
      * Handler for the popup trigger event. Hands the event off
      * to the {@link Alph.xlate#doMouseMoveOverText} method. 
@@ -539,44 +536,9 @@ Alph.main =
      */
     doXlateText: function(a_event)
     {
-        // TODO should we disable the double click handler if the
-        // the selected text was a link?
-        //if (this.xlateTrigger == 'dblclick' && a_event.srcElement.tagName == "A") {
-        //    return true;
-        //}
-
+        // forward the event to Alph.xlate.doMouseMoveOverText
         Alph.xlate.doMouseMoveOverText(a_event);
     },
-
-    /**
-     * Handler for the key down event.  Hands off to the assigned handler
-     * handler for the key in the current {@link Alph.LanguageTool} instance.
-     * shift (keyCode==16) : hands the event off to {@link Alph.LanguageTool#shiftHandler}. 
-     * ctrl (keyCode==17) : sets flag to temporarily disable the mousemove handler
-     * @param {Event} a_event the key press event
-     * @return true to allow event propogation
-     * @type Boolean
-     */
-    onKeyDown: function(a_event)
-    {
-        // shift key handler
-        // only effective while the mouseover popup is visible
-        if (a_event.keyCode == 16)
-        {
-            // don't respond to the shift key if we're not actively looking at 
-            // or working on a selected word
-            if (Alph.xlate.popupVisible() || Alph.interactive.query_visible())
-            {
-                // make a copy of the current popup element and use that in case the user
-                // moves the mouse before the target handler finishes initializing
-                var popup = Alph.$("#alph-text", content.document).clone();    
-                Alph.main.getLanguageTool().shiftHandler(a_event,popup);
-            }
-        }
-        // return true to allow event propogation if needed
-        return true;
-    },
-
 
     /**
      * Toggle the text of the browser menu items for extension to 
@@ -591,16 +553,10 @@ Alph.main =
         var status_text = '';
         if (! this.is_enabled(this.getCurrentBrowser()))
         {
-            cmenu_text =
-                Alph.$("#alpheios-strings").get(0)
-                    .getString("alph-inline-enable-cm");
-            tmenu_text =
-                Alph.$("#alpheios-strings").get(0)
-                    .getString("alph-inline-enable-tm");
+            cmenu_text = this.get_string("alph-inline-enable-cm");
+            tmenu_text = this.get_string("alph-inline-enable-tm");
             
-            status_text = 
-                Alph.$("#alpheios-strings").get(0)
-                    .getString("alph-tools-status-disabled");
+            status_text = this.get_string("alph-tools-status-disabled");
             // TODO - we ought to preserve the user's last
             //        language selection rather than resetting  
             menu_lang = this.defaultLanguage;
@@ -608,12 +564,8 @@ Alph.main =
         }
         else
         {
-            cmenu_text =
-                Alph.$("#alpheios-strings").get(0)
-                    .getString("alph-inline-disable-cm");
-            tmenu_text =
-                Alph.$("#alpheios-strings").get(0)
-                    .getString("alph-inline-disable-tm");
+            cmenu_text = this.get_string("alph-inline-disable-cm");
+            tmenu_text = this.get_string("alph-inline-disable-tm");
             menu_lang = this.get_state_obj().get_var("current_language");
             status_text = 
                 "[" +
@@ -655,7 +607,7 @@ Alph.main =
     on_mhttpd_start: function(daemon_response)
     {
         var daemonPid = daemon_response.replace(/^\s+|\s+$/g, "");
-        Alph.util.log("Daemon Pid: " + daemonPid);
+        Alph.MozUtils.log("Daemon Pid: " + daemonPid);
         
         var attach_url = Alph.main.getLocalDaemonHost() + ":"  + Alph.main.getLocalDaemonPort() + "/attach";
         
@@ -674,13 +626,13 @@ Alph.main =
                 dataType: "text",
                 cache: false,
                 url: attach_url,
-                //timeout: Alph.util.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
+                //timeout: Alph.MozUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
                 success: 
-                    function() { Alph.util.log("Daemon attached at " + attach_url); },
+                    function() { Alph.MozUtils.log("Daemon attached at " + attach_url); },
                 error:
                     function(req, status, error ) 
                     { 
-                        Alph.util.log("Daemon failed to attach: " + 
+                        Alph.MozUtils.log("Daemon failed to attach: " + 
                             status || error); 
                     } 
             }
@@ -697,10 +649,8 @@ Alph.main =
      */
     alert_mhttpd_failure: function(req,text,error)
     {
-        Alph.util.log("Unable to verify daemon start: " + error || text);
-        var err_msg = 
-                document.getElementById("alpheios-strings")
-                        .getString("alph-error-mhttpd-failure");
+        Alph.MozUtils.log("Unable to verify daemon start: " + error || text);
+        var err_msg = Alph.main.get_string("alph-error-mhttpd-failure");
         alert(err_msg);
     },
 
@@ -714,17 +664,16 @@ Alph.main =
      */
     start_mhttpd: function(req,text,error) 
     {
-        Alph.util.log("start daemon");
+        Alph.MozUtils.log("start daemon");
         var cc = Components.classes;
         var ci = Components.interfaces;
 
         var daemon = 
-            Alph.util.getPlatformFile(['mhttpd','mhttpd'],false,null,true);
+            Alph.MozUtils.getPlatformFile(['mhttpd','mhttpd'],false,null,true);
 
         if (daemon == null)
         {
-            alert(Alph.$("#alpheios-strings").get(0)
-                .getString("alph-error-mhttpd-notfound"));
+            alert(Alph.main.get_string("alph-error-mhttpd-notfound"));
             return;
                     
         }
@@ -741,12 +690,12 @@ Alph.main =
             {
                 var chromepkg = 
                     Alph.Languages.get_lang_tool(lang).getchromepkg();
-                Alph.util.log("setting up mhttpd for " + chromepkg);
+                Alph.MozUtils.log("setting up mhttpd for " + chromepkg);
                 var chrome_path = 
-                    Alph.util.getExtensionBasePath(chromepkg);
+                    Alph.MozUtils.getExtensionBasePath(chromepkg);
                 
                 chrome_path.append("mhttpd.conf");
-                Alph.util.log("Reading file at " + chrome_path.path);
+                Alph.MozUtils.log("Reading file at " + chrome_path.path);
                 // open an input stream from file
                 var istream = cc["@mozilla.org/network/file-input-stream;1"]
                               .createInstance(Components.interfaces.nsIFileInputStream);
@@ -757,16 +706,16 @@ Alph.main =
                 var line = {}, hasmore;
                 do {
                     hasmore = istream.readLine(line);
-                    Alph.util.log("Read " + line.value);
+                    Alph.MozUtils.log("Read " + line.value);
                     var values = line.value.split(/\|/);
                     
                     var exe_info = values[1].split(/,/);
                     // translate the exe file path
                     var exe_file = 
-                        Alph.util.getPlatformFile(exe_info,false,chromepkg,true);
+                        Alph.MozUtils.getPlatformFile(exe_info,false,chromepkg,true);
                     if (exe_file == null)
                     {
-                        Alph.util.log(
+                        Alph.MozUtils.log(
                             "Unable to find file at " + 
                             values[1] + " for package" + chromepkg);
                     }
@@ -782,7 +731,7 @@ Alph.main =
             }
         }
 
-        var keywords = Alph.util.getPref("mhttpd.keywords") || "";
+        var keywords = Alph.MozUtils.getPref("mhttpd.keywords") || "";
         var config = daemon.parent.clone();
         config.append("mhttpd.conf");    
         // write config file
@@ -832,50 +781,30 @@ Alph.main =
     {
 
         var languages_set = false;
+        
+        var lang_list = Alph.LanguageToolFactory.get_lang_list();
+        
+        var language_count = lang_list.length;
 
-        var language_count = 0;
-        // discover supported languages
-        Alph.$("#alpheios-lang-popup-tm menuitem").each(
-            function(i)
-            {
-                //var lang = Alph.$(this).attr("value");
-                var lang = this.value;
-                Alph.util.log("Language menuitem: " + lang);
-                if (lang != null && lang != '' )
-                {
-                    if (typeof Alph.LanguageToolSet[lang] == "undefined")
-                    {
-                        // if a derived class for this language isn't defined,
-                        //  instantiate an instance of the base class
-                        Alph.Languages.add_lang_tool(lang,new Alph.LanguageTool(lang));
-                    }
-                    else if (Alph.LanguageToolSet[lang].implementsAlphLanguageTool)
-                    {
-                        // if we have a derived class for this language,
-                        // instantiate an instance of the derived class
-                        Alph.Languages.add_lang_tool(lang,new Alph.LanguageToolSet[lang](lang));
-                    }   
-                    language_count++;
-                }
-                else
-                {
-                    Alph.util.log("Language value undefined for " + this.label);
-                    Alph.$(this).attr("hidden","true");
-                }
-            }
-         );
-         
-         // if we have don't have at least one language, show the 'none' item
-         // in the menu and return false to disable the extension
-         if (language_count==0)
-         {
+        // if we have don't have at least one language, show the 'none' item
+        // in the menu and return false to disable the extension
+        if (language_count==0)
+        {
             Alph.$("#alpheios-tm-lang-none").attr("hidden","false");
             Alph.$("#alpheios-cm-lang-none").attr("hidden","false"); 
-         }
-         else
-         { 
+        }
+        else
+        {
+            for (var i=0; i<lang_list.length; i++)
+            {
+                // TODO add the menu items
+            
+                var a_lang = lang_list[i];
+                Alph.Languages.add_lang_tool(a_lang,Alph.LanguageToolFactory.create_instance(a_lang,Alph));                
+            }
+         
             // set the default language from preferences if possible
-            var pref_lang = Alph.util.getPref("default_language");
+            var pref_lang = Alph.MozUtils.getPref("default_language");
             if (pref_lang != null && pref_lang != '' &&
                 Alph.Languages.has_lang(pref_lang))
             {
@@ -891,8 +820,8 @@ Alph.main =
             }
             // successfully setup the Alph.Languages object, so return true 
             languages_set = true;
-         }
-         return languages_set;
+        }
+        return languages_set;
     },
     
     /**
@@ -1007,9 +936,9 @@ Alph.main =
     setXlateTrigger: function(a_bro, a_trigger)
     {
         // trigger is hard-coded to dble-click in quiz mode
-        if (a_trigger == 'mousemove' && this.get_state_obj(a_bro).get_var("level") == this.levels.LEARNER)
+        if (a_trigger == 'mousemove' && this.get_state_obj(a_bro).get_var("level") == Alph.Constants.levels.LEARNER)
         {
-            alert(Alph.$("#alpheios-strings").get(0).getString('alph-trigger-force-dbleclick'));
+            alert(this.get_string('alph-trigger-force-dbleclick'));
             return;
         }
         // first, remove the old one, if any
@@ -1018,7 +947,7 @@ Alph.main =
         a_bro.addEventListener(a_trigger, this.doXlateText, false);
         this.get_state_obj(a_bro).set_var("xlate_trigger",a_trigger);
         this.set_tb_hints();
-        this.broadcast_ui_event(Alph.main.events.UPDATE_XLATE_TRIGGER,
+        this.broadcast_ui_event(Alph.Constants.events.UPDATE_XLATE_TRIGGER,
             {new_trigger: a_trigger,
              old_trigger: old_trigger
             }
@@ -1075,7 +1004,7 @@ Alph.main =
             function(i)
             {
                 var lang = this.value;
-                Alph.util.log("Adding menuitem for: " + lang);
+                Alph.MozUtils.log("Adding menuitem for: " + lang);
                 Alph.$(this).clone(true).appendTo(main_menu);
             }
         );
@@ -1251,7 +1180,7 @@ Alph.main =
         {
             return;
         }
-        Alph.util.log("Executing " + cmd_id);
+        Alph.MozUtils.log("Executing " + cmd_id);
         if (lang_tool && lang_tool.getCmd(cmd_id))
         {
             lang_tool[(lang_tool.getCmd(cmd_id))](a_event);
@@ -1261,7 +1190,7 @@ Alph.main =
     
     /** 
      * Broadcast a UI event to the panels
-     * @param a_event_type the type of event (per Alph.main.events)
+     * @param a_event_type the type of event (per Alph.Constants.events)
      * @param a_event_data optional data object associated with the event
      * TODO replace this with the Observes JS Module when FF3 is min supported
      */
@@ -1276,12 +1205,12 @@ Alph.main =
                 try 
                 {
                     var panel_obj = Alph.main.panels[panel_id];
-                    Alph.util.log("Observing ui event " + a_event + " for panel " + panel_id); 
+                    Alph.MozUtils.log("Observing ui event " + a_event + " for panel " + panel_id); 
                     panel_obj.observe_ui_event(bro,a_event,a_event_data);    
                 } 
                 catch (e)
                 {   
-                    Alph.util.log("Error observing ui event for panel " + panel_id + ":" + e);
+                    Alph.MozUtils.log("Error observing ui event for panel " + panel_id + ":" + e);
                 }
             }
         );
@@ -1328,7 +1257,7 @@ Alph.main =
         // so that the page can check for the their presense
         if (Alph.$("meta[name=_alpheios-installed-version]",doc).length == 0)
         {
-            var pkg_list = Alph.util.getAlpheiosPackages();
+            var pkg_list = Alph.MozUtils.getAlpheiosPackages();
             pkg_list.forEach(
                 function(a_item)
                 {
@@ -1375,7 +1304,7 @@ Alph.main =
         }
         else
         {
-            auto_lang=Alph.site.is_basic_site(Alph.util.IO_SVC.newURI(bro.contentDocument.location,null,null));
+            auto_lang=Alph.site.is_basic_site(Alph.MozSvc.get_svc('IO').newURI(bro.contentDocument.location,null,null));
         }   
         
         auto_lang = Alph.Languages.map_language(auto_lang);
@@ -1387,14 +1316,14 @@ Alph.main =
             // if Alpheios is not enabled, auto-enable it
             if (! this.is_enabled(bro))
             {
-                Alph.util.log("Auto-enabling alpheios for " + auto_lang);
+                Alph.MozUtils.log("Auto-enabling alpheios for " + auto_lang);
                 this.autoToggle(bro,auto_lang);
                 return;
             }
             // if alpheios is enabled set to the right language for the prototype
             else if (this.is_enabled(bro) && cur_lang != auto_lang)
             {
-                Alph.util.log("Auto-switching alpheios to " + auto_lang);
+                Alph.MozUtils.log("Auto-switching alpheios to " + auto_lang);
                 Alph.main.select_language(auto_lang,true);
                 // select_language calls onTabSelect which will re-call reset_state
                 return;  
@@ -1406,7 +1335,7 @@ Alph.main =
             // and make sure the mode is set to READER
             if (! ped_site)
             {
-                this.set_mode(bro,Alph.main.levels.READER);
+                this.set_mode(bro,Alph.Constants.levels.READER);
             }
             // if we're on an enhanced site,  
             // reset the mode to whatever the default is
@@ -1429,7 +1358,10 @@ Alph.main =
                 var new_host = bro.contentDocument.location.host;
                 if (! new_host.match(/alpheios\.(net|org)/))
                 {
-                    this.show_leaving_site();
+                    Alph.MozUtils.open_dialog(
+                        window,
+                        'chrome://alpheios/content/dialogs/leaving-site.xul', 
+                        'alpheios-leaving-dialog'); 
                 }
             }
             catch(a_e){}
@@ -1439,7 +1371,7 @@ Alph.main =
         {
             // if we're on a basic site, and the extension is enabled,
             // the set the mode to READER
-            this.set_mode(bro,Alph.main.levels.READER);
+            this.set_mode(bro,Alph.Constants.levels.READER);
         }
         else
         {
@@ -1560,7 +1492,7 @@ Alph.main =
                 } 
                 catch (e)
                 {   
-                    Alph.util.log("Unable to reset state for panel " + panel_id + ":" + e);
+                    Alph.MozUtils.log("Unable to reset state for panel " + panel_id + ":" + e);
                 }
             }
         );
@@ -1584,7 +1516,7 @@ Alph.main =
         } 
         catch(exception)
         {
-            Alph.util.log("Error instantiating " +
+            Alph.MozUtils.log("Error instantiating " +
                 panel_id + " with " + panel_class + ":" + exception);
         }
         
@@ -1647,7 +1579,7 @@ Alph.main =
         {
             a_on = false;
             try {
-                a_on = Alph.util.getPref("enable.toolbar");
+                a_on = Alph.MozUtils.getPref("enable.toolbar");
             }
             catch(a_e)
             {
@@ -1679,7 +1611,7 @@ Alph.main =
      */
     enable_tb_lookup: function()
     {
-        if (Alph.util.getPref("toolbar.lookup"))
+        if (Alph.MozUtils.getPref("toolbar.lookup"))
         {
             Alph.$("#alpheios-lookup-enabled").attr("hidden",false);
         }
@@ -1687,52 +1619,6 @@ Alph.main =
         {
             Alph.$("#alpheios-lookup-enabled").attr("hidden",true);
         }
-    },
-    
-    /**
-     * open the leaving site dialog
-     */
-    show_leaving_site: function()
-    {
-        window.openDialog(
-            'chrome://alpheios/content/site/leaving-site.xul', 
-            'alpheios-leaving-dialog', 
-            'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
-        );   
-    },
-    /**
-     * open the about dialog
-     */
-    show_about: function()
-    {
-        window.openDialog(
-            'chrome://alpheios/content/about.xul', 
-            'alpheios-about-dialog', 
-            'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
-        );
-    },
-    
-    /**
-     * open the help window
-     */
-    show_help: function()
-    {
-        window.open(
-            'http://dev.alpheios.net:8008/site/content/alpheios-user-guide',
-            'alpheios-help'
-        );  
-    },
-    
-    /**
-     * open the options dialog
-     */
-    show_options: function()
-    {
-        window.openDialog(
-            'chrome://alpheios/content/alpheios-prefs.xul', 
-            'alpheios-options-dialog', 
-            'titlebar=yes,toolbar=yes,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes,dialog=yes,dependent=yes'
-        );
     },
 
     /**
@@ -1779,7 +1665,7 @@ Alph.main =
             
             // update the trigger - hardcoded to dblclick for quiz mode
             var trigger = a_mode == 
-                this.levels.LEARNER ? 'dblclick' 
+                Alph.Constants.levels.LEARNER ? 'dblclick' 
                                     : this.getLanguageTool(a_bro).getpopuptrigger();
             this.setXlateTrigger(a_bro,trigger);
             // clear out any popup
@@ -1873,7 +1759,7 @@ Alph.main =
                 if (this.handle_refresh)
                 {
                     this.handle_refresh = false;
-                    Alph.util.log("Handling refresh for " + this.last_url_base);
+                    Alph.MozUtils.log("Handling refresh for " + this.last_url_base);
                     var bro = Alph.main.getCurrentBrowser();
                     var doc = bro.contentDocument;
                     Alph.main.insert_metadata({target: doc});
@@ -1896,7 +1782,7 @@ Alph.main =
                                 } 
                                 catch (e)
                                 {   
-                                    Alph.util.log("Unable to refresh state for panel " + panel_id + ":" + e);
+                                    Alph.MozUtils.log("Unable to refresh state for panel " + panel_id + ":" + e);
                                 }
                             }
                         );
@@ -1905,7 +1791,7 @@ Alph.main =
                 else if(this.handle_load) 
                 {
                     this.handle_load = false;
-                    Alph.util.log("Handling load for " + this.last_url_base);
+                    Alph.MozUtils.log("Handling load for " + this.last_url_base);
                     Alph.main.reset_state(aWebProgress.DOMWindow);
                 }
            }
@@ -1917,7 +1803,7 @@ Alph.main =
            // This fires when the location bar changes; i.e load event is confirmed
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
-           // Alph.util.log("caught location change : " + aURI.spec);
+           // Alph.MozUtils.log("caught location change : " + aURI.spec);
            var new_url_base= aURI.spec.match(/([^#|\?]+)[#|\?]?/)[1]
            if (new_url_base == this.last_url_base)
            {
@@ -1943,13 +1829,13 @@ Alph.main =
     show_update_help: function()
     {
         var firstrun = [];
-        var alph_pkgs = Alph.util.getAlpheiosPackages();
+        var alph_pkgs = Alph.MozUtils.getAlpheiosPackages();
         alph_pkgs.forEach(
             function(a_pkg)
             {
                 try
                 {
-                    var last_install_ver = Alph.util.getPref('firstrun.'+ a_pkg.id);
+                    var last_install_ver = Alph.MozUtils.getPref('firstrun.'+ a_pkg.id);
                     if (! last_install_ver || (last_install_ver != a_pkg.version))
                     {
                         firstrun.push(a_pkg);
@@ -1966,17 +1852,103 @@ Alph.main =
         if (firstrun.length > 0)
         {
             // TODO should we open multiple release/package specific pages?
-            Alph.util.open_alpheios_link('release-notes');
+            Alph.util.open_alpheios_link(window,'release-notes');
             firstrun.forEach(
                 function(a_pkg)
                 {
-                    Alph.util.setPref('firstrun.'+a_pkg.id,a_pkg.version);
+                    Alph.MozUtils.setPref('firstrun.'+a_pkg.id,a_pkg.version);
                 }
             );
         }
 
     },
+   
+    /**
+     * Called by the preferences observer upon change to a preference we're watching.
+     * @param {String} a_name the name of the preference
+     * @param {String} a_value the new value of the preference
+     * @param {String} a_lang optional specification of the language
+     *                 to which the preference applies.
+     */
+    updatePref: function(a_name, a_value, a_lang) {
+        if (typeof a_lang != 'undefined')
+        {
+            a_name = a_lang + '.' + a_name;
+        }
+        // try to determine if this is a language-specific setting
+        else
+        {
+            var first_branch = a_name.match(/^(.*?)\./);
+            if (first_branch != null && 
+                Alph.Languages.has_lang(first_branch[1]))
+            {
+                a_lang = first_branch[1];
+            }
+        }
+        if (a_name.search(/popuptrigger$/) != -1)
+        {
+            // iterate through the open browsers
+            // updating to the trigger if alpheios 
+            // is enabled and the current language is
+            // named in the preference 
+            var num = gBrowser.browsers.length;
+            for (var i = 0; i < num; i++) {
+                var bro = gBrowser.getBrowserAtIndex(i);
+                if (Alph.main.is_enabled(bro) && 
+                    a_name.indexOf(Alph.main.get_state_obj(bro).get_var("current_language")) == 0)
+                {
+                    Alph.main.setXlateTrigger(bro,a_value);
+                }
+            }
+        }
+        else if (a_name.search(/enable.toolbar$/) != -1)
+        {
+            Alph.main.toggle_toolbar(a_value);
+        }
+        else if (a_name.search(/toolbar.lookup$/) != -1)
+        {
+            Alph.main.enable_tb_lookup();
+        }
+        if (typeof a_lang != 'undefined')
+        {
+            Alph.Languages.get_lang_tool(a_lang).observe_pref_change(a_name,a_value);
+        }
+        Alph.main.broadcast_ui_event(
+            Alph.Constants.events.UPDATE_PREF,
+                { name: a_name,
+                  value: a_value });
+    },
     
+    /**
+     * Get a language specific application string
+     * @param {String} a_lang the language key
+     * @param {String} a_name the string name
+     * @param {Array} a_replace optional array of replacement values
+     * @return the string (empty string if not defined) 
+     * @type String
+     */
+    get_language_string: function(a_lang,a_name,a_replace)
+    {
+        var bundle = Alph.$("#alpheios-strings-"+a_lang).get(0);
+        var str = "";
+        if (bundle)
+        {
+            str = Alph.MozUtils.get_string(bundle,a_name,a_replace);
+        }
+        return str;
+    },
+
+    /**
+     * Get an application string
+     * @param {String} a_name the string name
+     * @param {Array} a_replace optional array of replacement values
+     * @return the string (empty string if not defined) 
+     * @type String
+     */
+    get_string: function(a_name,a_replace)
+    {
+        return Alph.MozUtils.get_string(this.string_bundle,a_name,a_replace);
+    }
 };
 
 Alph.main.init();

@@ -48,7 +48,7 @@ Alph.Etymology.prototype = new Alph.Panel();
  */
 Alph.Etymology.prototype.init = function(a_panel_state)
 {
-    Alph.util.log("etymology panel init");
+    Alph.MozUtils.log("etymology panel init");
     // hack to hold etymology data until we have a real service
     this.temp_data = {};
     
@@ -111,7 +111,7 @@ Alph.Etymology.prototype.init_document = function(a_doc,a_doc_state)
     
     if (typeof a_doc_state.contents == "undefined")
     {
-        Alph.util.log("initializing etymology document");
+        Alph.MozUtils.log("initializing etymology document");
         a_doc_state = { css: null, contents: null };
         a_doc_state.contents = a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
         a_doc_state.contents.setAttribute("id", "alph-window");
@@ -191,8 +191,8 @@ Alph.Etymology.prototype.observe_ui_event = function(a_bro,a_event_type)
     // or completing removing the popup
 
     if (panel_state.status != Alph.Panel.STATUS_SHOW
-        || ( a_event_type != Alph.main.events.SHOW_TRANS
-             && a_event_type != Alph.main.events.REMOVE_POPUP
+        || ( a_event_type != Alph.Constants.events.SHOW_TRANS
+             && a_event_type != Alph.Constants.events.REMOVE_POPUP
             ))
 
     {
@@ -254,7 +254,7 @@ Alph.Etymology.prototype.get_etym_data = function()
         {
             try 
             {
-                Alph.util.log("Loading etymology file for " + chromepkg);
+                Alph.MozUtils.log("Loading etymology file for " + chromepkg);
                 var data = document.implementation.createDocument("", "", null);
                 data.async = false;
                 var chrome_url = "chrome://" + chromepkg + "/content/testetym.xml";
@@ -264,7 +264,7 @@ Alph.Etymology.prototype.get_etym_data = function()
             catch(e)
             {
                 this.temp_data[chromepkg] = null;
-                Alph.util.log("Error loading etymology file for " + chromepkg);
+                Alph.MozUtils.log("Error loading etymology file for " + chromepkg);
             }
         }
         return this.temp_data[chromepkg];

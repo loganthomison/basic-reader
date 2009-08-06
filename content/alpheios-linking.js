@@ -27,15 +27,7 @@
  * @singleton
  */
 Alph.linking = {
-
-    io_service:  
-            Components.classes["@mozilla.org/network/io-service;1"]
-            .getService(Components.interfaces.nsIIOService),
-
-    input_stream: 
-            Components.classes["@mozilla.org/scriptableinputstream;1"]
-            .getService(Components.interfaces.nsIScriptableInputStream),
-
+            
     loaded_indices: {},
     
     /**
@@ -55,14 +47,7 @@ Alph.linking = {
             this.loaded_indices[a_docid] = {};
             try {
                 var index_file_url = a_lang_tool.getIndexFile(a_docid);
-                Alph.util.log("Reading index from file system: " + index_file_url);
-                var channel = this.io_service.newChannel(index_file_url, null, null);
-                var input = channel.open();
-                this.input_stream.init(input);
-                var buffer = this.input_stream.read(input.available());
-                this.input_stream.close();
-                input.close();
-                
+                var buffer = Alph.MozUtils.read_file(index_file_url);
                 var lines = buffer.split(/\r?\n/);
                 lines.forEach(
                     function(a_e,a_i,a_lines)
@@ -77,7 +62,7 @@ Alph.linking = {
             } 
             catch(exception)
             {
-                Alph.util.log(exception);
+                Alph.MozUtils.log(exception);
                 return;
             }
     
