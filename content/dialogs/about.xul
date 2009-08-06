@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?> 
+<?xml-stylesheet href="chrome://alpheios/skin/about.css" type="text/css"?> 
+
+<!DOCTYPE dialog [
+    <!ENTITY % aboutDTD SYSTEM "chrome://alpheios/locale/about.dtd">
+    <!ENTITY % alphDTD SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+%aboutDTD;
+%alphDTD;
+]>
+
+<dialog id="alpheios-about-dialog"
+        title="&alpheios-about-title;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        buttons="accept" onload="Alph.Dialogs.load_about();" onaccept="this.close();">
+  <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+  <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />  
+  <script type="application/x-javascript" src="chrome://alpheios/content/dialogs/alpheios-dlg.js" />
+  
+   <stringbundleset id="stringbundleset">
+        <stringbundle id="alpheios-strings" 
+                      src="chrome://alpheios/locale/alpheios.properties"/>
+   </stringbundleset>
+
+  <vbox flex="1">
+    <hbox>
+        <label class="site-link" id="alpheios-site-link" 
+               onclick="Alph.util.open_alpheios_link(window.opener,'main');"/>
+    </hbox>
+    <groupbox id="alpheios-extension-list">
+        <caption class="alpheios-about-extensions" label="&alpheios-about-versions;"/>
+    </groupbox>
+    <hbox>
+        <label class="site-link" id="alpheios-feedback-link"
+               onclick="Alph.util.send_feedback();"
+               value="&alpheios.menu.feedback;"/>
+    </hbox>
+  </vbox>
+    
+  <separator id="groove" class="groove"/>
+
+</dialog>
+
+        
