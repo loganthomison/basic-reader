@@ -223,8 +223,13 @@
                 tooltiptext="&alpheios.menu.lang.tooltip;"
                 type="menu">
                 <menupopup 
-                    id="alpheios-lang-popup-mm" 
-                    onpopupshowing="Alph.main.update_main_menu_languages()"/>
+                    id="alpheios-lang-popup-mm">
+                    <menuitem id="alpheios-mm-lang-none"
+                          label="&alpheios.lang.none;"
+                          hidden="true"
+                          type="checkbox"
+                          value=""/>
+                </menupopup>
             </toolbarbutton>
             <toolbarbutton
                 id="alpheios-level-button-reader"

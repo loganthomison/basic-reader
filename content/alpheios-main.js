@@ -44,11 +44,6 @@ Alph.MozUtils.import_resource("resource://alpheios/alpheios-langtool-factory.jsm
 Alph.main =
 {
     
-    /** 
-     * flag for main menu update status
-     */
-    mm_languages_updated: false,
-    
     // id of this extension
     // TODO we can probably remove this now
     extensionGUID: "{4816253c-3208-49d8-9557-0745a5508299}",
@@ -791,16 +786,29 @@ Alph.main =
         if (language_count==0)
         {
             Alph.$("#alpheios-tm-lang-none").attr("hidden","false");
+            Alph.$("#alpheios-mm-lang-none").attr("hidden","false");
             Alph.$("#alpheios-cm-lang-none").attr("hidden","false"); 
         }
         else
         {
             for (var i=0; i<lang_list.length; i++)
-            {
-                // TODO add the menu items
-            
+            {           
                 var a_lang = lang_list[i];
-                Alph.Languages.add_lang_tool(a_lang,Alph.LanguageToolFactory.create_instance(a_lang,Alph));                
+                Alph.Languages.add_lang_tool(a_lang,Alph.LanguageToolFactory.create_instance(a_lang,Alph));
+             
+                // add menu items to the various language menus for this language
+                var lang_string = this.get_language_string(a_lang,a_lang+'.string');
+                var menuitem = Alph.util.makeXUL(
+                    'menuitem',
+                    'alpheios-tm-lang-'+a_lang,
+                    ['label','value','type'],
+                    [lang_string,a_lang,'checkbox']
+                );
+                Alph.$("#alpheios-lang-popup-tm").append(menuitem);
+                Alph.$("#alpheios-lang-popup-mm").append(
+                    Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
+                Alph.$("#alpheios-lang-popup-cm").append(
+                    Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
             }
          
             // set the default language from preferences if possible
@@ -813,10 +821,9 @@ Alph.main =
             // no preferences so just use the first language in the 
             // menu as the default
             else
-            {
-                             
-             Alph.main.defaultLanguage = 
-                Alph.$("#alpheios-lang-popup-tm menuitem:visible").get(0).value;
+            {         
+                Alph.main.defaultLanguage = 
+                    Alph.$("#alpheios-lang-popup-tm menuitem:visible").get(0).value;
             }
             // successfully setup the Alph.Languages object, so return true 
             languages_set = true;
@@ -986,31 +993,6 @@ Alph.main =
         return trigger;
     },
         
-    /**
-     * Update the Languages menu items
-     */
-    update_main_menu_languages: function()
-    {
-        // just return if we've already done this once
-        if (this.mm_languages_updated)
-        {
-            return;
-        }
-        var main_menu = Alph.$("#alpheios-lang-popup-mm").get(0);
-        // iterate through the toolbar menu items
-        // adding them to the main menu
-        
-        Alph.$("#alpheios-lang-popup-tm menuitem").each(
-            function(i)
-            {
-                var lang = this.value;
-                Alph.MozUtils.log("Adding menuitem for: " + lang);
-                Alph.$(this).clone(true).appendTo(main_menu);
-            }
-        );
-        this.mm_languages_updated = true; 
-    },
-    
     /**
      * Lookup a user-provided word
      * @param {Event} a_event the event that triggered th elookup
@@ -1929,11 +1911,13 @@ Alph.main =
      */
     get_language_string: function(a_lang,a_name,a_replace)
     {
-        var bundle = Alph.$("#alpheios-strings-"+a_lang).get(0);
         var str = "";
-        if (bundle)
+        try { 
+            str = Alph.LanguageToolFactory.get_stringbundle(a_lang).get(a_name,a_replace); 
+        }
+        catch (a_e)
         {
-            str = Alph.MozUtils.get_string(bundle,a_name,a_replace);
+            str = "";
         }
         return str;
     },

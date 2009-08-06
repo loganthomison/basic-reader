@@ -16,7 +16,8 @@
     </stringbundleset>
     <prefpane id="alpheios-prefs-features" 
           label="&alpheios.prefs.features;" 
-          image="chrome://alpheios/skin/icons/alpheios_32.ico">
+          image="chrome://alpheios/skin/icons/alpheios_32.ico"
+          onpaneload="Alph.prefs.init_feature_prefs();">
         <preferences>
             <preference id="pref-tblookup" name="extensions.alpheios.toolbar.lookup" type="bool"/>
             <preference id="pref-smallicons" name="extensions.alpheios.smallicons" type="bool"/>

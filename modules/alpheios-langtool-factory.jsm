@@ -29,6 +29,9 @@
  */
 var EXPORTED_SYMBOLS = ["LanguageToolFactory"];
 
+Components.utils.import('resource://alpheios/alpheios-moz-utils.jsm');
+Components.utils.import('resource://alpheios/ext/StringBundle.jsm');
+
 /**
  * @singleton
  * 
@@ -90,5 +93,16 @@ LanguageToolFactory =
         {
            return new a_scope[this[a_lang]](a_lang);
         }
+    },
+    
+    /**
+     * get the StringBundle for a language
+     * @param {String} a_lang the language key
+     * @return {StringBundle} a StringBundle object
+     */
+    get_stringbundle: function(a_lang)
+    {
+        var chromepkg = MozUtils.getPref("chromepkg",a_lang);
+        return new StringBundle("chrome://" + chromepkg + "/locale/alpheios-"+a_lang+'.properties');
     }
 };
