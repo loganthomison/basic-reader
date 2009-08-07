@@ -556,7 +556,6 @@ Alph.Quiz =
                    ending: $(".alph-infl-set .alph-suff",a_src_node).eq(0).text() || '-', 
                    attributes: context_list[0],
                    src_node: a_src_node,
-                   convert_obj: Alph.convert,
                    lang_tool: window.arguments[0].lang_tool, 
                 },
                 function() { Alph.Quiz.on_infl_correct(a_src_node) }

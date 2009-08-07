@@ -30,6 +30,7 @@ if (typeof Alph == "undefined") {
 }
 
 Components.utils.import("resource://alpheios/alpheios-moz-utils.jsm",Alph);
+Components.utils.import("resource://alpheios/alpheios-convert.jsm",Alph);
 
 // load the jQuery library in the scope of the Alph object
 // and call jQuery.noConflict(extreme) to revert control of the

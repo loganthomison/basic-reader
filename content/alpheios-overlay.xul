@@ -26,7 +26,6 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-languages.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-state.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-popup.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-lang-tool.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-src-select.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />

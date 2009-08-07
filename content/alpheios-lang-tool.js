@@ -640,7 +640,7 @@ function(a_ro, a_rngstr)
  * Generic method to apply any necessary conversion
  * to the source text selection.
  * Delegates to a language-specific
- * conversion method in the Alph.convert namespace.
+ * conversion method in the Alph.Convert namespace.
  * @private
  * @param {Alph.SourceSelection} a_alphtarget the object returned by {@link #findSelection}
  */
@@ -650,10 +650,10 @@ Alph.LanguageTool.prototype.handleConversion = function(a_alphtarget)
         Alph.MozUtils.getPref("methods.convert",this.source_language);
 
     if (convert_method != null
-        && typeof Alph.convert[convert_method] == 'function'
+        && typeof Alph.Convert[convert_method] == 'function'
         && a_alphtarget.getWord())
     {
-        a_alphtarget.convertWord( function(a_word) { return Alph.convert[convert_method](a_word); } );
+        a_alphtarget.convertWord( function(a_word) { return Alph.Convert[convert_method](a_word); } );
     }
 
     return a_alphtarget;

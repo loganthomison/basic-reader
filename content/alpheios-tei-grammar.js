@@ -28,8 +28,8 @@ Alph.tei_grammar = {
      * @param {String} a_index name of the grammar index file
      */
     onLoad: function(a_index) {
-        var toc_doc = $("#alph-grammar-toc").get(0).contentDocument;
-        var content_browser = $("#alph-grammar-content");
+        var toc_doc = Alph.$("#alph-grammar-toc").get(0).contentDocument;
+        var content_browser = Alph.$("#alph-grammar-content");
         
         // Add a handler to main grammar content browser window 
         // which adds a click handler to the links in the grammar
@@ -39,7 +39,7 @@ Alph.tei_grammar = {
                 "DOMContentLoaded",
                 function() 
                 {
-                    $("a",this.contentDocument)
+                    Alph.$("a",this.contentDocument)
                         .click(Alph.tei_grammar.contentClickHandler);
                 },
                 true
@@ -66,11 +66,11 @@ Alph.tei_grammar = {
         }
         
         // hide the header in the toc
-        $("div.stdheader",toc_doc).css("display","none");
+        Alph.$("div.stdheader",toc_doc).css("display","none");
             
         // Add a click handler to the links in the toc: they set the 
         // src of the alph-grammar-content iframe
-        $("a.toc",toc_doc).click(
+        Alph.$("a.toc",toc_doc).click(
             function(a_e)
             {
                 return Alph.tei_grammar.tocClickHandler(a_e,this,params.lang_tool);
@@ -79,14 +79,14 @@ Alph.tei_grammar = {
     
 
         // add the toggle widgets
-        $("li.toc:has(li)",toc_doc).prepend("<div class='toc-widget toc-closed'/>");
+        Alph.$("li.toc:has(li)",toc_doc).prepend("<div class='toc-widget toc-closed'/>");
         
         // hide the subcontents of the toc headings and only show toc_0 by default
-        $("li.toc",toc_doc).css("display","none");
-        $("li.toc:has(a.toc_0)",toc_doc).css("display","block");
+        Alph.$("li.toc",toc_doc).css("display","none");
+        Alph.$("li.toc:has(a.toc_0)",toc_doc).css("display","block");
         
         // Add a click handler to the toc widgets
-        $("div.toc-widget",toc_doc).click(Alph.tei_grammar.tocheadClickHandler);
+        Alph.$("div.toc-widget",toc_doc).click(Alph.tei_grammar.tocheadClickHandler);
 
         // if a callback function was passed in in the window
         // arguments, execute it
@@ -106,14 +106,14 @@ Alph.tei_grammar = {
      */
     tocClickHandler: function(a_event,a_elem,a_lang_tool)
     {
-        var toc_doc = $("#alph-grammar-toc").get(0).contentDocument;
-        var href = $(a_elem).attr("href");
-        $("#alph-grammar-content").attr("src",
+        var toc_doc = Alph.$("#alph-grammar-toc").get(0).contentDocument;
+        var href = Alph.$(a_elem).attr("href");
+        Alph.$("#alph-grammar-content").attr("src",
                 
                 Alph.tei_grammar.get_base_url(a_lang_tool) + href 
             );
-        $('.highlighted',toc_doc).removeClass('highlighted');
-        $(a_elem).addClass('highlighted');
+        Alph.$('.highlighted',toc_doc).removeClass('highlighted');
+        Alph.$(a_elem).addClass('highlighted');
         return false;
     },
 
@@ -126,19 +126,19 @@ Alph.tei_grammar = {
     tocheadClickHandler: function(a_event)
     {
         // hide/show the child toc li items
-        var sib_uls = $(this).siblings("ul");
-        var sib_lis = $(">li",sib_uls);
-        if ($(sib_lis).css('display') == 'block') 
+        var sib_uls = Alph.$(this).siblings("ul");
+        var sib_lis = Alph.$(">li",sib_uls);
+        if (Alph.$(sib_lis).css('display') == 'block') 
         {
-            $(sib_lis).css("display", "none")
-            $(this).removeClass("toc-open");
-            $(this).addClass("toc-closed");
+            Alph.$(sib_lis).css("display", "none")
+            Alph.$(this).removeClass("toc-open");
+            Alph.$(this).addClass("toc-closed");
         }
         else
         {
-            $(sib_lis).css("display", "block")
-            $(this).removeClass("toc-closed");
-            $(this).addClass("toc-open");
+            Alph.$(sib_lis).css("display", "block")
+            Alph.$(this).removeClass("toc-closed");
+            Alph.$(this).addClass("toc-open");
         }
         
         // prevent event propagation
@@ -189,7 +189,7 @@ Alph.tei_grammar = {
         );
         if (typeof start_href_target != "undefined")
         {
-            $("#alph-grammar-content").attr("src", 
+            Alph.$("#alph-grammar-content").attr("src", 
                   Alph.tei_grammar.get_base_url(a_params.lang_tool) 
                 + start_href_target
             );
