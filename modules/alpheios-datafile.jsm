@@ -1,5 +1,5 @@
 /**
- * @fileoverview Alph.Datafile - access data from file
+ * @fileoverview Datafile - access data from file
  *  
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -21,13 +21,21 @@
  */
 
 /**
- * @class Alph.Datafile contains the datafile lookup functionality.
+ * This module exports a single symbol, Datafile
+ * This object should be imported into the namespace of the importing class
+ */
+const EXPORTED_SYMBOLS = ['Datafile'];
+
+Components.utils.import("resource://alpheios/alpheios-moz-utils.jsm");
+
+/**
+ * @class Datafile contains the datafile lookup functionality.
  * @constructor
  *
  * @param {String} a_url URL to read
  * @param {String} a_charset character set (or null for no conversion)
  */
-Alph.Datafile = function(a_url, a_charset)
+Datafile = function(a_url, a_charset)
 {
     // save parameters for possible future reload
     this.url = a_url;
@@ -35,14 +43,14 @@ Alph.Datafile = function(a_url, a_charset)
     this.separator = '|';
     this.specialFlag = '@';
 
-    this.data = Alph.MozUtils.read_file(a_url,a_charset);
+    this.data = MozUtils.read_file(a_url,a_charset);
 
     // make sure file ends with newline
     if (this.data[this.data.length - 1] != '\n')
         this.data += '\n';
 }
 
-Alph.Datafile.prototype =
+Datafile.prototype =
 {
     /**
      * get data
@@ -125,13 +133,14 @@ Alph.Datafile.prototype =
         var beg = 0;
         var end = this.data.length - 1;
 
+        MozUtils.log("a_key="+a_key);
         // while data still remains
         while (beg < end)
         {
             // find line containing midpoint of remaining data
             mid = this.data.lastIndexOf('\n', (beg + end) >> 1) + 1;
             midStr = this.data.substr(mid, tlen);
-
+            MozUtils.log("midStr="+midStr);
             // if too high, restrict to first half
             if (a_key < midStr)
                 end = mid - 1;
@@ -142,6 +151,10 @@ Alph.Datafile.prototype =
             else
                 break;
         }
+        
+        MozUtils.log("beg="+beg);
+        MozUtils.log("end="+end);
+        MozUtils.log("mid="+mid);
 
         // if found, back up to first line with key
         if (beg < end)
@@ -150,11 +163,13 @@ Alph.Datafile.prototype =
             while (mid >= 2)
             {
                 // find start of preceding line
-                prec = this.data.lastIndexOf('\n', mid - 2) + 1;
+                var prec = this.data.lastIndexOf('\n', mid - 2) + 1;
 
                 // if preceding line has different key then done,
                 // else back up to preceding line
                 midStr = this.data.substr(prec, tlen);
+                MozUtils.log("Midstr="+midStr);
+                MozUtils.log("key="+a_key);
                 if (a_key != midStr)
                     break;
                 mid = prec;
@@ -181,12 +196,12 @@ Alph.Datafile.prototype =
     findData: function(a_key)
     {
         // if key not found at all, return empty string
-        start = this.binarySearch(a_key);
+        var start = this.binarySearch(a_key);
         if (start == -1)
             return null;
 
         const tlen = a_key.length;
-        end = start;
+        var end = start;
 
         // while more lines remain
         while (end < this.data.length)
@@ -198,7 +213,7 @@ Alph.Datafile.prototype =
 
             // if next line has different key then done,
             // else include this line in output
-            test = this.data.substr(end, tlen);
+            var test = this.data.substr(end, tlen);
             if (a_key != test)
                 break;
         }

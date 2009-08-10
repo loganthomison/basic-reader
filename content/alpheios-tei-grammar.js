@@ -22,6 +22,8 @@
  */
 Alph.tei_grammar = {
 
+    index_file: null,
+    
     /**
      * onLoad 
      * load handler for the grammar window
@@ -49,8 +51,13 @@ Alph.tei_grammar = {
         var params;
         if (typeof window.arguments != "undefined")
         {
-            params=window.arguments[0];   
-
+            params=window.arguments[0];
+            if (this.index_file == null)
+            {
+                this.index_file = new Alph.Datafile(
+                    params.lang_tool.getIndexFile(a_index),null);
+                this.index_file.setSeparator(',');
+            }
             // add a callback to the parameters object
             // which can be called by the opener code 
             // to reload the window with new arguments
@@ -59,11 +66,13 @@ Alph.tei_grammar = {
                 params.update_args_callback =
                     function(a_args)
                         {
-                            Alph.tei_grammar.set_start_href(a_args,a_index);
+                            Alph.tei_grammar.set_start_href(a_args);
                         }
             }
-            this.set_start_href(params,a_index);            
+            this.set_start_href(params);            
         }
+        
+
         
         // hide the header in the toc
         Alph.$("div.stdheader",toc_doc).css("display","none");
@@ -162,11 +171,8 @@ Alph.tei_grammar = {
      * @param {Object} a_params object containing a target_href property 
      *                          which specifies the name of the target location in the 
      *                          grammar (according to the Alpheios morphological markup)
-     * @param {String} a_index name of the index file which contains the mapping of 
-     *                         the context supplied in the target_href to actual location
-     *                         in the grammar 
      */
-    set_start_href: function(a_params,a_index)
+    set_start_href: function(a_params)
      {
         // pick up the original target href for the grammar from the
         // window arguments
@@ -177,18 +183,10 @@ Alph.tei_grammar = {
                 a_params.target_href  : 
                 'preface';
         
-        // TODO - eventually, if we keep Alph.Linking, it
-        // should be made a JS Module singleton and 
-        // moved to the /modules directory eliminating the reference 
-        // to window.opener
-        var start_href_target = 
-            window.opener.Alph.linking.find_link_target(
-                start_href,
-                a_index,
-                a_params.lang_tool
-        );
-        if (typeof start_href_target != "undefined")
-        {
+        var data = this.index_file.findData(start_href); 
+        if (data != null)
+        {        
+            var start_href_target = data.split(this.index_file.getSeparator(),2)[1]
             Alph.$("#alph-grammar-content").attr("src", 
                   Alph.tei_grammar.get_base_url(a_params.lang_tool) 
                 + start_href_target
