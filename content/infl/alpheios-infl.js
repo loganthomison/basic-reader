@@ -24,7 +24,7 @@
 /**
  * @singleton
  */
-Alph.infl = {
+Alph.Infl = {
          /**
      * An XSLT Processor for the xml verb conjugation data
      * @private
@@ -98,10 +98,10 @@ Alph.infl = {
             (link_target.xml_url && link_target.xml_url.match(/alph-infl-index.xml/)))
         {
             var doc = $(infl_browser).get(0).contentDocument;
-            var infl_html = Alph.infl.transform(link_target);
+            var infl_html = Alph.Infl.transform(link_target);
             var infl_node = 
                 doc.importNode(infl_html.getElementById("alph-infl-index"),true);
-            this.init_index(infl_node);
+            this.initIndex(infl_node);
             $("body",doc).append(infl_node);   
             // add a click handler to each index link to bring up the 
             // corresponding inflection table
@@ -109,7 +109,7 @@ Alph.infl = {
                 function(e)
                 {
                     $(this).addClass("loading");
-                    var params = Alph.infl.parse_index_link(($(this).attr("href")));
+                    var params = Alph.Infl.parseIndexLink(($(this).attr("href")));
                     link_target.lang_tool.
                         handleInflections(e,$(this),params);
                 }
@@ -146,7 +146,7 @@ Alph.infl = {
 
                     if ((link_target.xml_url || link_target.xml_obj) && link_target.xslt_processor)
                     {
-                        var infl_html = Alph.infl.transform(link_target);
+                        var infl_html = Alph.Infl.transform(link_target);
                         var infl_node = 
                             this.contentDocument.importNode(infl_html.getElementById("alph-infl-table"),true);
                         var title_notes = infl_html.getElementById("table-notes");
@@ -163,8 +163,8 @@ Alph.infl = {
                     }
                     $(".loading",this.contentDocument).hide();
                     var tbl = $('#alph-infl-table',this.contentDocument);
-                    Alph.infl.showCols(tbl,link_target,pofs_set);
-                    Alph.infl.resize_window(this.contentDocument);
+                    Alph.Infl.showCols(tbl,link_target,pofs_set);
+                    Alph.Infl.resizeWindow(this.contentDocument);
 
                     // scroll to the current element
                     var focus_elem = 
@@ -209,7 +209,7 @@ Alph.infl = {
      * @private
      * @param {HTMLElement} a_tbl the Table element
      */
-    init_table: function(a_tbl) {
+    initTable: function(a_tbl) {
         $(a_tbl).tableHover({colClass: "highlight-hover",
                            rowClass: "highlight-hover",
                            headCols: true,
@@ -236,7 +236,7 @@ Alph.infl = {
         // then initialize it 
         if ($(a_tbl).eq(0).is('table') && ! $(a_tbl).eq(0).hasClass('nomatch') )
         {
-            this.init_table(a_tbl);    
+            this.initTable(a_tbl);    
         }
         // otherwise, it's probably a div containing one or more tables, so initialize
         // each child table
@@ -245,7 +245,7 @@ Alph.infl = {
             $('table', a_tbl).each(
                 function()
                 {
-                    Alph.infl.init_table(this);
+                    Alph.Infl.initTable(this);
                 }
             );
         }
@@ -261,7 +261,7 @@ Alph.infl = {
         // add handler for the reorder links
         $("#sortorder",topdoc).change( 
             function(e) { 
-                Alph.infl.resort(
+                Alph.Infl.resort(
                     e,
                     this,
                     a_link_target.source_node,
@@ -275,7 +275,7 @@ Alph.infl = {
         // add the version string and disclaimer
         $("body",topdoc).prepend('<div id="alph-version-info"></div>');
         var version_string = 
-            a_link_target.lang_tool.get_string_or_default('alph-version-link',[]);
+            a_link_target.lang_tool.getStringOrDefault('alph-version-link',[]);
         if (version_string)
         {
             $("#alph-version-info",topdoc)
@@ -283,7 +283,7 @@ Alph.infl = {
                 .click(
                     function()
                     {
-                        Alph.util.open_alpheios_link(window.opener,'release-notes');
+                        Alph.Util.openAlpheiosLink(window.opener,'release-notes');
                         return false;
                     });
         }
@@ -293,7 +293,7 @@ Alph.infl = {
             $(".ending",a_tbl).length > 0)
         {
             try {
-                var disclaimer = Alph.MozUtils.get_string(str_props,'disclaimer')
+                var disclaimer = Alph.MozUtils.getString(str_props,'disclaimer')
                 $("#alph-infl-table",topdoc)
                     .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
             } 
@@ -308,11 +308,11 @@ Alph.infl = {
         {
             if (typeof a_link_target.title == 'undefined')
             {
-                title = Alph.MozUtils.get_string(str_props,'alph-infl-title-'+showpofs);
+                title = Alph.MozUtils.getString(str_props,'alph-infl-title-'+showpofs);
             }
             else
             {   
-                title = Alph.MozUtils.get_string(str_props,a_link_target.title);
+                title = Alph.MozUtils.getString(str_props,a_link_target.title);
             }
         
         }
@@ -325,7 +325,7 @@ Alph.infl = {
         // add a link to the index
         $("body",topdoc).prepend(
             "<div id='alph-infl-index-link'>"
-            + Alph.MozUtils.get_string(str_props,"alph-infl-index-link") 
+            + Alph.MozUtils.getString(str_props,"alph-infl-index-link") 
             + '</div>');
             
         $("#alph-infl-index-link",topdoc).click(
@@ -340,7 +340,7 @@ Alph.infl = {
         
         // replace the table header text
         $(".header-text",topdoc).each( 
-            function(e) { Alph.infl.replace_string(this,str_props) } );
+            function(e) { Alph.Infl.replaceString(this,str_props) } );
         
         var end = (new Date()).getTime();
         Alph.MozUtils.log("Translation time: " + (end-start));
@@ -368,10 +368,10 @@ Alph.infl = {
                         (typeof a_link_target.xslt_params == "undefined" &&
                              a_link_target.suffixes[showpofs] != null &&
                              a_link_target.suffixes[showpofs].length > 0 && 
-                            Alph.infl.is_ending_match(a_link_target.suffixes[showpofs],this,a_link_target.lang_tool) )
+                            Alph.Infl.isEndingMatch(a_link_target.suffixes[showpofs],this,a_link_target.lang_tool) )
                        )
                     {
-                            Alph.infl.highlight_ending(this,col_parents);
+                            Alph.Infl.highlightEnding(this,col_parents);
                     }                       }
             
             );
@@ -379,7 +379,7 @@ Alph.infl = {
             Alph.MozUtils.log("Endings Highlighted: " + (end-start));
             start=end;
             
-            var sib_cols = Alph.infl.find_sib_cols(col_parents,all_cols);
+            var sib_cols = Alph.Infl.findSibCols(col_parents,all_cols);
                         
             // unhide all the cells in the colgroups to which the matched
             // endings belonged
@@ -392,20 +392,20 @@ Alph.infl = {
             // or we should expand anyway, expand the whole thing
             if (sib_cols.length == 0 || a_link_target.always_expand)
             {
-                Alph.infl.expand_table(a_tbl,topdoc);
+                Alph.Infl.expandTable(a_tbl,topdoc);
             }
             else 
             {
                 $("#expand-table-link",topdoc)
                     .css("display","inline")
                     .click( function(e) {
-                        Alph.infl.expand_table(a_tbl,topdoc,true);
+                        Alph.Infl.expandTable(a_tbl,topdoc,true);
                         return false;
                     });
             }
         } 
         else {
-            Alph.infl.expand_table(a_tbl,topdoc);            
+            Alph.Infl.expandTable(a_tbl,topdoc);            
         }
         end = (new Date()).getTime();
         Alph.MozUtils.log("Selected Endings Displayed: " + (end-start));
@@ -414,24 +414,24 @@ Alph.infl = {
         // with nothing highlighted
         
         // add the inflection links for the other parts of speech
-        this.add_infl_links(a_pofs_set,showpofs,topdoc,str_props);
+        this.addInflLinks(a_pofs_set,showpofs,topdoc,str_props);
     
         // add the auxiliary inflection links
-        this.add_infl_links(a_link_target.links,showpofs,topdoc,str_props);
+        this.addInflLinks(a_link_target.links,showpofs,topdoc,str_props);
         
         // TODO - dedupe all the inflection links? See congestaque
         
         // if we have any additional inflection links, show them
         if ($("select#infl-links-select option",topdoc).length > 1)
         {
-            var label = Alph.MozUtils.get_string(str_props,"alph-infl-links-label"); 
+            var label = Alph.MozUtils.getString(str_props,"alph-infl-links-label"); 
             $("#infl-links-label",topdoc).text(label);
             $("#infl-links",topdoc).css("display","block");
             
             // add the click handler to the inflections links
             $("#infl-links-select",topdoc).change(
                 function(e) {
-                    Alph.infl.switch_inflection(
+                    Alph.Infl.switchInflection(
                         e,
                         this,
                         a_link_target.source_node,
@@ -442,16 +442,16 @@ Alph.infl = {
         }
         
         // add a click handler to the footnotes
-        $(".footnote",topdoc).click(function(e){return Alph.infl.show_footnote(e,this)});
+        $(".footnote",topdoc).click(function(e){return Alph.Infl.showFootnote(e,this)});
         
         // add a click handler to any language-specific functional links
         $(".alph-lang-infl-link",topdoc).click(
             function(e)
-            { return Alph.infl.do_language_specific_feature(e,this,a_link_target.lang_tool)}
+            { return Alph.Infl.doLanguageSpecificFeature(e,this,a_link_target.lang_tool)}
         );
 
         // add a click handler to the reference links
-        $(".alph-reflink",topdoc).click(function(e){return Alph.infl.follow_reflink(e,this,a_link_target.lang_tool)});
+        $(".alph-reflink",topdoc).click(function(e){return Alph.Infl.followReflink(e,this,a_link_target.lang_tool)});
         
         // add a toggle to show the stem classes
         $(".stem-class-toggle",a_tbl).click(
@@ -466,11 +466,11 @@ Alph.infl = {
         start=end;
         
         var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props,a_link_target);
-        this.enable_expand_cols(collapsed,str_props,a_tbl);
+        this.enableExpandCols(collapsed,str_props,a_tbl);
         
         var start = (new Date()).getTime();
         
-        this.hide_empty_cols(a_tbl,all_cols);
+        this.hideEmptyCols(a_tbl,all_cols);
         
         var end = (new Date()).getTime();
         Alph.MozUtils.log("Hiding time: " + (end-start));
@@ -479,40 +479,41 @@ Alph.infl = {
     /**
      * Handler for the "Full Table" link to show all columns in the table.
      * @param {HTMLElement} a_tbl the table
-     * @param {Document} the Document containing the table
+     * @param {Document} a_doc the Document containing the table
+     * @param {Boolean{ a_hide_empty flag to indicate whether or not to hide empty cells
      */
-    expand_table: function(tbl,topdoc,a_hide_empty) {
-        $("th",tbl).css("display","table-cell");
-        $("td",tbl).css("display","table-cell");
-        $("#expand-table-link",topdoc).css("display","none");
+    expandTable: function(a_tbl,a_topdoc,a_hide_empty) {
+        $("th",a_tbl).css("display","table-cell");
+        $("td",a_tbl).css("display","table-cell");
+        $("#expand-table-link",a_topdoc).css("display","none");
         if (a_hide_empty)
         {
-            var all_cols = $("col",tbl);
-            $("th[origColspan]",tbl).each(
+            var all_cols = $("col",a_tbl);
+            $("th[origColspan]",a_tbl).each(
                 function()
                 {
                     var origColspan = $(this).attr("origColspan");
                     this.setAttribute("colspan",origColspan);
                 }
             );
-            Alph.infl.hide_empty_cols(tbl,all_cols);
+            Alph.Infl.hideEmptyCols(a_tbl,all_cols);
         }
-        Alph.infl.resize_window(topdoc);
+        Alph.Infl.resizeWindow(a_topdoc);
     },
     
     /**
      * Resizes the window to fit its contents.
      * @private
-     * @param {Document} the window content document
+     * @param {Document} a_topdoc the window content document
      */
-    resize_window: function(topdoc) {
+    resizeWindow: function(a_topdoc) {
         
         var max_tbl_height = 0;
         var max_tbl_width = 0;
         
         var min_tbl_height = 400;
         var min_tbl_width =600;
-        $("table",topdoc).each(
+        $("table",a_topdoc).each(
             function()
             {
                 var height = $(this).height();
@@ -531,7 +532,7 @@ Alph.infl = {
         // add a little space to the top
         var y = 
             max_tbl_height +
-            $("#page-header",topdoc).height() + 
+            $("#page-header",a_topdoc).height() + 
             75;
                     
         // add a little room to the right  
@@ -554,7 +555,7 @@ Alph.infl = {
         // TODO - need to reset screenX and screenY to original 
         // requested location
         window.resizeTo(x,y);
-        $(".reloading",topdoc).removeClass("reloading");
+        $(".reloading",a_topdoc).removeClass("reloading");
     },
     
         /**
@@ -562,29 +563,29 @@ Alph.infl = {
      * @type Object
      * @private
      */
-    entities: { },
+    d_entities: { },
                     
     /**
      * Decodes unicode/html entities
      * @private
-     * @param {String} str the string to decode
+     * @param {String} a_str the string to decode
      * TODO - this should eventually move to a multi-purpose object
      * for handing encodings
      */
-    decode: function(str) {
+    decode: function(a_str) {
         
         // replace the &nbsp; before trimming the string
-        str = str.replace(/\xA0/g, '***');
+        a_str = a_str.replace(/\xA0/g, '***');
         
-        str = jQuery.trim(str);
+        a_str = jQuery.trim(a_str);
         // only decode each entity once
-        if (this.entities[str]) {
-            return this.entities[str];
+        if (this.d_entities[a_str]) {
+            return this.d_entities[a_str];
         }
-        str = str.replace(/_|-/g, '');
-        str = str.replace(/_|-/g, '');
-        str = str.replace(/&nbsp;/g, '***');
-        return str;        
+        a_str = a_str.replace(/_|-/g, '');
+        a_str = a_str.replace(/_|-/g, '');
+        a_str = a_str.replace(/&nbsp;/g, '***');
+        return a_str;        
     },
     
     /**
@@ -613,7 +614,7 @@ Alph.infl = {
      * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced
      *                                        the inflection table
      */
-    switch_inflection: function(a_e,a_elem,a_node,a_doc,a_lang_tool)
+    switchInflection: function(a_e,a_elem,a_node,a_doc,a_lang_tool)
     {
         $(".loading",a_doc).show();
         var newpofs = $(":selected",a_elem).val();
@@ -628,7 +629,7 @@ Alph.infl = {
      * @param {Element} a_elem the target of the action
      * @param return false to cancel the action
      */
-    show_footnote: function(a_e,a_elem)
+    showFootnote: function(a_e,a_elem)
     {
         var text = $(a_elem).next(".footnote-text");
         if (text.length > 0)
@@ -664,7 +665,7 @@ Alph.infl = {
      * @return false if this is a reference link we can follow, otherwise true to
      *         allow event propogation
      */
-    follow_reflink: function(a_e,a_elem,a_lang_tool)
+    followReflink: function(a_e,a_elem,a_lang_tool)
     {
         // TODO this code will change once we have the real linking architecture
         // for now reflink syntax is <link_type>:<link url>
@@ -673,7 +674,7 @@ Alph.infl = {
         // handle external urls
         if (href.match(/^http:\/\//))
         {
-            Alph.MozUtils.open_new_tab(window.opener,href);
+            Alph.MozUtils.openNewTab(window.opener,href);
             return false;
         }
         // we can't just split on : because it might be used in later components of the
@@ -697,7 +698,7 @@ Alph.infl = {
         else if (link_type == 'inflect')
         {
             var href = link_target;
-            var params = Alph.infl.parse_index_link(link_target);
+            var params = Alph.Infl.parseIndexLink(link_target);
             a_lang_tool.
                 handleInflections(a_e,$(this),params);
             return false;
@@ -713,12 +714,12 @@ Alph.infl = {
      * @param {Element} the element whose text should be translated
      * @param {Properties} the properties object containing the display strings  
      */
-    replace_string: function(a_elem,a_props)
+    replaceString: function(a_elem,a_props)
     {
         var text = jQuery.trim($(a_elem).text());
         try 
         {
-            var newtext = Alph.MozUtils.get_string(a_props,text);
+            var newtext = Alph.MozUtils.getString(a_props,text);
             if (newtext)
             {
                 $(a_elem).text(newtext);        
@@ -737,12 +738,12 @@ Alph.infl = {
      * @param {Element} a_elem DOM element which contains the inflection table ending
      * @parma {Alph.LanguageTool} a_lang_tool current language tool
      */
-    is_ending_match: function(a_suffixes,a_elem,a_lang_tool)
+    isEndingMatch: function(a_suffixes,a_elem,a_lang_tool)
     {    
         var matches = false;
         for (var j=0; j<a_suffixes.length; j++ ) {
             var ending_text = a_lang_tool.convertString($(a_elem).text());
-            ending_text = Alph.infl.decode(ending_text);
+            ending_text = Alph.Infl.decode(ending_text);
             if (ending_text == $.trim($(a_suffixes[j]).text()))
             { 
                 matches = true;
@@ -758,7 +759,7 @@ Alph.infl = {
      * @param {Element} a_elem the DOM element which contains the ending
      * @param {Array} a_col_parents Array which holds indices of the parent cells 
      */
-    highlight_ending: function(a_elem,a_col_parents)
+    highlightEnding: function(a_elem,a_col_parents)
     {
         
         $(a_elem).addClass("highlight-ending");
@@ -778,7 +779,7 @@ Alph.infl = {
      * @return array of sibling column indices
      * @type Array
      */
-    find_sib_cols: function(a_cols,a_all_cols)
+    findSibCols: function(a_cols,a_all_cols)
     {
         var sib_cols = [];
         
@@ -814,7 +815,7 @@ Alph.infl = {
      * @param {Document} a_doc the contentDocument containing the table
      * @param {Properties} a_str_props string properties for the display
      */
-    add_infl_links: function(a_pofs_set,a_showpofs, a_doc,a_str_props)
+    addInflLinks: function(a_pofs_set,a_showpofs, a_doc,a_str_props)
     {
         if (typeof a_pofs_set == "undefined" || a_pofs_set.length == 0) 
         {
@@ -844,7 +845,7 @@ Alph.infl = {
                 link.setAttribute("value",a_pofs_set[i]);
                 try 
                 {
-                    link.innerHTML = Alph.MozUtils.get_string(a_str_props,
+                    link.innerHTML = Alph.MozUtils.getString(a_str_props,
                         "alph-infl-link-"+linktype, [linkname]);
                 }
                 catch(e)
@@ -866,15 +867,15 @@ Alph.infl = {
      * @param {Properties} a_str_props string properties for the display
      * @param {Element} the inflection table element 
      */
-    enable_expand_cols: function(a_collapsed,a_str_props,a_tbl)
+    enableExpandCols: function(a_collapsed,a_str_props,a_tbl)
     {
         if (typeof a_collapsed == "undefined")
         {
             // just return if we don't have any collapsed cells
             return;
         }
-        var expand = Alph.MozUtils.get_string(a_str_props,"alph-infl-expand");
-        var expand_tip = Alph.MozUtils.get_string(a_str_props,"alph-infl-expand-tooltip");
+        var expand = Alph.MozUtils.getString(a_str_props,"alph-infl-expand");
+        var expand_tip = Alph.MozUtils.getString(a_str_props,"alph-infl-expand-tooltip");
 
         // iterate through the table header cells of the row
         // which should contain the expand control, adding a toggle
@@ -897,7 +898,7 @@ Alph.infl = {
                 if (collapsed_children.length > 0)
                 {
                     $(this).append("<div class='endings-toggle'>" + expand + "</div>")
-                          .click( function(e) { Alph.infl.expand_column(e,this,a_tbl) });
+                          .click( function(e) { Alph.Infl.expandColumn(e,this,a_tbl) });
                 }
             }
        
@@ -910,17 +911,17 @@ Alph.infl = {
      * @param {Element} a_elem the target of the action
      * @param {Element} the inflection table element
      */
-    expand_column: function(a_e,a_elem,a_tbl)
+    expandColumn: function(a_e,a_elem,a_tbl)
     {
         // TODO - for some reaons the display is to show to reflect the class change
         // need to figure out how to fix this so that display can reflect the fact that  
         // action is in progress
         $(a_elem).addClass("reloading");
         var str_props = document.getElementById("alph-infl-strings");
-        var expand = Alph.MozUtils.get_string(str_props,"alph-infl-expand");
-        var collapse = Alph.MozUtils.get_string(str_props,"alph-infl-collapse");
-        var expand_tip = Alph.MozUtils.get_string(str_props,"alph-infl-expand-tooltip");
-        var collapse_tip = Alph.MozUtils.get_string(str_props,"alph-infl-collapse-tooltip");
+        var expand = Alph.MozUtils.getString(str_props,"alph-infl-expand");
+        var collapse = Alph.MozUtils.getString(str_props,"alph-infl-collapse");
+        var expand_tip = Alph.MozUtils.getString(str_props,"alph-infl-expand-tooltip");
+        var collapse_tip = Alph.MozUtils.getString(str_props,"alph-infl-collapse-tooltip");
 
         var toggle_elem = $(".endings-toggle",a_elem);
         var toggle = $(toggle_elem).html();
@@ -985,7 +986,7 @@ Alph.infl = {
             }
         );
         
-        Alph.infl.resize_window(window.content.document || window.document);
+        Alph.Infl.resizeWindow(window.content.document || window.document);
         return false;
     },
     
@@ -1000,7 +1001,7 @@ Alph.infl = {
      * @param a_all_colls jQuery wrapped set of the col elements
      * 
      */
-    hide_empty_cols: function(a_tbl,a_all_cols)
+    hideEmptyCols: function(a_tbl,a_all_cols)
     {
         var data_rows = $("tr.data-row",a_tbl).length;
         var empty_cols = [];
@@ -1089,7 +1090,7 @@ Alph.infl = {
      * Initialize the index menu
      * @param {Node} a_node the parent node of the index 
      */
-    init_index: function(a_node)
+    initIndex: function(a_node)
     {
         $('.tochead',a_node).click(function() {
             $(this).toggleClass("openmenu")
@@ -1102,7 +1103,7 @@ Alph.infl = {
      * Parse an index link
      * @param {String} a_href the unparsed url
      */
-    parse_index_link: function(a_href)
+    parseIndexLink: function(a_href)
     {
         // TODO syntax will change with linking architecture
         // for now, index link syntax is
@@ -1126,9 +1127,9 @@ Alph.infl = {
      *                                        the inflection table
      * @return false 
      */
-    do_language_specific_feature: function(a_event,a_elem,a_lang_tool)
+    doLanguageSpecificFeature: function(a_event,a_elem,a_lang_tool)
     {
-        a_lang_tool.handle_inflection_feature(a_event,a_elem);
+        a_lang_tool.handleInflectionFeature(a_event,a_elem);
     }
     
 };

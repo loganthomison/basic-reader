@@ -32,7 +32,7 @@ Constants = {
     /**
      * Event types
      */
-    events: 
+    EVENTS: 
         {
             SHOW_TRANS: 100,
             HIDE_POPUP: 200,
@@ -47,7 +47,7 @@ Constants = {
     /**
      * Levels (modes)
      */
-    levels: 
+    LEVELS: 
     {
         LEARNER: 'learner',
         READER: 'reader',

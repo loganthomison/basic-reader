@@ -32,14 +32,14 @@
  */
 Alph.Languages = 
 {
-    lang_list: [],
+    d_langList: [],
     
-    get_lang_tool: function(a_lang)
+    getLangTool: function(a_lang)
     {
         return this[a_lang];
     },
     
-    has_lang: function(a_lang)
+    hasLang: function(a_lang)
     {        
         if (typeof this[a_lang] == "undefined")
         {
@@ -51,17 +51,17 @@ Alph.Languages =
         }
     },
     
-    get_lang_list: function()
+    getLangList: function()
     {
-        return this.lang_list;
+        return this.d_langList;
     },
     
-    add_lang_tool: function(a_lang,a_lang_tool)
+    addLangTool: function(a_lang,a_lang_tool)
     {
         if (typeof this[a_lang] == "undefined")
         {
             this[a_lang] = a_lang_tool;
-            this.lang_list.push(a_lang);
+            this.d_langList.push(a_lang);
         }
     },
     
@@ -70,17 +70,17 @@ Alph.Languages =
      * @param {String} a_code the language code
      * @return the key in to the Languages object for this code, or '' if none found 
      */
-    map_language: function(a_code)
+    mapLanguage: function(a_code)
     {
         var lang_key = '';
-        for (var i=0; i<this.lang_list.length;i++)
+        for (var i=0; i<this.d_langList.length;i++)
         {
-            var lang_tool = this.get_lang_tool(this.lang_list[i]);
-            if (a_code == this.lang_list[i] ||
-                lang_tool.supports_language(a_code)
+            var lang_tool = this.getLangTool(this.d_langList[i]);
+            if (a_code == this.d_langList[i] ||
+                lang_tool.supportsLanguage(a_code)
             )
             {
-                lang_key = this.lang_list[i];
+                lang_key = this.d_langList[i];
                 break;
             }
         }

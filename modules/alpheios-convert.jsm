@@ -30,6 +30,11 @@ const EXPORTED_SYMBOLS = ['Convert'];
 
 Convert = {
     
+    /**
+     * bind a new method to the Convert object
+     * @param {String} the name of the method
+     * @param {Function} the function body
+     */
     bind: function(a_name,a_func)
     {
         this[a_name] = a_func;

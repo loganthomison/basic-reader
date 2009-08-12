@@ -23,20 +23,20 @@
  
 Alph.Dialogs = 
 {
-     load_about: function()
+     loadAbout: function()
      {
         // populate the Alpheios site link
-        Alph.$("#alpheios-site-link").attr("value",Alph.util.ALPHEIOS_URLS.main);
+        Alph.$("#alpheios-site-link").attr("value",Alph.Util.ALPHEIOS_URLS.main);
         
         // add the Alpheios version information
         var pkgs = Alph.MozUtils.getAlpheiosPackages();
         pkgs.forEach(
             function(a_item)
             {
-                var box = Alph.util.makeXUL('hbox',[],[]);
-                var name = Alph.util.makeXUL('label',null,['crop'],['right']);               
+                var box = Alph.Util.makeXUL('hbox',[],[]);
+                var name = Alph.Util.makeXUL('label',null,['crop'],['right']);               
                 Alph.$(name).text(a_item.name);
-                var version = Alph.util.makeXUL('description',null,[],[]);
+                var version = Alph.Util.makeXUL('description',null,[],[]);
                 Alph.$(version).text(a_item.version);
                 Alph.$(box).append(name);
                 Alph.$(box).append(version);
@@ -45,7 +45,7 @@ Alph.Dialogs =
         );
     },
     
-    load_leaving_site: function()
+    loadLeavingSite: function()
     {
         // add the survey link if there is one
         var survey = '';

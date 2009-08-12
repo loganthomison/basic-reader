@@ -32,13 +32,13 @@
  */
 Alph.Panel = function(a_panel)
 {
-    this.panel_elem = a_panel;
-    this.panel_id = Alph.$(a_panel).attr("id");
-    this.parent_box = Alph.$(this.panel_elem).parent(".alph-panel")[0];
-    this.section_parent = Alph.$(this.panel_elem).parents(".alph-panel-section");
-    this.notifier = Alph.$(this.panel_elem).attr("notifier");
-    this.panel_window = null;
-    this.current_browser = null;
+    this.d_panelElem = a_panel;
+    this.d_panelId = Alph.$(a_panel).attr("id");
+    this.d_parentBox = Alph.$(this.d_panelElem).parent(".alph-panel")[0];
+    this.d_sectionParent = Alph.$(this.d_panelElem).parents(".alph-panel-section");
+    this.d_notifier = Alph.$(this.d_panelElem).attr("notifier");
+    this.d_panelWindow = null;
+    this.d_currentBrowser = null;
     
 };
 
@@ -83,12 +83,12 @@ Alph.Panel.prototype.init = function()
  *              Alph.Panel.STATUS_AUTOHIDE)
  * @type int
  */
-Alph.Panel.prototype.reset_to_default = function()
+Alph.Panel.prototype.resetToDefault = function()
 {
     // if a preference is stored, use it
-    var status_pref = this.get_status_pref_setting();
+    var status_pref = this.getStatusPrefSetting();
     
-    var lang = Alph.main.get_state_obj().get_var("current_language");
+    var lang = Alph.main.getStateObj().getVar("current_language");
     var status;
     // use the global prefs unless we're overriding for this language
     if (Alph.MozUtils.getPref("panels.use.defaults",lang))
@@ -107,7 +107,7 @@ Alph.Panel.prototype.reset_to_default = function()
     else
     {
         // default status for all panels is hidden
-        this.update_status(this.hide());
+        this.updateStatus(this.hide());
     }
 }
 
@@ -121,33 +121,33 @@ Alph.Panel.prototype.reset_to_default = function()
  *              Alph.Panel.STATUS_AUTOHIDE)
  * @type int
  */
-Alph.Panel.prototype.reset_state = function(a_bro)
+Alph.Panel.prototype.resetState = function(a_bro)
 {
 
-    var old_browser = this.current_browser;
+    var old_browser = this.d_currentBrowser;
     
     // keep a reference to the current browser for the panel
     // so that when we reset to a new state, we can access
     // the prior browser state easily
-    this.current_browser = a_bro;
+    this.d_currentBrowser = a_bro;
     
-    var panel_state = this.get_browser_state(a_bro);
+    var panel_state = this.getBrowserState(a_bro);
     var old_state;
     if (old_browser != null)
     {
-        old_state = this.get_browser_state(old_browser);
+        old_state = this.getBrowserState(old_browser);
     }
     // update the panel contents for the current browser
-    this.reset_contents(panel_state,old_state);
+    this.resetContents(panel_state,old_state);
          
     // just auto hide everything if alpheios is disabled
-    if ( ! Alph.main.is_enabled(a_bro))
+    if ( ! Alph.main.isEnabled(a_bro))
     {
-        this.update_status(this.hide(true));
+        this.updateStatus(this.hide(true));
     }
     else
     {
-        this.reset_to_default(a_bro);
+        this.resetToDefault(a_bro);
     }
     
 };
@@ -155,7 +155,7 @@ Alph.Panel.prototype.reset_state = function(a_bro)
 /** 
  * Responds to a page refresh 
  */
-Alph.Panel.prototype.handle_refresh = function(a_bro)
+Alph.Panel.prototype.handleRefresh = function(a_bro)
 {
     // default does nothing
 }
@@ -170,14 +170,14 @@ Alph.Panel.prototype.handle_refresh = function(a_bro)
  * @return the new panel status
  * @type int
  */
-Alph.Panel.prototype.update_status = function(a_status)
+Alph.Panel.prototype.updateStatus = function(a_status)
 {
  
     var panel_obj = this;
     var sib_splitters = 
-        Alph.$(this.parent_box).siblings(".alph-panel-splitter");
+        Alph.$(this.d_parentBox).siblings(".alph-panel-splitter");
     
-    var notifier = Alph.$("#" + this.notifier);
+    var notifier = Alph.$("#" + this.d_notifier);
     
     // update the browser state object to reflect the new
     // panel status
@@ -185,7 +185,7 @@ Alph.Panel.prototype.update_status = function(a_status)
     // so that any event handlers which need to know the new
     // state get the correct value from the state object
     var bro = Alph.main.getCurrentBrowser();
-    var panel_state = this.get_browser_state(bro);
+    var panel_state = this.getBrowserState(bro);
     
     var old_status = panel_state.status;
     
@@ -194,15 +194,15 @@ Alph.Panel.prototype.update_status = function(a_status)
     // uncollapse parent box and parent's sibling splitter
     // update notifier
     // but not if we're just detaching the panel (in which case
-    // panel_window will be non null)
-    if (a_status == Alph.Panel.STATUS_SHOW && this.panel_window == null)
+    // d_panelWindow will be non null)
+    if (a_status == Alph.Panel.STATUS_SHOW && this.d_panelWindow == null)
     {
-        Alph.$(this.parent_box).attr("collapsed",false);
+        Alph.$(this.d_parentBox).attr("collapsed",false);
         
         Alph.$(sib_splitters).each(
             function()
             {
-                panel_obj.toggle_splitter(this,true);
+                panel_obj.toggleSplitter(this,true);
             }
         );
         
@@ -211,7 +211,7 @@ Alph.Panel.prototype.update_status = function(a_status)
             Alph.$(notifier).attr("checked", "true");
         }
         // make sure any section parents and section splitters are also expanded
-        Alph.$(this.section_parent).each(
+        Alph.$(this.d_sectionParent).each(
             function() {
                 Alph.$(this).attr("collapsed",false);
                 Alph.$(this)
@@ -219,7 +219,7 @@ Alph.Panel.prototype.update_status = function(a_status)
                     .each(
                         function()
                         {
-                            panel_obj.toggle_section_splitter(this, true);
+                            panel_obj.toggleSectionSplitter(this, true);
                         }
                     );
             }
@@ -228,11 +228,11 @@ Alph.Panel.prototype.update_status = function(a_status)
     }
     else
     {
-        Alph.$(this.parent_box).attr("collapsed",true);
+        Alph.$(this.d_parentBox).attr("collapsed",true);
         Alph.$(sib_splitters).each(
             function()
             {
-                panel_obj.toggle_splitter(this,false);
+                panel_obj.toggleSplitter(this,false);
             }
         );
 
@@ -240,7 +240,7 @@ Alph.Panel.prototype.update_status = function(a_status)
         // collapse the containing parent panel sections only 
         // if all the panels in it are now collapsed
 
-        Alph.$(this.section_parent).each(
+        Alph.$(this.d_sectionParent).each(
             function() {
                 var still_open = 0;   
                 Alph.$(".alph-panel",this).each(
@@ -260,7 +260,7 @@ Alph.Panel.prototype.update_status = function(a_status)
                         .each(
                             function() 
                             {
-                                panel_obj.toggle_section_splitter(
+                                panel_obj.toggleSectionSplitter(
                                     this,
                                     false
                                 );
@@ -279,12 +279,12 @@ Alph.Panel.prototype.update_status = function(a_status)
                 Alph.$(notifier).attr("checked", "false");
             }
             // if the panel is detached, close it 
-            if (this.window_open())
+            if (this.windowOpen())
             {
                 try 
                 {
-                    this.panel_window.close();
-                    this.panel_window = null;
+                    this.d_panelWindow.close();
+                    this.d_panelWindow = null;
                 }
                 catch(a_e)
                 {
@@ -312,30 +312,30 @@ Alph.Panel.prototype.update_status = function(a_status)
 
     {
         // TODO support per url preferences ?   
-        var lang = Alph.main.get_state_obj(bro).get_var("current_language");
+        var lang = Alph.main.getStateObj(bro).getVar("current_language");
         if (lang != "")
         {
             // if we're using the defaults, store to defaults
             // otherwise store to the language 
             if (Alph.MozUtils.getPref("panels.use.defaults",lang))
             {
-                Alph.MozUtils.setPref(this.get_status_pref_setting(),a_status);
+                Alph.MozUtils.setPref(this.getStatusPrefSetting(),a_status);
             }
             else
             {
-                Alph.MozUtils.setPref(this.get_status_pref_setting(),a_status,lang)
+                Alph.MozUtils.setPref(this.getStatusPrefSetting(),a_status,lang)
                 
             }
         }
     }
     
-    Alph.site.set_toolbar_panel_status(bro.contentDocument,this.panel_id,a_status);
+    Alph.Site.setToolbarPanelStatus(bro.contentDocument,this.d_panelId,a_status);
     
-    // if the panel status changed, call observe_ui_event to make sure the 
+    // if the panel status changed, call observeUIEvent to make sure the 
     // panel contents are up to date
     if (old_status != a_status)
     {
-        this.observe_ui_event(bro);    
+        this.observeUIEvent(bro);    
     }
     
     return a_status;
@@ -361,7 +361,7 @@ Alph.Panel.prototype.show = function()
  */
 Alph.Panel.prototype.detach = function()
 {   
-    var chrome_url = this.get_detach_chrome();
+    var chrome_url = this.getDetachChrome();
     if (chrome_url == null)
     {
         alert("Detach not yet supported for this panel.");
@@ -369,9 +369,9 @@ Alph.Panel.prototype.detach = function()
     }
      
     try {
-        this.panel_window = 
-            Alph.xlate.openSecondaryWindow(
-                this.panel_id,
+        this.d_panelWindow = 
+            Alph.Xlate.openSecondaryWindow(
+                this.d_panelId,
                 chrome_url
             );
     } catch(a_e) 
@@ -379,7 +379,7 @@ Alph.Panel.prototype.detach = function()
         Alph.MozUtils.log("Error detaching panel: " + a_e);
     }
   
-    return this.update_status(Alph.Panel.STATUS_SHOW);
+    return this.updateStatus(Alph.Panel.STATUS_SHOW);
 };
 
 /**
@@ -388,14 +388,14 @@ Alph.Panel.prototype.detach = function()
 Alph.Panel.prototype.restore = function()
 {
     // Close the window if it's not already
-    if (this.window_open())
+    if (this.windowOpen())
     {
-        this.panel_window.close();
-        this.panel_window = null;
+        this.d_panelWindow.close();
+        this.d_panelWindow = null;
     }
     
-    var panel_state = this.get_browser_state(Alph.main.getCurrentBrowser());
-    this.update_status(panel_state.status);
+    var panel_state = this.getBrowserState(Alph.main.getCurrentBrowser());
+    this.updateStatus(panel_state.status);
 }
 
 /**
@@ -405,7 +405,7 @@ Alph.Panel.prototype.restore = function()
  * @param {String} a_browser_id the id of the browser to update
  * @param {String} a_browser_index the index of the browser to update
  */
-Alph.Panel.prototype.update_panel_window = 
+Alph.Panel.prototype.updatePanelWindow = 
     function(a_panel_state,a_browser_id,a_browser_index)
 {
     // default does nothing - override for panel-specific behavior
@@ -428,16 +428,16 @@ Alph.Panel.prototype.hide = function(a_autoflag)
     // panel cleanup code.
     // a_autoflag can be used to distinguish between
     // when the user hides the panel vs. when the app does
-    if (this.panel_window != null)
+    if (this.d_panelWindow != null)
     {
         var closed = true;
         try {
-            closed = this.panel_window.closed;
+            closed = this.d_panelWindow.closed;
         } catch(a_e){ // in FF 3.5 the closed property isn't available for a closed chrome window
         }
         if (closed)
         {
-            this.panel_window = null;
+            this.d_panelWindow = null;
         }
     }
     if (a_autoflag != null && a_autoflag)
@@ -458,10 +458,10 @@ Alph.Panel.prototype.hide = function(a_autoflag)
  */
 Alph.Panel.prototype.open = function()
 {    
-    if (Alph.MozUtils.getPref('panels.inline.'+this.panel_id)
-        || (this.window_open()))
+    if (Alph.MozUtils.getPref('panels.inline.'+this.d_panelId)
+        || (this.windowOpen()))
     {
-        return this.update_status(this.show());
+        return this.updateStatus(this.show());
     }
     else
     {
@@ -479,11 +479,11 @@ Alph.Panel.prototype.open = function()
 Alph.Panel.prototype.toggle = function()
 {
     var bro = Alph.main.getCurrentBrowser();
-    var panel_state = this.get_browser_state(bro);
+    var panel_state = this.getBrowserState(bro);
     
     if (panel_state.status == Alph.Panel.STATUS_SHOW)
     {
-        return this.update_status(this.hide());
+        return this.updateStatus(this.hide());
     }
     else
     {
@@ -506,7 +506,7 @@ Alph.Panel.prototype.cleanup = function()
  * @param {Object} a_panel_state the current panel state object
  * @param {Object} the prior state object
  */
-Alph.Panel.prototype.reset_contents = function(a_panel_state,a_old_state)
+Alph.Panel.prototype.resetContents = function(a_panel_state,a_old_state)
 {
     // default does nothing  - override in panel-specific implementations
 };
@@ -520,7 +520,7 @@ Alph.Panel.prototype.reset_contents = function(a_panel_state,a_old_state)
  * @param a_event_type the event type (one of @link Alph.Constants.events)
  * @param a_event_data optional event data object
  */
-Alph.Panel.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
+Alph.Panel.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
 {
     // default does nothing - override in panel-specific implementations
 };
@@ -531,24 +531,24 @@ Alph.Panel.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data
  * @return the panel state object
  * @type Object
  */
-Alph.Panel.prototype.get_browser_state = function(a_bro)
+Alph.Panel.prototype.getBrowserState = function(a_bro)
 {
-  var panel_state = Alph.main.get_state_obj(a_bro).get_var("panels");
-  if (typeof panel_state[this.panel_id] == "undefined")
+  var panel_state = Alph.main.getStateObj(a_bro).getVar("panels");
+  if (typeof panel_state[this.d_panelId] == "undefined")
   {
-    panel_state[this.panel_id] = {};
+    panel_state[this.d_panelId] = {};
     // initialize the panel state
-    this.init(panel_state[this.panel_id]);
+    this.init(panel_state[this.d_panelId]);
   }
-  return panel_state[this.panel_id];
+  return panel_state[this.d_panelId];
 };
 
 /**
  * Get the name of the preferences setting for the panel status
  */
-Alph.Panel.prototype.get_status_pref_setting = function()
+Alph.Panel.prototype.getStatusPrefSetting = function()
 {
-    var status_pref = "panels." + this.panel_id + ".";
+    var status_pref = "panels." + this.d_panelId + ".";
     // Pedagogical Site preferences are separate from Basic preferences
     // TODO - eventually we may want to support per-url preferences for all sites
     if (Alph.$("#alpheios-pedagogical-status").attr("disabled") == "true")
@@ -567,7 +567,7 @@ Alph.Panel.prototype.get_status_pref_setting = function()
  * @return chrome url string
  * @type String
  */
-Alph.Panel.prototype.get_detach_chrome = function()
+Alph.Panel.prototype.getDetachChrome = function()
 {
     // default returns null
     return null;   
@@ -581,7 +581,7 @@ Alph.Panel.prototype.get_detach_chrome = function()
  *                     is the result of opening (true) or closing (false)
  *                     a panel  
  */
-Alph.Panel.prototype.toggle_splitter = function(a_splitter,a_open_panel)
+Alph.Panel.prototype.toggleSplitter = function(a_splitter,a_open_panel)
 {
 
     var prev_panels = Alph.$(a_splitter).prev(".alph-panel");
@@ -621,7 +621,7 @@ Alph.Panel.prototype.toggle_splitter = function(a_splitter,a_open_panel)
  *                     is the result of opening (true) or closing (false)
  *                     a panel  
  */
-Alph.Panel.prototype.toggle_section_splitter = function(a_splitter,a_open_panel)
+Alph.Panel.prototype.toggleSectionSplitter = function(a_splitter,a_open_panel)
 {
 
     var prev_panels = Alph.$(a_splitter).prev(".alph-panel-section");
@@ -660,7 +660,7 @@ Alph.Panel.prototype.toggle_section_splitter = function(a_splitter,a_open_panel)
  * @return the language used to populate a_panel_bro (or null if not known)
  * @type String
  */
-Alph.Panel.prototype.get_current_language = function(a_panel_bro)
+Alph.Panel.prototype.getCurrentLanguage = function(a_panel_bro)
 {
     return null;
 }
@@ -671,9 +671,9 @@ Alph.Panel.prototype.get_current_language = function(a_panel_bro)
  * @return true or false
  * @type Boolean
  */
-Alph.Panel.prototype.is_visible_inline = function(a_bro)
+Alph.Panel.prototype.isVisibleInline = function(a_bro)
 {
-    return Alph.$(this.parent_box).attr("collapsed") == 'false';
+    return Alph.$(this.d_parentBox).attr("collapsed") == 'false';
 };
 
 /**
@@ -681,16 +681,16 @@ Alph.Panel.prototype.is_visible_inline = function(a_bro)
  * @return the array of content documents for the panel and panel_window
  * @type Array{Document}
  */
-Alph.Panel.prototype.get_current_doc = function(a_bro)
+Alph.Panel.prototype.getCurrentDoc = function(a_bro)
 {
     var panel_obj = this;
-    var panel_state = this.get_browser_state(a_bro);
+    var panel_state = this.getBrowserState(a_bro);
     var docs = [];
-    Alph.$("browser",panel_obj.panel_elem).each(
+    Alph.$("browser",panel_obj.d_panelElem).each(
         function()
         {
             docs.push(this.contentDocument);
-            if (panel_obj.window_open())
+            if (panel_obj.windowOpen())
             {
                 var pw_bro =
                     panel_obj.panel_window.document.getElementById(this.id);
@@ -709,7 +709,7 @@ Alph.Panel.prototype.get_current_doc = function(a_bro)
  * @param {int} a_width requested width
  * @parma {int} a_height requested height
  */
-Alph.Panel.prototype.resize_panel_window = function(a_width,a_height)
+Alph.Panel.prototype.resizePanelWindow = function(a_width,a_height)
 {
     // add a little bit to the width and height to account for title bar and leave a
     // little room on the side
@@ -718,8 +718,8 @@ Alph.Panel.prototype.resize_panel_window = function(a_width,a_height)
         
     // make sure we don't resize the window to dimensions larger than the user's screen,
     // leaving a little room around the edges
-    var max_width = this.panel_window.screen.availWidth - 10;
-    var max_height = this.panel_window.screen.availHeight - 10;
+    var max_width = this.d_panelWindow.screen.availWidth - 10;
+    var max_height = this.d_panelWindow.screen.availHeight - 10;
     
     if (width > max_width )
     {
@@ -729,7 +729,7 @@ Alph.Panel.prototype.resize_panel_window = function(a_width,a_height)
     {
         height = max_height;
     }
-    this.panel_window.resizeTo(width,height);
+    this.d_panelWindow.resizeTo(width,height);
 }
 
 /**
@@ -737,36 +737,36 @@ Alph.Panel.prototype.resize_panel_window = function(a_width,a_height)
  * @param {Event} a_event the event which initiated the command
  * @param {String} a_panel_id the panel id
  */
-Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
+Alph.Panel.executeLangCommand = function(a_event,a_panel_id)
 {
     var panel_obj;
     if (typeof Alph.main == "undefined")
     {
-        panel_obj = window.opener.Alph.main.panels[a_panel_id];
+        panel_obj = window.opener.Alph.main.d_panels[a_panel_id];
     }   
     else
     {
-        panel_obj = Alph.main.panels[a_panel_id];    
+        panel_obj = Alph.main.d_panels[a_panel_id];    
     }
     
     // if the panel is detached, need to jump through some hoops
     // to get the correct language tool from the opener window
-    if (panel_obj.window_open())
+    if (panel_obj.windowOpen())
     {
-        Alph.$("browser",panel_obj.panel_elem).each(
+        Alph.$("browser",panel_obj.d_panelElem).each(
             function()
             {
                 var pw_bro =
-                    panel_obj.panel_window
+                    panel_obj.d_panelWindow
                         .Alph.$("#" + a_panel_id + " browser#"+this.id)
                         .get(0);
                 // figuring out how to get the language from the panel
                 // is panel-specific
-                var lang = panel_obj.get_current_language(pw_bro);
+                var lang = panel_obj.getCurrentLanguage(pw_bro);
                 if (lang)
                 {
                     var lang_tool = 
-                        window.opener.Alph.Languages.get_lang_tool(lang);
+                        window.opener.Alph.Languages.getLangTool(lang);
                     var cmd_id = a_event.target.getAttribute("id");
                     if (lang_tool && lang_tool.getCmd(cmd_id))
                     {
@@ -776,23 +776,23 @@ Alph.Panel.execute_lang_command = function(a_event,a_panel_id)
             }
         );
     }
-    // otherwise we can just pass it to the Alph.main_execute_lang_command function
+    // otherwise we can just pass it to the Alph.main.executeLangCommand function
     // to handle
     else
     {
-        Alph.main.execute_lang_command(a_event);
+        Alph.main.executeLangCommand(a_event);
     }
 };
 
 /**
  * Check to see if the detached panel window is open
  */
-Alph.Panel.prototype.window_open = function()
+Alph.Panel.prototype.windowOpen = function()
 {
     var open = false;
     try 
     {
-        open = (this.panel_window != null && ! this.panel_window.closed );
+        open = (this.d_panelWindow != null && ! this.d_panelWindow.closed );
     }
     catch (a_e)
     {

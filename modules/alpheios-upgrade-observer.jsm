@@ -32,8 +32,8 @@ var EXPORTED_SYMBOLS = ["Upgrader"];
  */
 Upgrader =
 { 
-    m_pkgids: null,
-    m_upgrade: false,
+    d_pkgids: null,
+    d_upgrade: false,
     
     /**
      * observe an extension action request
@@ -46,12 +46,12 @@ Upgrader =
                       .getService(Components.interfaces.nsIConsoleService)
                       .logStringMessage("alpheios: Observing " + a_data);
             a_subject.QueryInterface(Components.interfaces.nsIUpdateItem);
-            if (typeof this.m_pkgids[a_subject.id] != "undefined") 
+            if (typeof this.d_pkgids[a_subject.id] != "undefined") 
             {
                 if (a_data == "item-upgraded") 
                 {
                     
-                    this.m_upgrade = true;
+                    this.d_upgrade = true;
 
                 } 
             }        
@@ -65,16 +65,16 @@ Upgrader =
             // only clear the prefs if all the Alpheios packages are installed
             // TODO ideally we would clear the package specific prefs as each
             // package gets uninstalled 
-            if (this.m_upgrade) 
+            if (this.d_upgrade) 
             {
-                this.m_pkgids.forEach(
+                this.d_pkgids.forEach(
                     function(a_pkg_callback)
                     {
                         a_pkg_callback();
                     }
                 );
             }
-            this.m_upgrade = false;
+            this.d_upgrade = false;
         }
     },
     
@@ -83,35 +83,35 @@ Upgrader =
      * @param {String} a_id the package id
      * @param {Function} a_callback callback function to execute upon update 
      */
-    register_pkg : function(a_id,a_callback) 
+    registerPkg : function(a_id,a_callback) 
     {
         // if this package isn't registered already, increase the number of 
         // packages registered
-        if (typeof this.m_pkgids[a_id] == "undefined")
+        if (typeof this.d_pkgids[a_id] == "undefined")
         {
-            this.m_pkgids._size++;
+            this.d_pkgids._size++;
         }
-        this.m_pkgids[a_id] = a_callback;
+        this.d_pkgids[a_id] = a_callback;
     },
     
     /**
      * register the observer object
      * @param {Array} a_ids the list of Alpheios package ids
      */
-    register_observer : function(a_pkgs) 
+    registerObserver : function(a_pkgs) 
     {
         var my_obj = this;
         // only register the observer once
-        if (this.m_pkgids != null)
+        if (this.d_pkgids != null)
         {
             return;
         }
-        this.m_pkgids = Array();
-        this.m_pkgids._size = 0;
+        this.d_pkgids = Array();
+        this.d_pkgids._size = 0;
         a_pkgs.forEach(
             function(a_pkg)
             {
-                my_obj.register_pkg(a_pkg.id, a_pkg.callback);
+                my_obj.registerPkg(a_pkg.id, a_pkg.callback);
             }
         );
         Components.classes["@mozilla.org/consoleservice;1"]
@@ -128,7 +128,7 @@ Upgrader =
     /**
      * unregister the observer
      */
-    unregister_observer : function() 
+    unregisterObserver : function() 
     {
         var observerService =
             Components.classes["@mozilla.org/observer-service;1"].

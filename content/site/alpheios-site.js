@@ -1,5 +1,5 @@
 /**
- * @fileoverview This file defines the Alph.site class, which 
+ * @fileoverview This file defines the Alph.Site class, which 
  * contains the functionality injected by the Alpheios
  * extension into sites which support Alpheios pedagogical functionality.
  *  
@@ -27,7 +27,7 @@
 /**
  * @singleton
  */
-Alph.site = {
+Alph.Site = {
     
     /**
      * Check to see if this site supports the pedagogical functionality
@@ -35,7 +35,7 @@ Alph.site = {
      * @return true if the site supports the pedagogical functionality, false if not
      * @type Boolean
      */
-    is_ped_site: function(a_doc)
+    isPedSite: function(a_doc)
     {             
         return((Alph.$("meta[name=alpheios-pedagogical-text]",a_doc).length > 0)
                 ? true : false);
@@ -50,9 +50,9 @@ Alph.site = {
      *         is not registered
      * @type String
      */
-    is_basic_site: function(a_url)
+    isBasicSite: function(a_url)
     {
-        var lang_list = Alph.Languages.get_lang_list();
+        var lang_list = Alph.Languages.getLangList();
         var allowed_lang = null;
         for (var i=0; i<lang_list.length; i++)
         {
@@ -72,9 +72,9 @@ Alph.site = {
     /**
      * register sites for automatic support
      */
-    register_sites: function()
+    registerSites: function()
     {
-        var lang_list = Alph.Languages.get_lang_list();
+        var lang_list = Alph.Languages.getLangList();
         var allowed_lang = null;
         // iterate through the supported languages, registering any sites
         // which haven't yet been registered for this language
@@ -90,7 +90,7 @@ Alph.site = {
                     function(a_url)
                     {
                         var uri = 
-                            Alph.MozSvc.get_svc('IO').newURI(a_url,"UTF-8",null);
+                            Alph.MozSvc.getSvc('IO').newURI(a_url,"UTF-8",null);
                         if (Alph.PermissionMgr.testPermission(uri,key)
                             == Alph.PermissionMgr.UNKNOWN_ACTION)
                         {
@@ -114,18 +114,18 @@ Alph.site = {
      * functionality
      * @param {Document} a_doc the browser content document
      */
-    setup_page: function(a_doc,a_type)
+    setupPage: function(a_doc,a_type)
     {
         
         // unless interactivity is enabled,
         // add the mouseover handlers for the parallel alignment
         // and the interlinear alignment toggle
         Alph.$(".alpheios-aligned-word",a_doc).mouseover(  
-            function(e) { Alph.site.toggle_alignment(e,this,a_type,true)}
+            function(e) { Alph.Site.toggleAlignment(e,this,a_type,true)}
         );
             
         Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
-            function(e) { Alph.site.toggle_alignment(e,this,a_type,false)}
+            function(e) { Alph.Site.toggleAlignment(e,this,a_type,false)}
         );
             
         // wrap a div around each target word so that the aligned text can
@@ -139,13 +139,13 @@ Alph.site = {
 
         if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
         {
-            this.add_interlinear_toggle(a_doc);
+            this.addInterlinearToggle(a_doc);
         }
         
-        this.enable_toolbar(a_doc);
+        this.enableToolbar(a_doc);
         var bro = Alph.main.getCurrentBrowser();
         var trigger = Alph.main.getXlateTrigger(bro);
-        this.add_trigger_hint(bro,a_doc,trigger,Alph.main.getLanguageTool(bro));
+        this.addTriggerHint(bro,a_doc,trigger,Alph.main.getLanguageTool(bro));
     },
     
     /**
@@ -153,7 +153,7 @@ Alph.site = {
      * adds the toolbar handlers to the child elements
      * @param {Document} a_doc the browser content document
      */
-    enable_toolbar: function(a_doc)
+    enableToolbar: function(a_doc)
     {
         
         var toolbars = Alph.$(".alpheios-toolbar",a_doc);
@@ -162,12 +162,12 @@ Alph.site = {
         {
             return;
         }
-        if (this.translation_url(a_doc))
+        if (this.getTranslationUrl(a_doc))
         {
             Alph.$(".alpheios-toolbar-translation",toolbars).bind(
                 'click',
                 {alpheios_panel_id: 'alph-trans-panel'},
-                this.toggle_panel_handler
+                this.togglePanelHandler
          
             );
         }
@@ -175,12 +175,12 @@ Alph.site = {
         {
             Alph.$(".alpheios-toolbar-translation",toolbars).css("display","none");
         }
-        if (this.treebank_diagram_url(a_doc))
+        if (this.getTreebankDiagramUrl(a_doc))
         {
             Alph.$(".alpheios-toolbar-tree",toolbars).bind(
                 'click',
                 {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
-                this.do_command_handler
+                this.doCommandHandler
             );
         }
         else
@@ -190,17 +190,17 @@ Alph.site = {
         Alph.$(".alpheios-toolbar-options",toolbars).bind(
             'click',
             {alpheios_cmd_id: 'alpheios-options-cmd'},
-            this.do_command_handler
+            this.doCommandHandler
         );
         Alph.$(".alpheios-toolbar-about",toolbars).bind(
             'click',
             { alpheios_cmd_id: 'alpheios-about-cmd'},
-            this.do_command_handler
+            this.doCommandHandler
         );
         Alph.$(".alpheios-toolbar-feedback",toolbars).bind(
             'click',
             { alpheios_cmd_id: 'alpheios-feedback-cmd'},
-            this.do_command_handler
+            this.doCommandHandler
         );
 
         Alph.$(".alpheios-toolbar-level",toolbars).bind(
@@ -210,7 +210,7 @@ Alph.site = {
                 var mode = this.getAttribute('alpheios-value');
                 if (mode)
                 {
-                    Alph.main.set_mode(null,mode);
+                    Alph.main.setMode(null,mode);
                 }
             }
         );
@@ -218,22 +218,22 @@ Alph.site = {
         Alph.$(".alpheios-toolbar-inflect",toolbars).bind(
             'click',
             { alpheios_cmd_id: 'alpheios-inflect-cmd' },
-            this.do_command_handler
+            this.doCommandHandler
         );
         Alph.$(".alpheios-toolbar-grammar",toolbars).bind(
             'click',
             { alpheios_cmd_id: 'alpheios-grammar-cmd' },
-            this.do_command_handler
+            this.doCommandHandler
         );
         Alph.$(".alpheios-toolbar-wordlist",toolbars).bind(
             'click',
             { alpheios_cmd_id: 'alpheios-wordlist-cmd' },
-            this.do_command_handler
+            this.doCommandHandler
         );
         Alph.$(".alpheios-toolbar-help",toolbars).bind(
             'click',
             {alpheios_cmd_id: 'alpheios-help-cmd'},
-            this.do_command_handler
+            this.doCommandHandler
         );
         
     },
@@ -242,7 +242,7 @@ Alph.site = {
     /**
      * set current mode
      */
-    set_current_mode: function(a_doc,a_mode)
+    setCurrentMode: function(a_doc,a_mode)
     {
         try
         {
@@ -261,7 +261,7 @@ Alph.site = {
                         .addClass("alpheios-current");
                     Alph.$("body",a_doc).attr("alpheios-level",a_mode);
                     ;
-                    Alph.$("body",(Alph.main.panels['alph-trans-panel'].get_current_doc())[0])
+                    Alph.$("body",(Alph.main.d_panels['alph-trans-panel'].getCurrentDoc())[0])
                         .attr("alpheios-level",a_mode);
                 }
             );
@@ -275,7 +275,7 @@ Alph.site = {
     /**
      * update panel status
      */
-    set_toolbar_panel_status: function(a_doc,a_panel_id,a_status)
+    setToolbarPanelStatus: function(a_doc,a_panel_id,a_status)
     {
         // for now, only update the toolbar buttons for the translation panel 
         var toolbar_class = 
@@ -303,11 +303,11 @@ Alph.site = {
      * @param {Event} a_event the click event - the panel id should
      *                        be defined in a custom event property named alpheios_panel_id
      */
-    toggle_panel_handler: function(a_event)
+    togglePanelHandler: function(a_event)
     {
         // 'this' is the toolbar element
         var panel_status = 
-            Alph.main.toggle_panel(a_event,a_event.data.alpheios_panel_id);
+            Alph.main.togglePanel(a_event,a_event.data.alpheios_panel_id);
     },
     
     /**
@@ -316,7 +316,7 @@ Alph.site = {
      * @param {Event} a_event the click event - the id of the command to be executed should
      *                        be defined in a custom event property named alpheios_cmd_id
      */
-    do_command_handler: function(a_event)
+    doCommandHandler: function(a_event)
     {
         // 'this' is the toolbar element
         var command = document.getElementById(a_event.data.alpheios_cmd_id);
@@ -335,11 +335,11 @@ Alph.site = {
      * adds the interlinear toggle element to the page
      * @param {Document} a_doc the browser content document
      */
-    add_interlinear_toggle: function(a_doc)
+    addInterlinearToggle: function(a_doc)
     {
         
         // don't add the toggle if we don't have an aligned translation to use
-        if ( ! this.translation_url(a_doc) ||  
+        if ( ! this.getTranslationUrl(a_doc) ||  
                Alph.$(".alpheios-aligned-word",a_doc).length == 0)
         {
             return;
@@ -354,16 +354,16 @@ Alph.site = {
             var my_obj = this;
 
             Alph.$(".alpheios-interlinear-toggle",a_doc)
-                .bind('click', Alph.site.handle_interlinear_toggle);        
+                .bind('click', Alph.Site.handleInterlinearToggle);        
 
             // update the checked state of the interlinear toggle in the source text
             // document with the state of the XUL control
             if (Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == 'true')
             {
                 Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",true);
-                if (! Alph.interactive.enabled())
+                if (! Alph.Interactive.enabled())
                 {
-                    Alph.site.handle_interlinear_toggle(null,
+                    Alph.Site.handleInterlinearToggle(null,
                         Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
                 }
             }   
@@ -381,7 +381,7 @@ Alph.site = {
      * @param {Event} a_event the triggering event
      * @param {Object} a_toggle (Optional)
      */
-    handle_interlinear_toggle: function(a_event,a_toggle)
+    handleInterlinearToggle: function(a_event,a_toggle)
     {                      
         var toggle_elem;
         var checked;
@@ -404,11 +404,11 @@ Alph.site = {
         Alph.$("#alpheios-trans-opt-inter-src").attr('checked',
             checked ? 'true' : 'false');
                
-        var trans_url = Alph.site.translation_url(toggle_elem.ownerDocument);
+        var trans_url = Alph.Site.getTranslationUrl(toggle_elem.ownerDocument);
         var words = Alph.$(".alpheios-word-wrap",toggle_elem.ownerDocument).get();
         if (checked)
         {
-            var loading_msg = Alph.main.get_string("alph-loading-interlinear");
+            var loading_msg = Alph.main.getString("alph-loading-interlinear");
             Alph.$(toggle_elem)
                 .after('<div id="alpheios-loading-interlinear">' + loading_msg + '</div>');
                 
@@ -416,10 +416,10 @@ Alph.site = {
             // it from the translation panel, because the translation panel may
             // not be open. We may also eventually want to be able to use a different document 
             // for the interlinear than the side by side alignment.
-            Alph.site.load_alignment(toggle_elem.ownerDocument,
+            Alph.Site.loadAlignment(toggle_elem.ownerDocument,
                 function(a_align_doc)
                 {
-                    Alph.site.populate_interlinear(
+                    Alph.Site.populateInterlinear(
                         words,
                         a_align_doc,
                         function() {
@@ -435,7 +435,7 @@ Alph.site = {
                 }
             );                  
         } else {
-            Alph.site.hide_interlinear(words);
+            Alph.Site.hideInterlinear(words);
 
         }
     },
@@ -444,7 +444,7 @@ Alph.site = {
      * Resize the source text display, adding line breaks where needed
      * @param {Document} a_doc the contentDocument for the source text
      */
-    resize_interlinear: function(a_doc)
+    resizeInterlinear: function(a_doc)
     {
     },
     
@@ -457,12 +457,12 @@ Alph.site = {
      *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
      * @param {Boolean} a_on is the element toggling on (true) or off (false)
      */
-    toggle_alignment: function(a_event,a_elem,a_type,a_on)
+    toggleAlignment: function(a_event,a_elem,a_type,a_on)
     {
         // don't do alignment highlighting for quiz mode,
         // or if the translation panel is not open
-        if (Alph.interactive.enabled() || 
-            ! Alph.main.panels['alph-trans-panel'].is_visible_inline())
+        if (Alph.Interactive.enabled() || 
+            ! Alph.main.d_panels['alph-trans-panel'].isVisibleInline())
         {
             return;
         }
@@ -475,7 +475,7 @@ Alph.site = {
             {
                 Alph.$(a_elem).after(
                     '<span class="alpheios-aligned-nomatch alpheios-tooltip">' + 
-                    Alph.main.get_string("alph-align-nomatch") +
+                    Alph.main.getString("alph-align-nomatch") +
                     '</span>');
             }
         }
@@ -488,8 +488,8 @@ Alph.site = {
         
         // toggle the selection of the parallel aligned text
         try {
-            var panel_obj = Alph.main.panels['alph-trans-panel'];
-            panel_obj.toggle_parallel_alignment(a_elem,a_type,a_on);
+            var panel_obj = Alph.main.d_panels['alph-trans-panel'];
+            panel_obj.toggleParallelAlignment(a_elem,a_type,a_on);
         }
         catch(a_e)
         {
@@ -505,7 +505,7 @@ Alph.site = {
      * @param {Function} a_end_callback Callback function to execute once request
      *                                  is finished. 
      */
-    populate_interlinear: function(a_words,a_source,a_end_callback)
+    populateInterlinear: function(a_words,a_source,a_end_callback)
     {    
         /*
          * This code is a little convuluted.  We want to issue
@@ -614,7 +614,7 @@ Alph.site = {
      * @param {Boolen} a_on flag to indicate whether the translation is being toggled
      *                      on (true) or off (false)                   
      */
-    toggle_interlinear: function(a_words,a_src_doc,a_on)
+    toggleInterlinear: function(a_words,a_src_doc,a_on)
     {
         if (a_checked)
         {
@@ -626,7 +626,7 @@ Alph.site = {
      * @param {Array} a_words array of words within the document for which to 
      *                        remove the interlinear display 
      */
-    hide_interlinear: function(a_words)
+    hideInterlinear: function(a_words)
     {
         a_words.forEach(
             function(parent)
@@ -652,9 +652,9 @@ Alph.site = {
      * @return the alignment document, parsed as xhtml+xml
      * @type Document
      */
-    load_alignment: function(a_src_doc,a_success,a_error)
+    loadAlignment: function(a_src_doc,a_success,a_error)
     {
-        var align_url = this.translation_url(a_src_doc);
+        var align_url = this.getTranslationUrl(a_src_doc);
         var align_doc = null;
         
         // using XMLHttpRequest directly here because the alignment document
@@ -699,21 +699,21 @@ Alph.site = {
      * @param {int} a_event_type the event type (one of @link Alph.Constants.events)
      * @param {Object} a_event_data optional event data object
      */
-    observe_ui_event: function(a_bro,a_event_type,a_event_data)
+    observeUIEvent: function(a_bro,a_event_type,a_event_data)
     {
        //TODO - won't work for frames
        var doc = a_bro.contentDocument;
        
-        if (a_event_type == Alph.Constants.events.UPDATE_XLATE_TRIGGER)
+        if (a_event_type == Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER)
         {
-            this.add_trigger_hint(
+            this.addTriggerHint(
                 a_bro,doc,a_event_data.new_trigger,Alph.main.getLanguageTool(a_bro));
         }
         // observe change to config setting which enables interlinear
-        else if (a_event_type == Alph.Constants.events.UPDATE_PREF 
+        else if (a_event_type == Alph.Constants.EVENTS.UPDATE_PREF 
                  && a_event_data.name.indexOf('features.alpheios-interlinear') >= 0)
         {
-            this.add_interlinear_toggle(doc);             
+            this.addInterlinearToggle(doc);             
         }
 
     },
@@ -726,12 +726,12 @@ Alph.site = {
      * @pram {Alp.LanguageTool} a_lang_tool the current language tool 
      * 
      */
-    add_trigger_hint: function(a_bro,a_doc,a_trigger,a_lang_tool)
+    addTriggerHint: function(a_bro,a_doc,a_trigger,a_lang_tool)
     {
-        var mode = Alph.main.get_state_obj(a_bro).get_var("level");
+        var mode = Alph.main.getStateObj(a_bro).getVar("level");
         var hint_prop = 'alph-trigger-hint-'+a_trigger+'-'+mode;
-        var lang = a_lang_tool.get_language_string();
-        var hint = a_lang_tool.get_string_or_default(hint_prop,[lang]);
+        var lang = a_lang_tool.getLanguageString();
+        var hint = a_lang_tool.getStringOrDefault(hint_prop,[lang]);
         Alph.$(".alpheios-trigger-hint",a_doc).html(hint);
     },
     
@@ -741,13 +741,13 @@ Alph.site = {
      * @return the url or null if not defined
      * @type {String}
      */
-    treebank_url: function(a_doc)
+    getTreebankUrl: function(a_doc)
     { 
         var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",a_doc).attr("content");
         // if the treebank url is defined, but remote features are disabled and
         // the treebank url is remote, then act as if it's not defined
         if (treebank_url && Alph.MozUtils.getPref("disable.remote") && 
-            ! Alph.util.is_local_url(treebank_url)
+            ! Alph.Util.isLocalUrl(treebank_url)
            )
         {
            treebank_url = null; 
@@ -761,14 +761,14 @@ Alph.site = {
      * @return the url or null if not defined
      * @type {String}
      */
-    treebank_diagram_url: function(a_doc)
+    getTreebankDiagramUrl: function(a_doc)
     { 
         var url = Alph.$("meta[name=alpheios-treebank-diagram-url]",a_doc)
                       .attr("content");
         // if the url is defined, but remote features are disabled and
         // the url is remote, then act as if it's not defined
         if (url && Alph.MozUtils.getPref("disable.remote") && 
-            ! Alph.util.is_local_url(url)
+            ! Alph.Util.isLocalUrl(url)
            )
         {
            url = null; 
@@ -782,13 +782,13 @@ Alph.site = {
      * @return the url or null if not defined
      * @type {String}
      */
-    translation_url: function(a_doc)
+    getTranslationUrl: function(a_doc)
     {
         var trans_url = Alph.$("#alph-trans-url",a_doc).attr("url");
         // if the translation url is defined, but remote features are disabled and
         // the translation url is remote, then act as if it's not defined
         if (trans_url && Alph.MozUtils.getPref("disable.remote") && 
-            ! Alph.util.is_local_url(trans_url))
+            ! Alph.Util.isLocalUrl(trans_url))
         {
             trans_url = null;
         }
@@ -799,15 +799,15 @@ Alph.site = {
      * Update the browser elements which correspond to the site tools
      * @param {Document} a_doc the current document
      */
-    update_site_tool_status: function(a_doc)
+    updateSiteToolStatus: function(a_doc)
     {
-        if (! this.translation_url(a_doc))
+        if (! this.getTranslationUrl(a_doc))
         {
             Alph.$("#alph-trans-status").attr("disabled",true);
             Alph.$("#alph-trans-status").attr("hidden",true);
         
         }
-        if (! this.treebank_diagram_url(a_doc))
+        if (! this.getTreebankDiagramUrl(a_doc))
         {
             Alph.$("#alph-tree-status").attr("disabled",true);
             Alph.$("#alph-tree-status").attr("hidden",true);

@@ -24,11 +24,11 @@
     <commandset id="mainCommandSet">
         <command 
             id="alpheios-trans-toggle-cmd" 
-            oncommand="Alph.main.toggle_panel(event,'alph-trans-panel');"
+            oncommand="Alph.main.togglePanel(event,'alph-trans-panel');"
             observes="alph-trans-status"/>
          <command 
             id="alpheios-trans-toggle-inter-trans-cmd" 
-            oncommand="Alph.Translation.toggle_interlinear('trans',event);"
+            oncommand="Alph.Translation.toggleInterlinear('trans',event);"
             disabled="true">
             <observes element="alph-trans-inter-trans-status" attribute="disabled"/>
             <observes element="alph-trans-inter-trans-status" attribute="hidden"/>

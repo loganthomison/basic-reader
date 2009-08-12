@@ -9,7 +9,7 @@
 <window id="alph-infl-window" title="&alpheios.infl.window.title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         windowtype="alph-window"
-        onload="Alph.infl.onLoad();">
+        onload="Alph.Infl.onLoad();">
         
     <stringbundleset id="stringbundleset">
         <stringbundle id="alpheios-strings" 

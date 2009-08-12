@@ -44,11 +44,11 @@ Alph.Tree.prototype = new Alph.Panel();
 
 /**
  * Tree panel specific implementation of
- * {@link Alph.Panel#get_detach_chrome}
+ * {@link Alph.Panel#getDetachChrome}
  * @return the chrome url as a string
  * @type String
  */
-Alph.Tree.prototype.get_detach_chrome = function()
+Alph.Tree.prototype.getDetachChrome = function()
 {
     return 'chrome://alpheios/content/alpheios-tree-window.xul';
 };
@@ -61,7 +61,7 @@ Alph.Tree.prototype.init = function()
 {
     // add the popup trigger handler to the tree browser
     var trigger = Alph.main.getLanguageTool().getpopuptrigger();
-    Alph.$("browser",this.panel_elem).get(0).
+    Alph.$("browser",this.d_panelElem).get(0).
         addEventListener(trigger, Alph.main.doXlateText, false);
 };
 
@@ -75,7 +75,7 @@ Alph.Tree.prototype.show = function()
 {
     var panel_obj = this;
     var bro = Alph.main.getCurrentBrowser();
-    var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    var treeDoc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
 
     // clear out the prior tree and any error
     Alph.$("#tree-error", treeDoc).empty();
@@ -89,28 +89,28 @@ Alph.Tree.prototype.show = function()
 
     var svgError = "";
 
-    var treebankUrl = Alph.site.treebank_diagram_url(bro.contentDocument);
+    var treebankUrl = Alph.Site.getTreebankDiagramUrl(bro.contentDocument);
 
     var tbrefs;
     var sentence;
     var word;
     if (! treebankUrl)
     {
-        Alph.$("#tree-error",treeDoc).html(Alph.main.get_string("alph-error-tree-notree")
+        Alph.$("#tree-error",treeDoc).html(Alph.main.getString("alph-error-tree-notree")
         );
-        this.update_panel_window({},'alph-tree-body');
+        this.updatePanelWindow({},'alph-tree-body');
     }
-    else if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
+    else if (! Alph.Xlate.popupVisible() && ! Alph.Interactive.queryVisible())
     {
         // Just add the default message to the display
-        Alph.$("#tree-error",treeDoc).html(Alph.main.get_string("alph-info-tree-select"));
-        this.update_panel_window({},'alph-tree-body');
+        Alph.$("#tree-error",treeDoc).html(Alph.main.getString("alph-info-tree-select"));
+        this.updatePanelWindow({},'alph-tree-body');
     }
     else
     {
         try
         {
-            var last_elem = Alph.main.get_state_obj(bro).get_var("lastElem");
+            var last_elem = Alph.main.getStateObj(bro).getVar("lastElem");
             tbrefs = Alph.$(last_elem).attr("tbrefs");
             // if the selected element doesn't have a tbrefs attribute,
             // look for the first parent element that does
@@ -136,8 +136,8 @@ Alph.Tree.prototype.show = function()
         if (! sentence )
         {
             // Just add the default message to the display
-            Alph.$("#tree-error",treeDoc).html(Alph.main.get_string("alph-error-tree-notree"));
-            this.update_panel_window({},'alph-tree-body');
+            Alph.$("#tree-error",treeDoc).html(Alph.main.getString("alph-error-tree-notree"));
+            this.updatePanelWindow({},'alph-tree-body');
         }
         else
         {
@@ -152,17 +152,17 @@ Alph.Tree.prototype.show = function()
                     error: function(req,textStatus,errorThrown)
                     {
                         Alph.$("#tree-error",treeDoc).html(
-                            Alph.main.get_string("alph-error-tree-notree")
+                            Alph.main.getString("alph-error-tree-notree")
                         );
                         Alph.MozUtils.log("Error retrieving treebank diagram: "
                             + textStatus ||errorThrown);
-                        panel_obj.update_panel_window({},'alph-tree-body');
+                        panel_obj.updatePanelWindow({},'alph-tree-body');
                     },
                     success: function(data, textStatus)
                     {
-                        Alph.Tree.update_hint(panel_obj,bro,lang_tool,false);
-                        panel_obj.parse_tree(data, tbrefs);
-                        panel_obj.update_panel_window({},'alph-tree-body');
+                        Alph.Tree.updateHint(panel_obj,bro,lang_tool,false);
+                        panel_obj.parseTree(data, tbrefs);
+                        panel_obj.updatePanelWindow({},'alph-tree-body');
                     }
                 }
             );
@@ -175,15 +175,15 @@ Alph.Tree.prototype.show = function()
 
 /**
  * Tree specific implementation of
- * {@link Alph.Panel.observe_ui_event}
+ * {@link Alph.Panel.observeUIEvent}
  * @param {Browser} a_bro the current browser
  * @param a_event_type the event type (one of @link Alph.Constants.events)
  * @param a_event_data optional event data object
  */
-Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
+Alph.Tree.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
 {
     // listen for the window and the xlate trigger change events
-    if (a_event_type == Alph.Constants.events.UPDATE_XLATE_TRIGGER)
+    if (a_event_type == Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER)
     {
         Alph.MozUtils.log("Tree panel handling event " + a_event_type);
         var new_trigger = a_event_data.new_trigger;
@@ -192,34 +192,34 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         if (this.window_open())
         {
             pw_bro =
-                this.panel_window
-                    .Alph.$("#" + this.panel_id + " browser")
+                this.d_panelWindow
+                    .Alph.$("#" + this.d_panelId + " browser")
                     .get(0);
         }
 
         if (old_trigger)
         {
-            Alph.$("browser",this.panel_elem).get(0).
+            Alph.$("browser",this.d_panelElem).get(0).
                 removeEventListener(old_trigger, Alph.main.doXlateText,false);
             if (pw_bro)
             {
                 pw_bro.removeEventListener(old_trigger, Alph.main.doXlateText,false);
             }
         }
-        Alph.$("browser",this.panel_elem).get(0).
+        Alph.$("browser",this.d_panelElem).get(0).
             addEventListener(new_trigger, Alph.main.doXlateText,false);
         if (pw_bro)
         {
             pw_bro.addEventListener(new_trigger, Alph.main.doXlateText,false);
         }
-        Alph.Tree.update_hint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
+        Alph.Tree.updateHint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
     }
-    else if (a_event_type == Alph.Constants.events.LOAD_TREE_WINDOW)
+    else if (a_event_type == Alph.Constants.EVENTS.LOAD_TREE_WINDOW)
     {
         this.open();
         var trigger = Alph.main.getXlateTrigger();
-        this.panel_window
-            .Alph.$("#" + this.panel_id + " browser")
+        this.d_panelWindow
+            .Alph.$("#" + this.d_panelId + " browser")
             .get(0)
             .addEventListener(trigger, Alph.main.doXlateText,false);
     }
@@ -233,35 +233,35 @@ Alph.Tree.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
  * @param a_svgXML SVG representation of the tree
  * @param {Array} a_ids ids of initial words in the tree
  */
-Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
+Alph.Tree.prototype.parseTree = function(a_svgXML, a_ids)
 {
     var marginLeft = 10;
     var marginTop = 0;
     var fontSize = 20;
-    var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    var treeDoc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
     try
     {
         Alph.$("#dependency-tree", treeDoc).
             html(a_svgXML.firstChild.childNodes);
         var svgXML = Alph.$("#dependency-tree", treeDoc).get(0);
         var treeSize =
-                Alph.Tree.position_tree(
+                Alph.Tree.positionTree(
                     Alph.$(svgXML).children("g:first").children("g:first"),
                     fontSize)[0];
         var maxWidth = treeSize[0];
-        var keySize = Alph.Tree.position_key(treeDoc, fontSize);
+        var keySize = Alph.Tree.positionKey(treeDoc, fontSize);
         if (keySize[0] > maxWidth)
             maxWidth = keySize[0];
-        var textSize = Alph.Tree.position_text(treeDoc, maxWidth, fontSize);
-        Alph.Tree.position_all(treeDoc,
+        var textSize = Alph.Tree.positionText(treeDoc, maxWidth, fontSize);
+        Alph.Tree.positionAll(treeDoc,
                                treeSize,
                                textSize,
                                keySize,
                                fontSize);
         //Alph.MozUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
-        Alph.Tree.highlight_first(treeDoc, a_ids);
-        Alph.Tree.highlight_word(treeDoc, a_ids[0]);
-        Alph.Tree.scroll_to_focus(treeDoc);
+        Alph.Tree.highlightFirst(treeDoc, a_ids);
+        Alph.Tree.highlightWord(treeDoc, a_ids[0]);
+        Alph.Tree.scrollToFocus(treeDoc);
 //        Alph.MozUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
@@ -287,7 +287,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                     'mouseenter',
                     function()
                     {
-                        Alph.Tree.highlight_word(this.ownerDocument, tbrefid);
+                        Alph.Tree.highlightWord(this.ownerDocument, tbrefid);
                     }
                 );
             }
@@ -299,11 +299,11 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                 thisNode.hover(
                     function()
                     {
-                        Alph.Tree.highlight_word(this.ownerDocument, id);
+                        Alph.Tree.highlightWord(this.ownerDocument, id);
                     },
                     function()
                     {
-                        Alph.Tree.highlight_word(this.ownerDocument, null);
+                        Alph.Tree.highlightWord(this.ownerDocument, null);
                     }
                 );
             }
@@ -322,7 +322,7 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
                     'mouseleave',
                     function()
                     {
-                        Alph.Tree.highlight_word(this.ownerDocument, null);
+                        Alph.Tree.highlightWord(this.ownerDocument, null);
                     }
                 );
             }
@@ -344,17 +344,17 @@ Alph.Tree.prototype.parse_tree = function(a_svgXML, a_ids)
  * @param {String} a_browser_id the id of the browser to update
  * @param {String} a_browser_index the index of the browser to update
  */
-Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_browser_index)
+Alph.Tree.prototype.updatePanelWindow = function(a_panel_state,a_browser_id,a_browser_index)
 {
     // make sure to update the detached window document too...
-    if (this.window_open())
+    if (this.windowOpen())
     {
-        var treeDoc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+        var treeDoc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
         try
         {
             var pw_bro =
-                this.panel_window
-                    .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
+                this.d_panelWindow
+                    .Alph.$("#" + this.d_panelId + " browser#"+a_browser_id)
                     .get(0);
             if (pw_bro)
             {
@@ -379,15 +379,15 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
                 {
                     var w = parseInt(panel_tree.getAttribute("width"));
                     var h = parseInt(panel_tree.getAttribute("height"));
-                    this.resize_panel_window(w,h);
-                    Alph.Tree.scroll_to_focus(window_doc);
+                    this.resizePanelWindow(w,h);
+                    Alph.Tree.scrollToFocus(window_doc);
                 }
                 catch(a_e)
                 {
                     Alph.MozUtils.log("Error parsing window size: " + a_e);
                 }
 
-                this.panel_window.focus();
+                this.d_panelWindow.focus();
             }
          } catch(a_e)
          {
@@ -405,7 +405,7 @@ Alph.Tree.prototype.update_panel_window = function(a_panel_state,a_browser_id,a_
  * @return size of tree, center line of root element, and width of root node
  * @type Array
  */
-Alph.Tree.position_tree = function(a_container, a_fontSize)
+Alph.Tree.positionTree = function(a_container, a_fontSize)
 {
     // get various pieces of tree
     // childNodes contains arc labels followed by subtrees
@@ -437,7 +437,7 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
             return;
 
         // get size, center, and root width of child
-        var thisReturn = Alph.Tree.position_tree(Alph.$(this), a_fontSize);
+        var thisReturn = Alph.Tree.positionTree(Alph.$(this), a_fontSize);
         var thisSize = thisReturn[0];
         childReturn.push(thisReturn);
 
@@ -609,7 +609,7 @@ Alph.Tree.position_tree = function(a_container, a_fontSize)
  * @return size of text
  * @type Array
  */
-Alph.Tree.position_text = function(a_doc, a_width, a_fontSize)
+Alph.Tree.positionText = function(a_doc, a_width, a_fontSize)
 {
     // if no words, just return empty size
     var words = Alph.$("#dependency-tree", a_doc).children("g").next().children("text");
@@ -672,7 +672,7 @@ Alph.Tree.position_text = function(a_doc, a_width, a_fontSize)
  * @return size of key
  * @type Array
  */
-Alph.Tree.position_key = function(a_doc, a_fontSize)
+Alph.Tree.positionKey = function(a_doc, a_fontSize)
 {
     // find parts of key
     var keyGrp;
@@ -755,7 +755,7 @@ Alph.Tree.position_key = function(a_doc, a_fontSize)
  * @param {Array} a_keySize width and height of key
  * @param {int} a_fontSize size of font in pixels
  */
-Alph.Tree.position_all =
+Alph.Tree.positionAll =
 function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
 {
     Alph.$("#dependency-tree", a_doc).children("g").each(
@@ -820,7 +820,7 @@ function(a_doc, a_treeSize, a_textSize, a_keySize, a_fontSize)
 //  group element of class "arc-label", and that the top-level group of class
 //  "tree" immediately precedes the group of class "text".
 //
-Alph.Tree.highlight_word = function(a_doc, a_id)
+Alph.Tree.highlightWord = function(a_doc, a_id)
 {
     // find node of interest
     var focusNode = Alph.$("#" + a_id, a_doc);
@@ -982,21 +982,21 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
     }
 
     // set highlights on text words
-    Alph.Tree.highlight_text_word(a_doc, a_id, "focus");
-    Alph.Tree.highlight_text_word(a_doc,
+    Alph.Tree.highlightTextWord(a_doc, a_id, "focus");
+    Alph.Tree.highlightTextWord(a_doc,
                                   focusNode.parent().get(0).getAttribute("id"),
                                   "focus-parent");
     descendants.each(
     function()
     {
-        Alph.Tree.highlight_text_word(a_doc,
+        Alph.Tree.highlightTextWord(a_doc,
                                       this.getAttribute("id"),
                                       "focus-descendant");
     });
     children.each(
     function()
     {
-        Alph.Tree.highlight_text_word(a_doc,
+        Alph.Tree.highlightTextWord(a_doc,
                                       this.getAttribute("id"),
                                       "focus-child");
     });
@@ -1008,7 +1008,7 @@ Alph.Tree.highlight_word = function(a_doc, a_id)
  * @param {String} a_id id of word (tbref attribute on text word)
  * @param {String} a_focus value to set showme attribute to
  */
-Alph.Tree.highlight_text_word = function(a_doc, a_id, a_focus)
+Alph.Tree.highlightTextWord = function(a_doc, a_id, a_focus)
 {
     // do nothing if no id specified
     if ((a_id == null) || (a_id.length == 0))
@@ -1030,7 +1030,7 @@ Alph.Tree.highlight_text_word = function(a_doc, a_id, a_focus)
  * @param a_doc the document
  * @param {Array} a_ids ids of words in tree
  */
-Alph.Tree.highlight_first = function(a_doc, a_ids)
+Alph.Tree.highlightFirst = function(a_doc, a_ids)
 {
     // for each id
     for (i in a_ids)
@@ -1060,21 +1060,21 @@ Alph.Tree.highlight_first = function(a_doc, a_ids)
     }
 };
 
-Alph.Tree.pre_open_check = function()
+Alph.Tree.preOpenCheck = function()
 {
-    if (! Alph.xlate.popupVisible() && ! Alph.interactive.query_visible())
+    if (! Alph.Xlate.popupVisible() && ! Alph.Interactive.queryVisible())
     {
         var trigger = Alph.main.getXlateTrigger(Alph.main.getCurrentBrowser());
         var hint_prop = 'alph-tree-trigger-hint-'+ trigger;
         var lang_tool = Alph.main.getLanguageTool();
-        var lang = lang_tool.get_language_string();
-        var hint = lang_tool.get_string_or_default(hint_prop,[lang]);
+        var lang = lang_tool.getLanguageString();
+        var hint = lang_tool.getStringOrDefault(hint_prop,[lang]);
         alert(hint);
         return false;
     }
     else
     {
-        Alph.main.panels['alph-tree-panel'].open()
+        Alph.main.d_panels['alph-tree-panel'].open()
     }
 };
 
@@ -1085,19 +1085,19 @@ Alph.Tree.pre_open_check = function()
  * @param {Alph.LanguageTool} a_lang_tool the current language tool
  * @param {Boolean} a_update_window flag to indicate whether the panel window should be updated too 
  */
-Alph.Tree.update_hint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
+Alph.Tree.updateHint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
 {
-    var treeDoc = Alph.$("browser",a_panel_obj.panel_elem).get(0).contentDocument;
+    var treeDoc = Alph.$("browser",a_panel_obj.d_panelElem).get(0).contentDocument;
     var trigger = Alph.main.getXlateTrigger(a_bro);
-    var mode = Alph.main.get_state_obj(a_bro).get_var("level");
-    var tree_hint = a_lang_tool.get_string_or_default('alph-tree-hint',[]);
+    var mode = Alph.main.getStateObj(a_bro).getVar("level");
+    var tree_hint = a_lang_tool.getStringOrDefault('alph-tree-hint',[]);
     var trigger_hint_prop = 'alph-trigger-hint-'+ trigger + '-'+mode;
-    var lang = a_lang_tool.get_language_string();
-    var trigger_hint = a_lang_tool.get_string_or_default(trigger_hint_prop,[lang]);
+    var lang = a_lang_tool.getLanguageString();
+    var trigger_hint = a_lang_tool.getStringOrDefault(trigger_hint_prop,[lang]);
     Alph.$("#tree-hint",treeDoc).html(tree_hint + trigger_hint);
     if (a_update_window)
     {
-        a_panel_obj.update_panel_window({},'alph-tree-body');
+        a_panel_obj.updatePanelWindow({},'alph-tree-body');
     }
 }
     
@@ -1105,7 +1105,7 @@ Alph.Tree.update_hint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
      * Scroll a document so that focus node is visible
      * @param {Document} a_document the document containing the SVG diagram
      */
-Alph.Tree.scroll_to_focus= function(a_doc)
+Alph.Tree.scrollToFocus= function(a_doc)
 {
     var focus_node = Alph.$("g[focus-node]",a_doc).get(0);
     if (! focus_node)

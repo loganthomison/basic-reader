@@ -36,7 +36,7 @@ XFRState =
     /**
      * private variable to hold the state objects
      */
-    state_requests : {},
+    d_stateRequests : {},
     
     /**
      * retrieve the stored variable from the state object
@@ -45,19 +45,19 @@ XFRState =
      * @return the requested value or null if either the state object or 
      *         the variable requested from the state object doesn't exist
      */
-    get_state_value: function(a_guid,a_name)
+    getStateValue: function(a_guid,a_name)
     {
-        var request = this.get_state_request(a_guid);
+        var request = this.getStateRequest(a_guid);
         var value =  null;
         if (request)
         {
-            var obj = this.state_requests[a_guid][a_name]
+            var obj = this.d_stateRequests[a_guid][a_name]
             if (typeof obj != "undefined")
             {
                 value = obj.value;
                 if (obj.single_use)
                 {
-                    delete this.state_requests[a_guid][a_name];
+                    delete this.d_stateRequests[a_guid][a_name];
                 }
             }
         }
@@ -72,11 +72,11 @@ XFRState =
      * @return the unique identifier for the new state object
      * @type int 
      */
-    new_state_request: function(a_name,a_value,a_single_use)
+    newStateRequest: function(a_name,a_value,a_single_use)
     {
         var guid = (new Date()).getTime() + Math.floor(Math.random()* 100000000);
-        this.state_requests[guid] = {};
-        this.add_to_state_request(guid,a_name,a_value,a_single_use);
+        this.d_stateRequests[guid] = {};
+        this.addToStateRequest(guid,a_name,a_value,a_single_use);
         return guid;
     },
     
@@ -87,9 +87,9 @@ XFRState =
      * @param {Object} a_value the value to store
      * @param {Boolean} a_single_use flag to indicate the variable is a single-use object
      */
-    add_to_state_request: function(a_guid,a_name,a_value,a_single_use)
+    addToStateRequest: function(a_guid,a_name,a_value,a_single_use)
     {
-        var request = this.get_state_request(a_guid);
+        var request = this.getStateRequest(a_guid);
         if (request)
         {
             // default is for variables not to be single-use 
@@ -113,9 +113,9 @@ XFRState =
      * @return the state object, or null if it doesn't exist
      * @type Object
      */
-    get_state_request: function(a_guid)
+    getStateRequest: function(a_guid)
     {
-       var request = this.state_requests[a_guid] 
+       var request = this.d_stateRequests[a_guid] 
        if (typeof  request == "undefined")
        {
             request = null;

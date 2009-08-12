@@ -38,16 +38,16 @@ Components.utils.import("resource://alpheios/alpheios-moz-utils.jsm");
 Datafile = function(a_url, a_charset)
 {
     // save parameters for possible future reload
-    this.url = a_url;
-    this.charset = a_charset;
-    this.separator = '|';
-    this.specialFlag = '@';
+    this.d_url = a_url;
+    this.d_charset = a_charset;
+    this.d_separator = '|';
+    this.d_specialFlag = '@';
 
-    this.data = MozUtils.read_file(a_url,a_charset);
+    this.d_data = MozUtils.readFile(a_url,a_charset);
 
     // make sure file ends with newline
-    if (this.data[this.data.length - 1] != '\n')
-        this.data += '\n';
+    if (this.d_data[this.d_data.length - 1] != '\n')
+        this.d_data += '\n';
 }
 
 Datafile.prototype =
@@ -60,7 +60,7 @@ Datafile.prototype =
      */
     getData: function()
     {
-        return this.data;
+        return this.d_data;
     },
 
     /**
@@ -71,7 +71,7 @@ Datafile.prototype =
      */
     getSeparator: function()
     {
-        return this.separator;
+        return this.d_separator;
     },
 
     /**
@@ -81,7 +81,7 @@ Datafile.prototype =
      */
     setSeparator: function(a_separator)
     {
-        this.separator = a_separator;
+        this.d_separator = a_separator;
     },
 
     /**
@@ -92,7 +92,7 @@ Datafile.prototype =
      */
     getSpecialHandlingFlag: function()
     {
-        return this.specialFlag;
+        return this.d_specialFlag;
     },
 
     /**
@@ -102,7 +102,7 @@ Datafile.prototype =
      */
     setSpecialHandlingFlag: function(a_specialFlag)
     {
-        this.specialFlag = a_specialFlag;
+        this.d_specialFlag = a_specialFlag;
     },
 
     /**
@@ -123,7 +123,7 @@ Datafile.prototype =
      */
     binarySearch: function(a_key)
     {
-        a_key += this.separator;
+        a_key += this.d_separator;
 
         const tlen = a_key.length;
         var mid;
@@ -131,22 +131,22 @@ Datafile.prototype =
 
         // start with entire range of data
         var beg = 0;
-        var end = this.data.length - 1;
+        var end = this.d_data.length - 1;
 
         MozUtils.log("a_key="+a_key);
         // while data still remains
         while (beg < end)
         {
             // find line containing midpoint of remaining data
-            mid = this.data.lastIndexOf('\n', (beg + end) >> 1) + 1;
-            midStr = this.data.substr(mid, tlen);
+            mid = this.d_data.lastIndexOf('\n', (beg + end) >> 1) + 1;
+            midStr = this.d_data.substr(mid, tlen);
             MozUtils.log("midStr="+midStr);
             // if too high, restrict to first half
             if (a_key < midStr)
                 end = mid - 1;
             // if too low, restrict to second half
             else if (a_key > midStr)
-                beg = this.data.indexOf('\n', mid) + 1;
+                beg = this.d_data.indexOf('\n', mid) + 1;
             // if equal, done
             else
                 break;
@@ -163,11 +163,11 @@ Datafile.prototype =
             while (mid >= 2)
             {
                 // find start of preceding line
-                var prec = this.data.lastIndexOf('\n', mid - 2) + 1;
+                var prec = this.d_data.lastIndexOf('\n', mid - 2) + 1;
 
                 // if preceding line has different key then done,
                 // else back up to preceding line
-                midStr = this.data.substr(prec, tlen);
+                midStr = this.d_data.substr(prec, tlen);
                 MozUtils.log("Midstr="+midStr);
                 MozUtils.log("key="+a_key);
                 if (a_key != midStr)
@@ -204,20 +204,20 @@ Datafile.prototype =
         var end = start;
 
         // while more lines remain
-        while (end < this.data.length)
+        while (end < this.d_data.length)
         {
             // find start of next line
-            end = this.data.indexOf('\n', end) + 1;
+            end = this.d_data.indexOf('\n', end) + 1;
             if (end == 0)
-                end = this.data.length;
+                end = this.d_data.length;
 
             // if next line has different key then done,
             // else include this line in output
-            var test = this.data.substr(end, tlen);
+            var test = this.d_data.substr(end, tlen);
             if (a_key != test)
                 break;
         }
 
-        return this.data.substring(start, end);
+        return this.d_data.substring(start, end);
     }
 };

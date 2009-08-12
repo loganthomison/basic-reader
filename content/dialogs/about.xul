@@ -13,7 +13,7 @@
 <dialog id="alpheios-about-dialog"
         title="&alpheios-about-title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        buttons="accept" onload="Alph.Dialogs.load_about();" onaccept="this.close();">
+        buttons="accept" onload="Alph.Dialogs.loadAbout();" onaccept="this.close();">
   <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
   <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />  
   <script type="application/x-javascript" src="chrome://alpheios/content/dialogs/alpheios-dlg.js" />
@@ -26,14 +26,14 @@
   <vbox flex="1">
     <hbox>
         <label class="site-link" id="alpheios-site-link" 
-               onclick="Alph.util.open_alpheios_link(window.opener,'main');"/>
+               onclick="Alph.Util.openAlpheiosLink(window.opener,'main');"/>
     </hbox>
     <groupbox id="alpheios-extension-list">
         <caption class="alpheios-about-extensions" label="&alpheios-about-versions;"/>
     </groupbox>
     <hbox>
         <label class="site-link" id="alpheios-feedback-link"
-               onclick="Alph.util.send_feedback();"
+               onclick="Alph.Util.sendFeedback();"
                value="&alpheios.menu.feedback;"/>
     </hbox>
   </vbox>

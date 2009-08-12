@@ -44,16 +44,16 @@ LanguageToolFactory =
     /**
      * @private list of available languages
      */
-    lang_list: [],
+    d_langList: [],
     
     /**
      * get the list of available languages
      * @return the list 
      * @type Array
      */
-    get_lang_list: function()
+    getLangList: function()
     {
-        return this.lang_list;
+        return this.d_langList;
     },
     
     
@@ -63,11 +63,11 @@ LanguageToolFactory =
      * @param {String} a_class the name of the class to instantiate for this language
      *                  if not supplied, the base LanguageTool class will be used
      */
-    add_lang: function(a_lang,a_class)
+    addLang: function(a_lang,a_class)
     {
         if (typeof this[a_lang] == "undefined")
         {
-            this.lang_list.push(a_lang);
+            this.d_langList.push(a_lang);
             if (typeof a_class == "undefined")
             {
                 a_class = null;
@@ -83,7 +83,7 @@ LanguageToolFactory =
      * @param {Object} a_scope the object to which the language tool is scoped
      * @return the Language Tool object
      */
-    create_instance: function(a_lang,a_scope)
+    createInstance: function(a_lang,a_scope)
     { 
         if (this[a_lang] == null)
         {
@@ -100,7 +100,7 @@ LanguageToolFactory =
      * @param {String} a_lang the language key
      * @return {StringBundle} a StringBundle object
      */
-    get_stringbundle: function(a_lang)
+    getStringBundle: function(a_lang)
     {
         var chromepkg = MozUtils.getPref("chromepkg",a_lang);
         return new StringBundle("chrome://" + chromepkg + "/locale/alpheios-"+a_lang+'.properties');

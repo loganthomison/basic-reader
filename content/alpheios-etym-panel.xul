@@ -20,7 +20,7 @@
 
     <commandset id="mainCommandSet">
         <command id="alpheios-etym-toggle-cmd" 
-             oncommand="Alph.main.toggle_panel(event,'alph-etym-panel');"
+             oncommand="Alph.main.togglePanel(event,'alph-etym-panel');"
              observes="alph-etym-status" />
     </commandset>
              

@@ -25,9 +25,9 @@
  
 const EXPORTED_SYMBOLS = ['MozUtils','MozSvc'];
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cu = Components.utils;
+const CC = Components.classes;
+const CI = Components.interfaces;
+const CU = Components.utils;
 
 /**
  * Util contains the Alpheios utility functions
@@ -42,7 +42,7 @@ MozUtils = {
      * @type Object
      * @private
      */
-    extension_base_paths: {},
+    d_extensionBasePaths: {},
     
     /**
      * Log a string message to the javascript console.
@@ -55,7 +55,7 @@ MozUtils = {
         if (! isDebug ) {
             return;
         }
-        MozSvc.get_svc('Console').logStringMessage('alpheios:' + a_msg);
+        MozSvc.getSvc('Console').logStringMessage('alpheios:' + a_msg);
     },
     
     /**
@@ -72,13 +72,13 @@ MozUtils = {
         }
         
         //TODO - handle missing prefs? 
-        var type = MozSvc.get_svc('AlphPrefs').getPrefType(name);
-        if (type == Ci.nsIPrefBranch.PREF_STRING)
-            return MozSvc.get_svc('AlphPrefs').getCharPref(name);
-        else if (type == Ci.nsIPrefBranch.PREF_INT)
-            return MozSvc.get_svc('AlphPrefs').getIntPref(name);
-        else if (type == Ci.nsIPrefBranch.PREF_BOOL)
-            return MozSvc.get_svc('AlphPrefs').getBoolPref(name);
+        var type = MozSvc.getSvc('AlphPrefs').getPrefType(name);
+        if (type == CI.nsIPrefBranch.PREF_STRING)
+            return MozSvc.getSvc('AlphPrefs').getCharPref(name);
+        else if (type == CI.nsIPrefBranch.PREF_INT)
+            return MozSvc.getSvc('AlphPrefs').getIntPref(name);
+        else if (type == CI.nsIPrefBranch.PREF_BOOL)
+            return MozSvc.getSvc('AlphPrefs').getBoolPref(name);
     },
     
     /**
@@ -109,7 +109,7 @@ MozUtils = {
             a_name = a_lang + '.' + a_name;
         }
         
-        var type = MozSvc.get_svc('AlphPrefs').getPrefType(a_name);
+        var type = MozSvc.getSvc('AlphPrefs').getPrefType(a_name);
         
         // if we don't know the type, try to determine it
         if ( type == 0 )
@@ -139,11 +139,11 @@ MozUtils = {
         }
         
         if (type == Components.interfaces.nsIPrefBranch.PREF_STRING)
-            MozSvc.get_svc('AlphPrefs').setCharPref(a_name, a_value);
+            MozSvc.getSvc('AlphPrefs').setCharPref(a_name, a_value);
         else if (type == Components.interfaces.nsIPrefBranch.PREF_INT)
-            MozSvc.get_svc('AlphPrefs').setIntPref(a_name, a_value);
+            MozSvc.getSvc('AlphPrefs').setIntPref(a_name, a_value);
         else if (type == Components.interfaces.nsIPrefBranch.PREF_BOOL)
-            MozSvc.get_svc('AlphPrefs').setBoolPref(a_name, a_value);
+            MozSvc.getSvc('AlphPrefs').setBoolPref(a_name, a_value);
         else
             this.log("Invalid preference type for " + a_name + "(" + type + ":" + typeof a_value + ")")
             // fall through behavior is to not set the pref if we don't know what type it is
@@ -174,7 +174,7 @@ MozUtils = {
         var a_base_path= a_file_info[0];
         var a_filename = a_file_info[1];
         var runtime = 
-            Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
+            CC["@mozilla.org/xre/app-info;1"].getService(CI.nsIXULRuntime);
         var os = runtime.OS;
         var abi = runtime.XPCOMABI.split(/-/);
         var arch = abi[0];
@@ -204,7 +204,7 @@ MozUtils = {
                 {
                     var dir = 
                         file_iter.getNext()
-                        .QueryInterface(Ci.nsILocalFile);
+                        .QueryInterface(CI.nsILocalFile);
                     // if this is a directory for our os, keep it
                     // for potential use
                     if (dir.isDirectory() && dir.path.indexOf(os) != -1)
@@ -305,28 +305,28 @@ MozUtils = {
             a_ext_pkg = 'alpheios';
         }
         
-        if (typeof this.extension_base_paths[a_ext_pkg] == "undefined")
+        if (typeof this.d_extensionBasePaths[a_ext_pkg] == "undefined")
         {
             // build file for base path
             var base_path = 
-                Cc["@mozilla.org/file/local;1"]
-                    .createInstance(Ci.nsILocalFile);
+                CC["@mozilla.org/file/local;1"]
+                    .createInstance(CI.nsILocalFile);
 
             // translate the chrome url to a file
             var url =
-                MozSvc.get_svc('IO').newURI("chrome://" + a_ext_pkg + "/content/","UTF-8",null);
-            var pkg_path = MozSvc.get_svc("ChromeReg").convertChromeURL(url).spec;
+                MozSvc.getSvc('IO').newURI("chrome://" + a_ext_pkg + "/content/","UTF-8",null);
+            var pkg_path = MozSvc.getSvc("ChromeReg").convertChromeURL(url).spec;
             this.log("Converted chrome url: " + pkg_path);
             // remove the chrome dir and everything after it 
             pkg_path = pkg_path.substring(0,pkg_path.indexOf('/chrome'));
             // remove the jar prefix
             pkg_path = pkg_path.replace(/^jar:/,'');
             this.log("Cleaned chrome url: " + pkg_path);
-            base_path.initWithFile(MozSvc.get_svc('Protocol').getFileFromURLSpec(pkg_path));
-            this.extension_base_paths[a_ext_pkg] = base_path;
+            base_path.initWithFile(MozSvc.getSvc('Protocol').getFileFromURLSpec(pkg_path));
+            this.d_extensionBasePaths[a_ext_pkg] = base_path;
                 
         }
-        return this.extension_base_paths[a_ext_pkg].clone();
+        return this.d_extensionBasePaths[a_ext_pkg].clone();
     },
     
     /**
@@ -340,8 +340,8 @@ MozUtils = {
         var alph_pkgs = [];
         try
         {
-            var ext_list = MozSvc.get_svc('ExtMgr').getItemList(
-                Ci.nsIUpdateItem.TYPE_EXTENSION,{},{});
+            var ext_list = MozSvc.getSvc('ExtMgr').getItemList(
+                CI.nsIUpdateItem.TYPE_EXTENSION,{},{});
                         
             ext_list.forEach(
                 function(a_item)
@@ -363,11 +363,11 @@ MozUtils = {
     /**
      * launch the user's email application and prepare feedback email headers
      */
-    load_uri: function(a_url)
+    loadUri: function(a_url)
     {
-        var uriToOpen = MozSvc.get_svc('IO').newURI(a_url, null, null);
-        Cc['@mozilla.org/uriloader/external-protocol-service;1']
-            .getService(Ci.nsIExternalProtocolService)
+        var uriToOpen = MozSvc.getSvc('IO').newURI(a_url, null, null);
+        CC['@mozilla.org/uriloader/external-protocol-service;1']
+            .getService(CI.nsIExternalProtocolService)
             .loadURI(uriToOpen, null);
     },
     
@@ -379,7 +379,7 @@ MozUtils = {
      * @return the browser
      * @type Browser
      */
-    browser_for_doc: function(a_window,a_doc)
+    browserForDoc: function(a_window,a_doc)
     {
         return a_window.gBrowser.getBrowserForDocument(a_doc);
     },
@@ -391,7 +391,7 @@ MozUtils = {
      * @return true if the browser could be found and selected otherwise false
      * @type Boolean
      */
-    select_browser_for_doc:function(a_window,a_doc)
+    selectBrowserForDoc:function(a_window,a_doc)
     {
         var bro = a_window.gBrowser.getBrowserForDocument(a_doc);
         var num = a_window.gBrowser.browsers.length;
@@ -417,7 +417,7 @@ MozUtils = {
      * @param {Window} a_window the parent window
      * @param {String} a_url the url to open
      */
-    open_new_tab: function(a_window,a_url)
+    openNewTab: function(a_window,a_url)
     {
         a_window.gBrowser.selectedTab = a_window.gBrowser.addTab(a_url);
     },
@@ -427,10 +427,10 @@ MozUtils = {
      * @param {String} a_url the url of the file
      * @param {Object} a_object the object to which the javascript is scoped
      */
-    load_javascript: function(a_url,a_obj)
+    loadJavascript: function(a_url,a_obj)
     {
-        Cc["@mozilla.org/moz/jssubscript-loader;1"]
-          .getService(Ci.mozIJSSubScriptLoader)
+        CC["@mozilla.org/moz/jssubscript-loader;1"]
+          .getService(CI.mozIJSSubScriptLoader)
           .loadSubScript(a_url,a_obj);
     },
     
@@ -439,9 +439,9 @@ MozUtils = {
      * @param {String} a_url the url of the module
      * @param {Object} a_objec the object to which the resource is scoped
      */
-    import_resource: function(a_url,a_obj)
+    importResource: function(a_url,a_obj)
     {
-        Cu.import(a_url,a_obj);
+        CU.import(a_url,a_obj);
     },
     
     /**
@@ -451,11 +451,11 @@ MozUtils = {
      * @return the file contents
      * @type String
      */
-    read_file: function(a_uri,a_charset)
+    readFile: function(a_uri,a_charset)
     {
         this.log("Reading file from file system: " + a_uri);
-        var input_stream = MozSvc.get_svc('InputStream');
-        var channel = MozSvc.get_svc('IO').newChannel(a_uri,null,null);
+        var input_stream = MozSvc.getSvc('InputStream');
+        var channel = MozSvc.getSvc('IO').newChannel(a_uri,null,null);
         var input = channel.open();
         input_stream.init(input);
         var buffer = input_stream.read(input.available());
@@ -463,7 +463,7 @@ MozUtils = {
         input.close();
         if (typeof a_charset != "undefined" && a_charset != null)
         {
-            var conv = MozSvc.get_svc('UnicodeConverter');
+            var conv = MozSvc.getSvc('UnicodeConverter');
             conv.charset = a_charset;
             return conv.ConvertToUnicode(buffer);
         }
@@ -482,7 +482,7 @@ MozUtils = {
      * @return the dialog object
      * @type Window
      */
-    open_dialog: function(a_window,a_url,a_title,a_features)
+    openDialog: function(a_window,a_url,a_title,a_features)
     {
          // default features
         var features =
@@ -519,11 +519,11 @@ MozUtils = {
     /**
      * launch the user's email application and prepare feedback email headers
      */
-    send_feedback: function(a_window,a_url)
+    sendFeedback: function(a_window,a_url)
     {
         var bundle = a_window.document.getElementById('alpheios-strings');
-        var subject = this.get_string(bundle,'alph-feedback-subject');
-        var body = '\n\n' + this.get_string(bundle,'alph-installed-versions') + '\n';
+        var subject = this.getString(bundle,'alph-feedback-subject');
+        var body = '\n\n' + this.getString(bundle,'alph-installed-versions') + '\n';
         var pkgs = this.getAlpheiosPackages();
         pkgs.forEach(
             function(a_pkg)
@@ -534,7 +534,7 @@ MozUtils = {
         subject=encodeURIComponent(subject);
         body= encodeURIComponent(body);     
         var url = a_url + '?subject=' + subject + '&body=' + body;
-        this.load_uri(url);
+        this.loadUri(url);
     },
 
     
@@ -545,7 +545,7 @@ MozUtils = {
      * @param {Array} a_replace optional array of replacement values
      * @return the string (if not found, then an empty string)
      */
-    get_string: function(a_bundle,a_name,a_replace)
+    getString: function(a_bundle,a_name,a_replace)
     {
         
         var str_value = "";
@@ -570,7 +570,7 @@ MozUtils = {
 
 MozSvc = {
     
-    _svcs: 
+    d_svcs: 
     {
         UnicodeConverter: ['@mozilla.org/intl/scriptableunicodeconverter','nsIScriptableUnicodeConverter'],
         ChromeReg: ["@mozilla.org/chrome/chrome-registry;1",'nsIChromeRegistry'],
@@ -586,34 +586,34 @@ MozSvc = {
      */
     init: function() {
         this.AlphPrefs = 
-            Cc["@mozilla.org/preferences-service;1"]
-                    .getService(Ci.nsIPrefService)
+            CC["@mozilla.org/preferences-service;1"]
+                    .getService(CI.nsIPrefService)
                     .getBranch("extensions.alpheios.");
-        this.AlphPrefs.QueryInterface(Ci.nsIPrefBranch2);
+        this.AlphPrefs.QueryInterface(CI.nsIPrefBranch2);
     },
     
     /**
      * Lazy get for a service (create reference on first request)
      * @param {String} a_svc_name the name of the services (must be in the member _svcs object)
      * @return the requested service
-     * @throws an error if the requested service hasn't been predefined in the _svcs object
+     * @throws an error if the requested service hasn't been predefined in the d_svcs object
      */
-    get_svc: function(a_svc_name)
+    getSvc: function(a_svc_name)
     {
         if (typeof this[a_svc_name] == "undefined")
         {
-            if (typeof this._svcs[a_svc_name] == "undefined")
+            if (typeof this.d_svcs[a_svc_name] == "undefined")
             {
                 throw new Error("Service " + a_svc_name + " has not been defined"); 
             }
             else
             {
-                var cl = this._svcs[a_svc_name][0];
-                var iface = this._svcs[a_svc_name][1];
-                //Cc["@mozilla.org/consoleservice;1"]
-                //    .getService(Ci.nsIConsoleService)
+                var cl = this.d_svcs[a_svc_name][0];
+                var iface = this.d_svcs[a_svc_name][1];
+                //CC["@mozilla.org/consoleservice;1"]
+                //    .getService(CI.nsIConsoleService)
                 //    .logStringMessage("Loading Service " + a_svc_name + "," + cl + "," + iface);
-                this[a_svc_name] = Cc[cl].getService(Ci[iface]);
+                this[a_svc_name] = CC[cl].getService(CI[iface]);
             }
         }
         return this[a_svc_name];

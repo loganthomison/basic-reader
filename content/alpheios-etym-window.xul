@@ -11,8 +11,8 @@
 <window id="alph-etym-window" title="&alpheios-etym-toolbar-label;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         windowtype="alph-window"
-        onload="window.opener.Alph.main.panels['alph-etym-panel'].show();"
-        onunload="window.opener.Alph.main.panels['alph-etym-panel'].restore();">;
+        onload="window.opener.Alph.main.d_panels['alph-etym-panel'].show();"
+        onunload="window.opener.Alph.main.d_panels['alph-etym-panel'].restore();">;
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
 

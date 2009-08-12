@@ -34,7 +34,7 @@
  */
 Alph.LanguageTool = function(a_language,a_properties)
 {
-    this.source_language = a_language;
+    this.d_sourceLanguage = a_language;
 
     // TODO need to figure out which properties should be immutable.
     // Use of the function calls to Alph.MozUtils.getPref allows the properties
@@ -43,13 +43,13 @@ Alph.LanguageTool = function(a_language,a_properties)
     // the object.
     var default_properties =
     {
-        context_forward:
+        contextForward:
             function()
             {
                 return Alph.MozUtils.getPref("context_forward",a_language)
                     || 0;
             },
-        context_back:
+        contextBack:
             function()
             {
                 return Alph.MozUtils.getPref("context_back",a_language)
@@ -103,16 +103,16 @@ Alph.LanguageTool = function(a_language,a_properties)
             }
     };
 
-    this.set_accessors(default_properties);
-    this.set_accessors(a_properties);
+    this.setAccessors(default_properties);
+    this.setAccessors(a_properties);
 
     // TODO - should the list of methods to call here to generate the
     // language-specific functionality be automatically determined from
     // the configuration?
-    this.set_find_selection();
-    this.set_lexicon_lookup();
-    this.set_context_handler();
-    this.set_shift_handler();
+    this.setFindSelection();
+    this.setLexiconLookup();
+    this.setContextHandler();
+    this.setShiftHandler();
 
     var startup_methods = Alph.MozUtils.getPref("methods.startup",a_language);
     if (typeof startup_methods != "undefined")
@@ -140,16 +140,16 @@ Alph.LanguageTool = function(a_language,a_properties)
         }
     }
 
-    this.lexicon_setup();
+    this.lexiconSetup();
 };
 
 /**
  * Initializes lexicon search parameters
  */
-Alph.LanguageTool.prototype.lexicon_setup = function()
+Alph.LanguageTool.prototype.lexiconSetup = function()
 {
     // nothing to do if no language defined
-    var language = this.source_language;
+    var language = this.d_sourceLanguage;
     if (!language || typeof language == "undefined")
         return;
 
@@ -157,7 +157,7 @@ Alph.LanguageTool.prototype.lexicon_setup = function()
     // look first for lexicon-specific values and then, if not found,
     // for generic lexicon-independent values
     Alph.MozUtils.log("Reading params for " + language);
-    this.lexiconSearch = Array();
+    this.d_lexiconSearch = Array();
     var codeList;
     try 
     {
@@ -173,40 +173,40 @@ Alph.LanguageTool.prototype.lexicon_setup = function()
     {
         var code = codes[i];
         var base = "dictionary.full." + code + ".search.";
-        this.lexiconSearch[code] = Array();
-        this.lexiconSearch[code]["url"] =
+        this.d_lexiconSearch[code] = Array();
+        this.d_lexiconSearch[code]["url"] =
             Alph.MozUtils.getPref(base + "url", language);
 
         // if lexicon-specific URL is defined
-        if (this.lexiconSearch[code]["url"])
+        if (this.d_lexiconSearch[code]["url"])
         {
             // read lexicon-specific values
-            this.lexiconSearch[code]["lemma"] =
+            this.d_lexiconSearch[code]["lemma"] =
                 Alph.MozUtils.getPref(base + "lemma_param", language);
-            this.lexiconSearch[code]["id"] =
+            this.d_lexiconSearch[code]["id"] =
                 Alph.MozUtils.getPref(base + "id_param", language);
-            this.lexiconSearch[code]["multiple"] =
+            this.d_lexiconSearch[code]["multiple"] =
                 Alph.MozUtils.getPref(base + "multiple", language);
-            this.lexiconSearch[code]["convert"] =
+            this.d_lexiconSearch[code]["convert"] =
                 Alph.MozUtils.getPref(base + "convert_method", language);
-            this.lexiconSearch[code]["transform"] =
+            this.d_lexiconSearch[code]["transform"] =
                 Alph.MozUtils.getPref(base + "transform_method", language);
         }
         // else use lexicon-independent values
         else
         {
-            this.lexiconSearch[code]["url"] =
+            this.d_lexiconSearch[code]["url"] =
                 Alph.MozUtils.getPref(defaultBase + "url", language);
-            this.lexiconSearch[code]["lemma"] =
+            this.d_lexiconSearch[code]["lemma"] =
                 Alph.MozUtils.getPref(defaultBase + "lemma_param", language);
-            this.lexiconSearch[code]["id"] =
+            this.d_lexiconSearch[code]["id"] =
                 Alph.MozUtils.getPref(defaultBase + "id_param", language);
-            this.lexiconSearch[code]["multiple"] =
+            this.d_lexiconSearch[code]["multiple"] =
                 Alph.MozUtils.getPref(defaultBase + "multiple", language);
-            this.lexiconSearch[code]["convert"] =
+            this.d_lexiconSearch[code]["convert"] =
                 Alph.MozUtils.getPref(defaultBase + "convert_method",
                                   language);
-            this.lexiconSearch[code]["transform"] =
+            this.d_lexiconSearch[code]["transform"] =
                 Alph.MozUtils.getPref(defaultBase + "transform_method",
                                   language);
         }
@@ -220,7 +220,7 @@ Alph.LanguageTool.prototype.lexicon_setup = function()
  * @private
  * @type String
  */
-Alph.LanguageTool.prototype.source_language = '';
+Alph.LanguageTool.prototype.d_sourceLanguage = '';
 
 /**
  * Creates accessor methods on the instance for the
@@ -232,7 +232,7 @@ Alph.LanguageTool.prototype.source_language = '';
  *                      by the get accessor, otherwise,the value will
  *                      be returned as-is
  */
-Alph.LanguageTool.prototype.set_accessors = function(a_properties)
+Alph.LanguageTool.prototype.setAccessors = function(a_properties)
 {
     var myobj = this;
     for ( var prop in a_properties )
@@ -268,13 +268,13 @@ Alph.LanguageTool.prototype.set_accessors = function(a_properties)
  * @see #findSelection
  * @private
  */
-Alph.LanguageTool.prototype.set_find_selection = function()
+Alph.LanguageTool.prototype.setFindSelection = function()
 {
     // get the base unit
     // default to 'word' if not defined
     var base_unit =
         Alph.MozUtils.getPref('base_unit',
-                         this.source_language) || 'word';
+                         this.d_sourceLanguage) || 'word';
     if (base_unit == 'word')
     {
         this.findSelection = function(a_ro, a_rangstr)
@@ -316,10 +316,10 @@ Alph.LanguageTool.prototype.findSelection = function(a_ro, a_rngstr)
  * @see #lexiconLookup
  * @private
  */
-Alph.LanguageTool.prototype.set_lexicon_lookup = function()
+Alph.LanguageTool.prototype.setLexiconLookup = function()
 {
     var lexicon_method =
-        Alph.MozUtils.getPref("methods.lexicon",this.source_language);
+        Alph.MozUtils.getPref("methods.lexicon",this.d_sourceLanguage);
     if (lexicon_method == 'webservice')
     {
         this.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
@@ -327,8 +327,8 @@ Alph.LanguageTool.prototype.set_lexicon_lookup = function()
             Alph.MozUtils.log("Query word: " + a_alphtarget.getWord());
 
             var url =
-                Alph.MozUtils.getPref("url.lexicon",this.source_language) +
-                Alph.MozUtils.getPref("url.lexicon.request",this.source_language);
+                Alph.MozUtils.getPref("url.lexicon",this.d_sourceLanguage) +
+                Alph.MozUtils.getPref("url.lexicon.request",this.d_sourceLanguage);
                 url = url.replace(/\<WORD\>/,
                                   encodeURIComponent(a_alphtarget.getWord()));
                 // TODO add support for the context in the lexicon url
@@ -338,7 +338,7 @@ Alph.LanguageTool.prototype.set_lexicon_lookup = function()
                 {
                     type: "GET",
                     url: url,
-                    timeout: Alph.MozUtils.getPref("url.lexicon.timeout",this.source_language),
+                    timeout: Alph.MozUtils.getPref("url.lexicon.timeout",this.d_sourceLanguage),
                     dataType: 'html', //TODO - get from prefs
                     error: function(req,textStatus,errorThrown)
                     {
@@ -370,7 +370,7 @@ Alph.LanguageTool.prototype.set_lexicon_lookup = function()
  */
 Alph.LanguageTool.prototype.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
 {
-    a_onerror(Alph.main.get_string("alph-error-nolexicon",[this.source_language]));
+    a_onerror(Alph.main.getString("alph-error-nolexicon",[this.d_sourceLanguage]));
 };
 
 /**
@@ -379,17 +379,17 @@ Alph.LanguageTool.prototype.lexiconLookup = function(a_alphtarget,a_onsuccess,a_
  * @see #contextHandler
  * @private
  */
-Alph.LanguageTool.prototype.set_context_handler = function()
+Alph.LanguageTool.prototype.setContextHandler = function()
 {
     var context_handler =
-        Alph.MozUtils.getPref("context_handler",this.source_language);
+        Alph.MozUtils.getPref("context_handler",this.d_sourceLanguage);
     if (typeof this[context_handler] == 'function')
     {
         this.contextHandler = this[context_handler];
     }
     else
     {
-        Alph.MozUtils.log("No context_handler defined for " + this.source_language);
+        Alph.MozUtils.log("No context_handler defined for " + this.d_sourceLanguage);
     }
 
 }
@@ -412,17 +412,17 @@ Alph.LanguageTool.prototype.contextHandler = function(a_doc)
  * @see #shiftHandler
  * @private
  */
-Alph.LanguageTool.prototype.set_shift_handler = function()
+Alph.LanguageTool.prototype.setShiftHandler = function()
 {
     var shift_handler =
-        Alph.MozUtils.getPref("shift_handler",this.source_language);
+        Alph.MozUtils.getPref("shift_handler",this.d_sourceLanguage);
     if (typeof this[shift_handler] == 'function')
     {
         this.shiftHandler = this[shift_handler];
     }
     else
     {
-        Alph.MozUtils.log("No shift_handler defined for " + this.source_language);
+        Alph.MozUtils.log("No shift_handler defined for " + this.d_sourceLanguage);
     }
 }
 /**
@@ -502,8 +502,8 @@ function(a_ro, a_rngstr)
      * We also need to be able to pull surrounding context for text
      * nodes that are broken up by formatting tags (<br/> etc))
      */
-    var context_forward = this.getcontext_forward();
-    var context_back = this.getcontext_back();
+    var context_forward = this.getcontextForward();
+    var context_back = this.getcontextBack();
 
     var context_str = null;
     var context_pos = 0;
@@ -603,8 +603,8 @@ function(a_ro, a_rngstr)
      * We also need to be able to pull surrounding context for text
      * nodes that are broken up by formatting tags (<br/> etc))
      */
-    var context_forward = this.getcontext_forward();
-    var context_back = this.getcontext_back();
+    var context_forward = this.getcontextForward();
+    var context_back = this.getcontextBack();
 
     var context_str = null;
     var context_pos = 0;
@@ -647,7 +647,7 @@ function(a_ro, a_rngstr)
 Alph.LanguageTool.prototype.handleConversion = function(a_alphtarget)
 {
     var convert_method =
-        Alph.MozUtils.getPref("methods.convert",this.source_language);
+        Alph.MozUtils.getPref("methods.convert",this.d_sourceLanguage);
 
     if (convert_method != null
         && typeof Alph.Convert[convert_method] == 'function'
@@ -662,7 +662,7 @@ Alph.LanguageTool.prototype.handleConversion = function(a_alphtarget)
 Alph.LanguageTool.prototype.convertString = function(a_str)
 {
   var convert_method =
-        Alph.MozUtils.getPref("methods.convert",this.source_language);
+        Alph.MozUtils.getPref("methods.convert",this.d_sourceLanguage);
 
     if (convert_method != null
         && typeof Alph.convert[convert_method] == 'function')
@@ -716,10 +716,10 @@ Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_params)
 {
     var thisObj = this;
-    var targetURL = Alph.MozUtils.getPref("url.grammar",this.source_language) || "";
+    var targetURL = Alph.MozUtils.getPref("url.grammar",this.d_sourceLanguage) || "";
     targetURL = targetURL.replace(/\<ITEM\>/, a_target || "");
 
-    var grammar_loading_msg = Alph.main.get_string("alph-loading-grammar");
+    var grammar_loading_msg = Alph.main.getString("alph-loading-grammar");
     var features =
     {
         screen: Alph.MozUtils.getPref("grammar.window.loc")
@@ -731,19 +731,19 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
         {
             target_href: a_target,
             callback: a_node ? 
-                      function() { Alph.xlate.hideLoadingMessage(a_node.ownerDocument) }
+                      function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) }
                       : function() {},
             lang_tool: thisObj
         },
         a_params || {}
     );
     // open or replace the grammar window
-    Alph.xlate.openSecondaryWindow(
+    Alph.Xlate.openSecondaryWindow(
         "alph-grammar-window",
         targetURL,
         features,
         params,
-        Alph.xlate.showLoadingMessage,
+        Alph.Xlate.showLoadingMessage,
             [a_node||{},grammar_loading_msg]
     );
 };
@@ -764,7 +764,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     // in the default content document
     if (! a_node)
     {
-        a_node = Alph.$("#alph-text", Alph.xlate.getLastDoc()).clone();
+        a_node = Alph.$("#alph-text", Alph.Xlate.getLastDoc()).clone();
     }
     if (Alph.$(a_node).length != 0)
     {
@@ -777,7 +777,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
                 "chrome://"
                 + this.getchromepkg()
                 + "/content/inflections/alph-infl-index.xml";
-        params.xslt_processor = Alph.util.get_xslt_processor('alpheios','alph-infl-index.xsl');
+        params.xslt_processor = Alph.Util.getXsltProcessor('alpheios','alph-infl-index.xsl');
     }
     params.source_node = a_node;
 
@@ -800,12 +800,12 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         screen: Alph.MozUtils.getPref("shift.window.loc"),
     }
     // add a callback to hide the loading message
-    var loading_msg = Alph.main.get_string("alph-loading-inflect");
+    var loading_msg = Alph.main.getString("alph-loading-inflect");
 
     var loading_node;
     if (Alph.$(a_node).length >0)
     {
-        params.callback = function() { Alph.xlate.hideLoadingMessage(a_node.ownerDocument) };
+        params.callback = function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) };
         loading_node = Alph.$("#alph-word-tools",a_node).get(0);
     }
     else
@@ -814,15 +814,15 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         loading_node = {};
     }
      
-    Alph.xlate.openSecondaryWindow(
+    Alph.Xlate.openSecondaryWindow(
                     "alph-infl-table",
                     "chrome://alpheios/content/infl/alpheios-infl.xul",
                     features,
                     params,
-                    Alph.xlate.showLoadingMessage,[loading_node,loading_msg]
+                    Alph.Xlate.showLoadingMessage,[loading_node,loading_msg]
     );
     Alph.MozUtils.log("Inflections window should have focus with "
-            + Alph.main.get_state_obj().get_var("word"));
+            + Alph.main.getStateObj().getVar("word"));
 }
 
 /**
@@ -956,8 +956,8 @@ Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
  */
 Alph.LanguageTool.prototype.getFeature = function(a_id)
 {
-    var enabled = Alph.MozUtils.getPrefOrDefault("features."+a_id,this.source_language);
-    Alph.MozUtils.log("Feature " + a_id + " for " + this.source_language + " is " + enabled);
+    var enabled = Alph.MozUtils.getPrefOrDefault("features."+a_id,this.d_sourceLanguage);
+    Alph.MozUtils.log("Feature " + a_id + " for " + this.d_sourceLanguage + " is " + enabled);
     return enabled;
 };
 
@@ -969,7 +969,7 @@ Alph.LanguageTool.prototype.getFeature = function(a_id)
  */
 Alph.LanguageTool.prototype.getCmd = function(a_cmd)
 {
-    return Alph.MozUtils.getPrefOrDefault("cmds."+a_cmd,this.source_language);
+    return Alph.MozUtils.getPrefOrDefault("cmds."+a_cmd,this.d_sourceLanguage);
 };
 
 /**
@@ -1006,7 +1006,7 @@ Alph.LanguageTool.prototype.hasDictionary = function()
     var codeList;
     try 
     {
-        codeList = Alph.MozUtils.getPref("dictionaries.full",this.source_language).split(/,/);
+        codeList = Alph.MozUtils.getPref("dictionaries.full",this.d_sourceLanguage).split(/,/);
     }
     catch(a_e){
         // the preference might not be defined
@@ -1019,7 +1019,7 @@ Alph.LanguageTool.prototype.hasDictionary = function()
         var code = codeList[i];
         // if a dictionary wasn't setup properly
         // disable the dictionary feature
-        if (typeof this.lexiconSearch[code] == 'undefined')
+        if (typeof this.d_lexiconSearch[code] == 'undefined')
         {
             has_dict = false;
             break;
@@ -1027,7 +1027,7 @@ Alph.LanguageTool.prototype.hasDictionary = function()
         // if remote features are disabled and any of  the dictionaries 
         // uses a remote url, disable the dictionary feature
         else if ( remote_disabled &&  
-                  ! Alph.util.is_local_url(this.lexiconSearch[code].url)
+                  ! Alph.Util.isLocalUrl(this.d_lexiconSearch[code].url)
                 )
          {
             has_dict = false;
@@ -1058,7 +1058,7 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
      *   browse_url =
      *       Alph.MozUtils.getPref(
      *           "dictionary.full." + default_dict + ".browse.url",
-     *           this.source_language);
+     *           this.d_sourceLanguage);
      *}
     **/
     return browse_url;
@@ -1074,7 +1074,7 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
     var link = '';
     if (this.hasDictionary())
     {
-        var dict_alt_text = Alph.main.get_string('alph-dictionary-link');
+        var dict_alt_text = Alph.main.getString('alph-dictionary-link');
         link = '<div class="alph-tool-icon alpheios-button alph-dict-link" ' +
                'href="#alph-dict" title="' + dict_alt_text + '">' +
                '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
@@ -1098,7 +1098,7 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
  *                      {function} a_complete callback function upon completion
  * @return {Object} null if no default dictionary is defined for the language
  */
-Alph.LanguageTool.prototype.get_dictionary_callback = function()
+Alph.LanguageTool.prototype.getDictionaryCallback = function()
 {
     // if we have a specific method defined for producing
     // the dictionary urls for this dictionary, then use it
@@ -1109,7 +1109,7 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
         dict_method =
             Alph.MozUtils.getPrefOrDefault(
                 "methods.dictionary.full.default",
-                this.source_language);
+                this.d_sourceLanguage);
     }
 
     var lang_obj = this;
@@ -1135,7 +1135,7 @@ Alph.LanguageTool.prototype.get_dictionary_callback = function()
  * @param {function} a_error callback to be executed upon error
  * @param {function} a_complete callback to be executed upon completion
  */
-Alph.LanguageTool.prototype.default_dictionary_lookup =
+Alph.LanguageTool.prototype.defaultDictionaryLookup =
     function(a_lemmas, a_success, a_error, a_complete)
 {
     var lang_obj = this;
@@ -1149,7 +1149,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
             if (!a_lemma[0])
             {
                 // try to find id
-                var lemma_id = lang_obj.get_lemma_id(a_lemma[1]);
+                var lemma_id = lang_obj.getLemmaId(a_lemma[1]);
                 a_lemma[0] = lemma_id[0];
                 a_lemma[3] = lemma_id[1];
                 if (a_lemma[0])
@@ -1164,7 +1164,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
             if (!a_lemma[0] && a_lemma[1] && a_lemma[3])
             {
                 // if conversion method specified, apply it
-                var cvt = lang_obj.lexiconSearch[a_lemma[3]]["convert"];
+                var cvt = lang_obj.d_lexiconSearch[a_lemma[3]]["convert"];
                 if (cvt)
                     a_lemma[1] = Alph.convert[cvt](a_lemma[1]);
             }
@@ -1198,20 +1198,20 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
             // build URL with id if available else lemma
             if (!url)
             {
-                url = lang_obj.lexiconSearch[code]["url"];
+                url = lang_obj.d_lexiconSearch[code]["url"];
                 url = url.replace(/\<LEXICON\>/, encodeURIComponent(code));
             }
-            if (a_lemma[0] && lang_obj.lexiconSearch[code]["id"])
+            if (a_lemma[0] && lang_obj.d_lexiconSearch[code]["id"])
             {
                 url += "&" +
-                       lang_obj.lexiconSearch[code]["id"] +
+                       lang_obj.d_lexiconSearch[code]["id"] +
                        "=" +
                        encodeURIComponent(a_lemma[0]);
             }
-            else if (a_lemma[1] && lang_obj.lexiconSearch[code]["lemma"])
+            else if (a_lemma[1] && lang_obj.d_lexiconSearch[code]["lemma"])
             {
                 url += "&" +
-                       lang_obj.lexiconSearch[code]["lemma"] +
+                       lang_obj.d_lexiconSearch[code]["lemma"] +
                        "=" +
                        encodeURIComponent(a_lemma[1]);
             }
@@ -1219,14 +1219,14 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
             // if lexicon does not support multiple values
             // or we need to submit multi-valued URL
             // (because lexicon is about to change or this is last lemma)
-            if (!lang_obj.lexiconSearch[code]["multiple"] ||
+            if (!lang_obj.d_lexiconSearch[code]["multiple"] ||
                 (a_i == (a_lemmas.length - 1)) ||
                 (code != a_lemmas[a_i + 1][3]))
             {
                 // build success method
                 var on_success;
                 var xform_method =
-                        lang_obj.lexiconSearch[code]["transform"];
+                        lang_obj.d_lexiconSearch[code]["transform"];
                 if (xform_method != null)
                 {
                     on_success =
@@ -1245,7 +1245,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
                 // call dictionary
                 // but only use real completion for last item
                 Alph.MozUtils.log("Calling dictionary at " + url);
-                lang_obj.do_default_dictionary_lookup(
+                lang_obj.doDefaultDictionaryLookup(
                     code,
                     url,
                     on_success,
@@ -1266,7 +1266,7 @@ Alph.LanguageTool.prototype.default_dictionary_lookup =
  * @param {function} a_error callback upon error
  * @param {function} a_complete callback upon completion
  */
-Alph.LanguageTool.prototype.do_default_dictionary_lookup =
+Alph.LanguageTool.prototype.doDefaultDictionaryLookup =
     function(a_dict_name,a_url,a_success,a_error,a_complete)
 {
     Alph.$.ajax(
@@ -1275,7 +1275,7 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
             url: a_url,
             dataType: 'html',
             timeout: Alph.MozUtils.getPref("methods.dictionary.full.default.timeout",
-                                        this.source_language),
+                                        this.d_sourceLanguage),
             error: function(req,textStatus,errorThrown)
             {
                 a_error(textStatus||errorThrown,a_dict_name);
@@ -1315,7 +1315,7 @@ Alph.LanguageTool.prototype.do_default_dictionary_lookup =
  * @param {String} a_name the name of the preference which changed
  * @param {Object} a_value the new value of the preference
  */
-Alph.LanguageTool.prototype.observe_pref_change = function(a_name,a_value)
+Alph.LanguageTool.prototype.observePrefChange = function(a_name,a_value)
 {
     // default does nothing
 };
@@ -1325,7 +1325,7 @@ Alph.LanguageTool.prototype.observe_pref_change = function(a_name,a_value)
  * @param {String} a_lemma_key the lemma key
  * @return {Array} (lemma id, dict code) or (null, null) if not found
  */
-Alph.LanguageTool.prototype.get_lemma_id = function(a_lemma_key)
+Alph.LanguageTool.prototype.getLemmaId = function(a_lemma_key)
 {
     //default returns null
     return Array(null, null);
@@ -1338,10 +1338,10 @@ Alph.LanguageTool.prototype.get_lemma_id = function(a_lemma_key)
  * @return the requested string (or empty string if not found)
  * @type String
  */
-Alph.LanguageTool.prototype.get_string = function(a_name,a_replace)
+Alph.LanguageTool.prototype.getString = function(a_name,a_replace)
 {
 
-    return Alph.main.get_language_string(this.source_language,a_name,a_replace)
+    return Alph.main.getLanguageString(this.d_sourceLanguage,a_name,a_replace)
 }
 
 /**
@@ -1351,12 +1351,12 @@ Alph.LanguageTool.prototype.get_string = function(a_name,a_replace)
  * @return the requested string (or empty string if not found)
  * @type String
 */
-Alph.LanguageTool.prototype.get_string_or_default = function(a_name,a_replace)
+Alph.LanguageTool.prototype.getStringOrDefault = function(a_name,a_replace)
 {
-    var str = this.get_string(a_name,a_replace);
+    var str = this.getString(a_name,a_replace);
     if (str == '')
     {
-        str = Alph.main.get_string(a_name,a_replace);
+        str = Alph.main.getString(a_name,a_replace);
     }
     return str;
 }
@@ -1367,7 +1367,7 @@ Alph.LanguageTool.prototype.get_string_or_default = function(a_name,a_replace)
  *                              of the word lookup
  * @params {Alph.SourceSelection} a_target the target element of the user's selection
  */
-Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
+Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
 {
     var lang_tool = this;
 
@@ -1381,7 +1381,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     if (a_target.getTreebankQuery() &&
         Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length == 0)
     {
-        var diagram_alt_text = Alph.main.get_string('alph-diagram-link');
+        var diagram_alt_text = Alph.main.getString('alph-diagram-link');
         Alph.$('' +
             '<div class="alph-tool-icon alpheios-button alph-diagram-link" ' +
             'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+
@@ -1417,7 +1417,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
         Alph.$('#alph-word-tools .alph-dict-link',a_node).click(
             function(a_event)
             {
-                Alph.main.broadcast_ui_event(Alph.Constants.events.SHOW_DICT);
+                Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_DICT);
             }
         );
     }
@@ -1425,7 +1425,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     // add the inflection tool, if any
     if (this.getFeature('alpheios-inflect') && this.canInflect(a_node))
     {
-        var inflect_alt_text = Alph.main.get_string('alph-inflect-link');
+        var inflect_alt_text = Alph.main.getString('alph-inflect-link');
         Alph.$("#alph-word-tools",a_node).append(
             '<div class="alph-tool-icon alpheios-button alph-inflect-link" ' +
             'href="#alpheios-inflect" title="' + inflect_alt_text + '">' +
@@ -1433,11 +1433,11 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             'alt="' + inflect_alt_text + '"/>' + 
             '<div class="alpheios-icon-label">' + inflect_alt_text + '</div></div>'
         );
-        var loading_msg = Alph.main.get_string("alph-loading-inflect");
+        var loading_msg = Alph.main.getString("alph-loading-inflect");
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
             function(a_e)
             {
-                Alph.xlate.showLoadingMessage([tools_node,loading_msg]);
+                Alph.Xlate.showLoadingMessage([tools_node,loading_msg]);
                 lang_tool.handleInflections(a_e,a_node);
                 return false;
             }
@@ -1447,7 +1447,7 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
     if (Alph.$("#alph-word-tools",a_node).children().length > 0)
     {
         if (Alph.$("#alph-word-tools",a_node).prepend(
-            '<span class="alpheios-toolbar-label">' + Alph.main.get_string("alph-tools")
+            '<span class="alpheios-toolbar-label">' + Alph.main.getString("alph-tools")
             + '</span>')
         );
     }
@@ -1462,18 +1462,18 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
  * @param {Node} a_node the source node which produced the query display
  * @return {Element} the Element containing the tools 
  */
-Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
+Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
 {
     var lang_tool = this;
     var tools = Alph.$("#alph-word-tools",a_node).clone();
-    // if the node is from the dependency tree diagram, the call to select_browser_for_doc
+    // if the node is from the dependency tree diagram, the call to selectBrowserForDoc
     // will fail, but it should be unnecessary in this case, because the tree won't be available
     // if the browser that originated it isn't selected
     var from_tree = Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length > 0;
     Alph.$('.alph-diagram-link',tools).click(
         function(a_e)
         {
-            if (Alph.MozUtils.select_browser_for_doc(window,a_node.ownerDocument))
+            if (Alph.MozUtils.selectBrowserForDoc(window,a_node.ownerDocument))
             {
                 Alph.$("#alpheios-tree-open-cmd").get(0).doCommand(a_e);
             }
@@ -1488,10 +1488,10 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
     Alph.$('.alph-inflect-link',tools).click(
         function(a_e)
         {
-            if (Alph.MozUtils.select_browser_for_doc(window,a_node.ownerDocument) || from_tree)
+            if (Alph.MozUtils.selectBrowserForDoc(window,a_node.ownerDocument) || from_tree)
             {
-                var loading_msg = Alph.main.get_string("alph-loading-inflect");
-                Alph.xlate.showLoadingMessage([tools,loading_msg]);
+                var loading_msg = Alph.main.getString("alph-loading-inflect");
+                Alph.Xlate.showLoadingMessage([tools,loading_msg]);
                 lang_tool.handleInflections(a_e,a_node);
             }
             else
@@ -1504,10 +1504,10 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
     Alph.$('.alph-dict-link',tools).click(
         function(a_event)
         {
-            if (Alph.MozUtils.select_browser_for_doc(window,a_node.ownerDocument) || from_tree)
+            if (Alph.MozUtils.selectBrowserForDoc(window,a_node.ownerDocument) || from_tree)
             {
-                Alph.main.broadcast_ui_event(
-                    Alph.Constants.events.SHOW_DICT);
+                Alph.main.broadcastUiEvent(
+                    Alph.Constants.EVENTS.SHOW_DICT);
             }
             else
             {
@@ -1526,11 +1526,11 @@ Alph.LanguageTool.prototype.get_tools_for_query = function(a_node)
  *                              of the word lookup
  * @params {Alph.SourceSelection} a_target the target element of the user's selection
 */
-Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
+Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
 {
-    var form = Alph.main.get_string("alph-morph-form");
-    var stem = Alph.main.get_string("alph-morph-stem");
-    var suffix = Alph.main.get_string("alph-morph-suffix");
+    var form = Alph.main.getString("alph-morph-form");
+    var stem = Alph.main.getString("alph-morph-stem");
+    var suffix = Alph.main.getString("alph-morph-suffix");
     Alph.$(".alph-term",a_node).each(
         function()
         {
@@ -1573,12 +1573,12 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
                             if (Alph.$(this).nextAll(".alph-"+title[1]).length > 0)
                             {
                                 name =
-                                    Alph.main.get_string("alph-morph-" +title[1] + '-plural');
+                                    Alph.main.getString("alph-morph-" +title[1] + '-plural');
                             }
                             else
                             {
                                 name =
-                                    Alph.main.get_string("alph-morph-" +title[1]);
+                                    Alph.main.getString("alph-morph-" +title[1]);
                             }
                             // only display attributes for which we have explicitly
                             // defined strings, and which we haven't already added
@@ -1622,7 +1622,7 @@ Alph.LanguageTool.prototype.add_infl_help = function(a_node, a_target)
  * @param {Element} a_match_infl the .alph-infl element to match (single-valued) 
  * @param {Element} a_infls the .alph-infl element to match against (multi-valued)
  */
-Alph.LanguageTool.prototype.match_infl = function(a_match_infl, a_infls)
+Alph.LanguageTool.prototype.matchInfl = function(a_match_infl, a_infls)
 {
     var must_match = 0;
     var matched = 0;
@@ -1669,12 +1669,12 @@ Alph.LanguageTool.prototype.match_infl = function(a_match_infl, a_infls)
  * @return the string to be used in the interface for this language
  * @type String
  */
-Alph.LanguageTool.prototype.get_language_string = function()
+Alph.LanguageTool.prototype.getLanguageString = function()
 {
-    var str = this.get_string(this.source_language + '.string');
+    var str = this.getString(this.d_sourceLanguage + '.string');
     if (str == '')
     {
-        str = this.source_language;
+        str = this.d_sourceLanguage;
     }
     return str;
 }
@@ -1685,12 +1685,12 @@ Alph.LanguageTool.prototype.get_language_string = function()
  * @return true if supported false if not
  * @type Boolean
  */
-Alph.LanguageTool.prototype.supports_language = function(a_lang)
+Alph.LanguageTool.prototype.supportsLanguage = function(a_lang)
 {
     var supported = false;
     try
     {
-        var codes = Alph.MozUtils.getPref("languagecode",this.source_language).split(',');  
+        var codes = Alph.MozUtils.getPref("languagecode",this.d_sourceLanguage).split(',');  
         for (var i=0; i<codes.length; i++)
         {
             if (a_lang == codes[i])
@@ -1702,7 +1702,7 @@ Alph.LanguageTool.prototype.supports_language = function(a_lang)
     }
     catch(a_e)
     {
-        Alph.MozUtils.log("No language codes registered for " + this.source_language);
+        Alph.MozUtils.log("No language codes registered for " + this.d_sourceLanguage);
         supported = false;
     }
     return supported;

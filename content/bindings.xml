@@ -73,7 +73,7 @@
             var panelObj;
             if (typeof Alph.main != "undefined")
             {
-                panelObj = Alph.main.panels[this.panel_id];
+                panelObj = Alph.main.d_panels[this.panel_id];
                 if (typeof panelObj != "undefined")
                 {
                     panelObj.toggle();
@@ -86,7 +86,7 @@
             var panelObj;
             if (typeof Alph.main != "undefined")
             {
-                panelObj = Alph.main.panels[this.panel_id];
+                panelObj = Alph.main.d_panels[this.panel_id];
                 if (typeof panelObj != "undefined")
                 {
                     panelObj.detach();
@@ -99,7 +99,7 @@
             var panelObj;
             if (typeof Alph.main != "undefined")
             {
-                return Alph.main.panels[this.panel_id];
+                return Alph.main.d_panels[this.panel_id];
             }
             ]]></body>
             </method>

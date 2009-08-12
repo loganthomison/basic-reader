@@ -32,8 +32,8 @@ var EXPORTED_SYMBOLS = ["Uninstaller"];
  */
 Uninstaller =
 { 
-    m_pkgids: null,
-    m_uninstall: false,
+    d_pkgids: null,
+    d_uninstall: false,
     
     /**
      * observe an extension action request
@@ -43,17 +43,17 @@ Uninstaller =
         if (a_topic == "em-action-requested") 
         {
             a_subject.QueryInterface(Components.interfaces.nsIUpdateItem);
-            if (typeof this.m_pkgids[a_subject.id] != "undefined") 
+            if (typeof this.d_pkgids[a_subject.id] != "undefined") 
             {
                 if (a_data == "item-uninstalled") 
                 {
-                    this.unregister_pkg(a_subject.id);
-                    this.m_uninstall = true;
+                    this.unregisterPkg(a_subject.id);
+                    this.d_uninstall = true;
 
                 } else if (a_data == "item-cancel-action") 
                 {
-                    this.register_pkg(a_subject.id);
-                    this.m_uninstall = false;
+                    this.registerPkg(a_subject.id);
+                    this.d_uninstall = false;
                 }
             }        
         } 
@@ -66,11 +66,11 @@ Uninstaller =
             // only clear the prefs if all the Alpheios packages are installed
             // TODO ideally we would clear the package specific prefs as each
             // package gets uninstalled 
-            if (this.m_uninstall && this.m_pkgids._size <= 0) 
+            if (this.d_uninstall && this.d_pkgids._size <= 0) 
             {
                 prefs.deleteBranch('');
-                this.m_pkgids = null;
-                this.unregister_observer();
+                this.d_pkgids = null;
+                this.unregisterObserver();
             }
         }
     },
@@ -79,29 +79,29 @@ Uninstaller =
      * register a package to observe
      * @param {String} a_id the package id
      */
-    register_pkg : function(a_id) 
+    registerPkg : function(a_id) 
     {
         // if this package isn't registered already, increase the number of 
         // packages registered
-        if (typeof this.m_pkgids[a_id] == "undefined")
+        if (typeof this.d_pkgids[a_id] == "undefined")
         {
-            this.m_pkgids._size++;
+            this.d_pkgids._size++;
         }
-        this.m_pkgids[a_id] = true;
+        this.d_pkgids[a_id] = true;
     },
     
     /**
      * unregister a package from the list we're observing
      * @param {String} a_id the package id
      */
-    unregister_pkg: function(a_id) 
+    unregisterPkg: function(a_id) 
     {
         // if we haven't already removed this package, delete it
         // and decerease the number of packages registered
-        if (typeof this.m_pkgids[a_id] != "undefined")
+        if (typeof this.d_pkgids[a_id] != "undefined")
         {
-            delete this.m_pkgids[a_id];
-            this.m_pkgids._size--;
+            delete this.d_pkgids[a_id];
+            this.d_pkgids._size--;
         }
     },
     
@@ -109,20 +109,20 @@ Uninstaller =
      * register the observer object
      * @param {Array} a_ids the list of Alpheios package ids
      */
-    register_observer : function(a_ids) 
+    registerObserver : function(a_ids) 
     {
         var my_obj = this;
         // only register the observer once
-        if (this.m_pkgids != null)
+        if (this.d_pkgids != null)
         {
             return;
         }
-        this.m_pkgids = Array();
-        this.m_pkgids._size = 0;
+        this.d_pkgids = Array();
+        this.d_pkgids._size = 0;
         a_ids.forEach(
             function(a_id)
             {
-                my_obj.register_pkg(a_id);
+                my_obj.registerPkg(a_id);
             }
         );
         Components.classes["@mozilla.org/consoleservice;1"]
@@ -139,7 +139,7 @@ Uninstaller =
     /**
      * unregister the observer
      */
-    unregister_observer : function() 
+    unregisterObserver : function() 
     {
         var observerService =
             Components.classes["@mozilla.org/observer-service;1"].

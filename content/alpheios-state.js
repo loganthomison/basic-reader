@@ -35,7 +35,7 @@ Alph.State = function()
     /**
      * default values are in the format [ <default value>, <persist boolean> ]
      */
-    this._defaults = 
+    this.d_defaults = 
     {   enabled: [false,true],
         toggled_by: [Alph.State.SYS_ACTION,true],
         windows: [{}, true],
@@ -49,9 +49,9 @@ Alph.State = function()
         level: ['reader',false]
     };
     
-    for (var name in this._defaults)
+    for (var name in this.d_defaults)
     {
-       this.reset_to_default(name);
+       this.resetToDefault(name);
     }
 };
 
@@ -70,14 +70,14 @@ Alph.State.SYS_ACTION = 1;
  */
 Alph.State.USER_ACTION = 2;
 
-Alph.State.prototype.reset_to_default = function(a_name)
+Alph.State.prototype.resetToDefault = function(a_name)
 {
-    this.set_var(a_name,this._defaults[a_name][0]);  
+    this.setVar(a_name,this.d_defaults[a_name][0]);  
 };
 
 Alph.State.prototype.persist = function(a_name)
 {
-    return this._defaults[a_name][1];  
+    return this.d_defaults[a_name][1];  
 };
 
 /**
@@ -87,9 +87,9 @@ Alph.State.prototype.persist = function(a_name)
  * @throws an Error if the variable hasn't been declared
  */
 
-Alph.State.prototype.get_var = function(a_name)
+Alph.State.prototype.getVar = function(a_name)
 {
-    if (typeof this._defaults[a_name] != "undefined" )
+    if (typeof this.d_defaults[a_name] != "undefined" )
     {
         return this[a_name];
     }
@@ -105,9 +105,9 @@ Alph.State.prototype.get_var = function(a_name)
  * @param a_value the value to set for the variable
  * @throws an Error if the variable hasn't been declared
  */
-Alph.State.prototype.set_var = function(a_name,a_value)
+Alph.State.prototype.setVar = function(a_name,a_value)
 {
-    if (typeof this._defaults != "undefined")
+    if (typeof this.d_defaults != "undefined")
     {
         this[a_name] = a_value;
     }
@@ -120,16 +120,16 @@ Alph.State.prototype.set_var = function(a_name,a_value)
 /**
  * Resets the state to represent the disabled status 
  */
-Alph.State.prototype.set_disabled = function()
+Alph.State.prototype.setDisabled = function()
 {
     this.enabled = false;
     
     // clear all the temporary state
-    for (var name in this._defaults)
+    for (var name in this.d_defaults)
     {
         if (! this.persist(name))
         {
-            this.reset_to_default(name);                    
+            this.resetToDefault(name);                    
         }
     }
 };

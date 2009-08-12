@@ -35,7 +35,7 @@ Alph.Translation = function(a_panel)
 {
     Alph.Panel.call(this,a_panel);
     // override the main DOMContentLoaded listener for the browser
-    //Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).
+    //Alph.$("#alph-trans-panel-external browser",this.d_panelElem).get(0).
     //        addEventListener("DOMContentLoaded", function(e) { e.stopPropagation();} , true);
 
 };
@@ -59,13 +59,13 @@ Alph.Translation.prototype.show = function()
     // up from the user's preferences for the basic reader
     
     
-    var trans_url = Alph.site.translation_url(bro.contentDocument);
+    var trans_url = Alph.Site.getTranslationUrl(bro.contentDocument);
     if (trans_url)
     {
         Alph.MozUtils.log("loading translation from " + trans_url);
         
         var trans_doc = 
-                Alph.$("browser",this.panel_elem).get(0).contentDocument;  
+                Alph.$("browser",this.d_panelElem).get(0).contentDocument;  
         // jQuery can't handle a request to chrome which doesn't return expected
         // http headers --- this is a temporary hack to allow the interlinear
         // prototype to be run locally
@@ -76,11 +76,11 @@ Alph.Translation.prototype.show = function()
             {
                 if (r.readyState == 4 && r.responseText) 
                 {
-                    Alph.Translation.process_translation(r.responseText,bro,trans_doc);
+                    Alph.Translation.processTranslation(r.responseText,bro,trans_doc);
                 }
                 else 
                 {
-                    Alph.Translation.handle_error(Alph.main.get_string("alph-loading-misc")
+                    Alph.Translation.handleError(Alph.main.getString("alph-loading-misc")
                         ,trans_doc);
                 }
             }
@@ -97,13 +97,13 @@ Alph.Translation.prototype.show = function()
                     dataType: 'html', 
                     error: function(req,textStatus,errorThrown)
                     {
-                        Alph.Translation.handle_error(textStatus||errorThrown,trans_doc);
+                        Alph.Translation.handleError(textStatus||errorThrown,trans_doc);
     
                     },
                     success: function(data, textStatus) 
                     {
                         
-                        Alph.Translation.process_translation(data,bro,trans_doc);
+                        Alph.Translation.processTranslation(data,bro,trans_doc);
                     } 
                 }   
             );
@@ -111,9 +111,9 @@ Alph.Translation.prototype.show = function()
    }
    else
    {
-        Alph.Translation.handle_error(
-            Alph.main.get_string("alph-error-notranslation"),
-            Alph.$("browser",this.panel_elem).get(0).contentDocument
+        Alph.Translation.handleError(
+            Alph.main.getString("alph-error-notranslation"),
+            Alph.$("browser",this.d_panelElem).get(0).contentDocument
         );
    }
    return Alph.Panel.STATUS_SHOW;
@@ -122,7 +122,7 @@ Alph.Translation.prototype.show = function()
 /**
  * Display error returned by request for translation
  */
-Alph.Translation.handle_error = function(a_error,a_trans_doc)
+Alph.Translation.handleError = function(a_error,a_trans_doc)
 {
     Alph.$("body",a_trans_doc).html(
         '<div id="alph-trans-error" class="alpheios-hint">' + a_error + '</div>');
@@ -131,7 +131,7 @@ Alph.Translation.handle_error = function(a_error,a_trans_doc)
 /**
  * Populate the pedagogical panel with the translation
  */
-Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
+Alph.Translation.processTranslation = function(a_data,a_bro,a_trans_doc) {
     var new_doc = (new DOMParser()).parseFromString(
                             a_data,
                             "application/xhtml+xml");
@@ -139,7 +139,7 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
     Alph.$("body",a_trans_doc).html(Alph.$("body",new_doc).contents());
 
     // setup the display
-    Alph.site.setup_page(a_trans_doc,'trans');
+    Alph.Site.setupPage(a_trans_doc,'trans');
                         
     var disable_interlinear = true;
     if ( (Alph.$(".alpheios-aligned-word",a_trans_doc).length > 0) &&
@@ -148,20 +148,20 @@ Alph.Translation.process_translation = function(a_data,a_bro,a_trans_doc) {
         disable_interlinear = false;
         
     }
-    Alph.Translation.set_interlinear_toggle(disable_interlinear);                       
+    Alph.Translation.setInterlinearToggle(disable_interlinear);                       
 },
 
 
 /**
  * Translation panel specific implementation of 
- * {@link Alph.Panel#handle_refresh}
+ * {@link Alph.Panel#handleRefresh}
  * Loads the external url per the state of the current browser
  * @param {Object} a_panel_state the current panel state
  */
-Alph.Translation.prototype.handle_refresh = function(a_bro)
+Alph.Translation.prototype.handleRefresh = function(a_bro)
 {
-    var panel_state = this.get_browser_state(a_bro);
-    var doc = Alph.$("browser",this.panel_elem).get(0).contentDocument;
+    var panel_state = this.getBrowserState(a_bro);
+    var doc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
     Alph.MozUtils.log("handling refresh in trans panel");
     // if the translation panel is showing and the the previous load
     // was interrupted, we'll have an error in the document.  if the page
@@ -169,24 +169,24 @@ Alph.Translation.prototype.handle_refresh = function(a_bro)
     if (panel_state.status == Alph.Panel.STATUS_SHOW && 
         Alph.$("#alph-trans-error",doc).length > 0)
     {
-        var msg = Alph.main.get_string("alph-trans-reload");
-        Alph.Translation.handle_error(msg,doc);
-        this.reset_state();
+        var msg = Alph.main.getString("alph-trans-reload");
+        Alph.Translation.handleError(msg,doc);
+        this.resetState();
     }
 }
 
 /**
  * Translation panel specific implementation of 
- * {@link Alph.Panel#reset_contents}
+ * {@link Alph.Panel#resetContents}
  * Loads the external url per the state of the current browser
  * @param {Object} a_panel_state the current panel state
  */
-Alph.Translation.prototype.reset_contents = function(a_panel_state)
+Alph.Translation.prototype.resetContents = function(a_panel_state)
 {
     /**
     var url = a_panel_state.external_url;
     var current_url = 
-            Alph.$("#alph-trans-panel-external browser",this.panel_elem).get(0).currentURI.spec;
+            Alph.$("#alph-trans-panel-external browser",this.d_panelElem).get(0).currentURI.spec;
     if (typeof url == "undefined")
     {
         if (current_url != "about:blank" && current_url != "")
@@ -197,7 +197,7 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
     }
     if (typeof url != "undefined" && (url != current_url))
     {
-        var url_bar = Alph.$("#alph-trans-ext-urlbar",this.panel_elem).get(0); 
+        var url_bar = Alph.$("#alph-trans-ext-urlbar",this.d_panelElem).get(0); 
         url_bar.value = url;
         Alph.Translation.loadUrl(null,url_bar);
     }
@@ -206,17 +206,17 @@ Alph.Translation.prototype.reset_contents = function(a_panel_state)
 
 /**
  * Translation specific implementation of
- * {@link Alph.Panel.observe_ui_event}
+ * {@link Alph.Panel.observeUIEvent}
  * @param {Browser} a_bro the current browser
  * @param a_event_type the event type (one of @link Alph.Constants.events)
  * @param a_event_data optional event data object
  */
-Alph.Translation.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
+Alph.Translation.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
 {
-    if (a_event_type == Alph.Constants.events.UPDATE_PREF 
+    if (a_event_type == Alph.Constants.EVENTS.UPDATE_PREF 
         && a_event_data.name.indexOf('features.alpheios-interlinear') >= 0)
     {
-        Alph.Translation.set_interlinear_toggle(! a_event_data.value);             
+        Alph.Translation.setInterlinearToggle(! a_event_data.value);             
     }
 
 };
@@ -228,16 +228,16 @@ Alph.Translation.prototype.observe_ui_event = function(a_bro,a_event_type,a_even
  * Options menu 
  * @param {Event} a_event the Event which initiated the action (may be null)
  */
-Alph.Translation.toggle_interlinear = function(a_event)
+Alph.Translation.toggleInterlinear = function(a_event)
 {
 
     var panel = Alph.$("#alph-trans-panel");
 
     if (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
     {
-        Alph.Translation.show_interlinear();
+        Alph.Translation.showInterlinear();
     } else {
-        Alph.site.hide_interlinear(Alph.$(".alpheios-word-wrap",
+        Alph.Site.hideInterlinear(Alph.$(".alpheios-word-wrap",
             Alph.$("browser",panel).get(0).contentDocument).get());
     }
 };
@@ -246,7 +246,7 @@ Alph.Translation.toggle_interlinear = function(a_event)
  * Static helper method to trigger the display the interlinear alignment 
  */
 
-Alph.Translation.show_interlinear = function()
+Alph.Translation.showInterlinear = function()
 {
     var panel = Alph.$("#alph-trans-panel");
     var browser_doc = Alph.main.getCurrentBrowser().contentDocument;
@@ -258,7 +258,7 @@ Alph.Translation.show_interlinear = function()
         addClass('alpheios-loading');
     var words = Alph.$(".alpheios-word-wrap",trans_doc).get();
     
-    Alph.site.populate_interlinear(
+    Alph.Site.populateInterlinear(
         words,
         browser_doc,
         function(){Alph.$("#alpheios-trans-opt-inter-trans").
@@ -290,7 +290,7 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
     {
         // the panel should already be intialized by the time the user tries to load
         // a url but if not, just quiety log the error
-        var panel_state = (Alph.main.get_state_obj().get_var("panels"))["alph-trans-panel"];
+        var panel_state = (Alph.main.getStateObj().getVar("panels"))["alph-trans-panel"];
         panel_state.external_url = a_urlbar.value;
     }
     catch(e)
@@ -315,14 +315,14 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
  *                 @link Alph.Translation.INTERLINEAR_TARGET_TRANS)
  * @param {Boolean} a_on is the text toggled on or off (true for on, false for off)
  */
-Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_on)
+Alph.Translation.prototype.toggleParallelAlignment = function(a_elem,a_type,a_on)
 {
     
     var parallel_doc;
     if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
     {
         parallel_doc = 
-            Alph.$("browser",this.panel_elem).get(0).contentDocument;
+            Alph.$("browser",this.d_panelElem).get(0).contentDocument;
     }
     else
     {
@@ -342,7 +342,7 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_
                         function(a_i)
                         {
                             Alph.$(this).addClass("alpheios-highlight-parallel");
-                            Alph.util.scroll_to_element(this);
+                            Alph.Util.scrollToElement(this);
                             var source_refs = this.getAttribute('nrefs');
                             if (source_refs)
                             {
@@ -394,13 +394,13 @@ Alph.Translation.prototype.toggle_parallel_alignment = function(a_elem,a_type,a_
  * @param {object} a_params parameters object to be assigned to the event.data
  *                          object by the event handler 
  */
-Alph.Translation.prototype.enable_interactive_query = function(a_params)
+Alph.Translation.prototype.enableInteractiveQuery = function(a_params)
 {
     var trans_doc = 
-            Alph.$("browser",this.panel_elem).get(0).contentDocument;
-    Alph.$('.alpheios-aligned-word',trans_doc).unbind('click',Alph.interactive.checkAlignedSelect);
+            Alph.$("browser",this.d_panelElem).get(0).contentDocument;
+    Alph.$('.alpheios-aligned-word',trans_doc).unbind('click',Alph.Interactive.checkAlignedSelect);
     Alph.$('.alpheios-aligned-word',trans_doc)
-        .bind('click',a_params,Alph.interactive.checkAlignedSelect);            
+        .bind('click',a_params,Alph.Interactive.checkAlignedSelect);            
 };
 
 /**
@@ -426,16 +426,16 @@ Alph.Translation.INTERLINEAR_TARGET_TRANS = 'trans';
  * @param {Boolean} a_disabled true if the feature is disabled, false if it
  *                             is enabled
  */
-Alph.Translation.set_interlinear_toggle = function(a_disabled)
+Alph.Translation.setInterlinearToggle = function(a_disabled)
 {
     Alph.$("#alph-trans-inter-trans-status").attr("disabled",a_disabled);
     Alph.$("#alph-trans-inter-trans-status").attr("hidden",a_disabled);
     // populate the interlinear display if it's checked and enabled
     if ( ! a_disabled &&
         (Alph.$("#alpheios-trans-opt-inter-trans").attr('checked') == 'true')
-        && ! Alph.interactive.enabled()
+        && ! Alph.Interactive.enabled()
        )
     {
-        Alph.Translation.show_interlinear();
+        Alph.Translation.showInterlinear();
     }
 };

@@ -34,7 +34,7 @@
  */
 Alph.SourceSelection = function(a_properties) 
 {
-     this.set_accessors(a_properties);
+     this.setAccessors(a_properties);
 };
  
 /**
@@ -47,7 +47,7 @@ Alph.SourceSelection = function(a_properties)
  *                      by the get accessor, otherwise,the value will 
  *                      be returned as-is 
  */
-Alph.SourceSelection.prototype.set_accessors = function(a_properties) 
+Alph.SourceSelection.prototype.setAccessors = function(a_properties) 
 {
         var myobj = this;
         for ( var prop in a_properties ) 
@@ -83,7 +83,7 @@ Alph.SourceSelection.prototype.set_accessors = function(a_properties)
  * @private
  * @type String 
  */
-Alph.SourceSelection.prototype.m_word = '';
+Alph.SourceSelection.prototype.d_word = '';
 
 /**
  * the offset in the original string which represents the
@@ -91,7 +91,7 @@ Alph.SourceSelection.prototype.m_word = '';
  * @private
  * @type int
  */
-Alph.SourceSelection.prototype.m_wordStart = 0;
+Alph.SourceSelection.prototype.d_wordStart = 0;
 
 /**
  * the offset in the original string which represents the
@@ -99,35 +99,35 @@ Alph.SourceSelection.prototype.m_wordStart = 0;
  * @private
  * @type int
  */
-Alph.SourceSelection.prototype.m_wordEnd = 0;
+Alph.SourceSelection.prototype.d_wordEnd = 0;
 
 /**
  * optional relevant surrounding context
  * @private
  * @type String
  */
-Alph.SourceSelection.prototype.m_contextStr = '';
+Alph.SourceSelection.prototype.d_contextStr = '';
 
 /**
  * position of the word in the surrounding context
  * @private
  * @type int  
  */
-Alph.SourceSelection.prototype.m_contextPos = 0;
+Alph.SourceSelection.prototype.d_contextPos = 0;
 
 /**
  * rangeParent node for the selection
  * @private
  * @type Node 
  */
-Alph.SourceSelection.prototype.m_rangeParent;
+Alph.SourceSelection.prototype.d_rangeParent;
 
 /**
  * treebankQueryUrl for the selection
  * @private
  * @type String
  */
-Alph.SourceSelection.prototype.m_treebankQuery = null;
+Alph.SourceSelection.prototype.d_treebankQuery = null;
 
 /**
  * gets the selected 'word'
@@ -136,7 +136,7 @@ Alph.SourceSelection.prototype.m_treebankQuery = null;
  */
 Alph.SourceSelection.prototype.getWord = function()
 {
-    return this.m_word;   
+    return this.d_word;   
 };
 
 /**
@@ -147,7 +147,7 @@ Alph.SourceSelection.prototype.getWord = function()
  */
 Alph.SourceSelection.prototype.getWordStart = function()
 {
-    return this.m_wordStart
+    return this.d_wordStart
 };
 
 /**
@@ -158,7 +158,7 @@ Alph.SourceSelection.prototype.getWordStart = function()
  */
 Alph.SourceSelection.prototype.getWordEnd = function()
 {
-    return this.m_wordEnd
+    return this.d_wordEnd
 };
 
 /**
@@ -168,7 +168,7 @@ Alph.SourceSelection.prototype.getWordEnd = function()
  */
 Alph.SourceSelection.prototype.getContext = function()
 {
-    return this.m_contextStr;
+    return this.d_contextStr;
 };
 
 /**
@@ -179,7 +179,7 @@ Alph.SourceSelection.prototype.getContext = function()
  */
 Alph.SourceSelection.prototype.getContextPos = function()
 {
-    return this.m_contextPos;
+    return this.d_contextPos;
 };
 
 /**
@@ -189,7 +189,7 @@ Alph.SourceSelection.prototype.getContextPos = function()
  */
 Alph.SourceSelection.prototype.getRangeParent = function(a_parent)
 {
-    return this.m_rangeParent;
+    return this.d_rangeParent;
 };
 
 /**
@@ -199,7 +199,7 @@ Alph.SourceSelection.prototype.getRangeParent = function(a_parent)
  */
 Alph.SourceSelection.prototype.getTreebankQuery = function()
 {
-    return this.m_treebankQuery;
+    return this.d_treebankQuery;
 };
 
 /**
@@ -208,7 +208,7 @@ Alph.SourceSelection.prototype.getTreebankQuery = function()
  */
 Alph.SourceSelection.prototype.setWord = function(a_word)
 {
-    this.m_word = a_word;   
+    this.d_word = a_word;   
 };
 
 /**
@@ -218,7 +218,7 @@ Alph.SourceSelection.prototype.setWord = function(a_word)
  */
 Alph.SourceSelection.prototype.setWordStart = function(a_pos)
 {
-    this.m_wordStart = a_pos;
+    this.d_wordStart = a_pos;
 };
 
 /**
@@ -228,7 +228,7 @@ Alph.SourceSelection.prototype.setWordStart = function(a_pos)
  */
 Alph.SourceSelection.prototype.setWordEnd = function(a_pos)
 {
-    this.m_wordEnd = a_pos;
+    this.d_wordEnd = a_pos;
 };
 
 /**
@@ -237,7 +237,7 @@ Alph.SourceSelection.prototype.setWordEnd = function(a_pos)
  */
 Alph.SourceSelection.prototype.setContext = function(a_context)
 {
-    this.m_contextStr = a_context;
+    this.d_contextStr = a_context;
 };
 
 /**
@@ -247,7 +247,7 @@ Alph.SourceSelection.prototype.setContext = function(a_context)
  */
 Alph.SourceSelection.prototype.setContextPos = function(a_pos)
 {
-    this.m_contextPos = a_pos;
+    this.d_contextPos = a_pos;
 };
 
 /**
@@ -256,7 +256,7 @@ Alph.SourceSelection.prototype.setContextPos = function(a_pos)
  */
 Alph.SourceSelection.prototype.setRangeParent = function(a_parent)
 {
-    this.m_rangeParent = a_parent;
+    this.d_rangeParent = a_parent;
 };
 
 /**
@@ -265,7 +265,7 @@ Alph.SourceSelection.prototype.setRangeParent = function(a_parent)
  */
 Alph.SourceSelection.prototype.setTreebankQuery = function(a_url)
 {
-    this.m_treebankQuery = a_url;
+    this.d_treebankQuery = a_url;
 };
 
 /**
@@ -275,7 +275,7 @@ Alph.SourceSelection.prototype.setTreebankQuery = function(a_url)
  */
 Alph.SourceSelection.prototype.convertWord = function(a_callback)
 {
-    var converted = a_callback(this.m_word);
+    var converted = a_callback(this.d_word);
     this.setWord(converted);  
 };
 
@@ -291,12 +291,12 @@ Alph.SourceSelection.prototype.equals = function(a_other)
     //all fields must be equal
     if (a_other != null &&
         a_other instanceof Alph.SourceSelection &&
-        this.m_word == a_other.m_word &&
-        this.m_wordStart == a_other.m_wordStart &&
-        this.m_wordEnd == a_other.m_wordEnd &&
-        this.m_contextStr == a_other.m_contextStr &&
-        this.m_contextPos == a_other.m_contextPos &&
-        this.m_rangeParent == a_other.m_rangeParent)
+        this.d_word == a_other.d_word &&
+        this.d_wordStart == a_other.d_wordStart &&
+        this.d_wordEnd == a_other.d_wordEnd &&
+        this.d_contextStr == a_other.d_contextStr &&
+        this.d_contextPos == a_other.d_contextPos &&
+        this.d_rangeParent == a_other.d_rangeParent)
     {   
         return true;
     }

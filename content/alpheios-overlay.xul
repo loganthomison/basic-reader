@@ -63,41 +63,41 @@
         
 	<commandset id="mainCommandSet">
 		<command id="alpheios-toggle-cmd" 
-                 oncommand="Alph.main.alph_inlineToggle();"
+                 oncommand="Alph.main.alphInlineToggle();"
                  observes="alpheios-auto-enable-status" />
         <command id="alpheios-lang-cmd" 
-                 oncommand="Alph.main.select_language(event.target.value,true);"
+                 oncommand="Alph.main.selectLanguage(event.target.value,true);"
                  observes="alpheios-auto-enable-status"/>
         <command id="alpheios-lookup-cmd" 
-                 oncommand="Alph.main.do_tb_lookup();"/>
+                 oncommand="Alph.main.doTbLookup();"/>
         <command 
             id="alpheios-inflect-cmd" 
-            oncommand="Alph.main.execute_lang_command(event);" 
+            oncommand="Alph.main.executeLangCommand(event);" 
             observes="alpheios-inflect"/>
         <command
             id="alpheios-grammar-cmd" 
-            oncommand="Alph.main.execute_lang_command(event);" 
+            oncommand="Alph.main.executeLangCommand(event);" 
             observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
-            oncommand="Alph.MozUtils.open_dialog(
+            oncommand="Alph.MozUtils.openDialog(
                 window,
                 'chrome://alpheios/content/alpheios-prefs.xul', 
                 'alpheios-options-dialog');"/>
         <command id="alpheios-feedback-cmd"
-            oncommand="Alph.util.send_feedback();"/>
+            oncommand="Alph.Util.sendFeedback();"/>
         <command id="alpheios-help-cmd"
-            oncommand="Alph.util.open_alpheios_link(window,'help');"/>
+            oncommand="Alph.Util.openAlpheiosLink(window,'help');"/>
         <command id="alpheios-about-cmd"
-            oncommand="Alph.MozUtils.open_dialog(
+            oncommand="Alph.MozUtils.openDialog(
                 window,
                 'chrome://alpheios/content/dialogs/about.xul', 
                 'alpheios-about-dialog');"/>
     	<command id="alpheios-site-cmd"
-            oncommand="Alph.util.open_alpheios_link(window,'main');"/>
+            oncommand="Alph.Util.openAlpheiosLink(window,'main');"/>
         <command id="alpheios-level-learner-cmd"
-            oncommand="Alph.main.set_mode(null,'learner');"/>
+            oncommand="Alph.main.setMode(null,'learner');"/>
         <command id="alpheios-level-reader-cmd"
-            oncommand="Alph.main.set_mode(null,'reader');"/>
+            oncommand="Alph.main.setMode(null,'reader');"/>
     </commandset>
 
     <!-- FF context and tools menu overlays disabled for now 
@@ -262,7 +262,7 @@
             <toolbaritem id="alpheios-lookup-text-tbitem" observes="alpheios-learner-disabled">
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"
-                    onkeypress="Alph.main.do_tb_lookup(event);"
+                    onkeypress="Alph.main.doTbLookup(event);"
                     observes="alpheios-lookup-enabled"
                     tooltiptext="&alpheios-morph-lookup-tooltip;"/>
             </toolbaritem>

@@ -14,7 +14,7 @@
         title="&alpheios.leaving.title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         buttons="accept" 
-        onload="Alph.Dialogs.load_leaving_site();" 
+        onload="Alph.Dialogs.loadLeavingSite();" 
         onaccept="this.close();">
     
     <stringbundleset id="stringbundleset">
@@ -30,7 +30,7 @@
     <label value="&alpheios.leaving.thankyou;"/>
     <hbox flex="1">
         <label class="site-link" id="alpheios-feedback-link"
-            onclick="Alph.util.send_feedback();"
+            onclick="Alph.Util.sendFeedback();"
             value="&alpheios.menu.feedback;"/>
         <spacer width="30px"/> 
         <label id="survey-link" class="site-link" value="&alpheios.leaving.do.survey;" hidden="true" align="right"/>

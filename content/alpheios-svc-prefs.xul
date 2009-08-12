@@ -18,7 +18,7 @@
                       src="chrome://alpheios/locale/alpheios-prefs.properties"/>
     </stringbundleset>
     <prefpane id="alpheios-prefs-svc-advanced"
-              onpaneload="Alph.prefs.init_svc_prefs();">
+              onpaneload="Alph.Prefs.initSvcPrefs();">
         <preferences/>
         <tabbox id="alpheios-svc-tabs-advanced">
             <tabs id="alpheios-svc-prefs-tabs"/>

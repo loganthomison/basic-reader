@@ -19,7 +19,7 @@
              observes="alph-dict-status" />
         <command 
             id="alpheios-dict-browse-cmd" 
-            oncommand="Alph.Dict.browse_dictionary(event,'alph-dict-panel');"
+            oncommand="Alph.Dict.browseDictionary(event,'alph-dict-panel');"
             observes="alpheios-dict-status"/>
     </commandset>
              

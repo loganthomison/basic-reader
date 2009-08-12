@@ -37,27 +37,27 @@
 Alph.Quiz =
 {
 
-    main_str: null,
+    d_mainStr: null,
         
     /**
      * load data into the interactive querying window
      */
-     load_query_window: function()
+     loadQueryWindow: function()
      {
-        this.query_template = {};
+        this.d_queryTemplate = {};
         
         var params = window.arguments[0];
         var template_src = 
             "chrome://"
                 + params.lang_tool.getchromepkg()
                 + "/content/query/template.js";
-        Alph.MozUtils.load_javascript(template_src,this.query_template);
-        this.main_str = params.main_str;
+        Alph.MozUtils.loadJavascript(template_src,this.d_queryTemplate);
+        this.d_mainStr = params.main_str;
         var query_doc = $("#alph-query-frame").get(0).contentDocument;
         // add the version string 
         $("body",query_doc).prepend('<div id="alph-version-info"></div>');
         var version_string = 
-            params.lang_tool.get_string_or_default('alph-version-link',[]);
+            params.lang_tool.getStringOrDefault('alph-version-link',[]);
         if (version_string)
         {
             $("#alph-version-info",query_doc)
@@ -65,15 +65,15 @@ Alph.Quiz =
                 .click(
                     function()
                     {
-                        Alph.util.open_alpheios_link(window.opener,'release-notes');
+                        Alph.Util.openAlpheiosLink(window.opener,'release-notes');
                         return false;
                     });
         }
 
-        this.load_query_head(params);
+        this.loadQueryHead(params);
         
-        this.add_pofs_query(params);
-        this.add_defs_query(params);
+        this.addPofsQuery(params);
+        this.addDefsQuery(params);
 
         // only present the translation query if the word has an aligned translation
         if (params.type == 'full_query' && params.source_align.length > 0)
@@ -82,15 +82,15 @@ Alph.Quiz =
             // in a separate thread, after the on load handler has had a 
             // chance to complete. there ought to be a more reliable way
             // of doing this, but I haven't been able to find it.
-            setTimeout("Alph.Quiz.load_query_context_defs()",500);
+            setTimeout("Alph.Quiz.loadQueryContextDefs()",500);
         }
         else
         {
             query_doc = $("#alph-query-frame").get(0).contentDocument;
-            this.load_done();
+            this.loadDone();
             var translation = params.source_align.length > 0 ? params.aligned_defs.join(' ')
-                                                             : params.lang_tool.get_string_or_default('alph-align-nomatch',[]);
-            this.on_defs_correct(
+                                                             : params.lang_tool.getStringOrDefault('alph-align-nomatch',[]);
+            this.onDefsCorrect(
                 translation,
                 params.source_node,$(".alph-query-element",query_doc));
             
@@ -102,7 +102,7 @@ Alph.Quiz =
       * (to be called once the contextual definitions have finished loading
       * because the elements aren't usuable until that's done.)
       */
-     load_done: function()
+     loadDone: function()
      {
         var doc = $("#alph-query-frame").get(0).contentDocument;
         $(".alph-query-element .loading",doc).remove();
@@ -111,7 +111,7 @@ Alph.Quiz =
         window.focus();
      },
      
-     load_query_head: function(a_params)
+     loadQueryHead: function(a_params)
      {
         var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
@@ -133,22 +133,22 @@ Alph.Quiz =
         var query_html = 
             '<div class="alph-query-instruct">' +
             '  <button class="alph-query-close alpheios-button">'+
-                    Alph.MozUtils.get_string(this.main_str,"alph-query-close") +
+                    Alph.MozUtils.getString(this.d_mainStr,"alph-query-close") +
             '  </button>' +
              '  <div class="alph-query-context">' +
-                    Alph.MozUtils.get_string(this.main_str,"alph-query-header",[src_context]) +
+                    Alph.MozUtils.getString(this.d_mainStr,"alph-query-header",[src_context]) +
             '  </div>' +
             '</div>\n' +
             '<div class="alph-query-element">' +
             '  <div class="loading">' +
-            Alph.MozUtils.get_string(this.main_str,'alph-loading-misc') +
+            Alph.MozUtils.getString(this.d_mainStr,'alph-loading-misc') +
             '  </div>'+
                         '  <div class="alph-query-pofs" />\n' +
             '  <div class="alph-query-defs" />\n' +
             '  <div class="alph-query-infl" style="display:none;">' +
             '    <fieldset class="alph-infl-select">' + 
             '      <legend class="alph-query-header">' +
-               Alph.MozUtils.get_string(this.main_str,"alph-query-infl") +
+               Alph.MozUtils.getString(this.d_mainStr,"alph-query-infl") +
             '      </legend>' + 
             '      <div class="alph-query-hint alpheios-hint"/>' +
             '    </fieldset>' +
@@ -167,7 +167,7 @@ Alph.Quiz =
         
      },
      
-     add_pofs_query: function(a_params)
+     addPofsQuery: function(a_params)
      {
         var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
@@ -179,7 +179,7 @@ Alph.Quiz =
         var select_pofs =
              '<fieldset class="alph-select-pofs" style="display: none;">' + 
              '  <legend class="alph-query-header">' +
-                Alph.MozUtils.get_string(this.main_str,"alph-query-pofs") +
+                Alph.MozUtils.getString(this.d_mainStr,"alph-query-pofs") +
             '  </legend>';
             
         pofs_list.forEach(
@@ -203,7 +203,7 @@ Alph.Quiz =
         );
     },
     
-    add_defs_query: function(a_params)
+    addDefsQuery: function(a_params)
     {
          var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
@@ -211,7 +211,7 @@ Alph.Quiz =
         var select_defs = 
             '<fieldset class="alph-defs-select" style="display: none;">' + 
              '  <legend class="alph-query-header">' +
-                Alph.MozUtils.get_string(this.main_str,"alph-query-defs") +
+                Alph.MozUtils.getString(this.d_mainStr,"alph-query-defs") +
             '  </legend>' +
             '</fieldset>\n';
         $('.alph-query-defs',query_doc).append(select_defs);
@@ -230,18 +230,18 @@ Alph.Quiz =
         var query_parent = $(a_elem).parents('.alph-query-element').get(0); 
         if (selected_value == 'correct')
         {            
-            this.on_defs_correct(selected_text,a_src_node,query_parent);
+            this.onDefsCorrect(selected_text,a_src_node,query_parent);
             // if the pofs is already answered,  move on to the inflections
             if ( $(".alph-select-pofs .answer",query_parent).length > 0)
             {
-                this.load_query_infl(a_src_node);
+                this.loadQueryInfl(a_src_node);
             }
          }
          else
          {
             $(a_elem).parent("label").addClass("incorrect");
             $(a_elem).css("display","none");
-            //alert(Alph.MozUtils.get_string(this.main_str,"alph-query-incorrect"));
+            //alert(Alph.MozUtils.getString(this.d_mainStr,"alph-query-incorrect"));
             // TODO - need to check and handle scenario when only correct answer is left
          }
     },
@@ -249,18 +249,18 @@ Alph.Quiz =
     /**
      * function called once the user has correctly identified the definition
      */
-    on_defs_correct: function(a_answer,a_src_node,a_query_parent)
+    onDefsCorrect: function(a_answer,a_src_node,a_query_parent)
     { 
         var legend = 
             '<legend class="alph-query-header">' + 
-            Alph.MozUtils.get_string(this.main_str,"alph-query-defs-correct") +
+            Alph.MozUtils.getString(this.d_mainStr,"alph-query-defs-correct") +
             '</legend>';
         $(".alph-defs-select",a_query_parent)
                 .html(legend)
                 .append('<label class="answer">' + a_answer + '</label>');                
         $("#alph-word-tools .alph-dict-link",$(a_query_parent).get(0).ownerDocument)
             .css("visibility","visible");
-        var short_def_label = Alph.MozUtils.get_string(this.main_str,"alph-short-definition");
+        var short_def_label = Alph.MozUtils.getString(this.d_mainStr,"alph-short-definition");
         $(".alph-query-defs",a_query_parent).append('<div class="alph-query-dict"/>');
         $(".alph-query-dict",a_query_parent).append(
             '<div class="alpheios-label">' + short_def_label + '</div>');
@@ -290,7 +290,7 @@ Alph.Quiz =
         {
             var legend = 
                 '<legend class="alph-query-header">' + 
-                Alph.MozUtils.get_string(this.main_str,"alph-query-pofs-correct") +
+                Alph.MozUtils.getString(this.d_mainStr,"alph-query-pofs-correct") +
                 '</legend>';
             $(a_elem).parents("fieldset")
                 .html(legend)
@@ -298,14 +298,14 @@ Alph.Quiz =
             // if the definitions part is already answered,  move on to the inflections
             if ( $(".alph-defs-select .answer",a_elem.ownerDocument).length > 0)
             {
-                this.load_query_infl(a_src_node);
+                this.loadQueryInfl(a_src_node);
             }
         }
         else
         {
             $(a_elem).parent("label").addClass("incorrect");
             $(a_elem).css("display","none");
-            //alert(Alph.MozUtils.get_string(this.main_str,"alph-query-incorrect"));
+            //alert(Alph.MozUtils.getString(this.d_mainStr,"alph-query-incorrect"));
             // TODO - need to check and handle scenario when only correct answer is left
         }
         return false;
@@ -316,7 +316,7 @@ Alph.Quiz =
       * This should be called in a separate thread, as it may take a little while to 
       * process the aligned sentence.
       */
-     load_query_context_defs: function()
+     loadQueryContextDefs: function()
      {
         var a_params = window.arguments[0];
         var a_pofs = $('.alph-pofs',a_params.source_node).attr('context');
@@ -330,7 +330,7 @@ Alph.Quiz =
             $("body",a_params.source_node.ownerDocument)
                     .append('<div id="alpheios-context-defs" style="display:none;"/>');
             var align_doc = 
-                Alph.site.load_alignment(a_params.source_node.ownerDocument,
+                Alph.Site.loadAlignment(a_params.source_node.ownerDocument,
                 function(a_align_doc)
                 {
                     $(".alpheios-aligned-word",a_align_doc).each
@@ -349,24 +349,24 @@ Alph.Quiz =
                             .append(new_elem);
                         }
                     );
-                    Alph.Quiz.display_context_defs(a_params,a_pofs);
+                    Alph.Quiz.displayContextDefs(a_params,a_pofs);
                 },
                 function(a_error)
                 {
                     
-                    Alph.Quiz.display_context_defs(a_params,a_pofs);
+                    Alph.Quiz.displayContextDefs(a_params,a_pofs);
                 }
             );
         }
         else
         {
-            Alph.Quiz.display_context_defs(a_params,a_pofs)
+            Alph.Quiz.displayContextDefs(a_params,a_pofs)
         }
-        Alph.Quiz.load_done();
+        Alph.Quiz.loadDone();
         
     },                        
 
-    display_context_defs: function(a_params,a_pofs)
+    displayContextDefs: function(a_params,a_pofs)
     {
         var query_doc = $("#alph-query-frame").get(0).contentDocument;
         var src_doc = a_params.source_node.ownerDocument;
@@ -422,13 +422,13 @@ Alph.Quiz =
                         }
                     }
                 );
-                incorrect.sort(Alph.Quiz.sort_random);
+                incorrect.sort(Alph.Quiz.sortRandom);
                 var max = 4;
                 if (incorrect.length < max)
                 {
                     max = incorrect.length;
                 }
-                defs = defs.concat(incorrect.slice(0,max)).sort(Alph.Quiz.sort_random);
+                defs = defs.concat(incorrect.slice(0,max)).sort(Alph.Quiz.sortRandom);
                 
             }
             catch(a_e)
@@ -465,9 +465,9 @@ Alph.Quiz =
             }
             else
             {
-                answer = Alph.MozUtils.get_string(this.main_str,"alph-query-defs-not-found");
+                answer = Alph.MozUtils.getString(this.d_mainStr,"alph-query-defs-not-found");
             }
-            this.on_defs_correct(answer,a_params.source_node,$(".alph-query-element",query_doc));
+            this.onDefsCorrect(answer,a_params.source_node,$(".alph-query-element",query_doc));
         }
     },
     
@@ -475,7 +475,7 @@ Alph.Quiz =
      * Loads the inflection query elements
      * @param {Element} the DOM node for the selected word
      */
-    load_query_infl: function(a_src_node)
+    loadQueryInfl: function(a_src_node)
     {
 
         var infl_set = $('.alph-infl-set',a_src_node);
@@ -483,7 +483,7 @@ Alph.Quiz =
         // if we don't have an inflection set
         if (infl_set.length == 0)
         {
-            this.on_infl_correct(a_src_node);
+            this.onInflCorrect(a_src_node);
             return;
         }
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
@@ -549,7 +549,7 @@ Alph.Quiz =
         // treebanked text there should only be one set, but we may eventually
         // need to handle the case where more the one possible answer exists
         // for other uses
-        var has_infl_query = Alph.Quiz.query_template.make_infl_query(
+        var has_infl_query = Alph.Quiz.d_queryTemplate.makeInflQuery(
                 $(".alph-infl-select",parent_doc),
                 pofs,
                 {  form: $('.alph-infl-set',a_src_node).attr('context'),
@@ -558,46 +558,46 @@ Alph.Quiz =
                    src_node: a_src_node,
                    lang_tool: window.arguments[0].lang_tool, 
                 },
-                function() { Alph.Quiz.on_infl_correct(a_src_node) }
+                function() { Alph.Quiz.onInflCorrect(a_src_node) }
             );
         $('.alph-infl-select',parent_doc).removeClass("loading");
         if (! has_infl_query)
         {
-            this.on_infl_correct(a_src_node,
-                Alph.MozUtils.get_string(this.main_str,"alph-query-infl-missing"));
+            this.onInflCorrect(a_src_node,
+                Alph.MozUtils.getString(this.d_mainStr,"alph-query-infl-missing"));
         }
         else
         {
             try {
                 var disclaimer =
-                    Alph.MozUtils.get_string($("#alph-infl-strings").get(0),'disclaimer');
+                    Alph.MozUtils.getString($("#alph-infl-strings").get(0),'disclaimer');
                 $("#alph-infl-table",parent_doc)
                     .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
             } 
             catch(a_e){alert(a_e)};
-            var text = Alph.MozUtils.get_string(this.main_str,"alph-query-infl-continue",[form]);
+            var text = Alph.MozUtils.getString(this.d_mainStr,"alph-query-infl-continue",[form]);
             var infl_hint = '';
                 // look for a part-of-speech specific hint, and if not defined, use
                 // the more general inflection hint
             try 
             {
                 infl_hint = 
-                    Alph.MozUtils.get_string(this.main_str,"alph-query-infl-hint-"+pofs,
+                    Alph.MozUtils.getString(this.d_mainStr,"alph-query-infl-hint-"+pofs,
                     [form]);
             }
             catch(a_e)
             {
                 infl_hint = 
-                    Alph.MozUtils.get_string(this.main_str,"alph-query-infl-hint",
+                    Alph.MozUtils.getString(this.d_mainStr,"alph-query-infl-hint",
                         [form]);
             } 
             $(".alph-infl-select .alph-query-hint",parent_doc).html(text);
             $('.alph-infl-select',parent_doc).append(
                  '<label><input type="radio" name="do-infl" value="1">' +
-                    Alph.MozUtils.get_string(this.main_str,'alph-query-infl-yes') +
+                    Alph.MozUtils.getString(this.d_mainStr,'alph-query-infl-yes') +
                  '</label><br/>\n' +
                  '<label><input type="radio" name="do-infl" value="0">' +
-                    Alph.MozUtils.get_string(this.main_str,'alph-query-infl-no') +
+                    Alph.MozUtils.getString(this.d_mainStr,'alph-query-infl-no') +
                  '</label><br/>\n'
                 );
             $('input[name=do-infl]',parent_doc).click(
@@ -611,9 +611,9 @@ Alph.Quiz =
                     }
                     else
                     {
-                        Alph.Quiz.on_infl_correct(a_src_node);
+                        Alph.Quiz.onInflCorrect(a_src_node);
                     }
-                    Alph.Quiz.resize_window();
+                    Alph.Quiz.resizeWindow();
                 }
             );
         }
@@ -624,7 +624,7 @@ Alph.Quiz =
      * Resizes the window to fit its contents.
      * @private
      */
-    resize_window: function() 
+    resizeWindow: function() 
     {
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
         var height = $(".alph-query-element",parent_doc).height();
@@ -663,11 +663,11 @@ Alph.Quiz =
      * Callback executed when the correct inflection details are selected
      * @param {String} a_answer the answer string to be displayed
      */
-    on_infl_correct: function(a_src_node,a_message)
+    onInflCorrect: function(a_src_node,a_message)
     {
         var parent_doc = $("#alph-query-frame").get(0).contentDocument;
         $('.alph-query-infl .alph-query-header',parent_doc)
-            .text(Alph.MozUtils.get_string(Alph.Quiz.main_str,"alph-query-infl-correct"));
+            .text(Alph.MozUtils.getString(Alph.Quiz.d_mainStr,"alph-query-infl-correct"));
         $('.alph-query-infl .alph-query-hint',parent_doc).remove();
             
         // clone the entire entry to get any bound events on the child elements
@@ -686,15 +686,15 @@ Alph.Quiz =
         window.arguments[0].lang_tool.contextHandler(parent_doc);
         $(".alph-form-end",entry).remove();
         $(".alph-infl-end",entry).remove();
-        window.arguments[0].lang_tool.add_infl_help(entry);
-        this.quiz_done();
-        this.resize_window();
+        window.arguments[0].lang_tool.addInflHelp(entry);
+        this.quizDone();
+        this.resizeWindow();
     },
     
     /**
      * random array sort function
      */
-    sort_random: function(a,b)
+    sortRandom: function(a,b)
     {
         return (Math.round(Math.random())-0.5);
     },
@@ -702,7 +702,7 @@ Alph.Quiz =
     /**
      * function called when the user is finished with the quiz.
      */
-    quiz_done: function()
+    quizDone: function()
     {
         var params = window.arguments[0];
         var form = $(".alph-word",params.source_node).attr('context');
@@ -712,11 +712,11 @@ Alph.Quiz =
          */
 
         // get the tools 
-        var tools = params.lang_tool.get_tools_for_query(params.source_node);
+        var tools = params.lang_tool.getToolsForQuery(params.source_node);
  
         $(".alph-query-context",query_doc)
             .after('<div class="alph-query-context">' +
-                Alph.MozUtils.get_string(this.main_str,'alph-query-done-hint',[form]) +
+                Alph.MozUtils.getString(this.d_mainStr,'alph-query-done-hint',[form]) +
                 '</div>')
             .remove();
         $(".alph-query-instruct",query_doc).append(tools).append('<br/>');

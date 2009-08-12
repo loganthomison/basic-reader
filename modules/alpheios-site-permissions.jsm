@@ -56,7 +56,7 @@ PermissionMgr =
     /**
      * the array of sites and permissions
      */
-    m_sites: Array(),
+    d_sites: Array(),
     
     /**
      * add or change a permission for a specific uri
@@ -73,18 +73,18 @@ PermissionMgr =
         {
             path = '/';
         }
-        if (typeof this.m_sites[a_key] == "undefined")
+        if (typeof this.d_sites[a_key] == "undefined")
         {
-            this.m_sites[a_key] = Array();
+            this.d_sites[a_key] = Array();
         }
-        if (typeof this.m_sites[a_key][host] == "undefined")
+        if (typeof this.d_sites[a_key][host] == "undefined")
         {
-            this.m_sites[a_key][host] = [];
+            this.d_sites[a_key][host] = [];
         }
         var found = false;
-        for (var i=0; i<this.m_sites[a_key][host].length; i++)
+        for (var i=0; i<this.d_sites[a_key][host].length; i++)
         {
-            var r_path = this.m_sites[a_key][host][i];
+            var r_path = this.d_sites[a_key][host][i];
             if (r_path[0] == path)
             {
                 // if the url was already registered, update the permission
@@ -95,7 +95,7 @@ PermissionMgr =
         // if the url was not found, add it
         if (! found)
         {
-          this.m_sites[a_key][host].push([path,a_permission]);
+          this.d_sites[a_key][host].push([path,a_permission]);
         }
     },
     
@@ -118,11 +118,11 @@ PermissionMgr =
                 path = '/';
             }
             
-            if (typeof this.m_sites[a_key] != "undefined" && typeof this.m_sites[a_key][host] != "undefined")
+            if (typeof this.d_sites[a_key] != "undefined" && typeof this.d_sites[a_key][host] != "undefined")
             {
-                for (var i=0; i<this.m_sites[a_key][host].length; i++)
+                for (var i=0; i<this.d_sites[a_key][host].length; i++)
                 {
-                    var r_path_obj = this.m_sites[a_key][host][i];
+                    var r_path_obj = this.d_sites[a_key][host][i];
                     var regex = new RegExp('^'+r_path_obj[0])
                     if (regex.exec(path))
                     {
@@ -149,10 +149,10 @@ PermissionMgr =
      */
     remove: function(a_host,a_key)
     {
-        if (typeof this.m_sites[a_key] != "undefined" 
-            && typeof this.m_sites[a_key][a_host] != "undefined")
+        if (typeof this.d_sites[a_key] != "undefined" 
+            && typeof this.d_sites[a_key][a_host] != "undefined")
         {
-            delete this.m_sites[a_key][a_host];
+            delete this.d_sites[a_key][a_host];
         }
     }
 }

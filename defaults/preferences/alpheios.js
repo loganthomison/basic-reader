@@ -29,7 +29,7 @@ pref("extensions.alpheios.panels.alph-tree-panel.pedagogical",0);
 pref("extensions.alpheios.panels.alph-tree-panel.basic",0);
 pref("extensions.alpheios.panels.alph-morph-panel.basic",0);
 pref("extensions.alpheios.panels.alph-morph-panel.pedagogical",0);
-pref("extensions.alpheios.methods.dictionary.full.default",'default_dictionary_lookup');
+pref("extensions.alpheios.methods.dictionary.full.default",'defaultDictionaryLookup');
 pref("extensions.alpheios.methods.dictionary.full.default.timeout",5000);
 pref("extensions.alpheios.partsofspeech","noun,adjective,verb,adverb,pronoun,article,preposition,conjunction,verb_participle");
 pref("extensions.alpheios.smallicons",false);

@@ -1,5 +1,5 @@
 /**
- * @fileoverview This file contains the Alph.prefs class which defines
+ * @fileoverview This file contains the Alph.Prefs class which defines
  * the functionality for the Preferences dialog
  * 
  * @version $Id$
@@ -22,48 +22,48 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-Alph.MozUtils.import_resource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
-Alph.MozUtils.import_resource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+Alph.MozUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
+Alph.MozUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
 
  /**
  * @singleton
  */
-Alph.prefs = {
+Alph.Prefs = {
 
-    _selected_dict_item: null,
-    _selected_site_item:  null,
+    d_selectedDictItem: null,
+    d_selectedSiteItem:  null,
        
     /**
      * Add language-specific feature preferences
      */
-    init_feature_prefs: function()
+    initFeaturePrefs: function()
     {
         var prefs = Alph.$("#alpheios-prefs-features preferences").get(0);
         var strings = document.getElementById("alpheios-prefs-strings");
         
-        var languages = Alph.LanguageToolFactory.get_lang_list();        
+        var languages = Alph.LanguageToolFactory.getLangList();        
         // iterate through the languages adding mouse preferences 
         for (var i =0; i<languages.length; i++)
         {
             var lang = languages[i];
-            var lang_strings = Alph.LanguageToolFactory.get_stringbundle(lang);
+            var lang_strings = Alph.LanguageToolFactory.getStringBundle(lang);
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     lang+'-pref-trigger',
                     'extensions.alpheios.' + lang + '.popuptrigger',
                     'string')
             );
-            var radiogroup = Alph.util.makeXUL(
+            var radiogroup = Alph.Util.makeXUL(
                 'radiogroup','',['preference'],[lang+'-pref-trigger']
             );
             Alph.$(radiogroup).append(
-                Alph.util.makeXUL('caption','',['label'],[lang_strings.get(lang+'.string')])
+                Alph.Util.makeXUL('caption','',['label'],[lang_strings.get(lang+'.string')])
             ).append(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'radio','',
                     ['label','value'],[strings.getString('trigger.mousemove'),'mousemove'])
             ).append(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'radio','',
                     ['label','value'],[strings.getString('trigger.dblclick'),'dblclick'])
             );
@@ -77,64 +77,64 @@ Alph.prefs = {
     /**
      * Add language-specific service preferences
      */
-    init_svc_prefs: function()
+    initSvcPrefs: function()
     {
         var prefs = Alph.$("#alpheios-prefs-svc-advanced preferences").get(0);
         var strings = document.getElementById("alpheios-prefs-strings");
         
-        var languages = Alph.LanguageToolFactory.get_lang_list();        
+        var languages = Alph.LanguageToolFactory.getLangList();        
         // iterate through the languages adding service preferences 
         for (var i =0; i<languages.length; i++)
         {
             var lang = languages[i];
             // TODO - move string url into language factory?
-            var lang_strings = Alph.LanguageToolFactory.get_stringbundle(lang);
+            var lang_strings = Alph.LanguageToolFactory.getStringBundle(lang);
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     'pref-'+lang+'-lexicon',
                     'extensions.alpheios.' + lang + '.url.lexicon',
                     'string')
             );
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     'pref-'+lang+'-lexicon-request',
                     'extensions.alpheios.' + lang + '.url.lexicon.request',
                     'string')
             );
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     'pref-'+lang+'-lexicon-timeout',
                     'extensions.alpheios.' + lang + '.url.lexicon.timeout',
                     'int')
             );
             Alph.$("#alpheios-svc-prefs-tabs").append(   
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'tab','',['label'],[lang_strings.get(lang+'.string')])
             );
-            var tabpanel = Alph.util.makeXUL(
+            var tabpanel = Alph.Util.makeXUL(
                 'tabpanel','alpheios-svc-prefs-'+lang,[],[]);
             Alph.$("#alpheios-svc-prefs-details").append(tabpanel);
-            var hbox = Alph.util.makeXUL('hbox','',['flex','align'],['1','center']);
-            var vbox = Alph.util.makeXUL('vbox','',['flex'],['1']);
+            var hbox = Alph.Util.makeXUL('hbox','',['flex','align'],['1','center']);
+            var vbox = Alph.Util.makeXUL('vbox','',['flex'],['1']);
             Alph.$(vbox).append(
-                Alph.util.makeXUL('label','',
+                Alph.Util.makeXUL('label','',
                     ['value','control'],[strings.getString('url.morph'),lang+'-lexicon'])
             ).append(
-                Alph.util.makeXUL('textbox',lang+'-lexicon',['preference'],['pref-'+lang+'-lexicon'])
+                Alph.Util.makeXUL('textbox',lang+'-lexicon',['preference'],['pref-'+lang+'-lexicon'])
             ).append(
-                Alph.util.makeXUL('label','',
+                Alph.Util.makeXUL('label','',
                     ['value','control'],[strings.getString('url.morph.request'),lang+'-lexicon-request'])
 
             ).append(
-                Alph.util.makeXUL('textbox',lang+'-lexicon-requext',
+                Alph.Util.makeXUL('textbox',lang+'-lexicon-requext',
                     ['preference'],['pref-'+lang+'-lexicon-request'])
 
             ).append(
-                Alph.util.makeXUL('label','',
+                Alph.Util.makeXUL('label','',
                     ['value','control'],[strings.getString('url.morph.timeout'),lang+'-lexicon-timeout'])
 
             ).append(
-                Alph.util.makeXUL('textbox',lang+'-lexicon-timeout',
+                Alph.Util.makeXUL('textbox',lang+'-lexicon-timeout',
                     ['preference'],['pref-'+lang+'-lexicon-timeout'])
 
             );
@@ -150,53 +150,53 @@ Alph.prefs = {
      * - adds a click handler to the override defaults checkbox to
      *   toggle the disabled status of the language-specific panel prefs
      */
-    init_panel_prefs: function()
+    initPanelPrefs: function()
     {
         
         var prefs = Alph.$("#alpheios-panel-prefs preferences").get(0);
         var strings = document.getElementById("alpheios-prefs-strings");
         
-        var languages = Alph.LanguageToolFactory.get_lang_list();
+        var languages = Alph.LanguageToolFactory.getLangList();
         
         // iterate through the languages adding dictionary preferences for those which
         // have dictionaries defined
         for (var i =0; i<languages.length; i++)
         {
             var lang = languages[i];
-            var lang_strings = Alph.LanguageToolFactory.get_stringbundle(lang);
+            var lang_strings = Alph.LanguageToolFactory.getStringBundle(lang);
             
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     'pref-panel-override-'+lang,
                     'extensions.alpheios.' + lang + '.panels.use.defaults',
                     'bool')
             );
             Alph.$('#panel-prefs-tabs').append(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'tab','',['label'],[lang_strings.get(lang+'.string')])
             );
-            var tabpanel = Alph.util.makeXUL(
+            var tabpanel = Alph.Util.makeXUL(
                 'tabpanel','panel-prefs-tabpanel-'+lang,['align'],['vertical']
             );
             Alph.$('#panel-prefs-tabpanels').append(tabpanel);
-            var vbox = Alph.util.makeXUL('vbox','',[],[]);
-            var hbox = Alph.util.makeXUL('hbox','',['align'],['center']);
+            var vbox = Alph.Util.makeXUL('vbox','',[],[]);
+            var hbox = Alph.Util.makeXUL('hbox','',['align'],['center']);
             Alph.$(tabpanel).append(Alph.$(vbox).append(hbox));
-            var use_defs_cbx = Alph.util.makeXUL(
+            var use_defs_cbx = Alph.Util.makeXUL(
                 'checkbox','panel-override-'+lang,['preference'],['pref-panel-override-'+lang]);
             var use_defaults = Alph.MozUtils.getPref('panels.use.defaults',lang);
             Alph.$(hbox)
                 .append(use_defs_cbx)
                 .append(
-                    Alph.util.makeXUL('label','',
+                    Alph.Util.makeXUL('label','',
                         ['control','value'],
                         ['panel-override-latin',strings.getString('panels.use.defaults')]))
                 .append(
-                    Alph.util.makeXUL('button','',
+                    Alph.Util.makeXUL('button','',
                         ['oncommand','label'],
-                        ['Alph.prefs.restore_panel_defaults(this,"'+lang+'")',
+                        ['Alph.Prefs.restorePanelDefaults(this,"'+lang+'")',
                             strings.getString('panels.restore.defaults')]));
-            var groupbox = Alph.util.makeXUL('groupbox','panel-prefs-box-'+lang,[],[]);
+            var groupbox = Alph.Util.makeXUL('groupbox','panel-prefs-box-'+lang,[],[]);
             // clone the default panel preferences grid
             // repurpose the cloned copy for this language
             var grid = Alph.$("grid#alpheios-panel-prefs-default").clone();
@@ -250,7 +250,7 @@ Alph.prefs = {
             Alph.$(use_defs_cbx).click(
                 function()
                 {
-                    Alph.prefs.toggle_panel_pref_cbx(this);
+                    Alph.Prefs.togglePanelPrefCbx(this);
                 }
             );
             // add the new grid to the box
@@ -268,7 +268,7 @@ Alph.prefs = {
      * @return one of Alph.Panel.STATUS_SHOW or Alph.Panel.STATUS_HIDE
      * @type int
      */
-    update_panel_pref: function(a_cbx)
+    updatePanelPref: function(a_cbx)
     {
         if (a_cbx.checked)
         {
@@ -285,7 +285,7 @@ Alph.prefs = {
      * preferences checkboxes
      * @param {XULElement} a_cbx the XUL Checkbux element for using panel defaults 
      */
-    toggle_panel_pref_cbx: function(a_cbx)
+    togglePanelPrefCbx: function(a_cbx)
     {
         // if the use defaults checkbox is checked, then  
         // the per-language panel preference checkboxes should be disabled
@@ -314,7 +314,7 @@ Alph.prefs = {
      * Restore the default panel settings for a language
      * @param {String} a_lang the language
      */
-    restore_panel_defaults: function(a_elem,a_lang)
+    restorePanelDefaults: function(a_elem,a_lang)
     {
             var grid_id = "#alpheios-panel-prefs";
             if (typeof a_lang == "undefined")
@@ -360,7 +360,7 @@ Alph.prefs = {
      * preferences pane with the default dictionary preference 
      * elements for the language. 
      */
-    init_dict_prefs: function()
+    initDictPrefs: function()
     {
         var strings = document.getElementById("alpheios-prefs-strings");
 
@@ -368,14 +368,14 @@ Alph.prefs = {
 
         var dict_types = ['short','full'];
         
-        var languages = Alph.LanguageToolFactory.get_lang_list();
+        var languages = Alph.LanguageToolFactory.getLangList();
         
         // iterate through the languages adding dictionary preferences for those which
         // have dictionaries defined
         for (var i =0; i<languages.length; i++)
         {
             var lang = languages[i];
-            var lang_strings = Alph.LanguageToolFactory.get_stringbundle(lang);
+            var lang_strings = Alph.LanguageToolFactory.getStringBundle(lang);
 
             var short_list = null;
             var full_list = null;
@@ -389,13 +389,13 @@ Alph.prefs = {
                 continue;
             }
             Alph.$('#dicts-prefs-language-tabs').append(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'tab','dicts-prefs-language-tabs-latin',['label'],[lang_strings.get(lang+'.string')])
             );
             var tabpanel =     
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'tabpanel','',[],[]);
-            var dict_parent = Alph.util.makeXUL(
+            var dict_parent = Alph.Util.makeXUL(
                 'vbox',
                 'dict-prefs-language-details-' + lang,
                 [],[]);
@@ -418,38 +418,38 @@ Alph.prefs = {
                     {
                         // add preference 
                         prefs.appendChild(
-                        Alph.util.makePref(
+                        Alph.Util.makePref(
                             'pref-' + lang + '-dict-' + a_type,
                             'extensions.alpheios.' + lang + '.dictionaries.' + a_type,
                             'string')
                         );
-                        var grid = Alph.util.makeXUL(
+                        var grid = Alph.Util.makeXUL(
                             'grid',
                             'alph-dict-grid-'+lang,
                             [],[]
                         );
-                        var cols = Alph.util.makeXUL('columns',null,[],[]);
-                        cols.appendChild(Alph.util.makeXUL('column',null,['flex'],['1']));
-                        cols.appendChild(Alph.util.makeXUL('column',null,[],[]));
+                        var cols = Alph.Util.makeXUL('columns',null,[],[]);
+                        cols.appendChild(Alph.Util.makeXUL('column',null,['flex'],['1']));
+                        cols.appendChild(Alph.Util.makeXUL('column',null,[],[]));
                         grid.appendChild(cols);
-                        var rows = Alph.util.makeXUL('rows',null,[],[]);
-                        var row = Alph.util.makeXUL('row',null,[],[])
-                        var lb_ordered = Alph.util.makeXUL('listbox',
+                        var rows = Alph.Util.makeXUL('rows',null,[],[]);
+                        var row = Alph.Util.makeXUL('row',null,[],[])
+                        var lb_ordered = Alph.Util.makeXUL('listbox',
                             'dict-order-'+lang + '-' + a_type,
                             ['seltype','preference','onsyncfrompreference'],
                             ['single','pref-' + lang + '-dict-' + a_type,
-                             'Alph.prefs.read_dict_list("' + lang + '","' + a_type +'");' 
+                             'Alph.Prefs.readDictList("' + lang + '","' + a_type +'");' 
                             ]);
-                        var button_box = Alph.util.makeXUL('vbox',null,[],[]);
+                        var button_box = Alph.Util.makeXUL('vbox',null,[],[]);
                         button_box.appendChild(
-                            Alph.util.makeXUL(
+                            Alph.Util.makeXUL(
                                 'button',
                                 'up_'+a_type,
                                 ['label','disabled'],
                                 [strings.getString('dict.buttons.moveup'),'true'])
                         );
                         button_box.appendChild(
-                            Alph.util.makeXUL(
+                            Alph.Util.makeXUL(
                                 'button',
                                 'down_'+ a_type,
                                 ['label','disabled'],
@@ -458,20 +458,20 @@ Alph.prefs = {
                         if (short_list == full_list)
                         {
                             button_box.appendChild(
-                                Alph.util.makeXUL(
+                                Alph.Util.makeXUL(
                                     'button',
                                     'reset_' + a_type,
                                     ['label'],
                                     [strings.getString('dict.buttons.copy.'+a_type),'true'])
                             );
                         }
-                        Alph.$(lb_ordered).select(Alph.prefs.on_dict_select); 
+                        Alph.$(lb_ordered).select(Alph.Prefs.onDictSelect); 
                         row.appendChild(lb_ordered);
                         row.appendChild(button_box);
                         rows.appendChild(row);
                         grid.appendChild(cols);
                         grid.appendChild(rows);
-                        var label = Alph.util.makeXUL(
+                        var label = Alph.Util.makeXUL(
                             'label',
                             null,
                             ['value'],
@@ -488,7 +488,7 @@ Alph.prefs = {
                                 'dict.labels.single.' + a_type,
                                 [lang_strings.get('dict.' + list)]);
                         dict_parent.appendChild(
-                            Alph.util.makeXUL(
+                            Alph.Util.makeXUL(
                                 'label',
                                  '',
                                  ['value'],
@@ -498,15 +498,15 @@ Alph.prefs = {
                     }
                 }
             );
-            Alph.$("button",dict_parent).click(Alph.prefs.write_dict_list);
-            var hbox = Alph.util.makeXUL('hbox',null,[],[]);
+            Alph.$("button",dict_parent).click(Alph.Prefs.writeDictList);
+            var hbox = Alph.Util.makeXUL('hbox',null,[],[]);
             var command_str = 
                     'document.documentElement.openSubDialog(' + 
                     '"chrome://alpheios/content/alpheios-dict-prefs-adv.xul","",' + 
                     '{lang: "' + lang + '"}' +
                     ');'
             hbox.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'button',
                     'advanced',
                     ['label','oncommand'],
@@ -519,7 +519,7 @@ Alph.prefs = {
     /**
      * Initialize the advanced dictionary preferences screen
      */
-    init_adv_dict_prefs: function()
+    initAdvDictPrefs: function()
     {
         var a_lang = window.arguments[0].lang;
         var strings = document.getElementById("alpheios-prefs-strings");
@@ -536,16 +536,16 @@ Alph.prefs = {
         catch (a_e) {}
         if (full_list)
         {
-            var lang_strings = Alph.LanguageToolFactory.get_stringbundle(a_lang);
+            var lang_strings = Alph.LanguageToolFactory.getStringBundle(a_lang);
 
-            var dict_parent = Alph.util.makeXUL(
+            var dict_parent = Alph.Util.makeXUL(
                 'groupbox',
                 'dict-prefs-language-details-adv-' + a_lang,
                 [],[]);
 
             Alph.$('#alpheios-dict-tabs-advanced').append(dict_parent);
             Alph.$(dict_parent).append(
-                Alph.util.makeXUL('caption','',['label'],[lang_strings.get(a_lang+'.string')])
+                Alph.Util.makeXUL('caption','',['label'],[lang_strings.get(a_lang+'.string')])
             );
                                         
             var ctl_id = a_lang+'-dict-url';
@@ -558,34 +558,34 @@ Alph.prefs = {
             var pref_base_s = pref_base + '.search';
             // add the preferences for url and lemma
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     pref_id,
                     pref_base_s + URL,
                     'string')
             );
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     pref_id + LEMMA,
                     pref_base_s + LEMMA,
                     'string')
             );
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     pref_id + ID,
                     pref_base_s + ID,
                     'string')
             );
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     pref_id + MULTI,
                     pref_base_s + MULTI,
                     'bool')
             );
                 
             var hbox =
-                Alph.util.makeXUL('hbox','',[],[]);
+                Alph.Util.makeXUL('hbox','',[],[]);
             hbox.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'label',
                     '',
                     ['control','value'],
@@ -593,7 +593,7 @@ Alph.prefs = {
                 )
             );
             hbox.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'textbox',
                     ctl_id,
                     ['preference','class'],
@@ -601,9 +601,9 @@ Alph.prefs = {
                 )
             );
              var hbox_lemma =
-                Alph.util.makeXUL('hbox','',[],[]);
+                Alph.Util.makeXUL('hbox','',[],[]);
             hbox_lemma.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'label',
                     '',
                     ['control','value'],
@@ -612,7 +612,7 @@ Alph.prefs = {
                 )
             );
             hbox_lemma.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'textbox',
                     ctl_id + LEMMA,
                     ['preference','class'],
@@ -620,9 +620,9 @@ Alph.prefs = {
                 )
             );
             var hbox_id =
-                Alph.util.makeXUL('hbox','',[],[]);
+                Alph.Util.makeXUL('hbox','',[],[]);
             hbox_id.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'label',
                     '',
                     ['control','value'],
@@ -631,7 +631,7 @@ Alph.prefs = {
                 )
             );
             hbox_id.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'textbox',
                     ctl_id + ID,
                     ['preference','class'],
@@ -639,9 +639,9 @@ Alph.prefs = {
                 )
             );
             var hbox_multi =
-                Alph.util.makeXUL('hbox','',['align'],['top']);
+                Alph.Util.makeXUL('hbox','',['align'],['top']);
             hbox_multi.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'checkbox',
                     ctl_id + MULTI,
                     ['preference','label'],
@@ -662,7 +662,7 @@ Alph.prefs = {
      * 'this' is the listbox element
      * Adapted from chrome://browser/content/preferences/languages.js
      */
-    on_dict_select: function()
+    onDictSelect: function()
     {
         var button_col = Alph.$(this).next().get(0);
         if (button_col)
@@ -690,9 +690,9 @@ Alph.prefs = {
      * @param {String} a_type short or full
      * Adapted from chrome://browser/content/preferences/languages.js
      */
-    read_dict_list: function(a_lang,a_type)
+    readDictList: function(a_lang,a_type)
     {
-        var lang_strings = Alph.LanguageToolFactory.get_stringbundle(a_lang);
+        var lang_strings = Alph.LanguageToolFactory.getStringBundle(a_lang);
         var dictionary_list = 
             Alph.$("#pref-" + a_lang + '-dict-' + a_type).get(0).value;
         
@@ -707,12 +707,12 @@ Alph.prefs = {
             {
                 var item_id = a_dict + '.' + a_type;
                 listbox.appendChild(
-                    Alph.util.makeXUL(
+                    Alph.Util.makeXUL(
                     'listitem',
                     item_id,
                     ['label'],[lang_strings.get('dict.' + a_dict)])
                 );   
-                if (item_id == Alph.prefs._selected_dict_item)
+                if (item_id == Alph.Prefs.d_selectedDictItem)
                 {
                     selected_index = a_i;    
                 }
@@ -727,7 +727,7 @@ Alph.prefs = {
      * 'this' is the button element which was clicked
      * Adapted from chrome://browser/content/preferences/languages.js
      */
-    write_dict_list: function()
+    writeDictList: function()
     {
         var button_id = this.id.split(/_/);
         var list = Alph.$(this).parent().prev().get(0);
@@ -747,7 +747,7 @@ Alph.prefs = {
                 else
                     string += item.id.match(/^(.+)\./)[1];
             }
-            Alph.prefs._selected_dict_item = selectedItem.id;
+            Alph.Prefs.d_selectedDictItem = selectedItem.id;
 
         }
         else if (button_id[0] == 'down')
@@ -767,7 +767,7 @@ Alph.prefs = {
                 else
                     string += item.id.match(/^(.+)\./)[1];
             }
-            Alph.prefs._selected_dict_item = selectedItem.id;
+            Alph.Prefs.d_selectedDictItem = selectedItem.id;
         }
         else if (button_id[0] == 'reset')
         {
@@ -781,7 +781,7 @@ Alph.prefs = {
                 pref = pref.replace('full','short');
             }
             string = Alph.$("#"+pref).get(0).value;
-            Alph.prefs._selected_dict_item = 0;
+            Alph.Prefs.d_selectedDictItem = 0;
         }
         else
         {
@@ -791,7 +791,7 @@ Alph.prefs = {
         // Update the preference and force a UI rebuild
         var preference = Alph.$("#" + list.getAttribute("preference")).get(0);
         preference.value = string;
-        //Alph.prefs.read_dict_list(list.id.match(/dict-order-(.*?)-/)[1],button_id[1]);
+        //Alph.Prefs.readDictList(list.id.match(/dict-order-(.*?)-/)[1],button_id[1]);
     },
    
     /**
@@ -800,17 +800,17 @@ Alph.prefs = {
      * preferences pane with the default dictionary preference 
      * elements for the language. 
      */
-    init_site_prefs: function()
+    initSitePrefs: function()
     {
         var strings = document.getElementById("alpheios-prefs-strings");
         var prefs = Alph.$("#alpheios-prefs-sites preferences").get(0);
-        var languages = Alph.LanguageToolFactory.get_lang_list();
+        var languages = Alph.LanguageToolFactory.getLangList();
         
         // iterate through the languages adding site preferences tabs
         for (var i =0; i<languages.length; i++)
         {
             var lang = languages[i];
-            var lang_strings = Alph.LanguageToolFactory.get_stringbundle(lang);
+            var lang_strings = Alph.LanguageToolFactory.getStringBundle(lang);
             var site_list = null;
             try {site_list = Alph.MozUtils.getPref('sites.autoenable',lang);} catch(a_e){}
             // don't add a tab if the preference isn't set
@@ -819,67 +819,67 @@ Alph.prefs = {
                 continue;
             }
             prefs.appendChild(
-                Alph.util.makePref(
+                Alph.Util.makePref(
                     'pref-' + lang + '-autoenable-sites',
                     'extensions.alpheios.' + lang + '.sites.autoenable',
                     'string')
                 );
             Alph.$("#site-prefs-language-tabs").append(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                     'tab','site-prefs-language-tabs-'+lang,['label'],[lang_strings.get(lang+'.string')])
             );
-            var tabpanel = Alph.util.makeXUL('tabpanel','',[],[])
-            var lang_parent = Alph.util.makeXUL(
+            var tabpanel = Alph.Util.makeXUL('tabpanel','',[],[])
+            var lang_parent = Alph.Util.makeXUL(
                 'vbox','site-prefs-language-details-'+lang,[],[]
             );
             Alph.$("#site-prefs-language-details").append(Alph.$(tabpanel).append(lang_parent));
            
-            var grid = Alph.util.makeXUL(
+            var grid = Alph.Util.makeXUL(
                 'grid',
                 'alph-site-grid-'+lang,
                 [],[]
             );
-            var cols = Alph.util.makeXUL('columns',null,[],[]);
-            cols.appendChild(Alph.util.makeXUL('column',null,['flex'],['1']));
-            cols.appendChild(Alph.util.makeXUL('column',null,[],[]));
+            var cols = Alph.Util.makeXUL('columns',null,[],[]);
+            cols.appendChild(Alph.Util.makeXUL('column',null,['flex'],['1']));
+            cols.appendChild(Alph.Util.makeXUL('column',null,[],[]));
             grid.appendChild(cols);
-            var rows = Alph.util.makeXUL('rows',null,[],[]);
-            var row = Alph.util.makeXUL('row',null,[],[])
-            var lb_ordered = Alph.util.makeXUL('listbox',
+            var rows = Alph.Util.makeXUL('rows',null,[],[]);
+            var row = Alph.Util.makeXUL('row',null,[],[])
+            var lb_ordered = Alph.Util.makeXUL('listbox',
                 'site-list-autoenable-'+lang,
                 ['seltype','preference','onsyncfrompreference'],
                 ['single','pref-' + lang + '-autoenable-sites',
-                'Alph.prefs.read_site_list("' + lang + '");' 
+                'Alph.Prefs.readSiteList("' + lang + '");' 
             ]);
-            var button_box = Alph.util.makeXUL('vbox',null,[],[]);
+            var button_box = Alph.Util.makeXUL('vbox',null,[],[]);
             button_box.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                 'button',
                 'disable-site',
                 ['label','disabled'],
                 [strings.getString('sites.buttons.disable'),'true'])
             );
             button_box.appendChild(
-                Alph.util.makeXUL(
+                Alph.Util.makeXUL(
                 'button',
                 'enable-site',
                 ['label','disabled'],
                 [strings.getString('sites.buttons.enable'),'true'])
             );
-            Alph.$(lb_ordered).select(Alph.prefs.on_site_select); 
+            Alph.$(lb_ordered).select(Alph.Prefs.onSiteSelect); 
             row.appendChild(lb_ordered);
             row.appendChild(button_box);
             rows.appendChild(row);
             grid.appendChild(cols);
             grid.appendChild(rows);
-            var label = Alph.util.makeXUL(
+            var label = Alph.Util.makeXUL(
                 'label',
                 null,
                 ['value'],
                 [strings.getString('site.labels.autoenable')]);
                 lang_parent.appendChild(label);
                 lang_parent.appendChild(grid);
-            Alph.$("button",lang_parent).click(Alph.prefs.toggle_site);
+            Alph.$("button",lang_parent).click(Alph.Prefs.toggleSite);
         }
     },
     
@@ -888,9 +888,9 @@ Alph.prefs = {
      * @param {String} a_lang the language 
      * Adapted from chrome://browser/content/preferences/languages.js
      */
-    read_site_list: function(a_lang)
+    readSiteList: function(a_lang)
     {
-        var lang_strings = Alph.LanguageToolFactory.get_stringbundle(a_lang);
+        var lang_strings = Alph.LanguageToolFactory.getStringBundle(a_lang);
         var site_list = 
             Alph.$("#pref-" + a_lang + '-autoenable-sites').get(0).value;
         
@@ -905,18 +905,18 @@ Alph.prefs = {
             function(a_site,a_i)
             {
       
-                var uri = Alph.MozSvc.get_svc('IO').newURI(a_site,"UTF-8",null);
+                var uri = Alph.MozSvc.getSvc('IO').newURI(a_site,"UTF-8",null);
                 var perm = Alph.PermissionMgr.testPermission(uri,key);
                 var status = perm == Alph.PermissionMgr.ALLOW_ACTION ? 'site-enabled' : 'site-disabled';
       
                 var item_id = a_lang + '-autoenable-' + a_i;
                 listbox.appendChild(
-                    Alph.util.makeXUL(
+                    Alph.Util.makeXUL(
                     'listitem',
                     item_id,
                     ['label','class'],[a_site,status])
                 );   
-                if (item_id == Alph.prefs._selected_site_item)
+                if (item_id == Alph.Prefs.d_selectedSiteItem)
                 {
                     selected_index = a_i;    
                 }
@@ -931,7 +931,7 @@ Alph.prefs = {
      * 'this' is the button element which was clicked
      * Adapted from chrome://browser/content/preferences/languages.js
      */
-    toggle_site: function()
+    toggleSite: function()
     {
         var button_id = this.id;
         var list = Alph.$(this).parent().prev().get(0);
@@ -939,7 +939,7 @@ Alph.prefs = {
         var lang = selectedItem.id.match(/^(\w+)-/)[1];
         var key = 'alpheios-auto-enable-'+lang;
         var selectedURL = selectedItem.getAttribute('label');
-        var uri = Alph.MozSvc.get_svc('IO').newURI(selectedURL,"UTF-8",null); 
+        var uri = Alph.MozSvc.getSvc('IO').newURI(selectedURL,"UTF-8",null); 
         if (button_id == 'enable-site')
         {
             Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION);
@@ -948,9 +948,9 @@ Alph.prefs = {
         {
             Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.DENY_ACTION);
         }
-        Alph.prefs._selected_site_item = selectedItem.id;
+        Alph.Prefs.d_selectedSiteItem = selectedItem.id;
         // update the site list                     
-        Alph.prefs.read_site_list(lang);
+        Alph.Prefs.readSiteList(lang);
     },
    
     
@@ -960,7 +960,7 @@ Alph.prefs = {
      * 'this' is the listbox element
      * Adapted from chrome://browser/content/preferences/languages.js
      */
-    on_site_select: function()
+    onSiteSelect: function()
     {
         var button_col = Alph.$(this).next().get(0);
         var lang = this.id.match(/-(\w+)$/)[1];
@@ -969,7 +969,7 @@ Alph.prefs = {
         if (this.selectedItem)
         {
             var selectedURL = selectedItem.getAttribute('label');
-            var uri = Alph.MozSvc.get_svc('IO').newURI(selectedURL,"UTF-8",null);
+            var uri = Alph.MozSvc.getSvc('IO').newURI(selectedURL,"UTF-8",null);
             var perm = Alph.PermissionMgr.testPermission(uri,key);
             if (button_col)
             {

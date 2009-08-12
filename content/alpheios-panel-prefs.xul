@@ -15,7 +15,7 @@
                       src="chrome://alpheios/locale/alpheios-prefs.properties"/>
     </stringbundleset>
     <prefpane id="alpheios-panel-prefs"
-              onpaneload="Alph.prefs.init_panel_prefs();">
+              onpaneload="Alph.Prefs.initPanelPrefs();">
         <preferences>
             <preference id="pref-panels-sticky"
                         name="extensions.alpheios.panels.sticky"
@@ -73,7 +73,7 @@
                             <checkbox 
                                 id="panels-sticky"
                                 preference="pref-panels-sticky"/>
-                            <button oncommand="Alph.prefs.restore_panel_defaults(this);"
+                            <button oncommand="Alph.Prefs.restorePanelDefaults(this);"
                                 label="&alpheios.prefs.panels.restore.defaults;"/>
                         </hbox>
                         <groupbox>
@@ -141,12 +141,12 @@
                                         <checkbox 
                                             id="morph-basic" 
                                             preference="pref-panel-morph-basic"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                         <checkbox 
                                             id="morph-ped" 
                                             preference="pref-panel-morph-ped"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                     </row>
                                     <row>
@@ -154,12 +154,12 @@
                                         <checkbox
                                             id="dict-basic" 
                                             preference="pref-panel-dict-basic"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                         <checkbox 
                                             id="dict-ped" 
                                             preference="pref-panel-dict-ped"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                     </row>
                                     <row>
@@ -167,12 +167,12 @@
                                         <checkbox 
                                             id="trans-basic" 
                                             preference="pref-panel-trans-basic"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                         <checkbox 
                                             id="trans-ped" 
                                             preference="pref-panel-trans-ped"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                     </row>
                                     <row>
@@ -181,7 +181,7 @@
                                         <checkbox 
                                             id="tree-ped" 
                                             preference="pref-panel-tree-ped"
-                                            onsynctopreference="return Alph.prefs.update_panel_pref(this);"
+                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                     </row>
                                 </rows>

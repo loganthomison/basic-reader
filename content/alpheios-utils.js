@@ -1,5 +1,5 @@
 /**
- * @fileoverview This file contains the Alph.util class with the 
+ * @fileoverview This file contains the Alph.Util class with the 
  * Alpheios utility functions which are not specific to the Mozilla framework
  *
  * @version $Id $
@@ -40,14 +40,14 @@ Components.utils.import("resource://alpheios/alpheios-datafile.jsm",Alph);
 // See http://docs.jquery.com/Core/jQuery.noConflict#extreme
 // Note, we may run into problems if we want to use any jQuery plugins,
 // in which case it might be sufficient to skip the extreme flag
-Alph.MozUtils.load_javascript("chrome://alpheios/content/jquery-1.2.6-alph.js",Alph);
+Alph.MozUtils.loadJavascript("chrome://alpheios/content/jquery-1.2.6-alph.js",Alph);
 Alph.$ = jQuery.noConflict(true);    
 
 /**
- * Alph.util contains the Alpheios utility functions
+ * Alph.Util contains the Alpheios utility functions
  * @singleton
  */
-Alph.util = {
+Alph.Util = {
 
     ALPHEIOS_URLS:
     {
@@ -83,7 +83,7 @@ Alph.util = {
      * @param {Window} a_window the parent window from which to launch the link
      * @param {String} a_loc site location
      */
-    open_alpheios_link: function(a_window,a_loc)
+    openAlpheiosLink: function(a_window,a_loc)
     {
         var url = this.ALPHEIOS_URLS[a_loc];
         // if we don't have a specific location defined,
@@ -93,15 +93,15 @@ Alph.util = {
         {
             url = this.ALPHEIOS_URLS.content + a_loc; 
         }
-        Alph.MozUtils.open_new_tab(a_window,url);
+        Alph.MozUtils.openNewTab(a_window,url);
     },
     
     /**
      * launch the user's email application and prepare feedback email headers
      */
-    send_feedback: function()
+    sendFeedback: function()
     {
-        Alph.MozUtils.send_feedback(window,Alph.util.ALPHEIOS_URLS.support);
+        Alph.MozUtils.sendFeedback(window,Alph.Util.ALPHEIOS_URLS.support);
     },
     
     /**
@@ -111,7 +111,7 @@ Alph.util = {
      * the document will scroll just until it is in view at the bottom
      * @param {Element} a_el the element which should be in view
      */
-    scroll_to_element: function(a_el)
+    scrollToElement: function(a_el)
     {
         var top = a_el.offsetTop;
         var left = a_el.offsetLeft;
@@ -168,7 +168,7 @@ Alph.util = {
      * @return true if in view, otherwise false
      * @type Boolean
      */
-    in_viewport: function(a_el) {
+    inViewPort: function(a_el) {
         var top = a_el.offsetTop;
         var left = a_el.offsetLeft;
         var width = a_el.offsetWidth;
@@ -197,7 +197,7 @@ Alph.util = {
      * @return the # of pixels out of view
      * @type Boolean
      */
-    below_the_fold: function(a_el) {
+    belowTheFold: function(a_el) {
         var top = a_el.offsetTop;
         var height = a_el.offsetHeight;
 
@@ -218,7 +218,7 @@ Alph.util = {
      * @return the # of pixels out of view
      * @type int
      */
-    right_of_screen: function(a_el) {
+    rightOfScreen: function(a_el) {
         var left = a_el.offsetLeft;
         var width = a_el.offsetWidth;
 
@@ -238,7 +238,7 @@ Alph.util = {
      * @return true if its a localhost or chrome url otherwise false
      * @type Boolean
      */
-    is_local_url: function(a_url)
+    isLocalUrl: function(a_url)
     {
         return (
             a_url.match(/^http:\/\/(localhost|127\.0\.0\.1)/) || 
@@ -252,7 +252,7 @@ Alph.util = {
      * @return a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
      * @type XSLTProcessor
      */
-     get_xslt_processor: function(a_ext,a_filename)
+     getXsltProcessor: function(a_ext,a_filename)
     {
         var xsltProcessor = new XSLTProcessor();
         
