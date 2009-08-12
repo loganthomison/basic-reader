@@ -48,7 +48,7 @@ Alph.Etymology.prototype = new Alph.Panel();
  */
 Alph.Etymology.prototype.init = function(a_panel_state)
 {
-    Alph.MozUtils.log("etymology panel init");
+    Alph.BrowserUtils.log("etymology panel init");
     // hack to hold etymology data until we have a real service
     this.d_tempData = {};
     
@@ -111,7 +111,7 @@ Alph.Etymology.prototype.initDocument = function(a_doc,a_doc_state)
     
     if (typeof a_doc_state.contents == "undefined")
     {
-        Alph.MozUtils.log("initializing etymology document");
+        Alph.BrowserUtils.log("initializing etymology document");
         a_doc_state = { css: null, contents: null };
         a_doc_state.contents = a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
         a_doc_state.contents.setAttribute("id", "alph-window");
@@ -254,7 +254,7 @@ Alph.Etymology.prototype.getEtymData = function()
         {
             try 
             {
-                Alph.MozUtils.log("Loading etymology file for " + chromepkg);
+                Alph.BrowserUtils.log("Loading etymology file for " + chromepkg);
                 var data = document.implementation.createDocument("", "", null);
                 data.async = false;
                 var chrome_url = "chrome://" + chromepkg + "/content/testetym.xml";
@@ -264,7 +264,7 @@ Alph.Etymology.prototype.getEtymData = function()
             catch(e)
             {
                 this.d_tempData[chromepkg] = null;
-                Alph.MozUtils.log("Error loading etymology file for " + chromepkg);
+                Alph.BrowserUtils.log("Error loading etymology file for " + chromepkg);
             }
         }
         return this.d_tempData[chromepkg];

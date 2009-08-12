@@ -22,8 +22,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-Alph.MozUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
-Alph.MozUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
 
  /**
  * @singleton
@@ -184,7 +184,7 @@ Alph.Prefs = {
             Alph.$(tabpanel).append(Alph.$(vbox).append(hbox));
             var use_defs_cbx = Alph.Util.makeXUL(
                 'checkbox','panel-override-'+lang,['preference'],['pref-panel-override-'+lang]);
-            var use_defaults = Alph.MozUtils.getPref('panels.use.defaults',lang);
+            var use_defaults = Alph.BrowserUtils.getPref('panels.use.defaults',lang);
             Alph.$(hbox)
                 .append(use_defs_cbx)
                 .append(
@@ -379,9 +379,9 @@ Alph.Prefs = {
 
             var short_list = null;
             var full_list = null;
-            try { short_list = Alph.MozUtils.getPref('dictionaries.short',lang); }
+            try { short_list = Alph.BrowserUtils.getPref('dictionaries.short',lang); }
             catch(a_e){}
-            try { full_list = Alph.MozUtils.getPref('dictionaries.full',lang); }
+            try { full_list = Alph.BrowserUtils.getPref('dictionaries.full',lang); }
             catch (a_e) {}
             // don't add any language tab to the dict prefs if no dicts are defined
             if ( short_list == null && full_list == null)
@@ -532,7 +532,7 @@ Alph.Prefs = {
         var MULTI = '.multiple_lemmas';
         
         var full_list = null;
-        try { full_list = Alph.MozUtils.getPref('dictionaries.full',a_lang); }
+        try { full_list = Alph.BrowserUtils.getPref('dictionaries.full',a_lang); }
         catch (a_e) {}
         if (full_list)
         {
@@ -812,7 +812,7 @@ Alph.Prefs = {
             var lang = languages[i];
             var lang_strings = Alph.LanguageToolFactory.getStringBundle(lang);
             var site_list = null;
-            try {site_list = Alph.MozUtils.getPref('sites.autoenable',lang);} catch(a_e){}
+            try {site_list = Alph.BrowserUtils.getPref('sites.autoenable',lang);} catch(a_e){}
             // don't add a tab if the preference isn't set
             if (site_list == null)
             {
@@ -905,7 +905,7 @@ Alph.Prefs = {
             function(a_site,a_i)
             {
       
-                var uri = Alph.MozSvc.getSvc('IO').newURI(a_site,"UTF-8",null);
+                var uri = Alph.BrowserUtils.getSvc('IO').newURI(a_site,"UTF-8",null);
                 var perm = Alph.PermissionMgr.testPermission(uri,key);
                 var status = perm == Alph.PermissionMgr.ALLOW_ACTION ? 'site-enabled' : 'site-disabled';
       
@@ -939,7 +939,7 @@ Alph.Prefs = {
         var lang = selectedItem.id.match(/^(\w+)-/)[1];
         var key = 'alpheios-auto-enable-'+lang;
         var selectedURL = selectedItem.getAttribute('label');
-        var uri = Alph.MozSvc.getSvc('IO').newURI(selectedURL,"UTF-8",null); 
+        var uri = Alph.BrowserUtils.getSvc('IO').newURI(selectedURL,"UTF-8",null); 
         if (button_id == 'enable-site')
         {
             Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION);
@@ -969,7 +969,7 @@ Alph.Prefs = {
         if (this.selectedItem)
         {
             var selectedURL = selectedItem.getAttribute('label');
-            var uri = Alph.MozSvc.getSvc('IO').newURI(selectedURL,"UTF-8",null);
+            var uri = Alph.BrowserUtils.getSvc('IO').newURI(selectedURL,"UTF-8",null);
             var perm = Alph.PermissionMgr.testPermission(uri,key);
             if (button_col)
             {

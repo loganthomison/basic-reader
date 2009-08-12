@@ -29,7 +29,7 @@
  */
 var EXPORTED_SYMBOLS = ["LanguageToolFactory"];
 
-Components.utils.import('resource://alpheios/alpheios-moz-utils.jsm');
+Components.utils.import('resource://alpheios/alpheios-browser-utils.jsm');
 Components.utils.import('resource://alpheios/ext/StringBundle.jsm');
 
 /**
@@ -102,7 +102,7 @@ LanguageToolFactory =
      */
     getStringBundle: function(a_lang)
     {
-        var chromepkg = MozUtils.getPref("chromepkg",a_lang);
+        var chromepkg = BrowserUtils.getPref("chromepkg",a_lang);
         return new StringBundle("chrome://" + chromepkg + "/locale/alpheios-"+a_lang+'.properties');
     }
 };

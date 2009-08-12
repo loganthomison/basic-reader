@@ -84,17 +84,17 @@ Alph.Site = {
             try 
             {
                 var key = 'alpheios-auto-enable-'+lang;
-                var sites = Alph.MozUtils.getPref('sites.autoenable',lang).split(',');
-                Alph.MozUtils.log("Registering sites for " + lang + ":" + sites);
+                var sites = Alph.BrowserUtils.getPref('sites.autoenable',lang).split(',');
+                Alph.BrowserUtils.log("Registering sites for " + lang + ":" + sites);
                 sites.forEach(
                     function(a_url)
                     {
                         var uri = 
-                            Alph.MozSvc.getSvc('IO').newURI(a_url,"UTF-8",null);
+                            Alph.BrowserUtils.getSvc('IO').newURI(a_url,"UTF-8",null);
                         if (Alph.PermissionMgr.testPermission(uri,key)
                             == Alph.PermissionMgr.UNKNOWN_ACTION)
                         {
-                            Alph.MozUtils.log("Registering " + a_url);
+                            Alph.BrowserUtils.log("Registering " + a_url);
                             Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION)
                         }
                     }
@@ -102,7 +102,7 @@ Alph.Site = {
             }
             catch(a_e)
             {
-                Alph.MozUtils.log("Not registering sites for " + lang + ":"+ a_e);
+                Alph.BrowserUtils.log("Not registering sites for " + lang + ":"+ a_e);
                 // quiety ignore missing preference
             }
         }
@@ -268,7 +268,7 @@ Alph.Site = {
         }
         catch(a_e)
         {
-            Alph.MozUtils.log("Unable to update menu with new mode " + a_e);
+            Alph.BrowserUtils.log("Unable to update menu with new mode " + a_e);
         }
     },
     
@@ -348,7 +348,7 @@ Alph.Site = {
         // add handlers to interlinear translation controls 
         // in the source text display, but only do it if this feature
         // is turned on
-        if ( Alph.MozUtils.getPref("features.alpheios-interlinear") )
+        if ( Alph.BrowserUtils.getPref("features.alpheios-interlinear") )
         {
             
             var my_obj = this;
@@ -431,7 +431,7 @@ Alph.Site = {
                 {
                     Alph.$("#alpheios-loading-interlinear",
                         toggle_elem.ownerDocument).remove();
-                    Alph.MozUtils.log("Unable to parse translation: " + a_e);
+                    Alph.BrowserUtils.log("Unable to parse translation: " + a_e);
                 }
             );                  
         } else {
@@ -493,7 +493,7 @@ Alph.Site = {
         }
         catch(a_e)
         {
-            Alph.MozUtils.log("Error toggling alignment: " + a_e);
+            Alph.BrowserUtils.log("Error toggling alignment: " + a_e);
         }
     },
     
@@ -529,7 +529,7 @@ Alph.Site = {
                 var next_offset = 0;
         
                 var start = (new Date()).getTime();
-                Alph.MozUtils.log("Starting interlinear " + start);
+                Alph.BrowserUtils.log("Starting interlinear " + start);
                 // add the aligned text to each source word
                 a_words.forEach(
                     function(parent)
@@ -599,7 +599,7 @@ Alph.Site = {
                 );
                 a_end_callback();
                 var end = (new Date()).getTime();
-                Alph.MozUtils.log("Total time to insert interlinear: " + (end-start));
+                Alph.BrowserUtils.log("Total time to insert interlinear: " + (end-start));
             };
         };
         var thread = new populate_thread();
@@ -686,7 +686,7 @@ Alph.Site = {
             }
             else 
             {
-                Alph.MozUtils.log("Loading alignment from " + align_url + "...");
+                Alph.BrowserUtils.log("Loading alignment from " + align_url + "...");
             }
         }
         r.open("GET", align_url);
@@ -746,7 +746,7 @@ Alph.Site = {
         var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",a_doc).attr("content");
         // if the treebank url is defined, but remote features are disabled and
         // the treebank url is remote, then act as if it's not defined
-        if (treebank_url && Alph.MozUtils.getPref("disable.remote") && 
+        if (treebank_url && Alph.BrowserUtils.getPref("disable.remote") && 
             ! Alph.Util.isLocalUrl(treebank_url)
            )
         {
@@ -767,7 +767,7 @@ Alph.Site = {
                       .attr("content");
         // if the url is defined, but remote features are disabled and
         // the url is remote, then act as if it's not defined
-        if (url && Alph.MozUtils.getPref("disable.remote") && 
+        if (url && Alph.BrowserUtils.getPref("disable.remote") && 
             ! Alph.Util.isLocalUrl(url)
            )
         {
@@ -787,7 +787,7 @@ Alph.Site = {
         var trans_url = Alph.$("#alph-trans-url",a_doc).attr("url");
         // if the translation url is defined, but remote features are disabled and
         // the translation url is remote, then act as if it's not defined
-        if (trans_url && Alph.MozUtils.getPref("disable.remote") && 
+        if (trans_url && Alph.BrowserUtils.getPref("disable.remote") && 
             ! Alph.Util.isLocalUrl(trans_url))
         {
             trans_url = null;

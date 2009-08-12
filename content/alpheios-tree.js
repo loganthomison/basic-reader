@@ -128,7 +128,7 @@ Alph.Tree.prototype.show = function()
         }
         catch(a_e)
         {
-            Alph.MozUtils.log("Error identifying sentence and id: " + a_e);
+            Alph.BrowserUtils.log("Error identifying sentence and id: " + a_e);
         }
 
         //var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
@@ -147,14 +147,14 @@ Alph.Tree.prototype.show = function()
                 {
                     type: "GET",
                     url: treebankUrl,
-                    timeout: Alph.MozUtils.getPref("url.treebank.timeout") || 5000,
+                    timeout: Alph.BrowserUtils.getPref("url.treebank.timeout") || 5000,
                     dataType: 'xml',
                     error: function(req,textStatus,errorThrown)
                     {
                         Alph.$("#tree-error",treeDoc).html(
                             Alph.main.getString("alph-error-tree-notree")
                         );
-                        Alph.MozUtils.log("Error retrieving treebank diagram: "
+                        Alph.BrowserUtils.log("Error retrieving treebank diagram: "
                             + textStatus ||errorThrown);
                         panel_obj.updatePanelWindow({},'alph-tree-body');
                     },
@@ -185,7 +185,7 @@ Alph.Tree.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     // listen for the window and the xlate trigger change events
     if (a_event_type == Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER)
     {
-        Alph.MozUtils.log("Tree panel handling event " + a_event_type);
+        Alph.BrowserUtils.log("Tree panel handling event " + a_event_type);
         var new_trigger = a_event_data.new_trigger;
         var old_trigger = a_event_data.old_trigger;
         var pw_bro = null;
@@ -258,11 +258,11 @@ Alph.Tree.prototype.parseTree = function(a_svgXML, a_ids)
                                textSize,
                                keySize,
                                fontSize);
-        //Alph.MozUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+        //Alph.BrowserUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
         Alph.Tree.highlightFirst(treeDoc, a_ids);
         Alph.Tree.highlightWord(treeDoc, a_ids[0]);
         Alph.Tree.scrollToFocus(treeDoc);
-//        Alph.MozUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
+//        Alph.BrowserUtils.log("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
         // or attribute, so just get by tag name and retrieve the attribute
@@ -331,7 +331,7 @@ Alph.Tree.prototype.parseTree = function(a_svgXML, a_ids)
     }
     catch(e)
     {
-        Alph.MozUtils.log(e);
+        Alph.BrowserUtils.log(e);
     }
 
 
@@ -384,7 +384,7 @@ Alph.Tree.prototype.updatePanelWindow = function(a_panel_state,a_browser_id,a_br
                 }
                 catch(a_e)
                 {
-                    Alph.MozUtils.log("Error parsing window size: " + a_e);
+                    Alph.BrowserUtils.log("Error parsing window size: " + a_e);
                 }
 
                 this.d_panelWindow.focus();
@@ -416,7 +416,7 @@ Alph.Tree.positionTree = function(a_container, a_fontSize)
     var numChildren = arcLineNodes.size();
     if (childNodes.size() != 2 * numChildren)
     {
-        Alph.MozUtils.log("Bad tree count: " + numChildren +
+        Alph.BrowserUtils.log("Bad tree count: " + numChildren +
                       "/" + childNodes.size());
     }
 
@@ -1133,7 +1133,7 @@ Alph.Tree.scrollToFocus= function(a_doc)
                     }
                     catch (a_e)
                     {
-                        Alph.MozUtils.log("Invalid coordinates: " + a_e);
+                        Alph.BrowserUtils.log("Invalid coordinates: " + a_e);
                     }
                 }
             }

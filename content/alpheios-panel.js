@@ -91,13 +91,13 @@ Alph.Panel.prototype.resetToDefault = function()
     var lang = Alph.main.getStateObj().getVar("current_language");
     var status;
     // use the global prefs unless we're overriding for this language
-    if (Alph.MozUtils.getPref("panels.use.defaults",lang))
+    if (Alph.BrowserUtils.getPref("panels.use.defaults",lang))
     {
-        status = Alph.MozUtils.getPref(status_pref);
+        status = Alph.BrowserUtils.getPref(status_pref);
     }
     else
     {
-        status = Alph.MozUtils.getPref(status_pref,lang);
+        status = Alph.BrowserUtils.getPref(status_pref,lang);
     }
     
     if (typeof status != "undefined" && status == Alph.Panel.STATUS_SHOW)
@@ -288,7 +288,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
                 }
                 catch(a_e)
                 {
-                    Alph.MozUtils.log("Error closing window " + a_e)
+                    Alph.BrowserUtils.log("Error closing window " + a_e)
                 }
                 // TODO - need to figure out how we want to handle detached panels
                 // across multiple tabs
@@ -307,7 +307,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
     // if we're responding to a user request, and panel changes
     // are sticky, store the new status as the default status for the panel
     if (a_status != Alph.Panel.STATUS_AUTOHIDE 
-        && Alph.MozUtils.getPref("panels.sticky")
+        && Alph.BrowserUtils.getPref("panels.sticky")
         )
 
     {
@@ -317,13 +317,13 @@ Alph.Panel.prototype.updateStatus = function(a_status)
         {
             // if we're using the defaults, store to defaults
             // otherwise store to the language 
-            if (Alph.MozUtils.getPref("panels.use.defaults",lang))
+            if (Alph.BrowserUtils.getPref("panels.use.defaults",lang))
             {
-                Alph.MozUtils.setPref(this.getStatusPrefSetting(),a_status);
+                Alph.BrowserUtils.setPref(this.getStatusPrefSetting(),a_status);
             }
             else
             {
-                Alph.MozUtils.setPref(this.getStatusPrefSetting(),a_status,lang)
+                Alph.BrowserUtils.setPref(this.getStatusPrefSetting(),a_status,lang)
                 
             }
         }
@@ -376,7 +376,7 @@ Alph.Panel.prototype.detach = function()
             );
     } catch(a_e) 
     {
-        Alph.MozUtils.log("Error detaching panel: " + a_e);
+        Alph.BrowserUtils.log("Error detaching panel: " + a_e);
     }
   
     return this.updateStatus(Alph.Panel.STATUS_SHOW);
@@ -458,7 +458,7 @@ Alph.Panel.prototype.hide = function(a_autoflag)
  */
 Alph.Panel.prototype.open = function()
 {    
-    if (Alph.MozUtils.getPref('panels.inline.'+this.d_panelId)
+    if (Alph.BrowserUtils.getPref('panels.inline.'+this.d_panelId)
         || (this.windowOpen()))
     {
         return this.updateStatus(this.show());
@@ -796,7 +796,7 @@ Alph.Panel.prototype.windowOpen = function()
     }
     catch (a_e)
     {
-        Alph.MozUtils.log("Error checking panel window " + a_e);
+        Alph.BrowserUtils.log("Error checking panel window " + a_e);
         // FF 3.5 throws an error checking properties on closed window objects   
     }
     return open;

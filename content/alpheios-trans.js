@@ -62,7 +62,7 @@ Alph.Translation.prototype.show = function()
     var trans_url = Alph.Site.getTranslationUrl(bro.contentDocument);
     if (trans_url)
     {
-        Alph.MozUtils.log("loading translation from " + trans_url);
+        Alph.BrowserUtils.log("loading translation from " + trans_url);
         
         var trans_doc = 
                 Alph.$("browser",this.d_panelElem).get(0).contentDocument;  
@@ -143,7 +143,7 @@ Alph.Translation.processTranslation = function(a_data,a_bro,a_trans_doc) {
                         
     var disable_interlinear = true;
     if ( (Alph.$(".alpheios-aligned-word",a_trans_doc).length > 0) &&
-          Alph.MozUtils.getPref("features.alpheios-interlinear"))
+          Alph.BrowserUtils.getPref("features.alpheios-interlinear"))
     {
         disable_interlinear = false;
         
@@ -162,7 +162,7 @@ Alph.Translation.prototype.handleRefresh = function(a_bro)
 {
     var panel_state = this.getBrowserState(a_bro);
     var doc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
-    Alph.MozUtils.log("handling refresh in trans panel");
+    Alph.BrowserUtils.log("handling refresh in trans panel");
     // if the translation panel is showing and the the previous load
     // was interrupted, we'll have an error in the document.  if the page
     // is refreshed, we should try to load the document again. See bug 309.
@@ -295,7 +295,7 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
     }
     catch(e)
     {
-        Alph.MozUtils.log("Unable to update trans panel state with external url: " + e);
+        Alph.BrowserUtils.log("Unable to update trans panel state with external url: " + e);
     }
     
     // clear the value from the url bar if it's set to "about:blank"

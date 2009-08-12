@@ -26,7 +26,7 @@
  */
 const EXPORTED_SYMBOLS = ['Datafile'];
 
-Components.utils.import("resource://alpheios/alpheios-moz-utils.jsm");
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 
 /**
  * @class Datafile contains the datafile lookup functionality.
@@ -43,7 +43,7 @@ Datafile = function(a_url, a_charset)
     this.d_separator = '|';
     this.d_specialFlag = '@';
 
-    this.d_data = MozUtils.readFile(a_url,a_charset);
+    this.d_data = BrowserUtils.readFile(a_url,a_charset);
 
     // make sure file ends with newline
     if (this.d_data[this.d_data.length - 1] != '\n')
@@ -133,14 +133,14 @@ Datafile.prototype =
         var beg = 0;
         var end = this.d_data.length - 1;
 
-        MozUtils.log("a_key="+a_key);
+        BrowserUtils.log("a_key="+a_key);
         // while data still remains
         while (beg < end)
         {
             // find line containing midpoint of remaining data
             mid = this.d_data.lastIndexOf('\n', (beg + end) >> 1) + 1;
             midStr = this.d_data.substr(mid, tlen);
-            MozUtils.log("midStr="+midStr);
+            BrowserUtils.log("midStr="+midStr);
             // if too high, restrict to first half
             if (a_key < midStr)
                 end = mid - 1;
@@ -152,9 +152,9 @@ Datafile.prototype =
                 break;
         }
         
-        MozUtils.log("beg="+beg);
-        MozUtils.log("end="+end);
-        MozUtils.log("mid="+mid);
+        BrowserUtils.log("beg="+beg);
+        BrowserUtils.log("end="+end);
+        BrowserUtils.log("mid="+mid);
 
         // if found, back up to first line with key
         if (beg < end)
@@ -168,8 +168,8 @@ Datafile.prototype =
                 // if preceding line has different key then done,
                 // else back up to preceding line
                 midStr = this.d_data.substr(prec, tlen);
-                MozUtils.log("Midstr="+midStr);
-                MozUtils.log("key="+a_key);
+                BrowserUtils.log("Midstr="+midStr);
+                BrowserUtils.log("key="+a_key);
                 if (a_key != midStr)
                     break;
                 mid = prec;

@@ -79,7 +79,7 @@
             oncommand="Alph.main.executeLangCommand(event);" 
             observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
-            oncommand="Alph.MozUtils.openDialog(
+            oncommand="Alph.BrowserUtils.openDialog(
                 window,
                 'chrome://alpheios/content/alpheios-prefs.xul', 
                 'alpheios-options-dialog');"/>
@@ -88,7 +88,7 @@
         <command id="alpheios-help-cmd"
             oncommand="Alph.Util.openAlpheiosLink(window,'help');"/>
         <command id="alpheios-about-cmd"
-            oncommand="Alph.MozUtils.openDialog(
+            oncommand="Alph.BrowserUtils.openDialog(
                 window,
                 'chrome://alpheios/content/dialogs/about.xul', 
                 'alpheios-about-dialog');"/>

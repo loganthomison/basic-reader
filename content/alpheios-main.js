@@ -31,12 +31,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-Alph.MozUtils.importResource("resource://alpheios/alpheios-constants.jsm",Alph);
-Alph.MozUtils.importResource("resource://alpheios/alpheios-xfer-state.jsm",Alph);
-Alph.MozUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
-Alph.MozUtils.importResource("resource://alpheios/alpheios-uninstaller.jsm",Alph);
-Alph.MozUtils.importResource("resource://alpheios/alpheios-upgrade-observer.jsm",Alph);
-Alph.MozUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-constants.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-xfer-state.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-uninstaller.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-upgrade-observer.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
 
 /**
  * @singleton
@@ -85,7 +85,7 @@ Alph.main =
                 return;
             }
             var name = a_data;
-            var value = Alph.MozUtils.getPref(name);
+            var value = Alph.BrowserUtils.getPref(name);
             Alph.main.updatePref(name, value);
         }
     },
@@ -103,7 +103,7 @@ Alph.main =
     init: function()
     { 
         window.addEventListener("load", this.onLoad, false);
-        Alph.MozSvc.getSvc('AlphPrefs').addObserver("", this.d_prefsObserver,false);
+        Alph.BrowserUtils.getSvc('AlphPrefs').addObserver("", this.d_prefsObserver,false);
     },
 
     /**
@@ -117,7 +117,7 @@ Alph.main =
         Alph.main.d_stringBundle = Alph.$("#alpheios-strings").get(0);
         // register the uninstaller for the installed Alpheios packages
         Alph.Uninstaller.registerObserver(
-            Alph.$.map(Alph.MozUtils.getAlpheiosPackages(),function(a){return a.id}));
+            Alph.$.map(Alph.BrowserUtils.getAlpheiosPackages(),function(a){return a.id}));
         // register an upgrade observer for this package ---
         // if we're upgrading the basic libraries, we need to make sure to kill the 
         // mhttpd daemon before the browser restarts. Bug 308.
@@ -146,8 +146,8 @@ Alph.main =
         for (var i = 0; i<names.length; i++)
         {
             var name = names[i];
-            var keychar = Alph.MozUtils.getPref("keys." + name);
-            var mod = Alph.MozUtils.getPref("keymodifiers." + name);
+            var keychar = Alph.BrowserUtils.getPref("keys." + name);
+            var mod = Alph.BrowserUtils.getPref("keymodifiers." + name);
             if (keychar.length > 0)
             {
                 var key = document.createElementNS(
@@ -181,7 +181,7 @@ Alph.main =
      */
     onUnLoad: function(a_event)
     {
-        Alph.MozUtils.log("Unloading window");
+        Alph.BrowserUtils.log("Unloading window");
  
         // iterate through the open tabs calling onTabClose on each
         // to make sure to cleanup the resources used by that tab
@@ -190,10 +190,10 @@ Alph.main =
         for (var i = 0; i < num; i++) {
             var bro = gBrowser.getBrowserAtIndex(i);
             try {
-                Alph.MozUtils.log("Closing tab " + bro.currentURI.spec);
+                Alph.BrowserUtils.log("Closing tab " + bro.currentURI.spec);
                 this.onTabClose(a_event,bro);
             } catch(e) {
-                Alph.MozUtils.log(e);
+                Alph.BrowserUtils.log(e);
             }
         }
         gBrowser.mTabContainer
@@ -201,7 +201,7 @@ Alph.main =
         gBrowser.mTabContainer
             .removeEventListener("TabClose", this.onTabClose, false);
         gBrowser.removeProgressListener(Alph.main.d_locListener);
-        Alph.MozSvc.getSvc('AlphPrefs').removeObserver("", this.d_prefsObserver);
+        Alph.BrowserUtils.getSvc('AlphPrefs').removeObserver("", this.d_prefsObserver);
     },
 
     /**
@@ -222,7 +222,7 @@ Alph.main =
      */
     onTabClose: function(a_event,a_bro)
     {
-        Alph.MozUtils.log("in onTabClose");
+        Alph.BrowserUtils.log("in onTabClose");
         if (typeof a_bro == "undefined")
         {
             // get the browser associated with the tab
@@ -393,7 +393,7 @@ Alph.main =
      */
     getLocalDaemonHost: function()
     {
-        return 'http://' + Alph.MozUtils.getPref("mhttpd.host");
+        return 'http://' + Alph.BrowserUtils.getPref("mhttpd.host");
     },
 
     /**
@@ -405,7 +405,7 @@ Alph.main =
      */
     getLocalDaemonPort: function()
     {
-        return Alph.MozUtils.getPref("mhttpd.port");
+        return Alph.BrowserUtils.getPref("mhttpd.port");
     },
 
     /**
@@ -423,7 +423,7 @@ Alph.main =
                 dataType: "text",
                 cache: false,
                 url: Alph.main.getLocalDaemonHost() + ":" + Alph.main.getLocalDaemonPort() + "/mypid",
-                //timeout: Alph.MozUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
+                //timeout: Alph.BrowserUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
                 success: 
                     a_onsuccess,
                 error:
@@ -449,7 +449,7 @@ Alph.main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000)
         detach_url = detach_url + "?_r=" + rand_num;
-        Alph.MozUtils.log("detach daemon at " + detach_url);
+        Alph.BrowserUtils.log("detach daemon at " + detach_url);
         
         Alph.$.ajax(
             {
@@ -461,7 +461,7 @@ Alph.main =
                 error: 
                     function(a_req,a_text,a_error) 
                     {
-                        Alph.MozUtils.log("Error detaching Daemon : " + a_error);
+                        Alph.BrowserUtils.log("Error detaching Daemon : " + a_error);
                     }
             }
         );
@@ -485,7 +485,7 @@ Alph.main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000)
         kill_url = detach_url + "?_r=" + rand_num;
-        Alph.MozUtils.log("kill daemon at " + detach_url);
+        Alph.BrowserUtils.log("kill daemon at " + detach_url);
         
         Alph.$.ajax(
             {
@@ -497,7 +497,7 @@ Alph.main =
                 error: 
                     function(a_req,a_text,error) 
                     {
-                        Alph.MozUtils.log("Error killing daemon : " + error);
+                        Alph.BrowserUtils.log("Error killing daemon : " + error);
                     }
             }
         );
@@ -601,7 +601,7 @@ Alph.main =
     onMhttpdStart: function(a_daemon_response)
     {
         var daemonPid = a_daemon_response.replace(/^\s+|\s+$/g, "");
-        Alph.MozUtils.log("Daemon Pid: " + daemonPid);
+        Alph.BrowserUtils.log("Daemon Pid: " + daemonPid);
         
         var attach_url = Alph.main.getLocalDaemonHost() + ":"  + Alph.main.getLocalDaemonPort() + "/attach";
         
@@ -620,13 +620,13 @@ Alph.main =
                 dataType: "text",
                 cache: false,
                 url: attach_url,
-                //timeout: Alph.MozUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
+                //timeout: Alph.BrowserUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
                 success: 
-                    function() { Alph.MozUtils.log("Daemon attached at " + attach_url); },
+                    function() { Alph.BrowserUtils.log("Daemon attached at " + attach_url); },
                 error:
                     function(a_req, a_status, a_error ) 
                     { 
-                        Alph.MozUtils.log("Daemon failed to attach: " + 
+                        Alph.BrowserUtils.log("Daemon failed to attach: " + 
                             a_status || a_error); 
                     } 
             }
@@ -643,7 +643,7 @@ Alph.main =
      */
     alertMhttpdFailure: function(a_req,a_text,a_error)
     {
-        Alph.MozUtils.log("Unable to verify daemon start: " + a_error || a_text);
+        Alph.BrowserUtils.log("Unable to verify daemon start: " + a_error || a_text);
         var err_msg = Alph.main.getString("alph-error-mhttpd-failure");
         alert(err_msg);
     },
@@ -658,12 +658,12 @@ Alph.main =
      */
     startMhttpd: function(a_req,a_text,a_error) 
     {
-        Alph.MozUtils.log("start daemon");
+        Alph.BrowserUtils.log("start daemon");
         var cc = Components.classes;
         var ci = Components.interfaces;
 
         var daemon = 
-            Alph.MozUtils.getPlatformFile(['mhttpd','mhttpd'],false,null,true);
+            Alph.BrowserUtils.getPlatformFile(['mhttpd','mhttpd'],false,null,true);
 
         if (daemon == null)
         {
@@ -684,12 +684,12 @@ Alph.main =
             {
                 var chromepkg = 
                     Alph.Languages.getLangTool(lang).getchromepkg();
-                Alph.MozUtils.log("setting up mhttpd for " + chromepkg);
+                Alph.BrowserUtils.log("setting up mhttpd for " + chromepkg);
                 var chrome_path = 
-                    Alph.MozUtils.getExtensionBasePath(chromepkg);
+                    Alph.BrowserUtils.getExtensionBasePath(chromepkg);
                 
                 chrome_path.append("mhttpd.conf");
-                Alph.MozUtils.log("Reading file at " + chrome_path.path);
+                Alph.BrowserUtils.log("Reading file at " + chrome_path.path);
                 // open an input stream from file
                 var istream = cc["@mozilla.org/network/file-input-stream;1"]
                               .createInstance(Components.interfaces.nsIFileInputStream);
@@ -700,16 +700,16 @@ Alph.main =
                 var line = {}, hasmore;
                 do {
                     hasmore = istream.readLine(line);
-                    Alph.MozUtils.log("Read " + line.value);
+                    Alph.BrowserUtils.log("Read " + line.value);
                     var values = line.value.split(/\|/);
                     
                     var exe_info = values[1].split(/,/);
                     // translate the exe file path
                     var exe_file = 
-                        Alph.MozUtils.getPlatformFile(exe_info,false,chromepkg,true);
+                        Alph.BrowserUtils.getPlatformFile(exe_info,false,chromepkg,true);
                     if (exe_file == null)
                     {
-                        Alph.MozUtils.log(
+                        Alph.BrowserUtils.log(
                             "Unable to find file at " + 
                             values[1] + " for package" + chromepkg);
                     }
@@ -725,7 +725,7 @@ Alph.main =
             }
         }
 
-        var keywords = Alph.MozUtils.getPref("mhttpd.keywords") || "";
+        var keywords = Alph.BrowserUtils.getPref("mhttpd.keywords") || "";
         var config = daemon.parent.clone();
         config.append("mhttpd.conf");    
         // write config file
@@ -811,7 +811,7 @@ Alph.main =
             }
          
             // set the default language from preferences if possible
-            var pref_lang = Alph.MozUtils.getPref("default_language");
+            var pref_lang = Alph.BrowserUtils.getPref("default_language");
             if (pref_lang != null && pref_lang != '' &&
                 Alph.Languages.hasLang(pref_lang))
             {
@@ -1161,7 +1161,7 @@ Alph.main =
         {
             return;
         }
-        Alph.MozUtils.log("Executing " + cmd_id);
+        Alph.BrowserUtils.log("Executing " + cmd_id);
         if (lang_tool && lang_tool.getCmd(cmd_id))
         {
             lang_tool[(lang_tool.getCmd(cmd_id))](a_event);
@@ -1186,12 +1186,12 @@ Alph.main =
                 try 
                 {
                     var panel_obj = Alph.main.d_panels[panel_id];
-                    Alph.MozUtils.log("Observing ui event " + a_event + " for panel " + panel_id); 
+                    Alph.BrowserUtils.log("Observing ui event " + a_event + " for panel " + panel_id); 
                     panel_obj.observeUIEvent(bro,a_event,a_event_data);    
                 } 
                 catch (e)
                 {   
-                    Alph.MozUtils.log("Error observing ui event for panel " + panel_id + ":" + e);
+                    Alph.BrowserUtils.log("Error observing ui event for panel " + panel_id + ":" + e);
                 }
             }
         );
@@ -1238,7 +1238,7 @@ Alph.main =
         // so that the page can check for the their presense
         if (Alph.$("meta[name=_alpheios-installed-version]",doc).length == 0)
         {
-            var pkg_list = Alph.MozUtils.getAlpheiosPackages();
+            var pkg_list = Alph.BrowserUtils.getAlpheiosPackages();
             pkg_list.forEach(
                 function(a_item)
                 {
@@ -1285,7 +1285,7 @@ Alph.main =
         }
         else
         {
-            auto_lang=Alph.Site.isBasicSite(Alph.MozSvc.getSvc('IO').newURI(bro.contentDocument.location,null,null));
+            auto_lang=Alph.Site.isBasicSite(Alph.BrowserUtils.getSvc('IO').newURI(bro.contentDocument.location,null,null));
         }   
         
         auto_lang = Alph.Languages.mapLanguage(auto_lang);
@@ -1297,14 +1297,14 @@ Alph.main =
             // if Alpheios is not enabled, auto-enable it
             if (! this.isEnabled(bro))
             {
-                Alph.MozUtils.log("Auto-enabling alpheios for " + auto_lang);
+                Alph.BrowserUtils.log("Auto-enabling alpheios for " + auto_lang);
                 this.autoToggle(bro,auto_lang);
                 return;
             }
             // if alpheios is enabled set to the right language for the prototype
             else if (this.isEnabled(bro) && cur_lang != auto_lang)
             {
-                Alph.MozUtils.log("Auto-switching alpheios to " + auto_lang);
+                Alph.BrowserUtils.log("Auto-switching alpheios to " + auto_lang);
                 Alph.main.selectLanguage(auto_lang,true);
                 // selectLanguage calls onTabSelect which will re-call resetState
                 return;  
@@ -1339,7 +1339,7 @@ Alph.main =
                 var new_host = bro.contentDocument.location.host;
                 if (! new_host.match(/alpheios\.(net|org)/))
                 {
-                    Alph.MozUtils.openDialog(
+                    Alph.BrowserUtils.openDialog(
                         window,
                         'chrome://alpheios/content/dialogs/leaving-site.xul', 
                         'alpheios-leaving-dialog'); 
@@ -1473,7 +1473,7 @@ Alph.main =
                 } 
                 catch (e)
                 {   
-                    Alph.MozUtils.log("Unable to reset state for panel " + panel_id + ":" + e);
+                    Alph.BrowserUtils.log("Unable to reset state for panel " + panel_id + ":" + e);
                 }
             }
         );
@@ -1497,7 +1497,7 @@ Alph.main =
         } 
         catch(exception)
         {
-            Alph.MozUtils.log("Error instantiating " +
+            Alph.BrowserUtils.log("Error instantiating " +
                 panel_id + " with " + panel_class + ":" + exception);
         }
         
@@ -1560,7 +1560,7 @@ Alph.main =
         {
             a_on = false;
             try {
-                a_on = Alph.MozUtils.getPref("enable.toolbar");
+                a_on = Alph.BrowserUtils.getPref("enable.toolbar");
             }
             catch(a_e)
             {
@@ -1592,7 +1592,7 @@ Alph.main =
      */
     enableTbLookup: function()
     {
-        if (Alph.MozUtils.getPref("toolbar.lookup"))
+        if (Alph.BrowserUtils.getPref("toolbar.lookup"))
         {
             Alph.$("#alpheios-lookup-enabled").attr("hidden",false);
         }
@@ -1740,7 +1740,7 @@ Alph.main =
                 if (this.d_handleRefresh)
                 {
                     this.d_handleRefresh = false;
-                    Alph.MozUtils.log("Handling refresh for " + this.d_lastUrlBase);
+                    Alph.BrowserUtils.log("Handling refresh for " + this.d_lastUrlBase);
                     var bro = Alph.main.getCurrentBrowser();
                     var doc = bro.contentDocument;
                     Alph.main.insertMetadata({target: doc});
@@ -1763,7 +1763,7 @@ Alph.main =
                                 } 
                                 catch (e)
                                 {   
-                                    Alph.MozUtils.log("Unable to refresh state for panel " + panel_id + ":" + e);
+                                    Alph.BrowserUtils.log("Unable to refresh state for panel " + panel_id + ":" + e);
                                 }
                             }
                         );
@@ -1772,7 +1772,7 @@ Alph.main =
                 else if(this.d_handleLoad) 
                 {
                     this.d_handleLoad = false;
-                    Alph.MozUtils.log("Handling load for " + this.d_lastUrlBase);
+                    Alph.BrowserUtils.log("Handling load for " + this.d_lastUrlBase);
                     Alph.main.resetState(aWebProgress.DOMWindow);
                 }
            }
@@ -1784,7 +1784,7 @@ Alph.main =
            // This fires when the location bar changes; i.e load event is confirmed
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
-           // Alph.MozUtils.log("caught location change : " + aURI.spec);
+           // Alph.BrowserUtils.log("caught location change : " + aURI.spec);
            var new_url_base= aURI.spec.match(/([^#|\?]+)[#|\?]?/)[1]
            if (new_url_base == this.d_lastUrlBase)
            {
@@ -1810,13 +1810,13 @@ Alph.main =
     showUpdateHelp: function()
     {
         var firstrun = [];
-        var alph_pkgs = Alph.MozUtils.getAlpheiosPackages();
+        var alph_pkgs = Alph.BrowserUtils.getAlpheiosPackages();
         alph_pkgs.forEach(
             function(a_pkg)
             {
                 try
                 {
-                    var last_install_ver = Alph.MozUtils.getPref('firstrun.'+ a_pkg.id);
+                    var last_install_ver = Alph.BrowserUtils.getPref('firstrun.'+ a_pkg.id);
                     if (! last_install_ver || (last_install_ver != a_pkg.version))
                     {
                         firstrun.push(a_pkg);
@@ -1837,7 +1837,7 @@ Alph.main =
             firstrun.forEach(
                 function(a_pkg)
                 {
-                    Alph.MozUtils.setPref('firstrun.'+a_pkg.id,a_pkg.version);
+                    Alph.BrowserUtils.setPref('firstrun.'+a_pkg.id,a_pkg.version);
                 }
             );
         }
@@ -1930,7 +1930,7 @@ Alph.main =
      */
     getString: function(a_name,a_replace)
     {
-        return Alph.MozUtils.getString(this.d_stringBundle,a_name,a_replace);
+        return Alph.BrowserUtils.getString(this.d_stringBundle,a_name,a_replace);
     }
 };
 

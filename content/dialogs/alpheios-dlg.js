@@ -29,7 +29,7 @@ Alph.Dialogs =
         Alph.$("#alpheios-site-link").attr("value",Alph.Util.ALPHEIOS_URLS.main);
         
         // add the Alpheios version information
-        var pkgs = Alph.MozUtils.getAlpheiosPackages();
+        var pkgs = Alph.BrowserUtils.getAlpheiosPackages();
         pkgs.forEach(
             function(a_item)
             {
@@ -51,7 +51,7 @@ Alph.Dialogs =
         var survey = '';
         try 
         {   
-            survey = Alph.MozUtils.getPref('survey.url');
+            survey = Alph.BrowserUtils.getPref('survey.url');
         }
         catch(a_e)
         {

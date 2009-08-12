@@ -68,12 +68,12 @@ Alph.Infl = {
             var start = (new Date()).getTime();
             inflHTML = this.xsltProcessor.transformToDocument(xmlRef);
             var end = (new Date()).getTime();
-            Alph.MozUtils.log("Transformation time: " + (end-start));
+            Alph.BrowserUtils.log("Transformation time: " + (end-start));
 
         }
         catch (e)
         {
-            Alph.MozUtils.log(e);
+            Alph.BrowserUtils.log(e);
         }
         return inflHTML;
     },
@@ -293,7 +293,7 @@ Alph.Infl = {
             $(".ending",a_tbl).length > 0)
         {
             try {
-                var disclaimer = Alph.MozUtils.getString(str_props,'disclaimer')
+                var disclaimer = Alph.BrowserUtils.getString(str_props,'disclaimer')
                 $("#alph-infl-table",topdoc)
                     .after('<span class="alpheios-hint">' + disclaimer + '</span>');                    
             } 
@@ -308,24 +308,24 @@ Alph.Infl = {
         {
             if (typeof a_link_target.title == 'undefined')
             {
-                title = Alph.MozUtils.getString(str_props,'alph-infl-title-'+showpofs);
+                title = Alph.BrowserUtils.getString(str_props,'alph-infl-title-'+showpofs);
             }
             else
             {   
-                title = Alph.MozUtils.getString(str_props,a_link_target.title);
+                title = Alph.BrowserUtils.getString(str_props,a_link_target.title);
             }
         
         }
         catch(a_e)
         {
-            Alph.MozUtils.log("No title string defined for " + showpofs);
+            Alph.BrowserUtils.log("No title string defined for " + showpofs);
         }
         $("#alph-inflect-title span.title",topdoc).html(title);
         
         // add a link to the index
         $("body",topdoc).prepend(
             "<div id='alph-infl-index-link'>"
-            + Alph.MozUtils.getString(str_props,"alph-infl-index-link") 
+            + Alph.BrowserUtils.getString(str_props,"alph-infl-index-link") 
             + '</div>');
             
         $("#alph-infl-index-link",topdoc).click(
@@ -343,7 +343,7 @@ Alph.Infl = {
             function(e) { Alph.Infl.replaceString(this,str_props) } );
         
         var end = (new Date()).getTime();
-        Alph.MozUtils.log("Translation time: " + (end-start));
+        Alph.BrowserUtils.log("Translation time: " + (end-start));
 
         // for each ending in the table, highlight it if there's a matching suffix
         // in the link source but only if we haven't been asked not to look for matches
@@ -353,7 +353,7 @@ Alph.Infl = {
         var all_cols = $("col",a_tbl);
         
         end = (new Date()).getTime();
-        Alph.MozUtils.log("Endings Processed: " + (end-start));
+        Alph.BrowserUtils.log("Endings Processed: " + (end-start));
         start=end;
         
         if (  ! a_link_target.suppress_match) {
@@ -376,7 +376,7 @@ Alph.Infl = {
             
             );
             end = (new Date()).getTime();
-            Alph.MozUtils.log("Endings Highlighted: " + (end-start));
+            Alph.BrowserUtils.log("Endings Highlighted: " + (end-start));
             start=end;
             
             var sib_cols = Alph.Infl.findSibCols(col_parents,all_cols);
@@ -408,7 +408,7 @@ Alph.Infl = {
             Alph.Infl.expandTable(a_tbl,topdoc);            
         }
         end = (new Date()).getTime();
-        Alph.MozUtils.log("Selected Endings Displayed: " + (end-start));
+        Alph.BrowserUtils.log("Selected Endings Displayed: " + (end-start));
         start=end;
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted
@@ -424,7 +424,7 @@ Alph.Infl = {
         // if we have any additional inflection links, show them
         if ($("select#infl-links-select option",topdoc).length > 1)
         {
-            var label = Alph.MozUtils.getString(str_props,"alph-infl-links-label"); 
+            var label = Alph.BrowserUtils.getString(str_props,"alph-infl-links-label"); 
             $("#infl-links-label",topdoc).text(label);
             $("#infl-links",topdoc).css("display","block");
             
@@ -462,7 +462,7 @@ Alph.Infl = {
         );
 
         end = (new Date()).getTime();
-        Alph.MozUtils.log("Handlers Added: " + (end-start));
+        Alph.BrowserUtils.log("Handlers Added: " + (end-start));
         start=end;
         
         var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props,a_link_target);
@@ -473,7 +473,7 @@ Alph.Infl = {
         this.hideEmptyCols(a_tbl,all_cols);
         
         var end = (new Date()).getTime();
-        Alph.MozUtils.log("Hiding time: " + (end-start));
+        Alph.BrowserUtils.log("Hiding time: " + (end-start));
     },
     
     /**
@@ -618,7 +618,7 @@ Alph.Infl = {
     {
         $(".loading",a_doc).show();
         var newpofs = $(":selected",a_elem).val();
-        Alph.MozUtils.log("Switching to " + newpofs);
+        Alph.BrowserUtils.log("Switching to " + newpofs);
         a_lang_tool.
             handleInflections(a_e,a_node,{showpofs: newpofs});
     },
@@ -674,7 +674,7 @@ Alph.Infl = {
         // handle external urls
         if (href.match(/^http:\/\//))
         {
-            Alph.MozUtils.openNewTab(window.opener,href);
+            Alph.BrowserUtils.openNewTab(window.opener,href);
             return false;
         }
         // we can't just split on : because it might be used in later components of the
@@ -719,7 +719,7 @@ Alph.Infl = {
         var text = jQuery.trim($(a_elem).text());
         try 
         {
-            var newtext = Alph.MozUtils.getString(a_props,text);
+            var newtext = Alph.BrowserUtils.getString(a_props,text);
             if (newtext)
             {
                 $(a_elem).text(newtext);        
@@ -727,7 +727,7 @@ Alph.Infl = {
         } 
         catch(e)
         {
-            Alph.MozUtils.log("Couldn't find string for " + text);   
+            Alph.BrowserUtils.log("Couldn't find string for " + text);   
         }  
     },
     
@@ -845,7 +845,7 @@ Alph.Infl = {
                 link.setAttribute("value",a_pofs_set[i]);
                 try 
                 {
-                    link.innerHTML = Alph.MozUtils.getString(a_str_props,
+                    link.innerHTML = Alph.BrowserUtils.getString(a_str_props,
                         "alph-infl-link-"+linktype, [linkname]);
                 }
                 catch(e)
@@ -874,8 +874,8 @@ Alph.Infl = {
             // just return if we don't have any collapsed cells
             return;
         }
-        var expand = Alph.MozUtils.getString(a_str_props,"alph-infl-expand");
-        var expand_tip = Alph.MozUtils.getString(a_str_props,"alph-infl-expand-tooltip");
+        var expand = Alph.BrowserUtils.getString(a_str_props,"alph-infl-expand");
+        var expand_tip = Alph.BrowserUtils.getString(a_str_props,"alph-infl-expand-tooltip");
 
         // iterate through the table header cells of the row
         // which should contain the expand control, adding a toggle
@@ -918,10 +918,10 @@ Alph.Infl = {
         // action is in progress
         $(a_elem).addClass("reloading");
         var str_props = document.getElementById("alph-infl-strings");
-        var expand = Alph.MozUtils.getString(str_props,"alph-infl-expand");
-        var collapse = Alph.MozUtils.getString(str_props,"alph-infl-collapse");
-        var expand_tip = Alph.MozUtils.getString(str_props,"alph-infl-expand-tooltip");
-        var collapse_tip = Alph.MozUtils.getString(str_props,"alph-infl-collapse-tooltip");
+        var expand = Alph.BrowserUtils.getString(str_props,"alph-infl-expand");
+        var collapse = Alph.BrowserUtils.getString(str_props,"alph-infl-collapse");
+        var expand_tip = Alph.BrowserUtils.getString(str_props,"alph-infl-expand-tooltip");
+        var collapse_tip = Alph.BrowserUtils.getString(str_props,"alph-infl-collapse-tooltip");
 
         var toggle_elem = $(".endings-toggle",a_elem);
         var toggle = $(toggle_elem).html();
@@ -1037,7 +1037,7 @@ Alph.Infl = {
                         }
                         catch(e)
                         {
-                            Alph.MozUtils.log("Invalid colspan");
+                            Alph.BrowserUtils.log("Invalid colspan");
                         }
                         
                         if (typeof realIndex != "undefined" && 

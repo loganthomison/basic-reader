@@ -1,5 +1,5 @@
 /**
- * @fileoverview This file contains the MozUtils and MozSvc objects
+ * @fileoverview This file contains the BrowserUtils and BrowserSvc objects
  * which contain code and services specific to the Mozilla platform
  *
  * @version $Id $
@@ -23,17 +23,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */    
  
-const EXPORTED_SYMBOLS = ['MozUtils','MozSvc'];
+ /**
+ * This module exports a single symbol, BrowserUtils.
+ * This object should be imported into the namespace of the importing class
+ */
+const EXPORTED_SYMBOLS = ['BrowserUtils'];
 
 const CC = Components.classes;
 const CI = Components.interfaces;
 const CU = Components.utils;
 
 /**
- * Util contains the Alpheios utility functions
+ * Alpheios Browser-Specific Utility functions
  * @singleton
  */
-MozUtils = {
+BrowserUtils = {
     
     /**
      * Holds nsILocalFile objects for the local directory of each 
@@ -55,7 +59,7 @@ MozUtils = {
         if (! isDebug ) {
             return;
         }
-        MozSvc.getSvc('Console').logStringMessage('alpheios:' + a_msg);
+        BrowserSvc.getSvc('Console').logStringMessage('alpheios:' + a_msg);
     },
     
     /**
@@ -72,13 +76,13 @@ MozUtils = {
         }
         
         //TODO - handle missing prefs? 
-        var type = MozSvc.getSvc('AlphPrefs').getPrefType(name);
+        var type = BrowserSvc.getSvc('AlphPrefs').getPrefType(name);
         if (type == CI.nsIPrefBranch.PREF_STRING)
-            return MozSvc.getSvc('AlphPrefs').getCharPref(name);
+            return BrowserSvc.getSvc('AlphPrefs').getCharPref(name);
         else if (type == CI.nsIPrefBranch.PREF_INT)
-            return MozSvc.getSvc('AlphPrefs').getIntPref(name);
+            return BrowserSvc.getSvc('AlphPrefs').getIntPref(name);
         else if (type == CI.nsIPrefBranch.PREF_BOOL)
-            return MozSvc.getSvc('AlphPrefs').getBoolPref(name);
+            return BrowserSvc.getSvc('AlphPrefs').getBoolPref(name);
     },
     
     /**
@@ -109,7 +113,7 @@ MozUtils = {
             a_name = a_lang + '.' + a_name;
         }
         
-        var type = MozSvc.getSvc('AlphPrefs').getPrefType(a_name);
+        var type = BrowserSvc.getSvc('AlphPrefs').getPrefType(a_name);
         
         // if we don't know the type, try to determine it
         if ( type == 0 )
@@ -139,11 +143,11 @@ MozUtils = {
         }
         
         if (type == Components.interfaces.nsIPrefBranch.PREF_STRING)
-            MozSvc.getSvc('AlphPrefs').setCharPref(a_name, a_value);
+            BrowserSvc.getSvc('AlphPrefs').setCharPref(a_name, a_value);
         else if (type == Components.interfaces.nsIPrefBranch.PREF_INT)
-            MozSvc.getSvc('AlphPrefs').setIntPref(a_name, a_value);
+            BrowserSvc.getSvc('AlphPrefs').setIntPref(a_name, a_value);
         else if (type == Components.interfaces.nsIPrefBranch.PREF_BOOL)
-            MozSvc.getSvc('AlphPrefs').setBoolPref(a_name, a_value);
+            BrowserSvc.getSvc('AlphPrefs').setBoolPref(a_name, a_value);
         else
             this.log("Invalid preference type for " + a_name + "(" + type + ":" + typeof a_value + ")")
             // fall through behavior is to not set the pref if we don't know what type it is
@@ -314,15 +318,15 @@ MozUtils = {
 
             // translate the chrome url to a file
             var url =
-                MozSvc.getSvc('IO').newURI("chrome://" + a_ext_pkg + "/content/","UTF-8",null);
-            var pkg_path = MozSvc.getSvc("ChromeReg").convertChromeURL(url).spec;
+                BrowserSvc.getSvc('IO').newURI("chrome://" + a_ext_pkg + "/content/","UTF-8",null);
+            var pkg_path = BrowserSvc.getSvc("ChromeReg").convertChromeURL(url).spec;
             this.log("Converted chrome url: " + pkg_path);
             // remove the chrome dir and everything after it 
             pkg_path = pkg_path.substring(0,pkg_path.indexOf('/chrome'));
             // remove the jar prefix
             pkg_path = pkg_path.replace(/^jar:/,'');
             this.log("Cleaned chrome url: " + pkg_path);
-            base_path.initWithFile(MozSvc.getSvc('Protocol').getFileFromURLSpec(pkg_path));
+            base_path.initWithFile(BrowserSvc.getSvc('Protocol').getFileFromURLSpec(pkg_path));
             this.d_extensionBasePaths[a_ext_pkg] = base_path;
                 
         }
@@ -340,7 +344,7 @@ MozUtils = {
         var alph_pkgs = [];
         try
         {
-            var ext_list = MozSvc.getSvc('ExtMgr').getItemList(
+            var ext_list = BrowserSvc.getSvc('ExtMgr').getItemList(
                 CI.nsIUpdateItem.TYPE_EXTENSION,{},{});
                         
             ext_list.forEach(
@@ -365,7 +369,7 @@ MozUtils = {
      */
     loadUri: function(a_url)
     {
-        var uriToOpen = MozSvc.getSvc('IO').newURI(a_url, null, null);
+        var uriToOpen = BrowserSvc.getSvc('IO').newURI(a_url, null, null);
         CC['@mozilla.org/uriloader/external-protocol-service;1']
             .getService(CI.nsIExternalProtocolService)
             .loadURI(uriToOpen, null);
@@ -454,8 +458,8 @@ MozUtils = {
     readFile: function(a_uri,a_charset)
     {
         this.log("Reading file from file system: " + a_uri);
-        var input_stream = MozSvc.getSvc('InputStream');
-        var channel = MozSvc.getSvc('IO').newChannel(a_uri,null,null);
+        var input_stream = BrowserSvc.getSvc('InputStream');
+        var channel = BrowserSvc.getSvc('IO').newChannel(a_uri,null,null);
         var input = channel.open();
         input_stream.init(input);
         var buffer = input_stream.read(input.available());
@@ -463,7 +467,7 @@ MozUtils = {
         input.close();
         if (typeof a_charset != "undefined" && a_charset != null)
         {
-            var conv = MozSvc.getSvc('UnicodeConverter');
+            var conv = BrowserSvc.getSvc('UnicodeConverter');
             conv.charset = a_charset;
             return conv.ConvertToUnicode(buffer);
         }
@@ -565,10 +569,21 @@ MozUtils = {
             str_value = "";
         }
         return str_value;
+    },
+    
+    /**
+     * Get a browser service from the BrowserSvc object
+     * @param {String} a_svc_name the name of the services (must be in the member _svcs object)
+     * @return the requested service
+     * @throws an error if the requested service hasn't been predefined 
+     */
+    getSvc: function(a_name)
+    {
+        return BrowserSvc.getSvc(a_name);        
     }
 };
 
-MozSvc = {
+BrowserSvc = {
     
     d_svcs: 
     {
@@ -620,6 +635,6 @@ MozSvc = {
     }
 
 };
-MozSvc.init();
+BrowserSvc.init();
             
 

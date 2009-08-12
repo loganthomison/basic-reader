@@ -73,7 +73,7 @@ Alph.Interactive = {
             return;
         }
         
-        var browser = Alph.MozUtils.browserForDoc(window,a_topdoc) || Alph.main.getCurrentBrowser();
+        var browser = Alph.BrowserUtils.browserForDoc(window,a_topdoc) || Alph.main.getCurrentBrowser();
         var lang_tool = Alph.main.getLanguageTool(browser);
         var pofs_list = lang_tool.getpofs();
         var valid_pofs = Alph.$('#alph-text .alph-pofs',popup).attr('context');

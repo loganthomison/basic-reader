@@ -29,7 +29,7 @@ if (typeof Alph == "undefined") {
     Alph = {};
 }
 
-Components.utils.import("resource://alpheios/alpheios-moz-utils.jsm",Alph);
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm",Alph);
 Components.utils.import("resource://alpheios/alpheios-convert.jsm",Alph);
 Components.utils.import("resource://alpheios/alpheios-datafile.jsm",Alph);
 
@@ -40,7 +40,7 @@ Components.utils.import("resource://alpheios/alpheios-datafile.jsm",Alph);
 // See http://docs.jquery.com/Core/jQuery.noConflict#extreme
 // Note, we may run into problems if we want to use any jQuery plugins,
 // in which case it might be sufficient to skip the extreme flag
-Alph.MozUtils.loadJavascript("chrome://alpheios/content/jquery-1.2.6-alph.js",Alph);
+Alph.BrowserUtils.loadJavascript("chrome://alpheios/content/jquery-1.2.6-alph.js",Alph);
 Alph.$ = jQuery.noConflict(true);    
 
 /**
@@ -93,7 +93,7 @@ Alph.Util = {
         {
             url = this.ALPHEIOS_URLS.content + a_loc; 
         }
-        Alph.MozUtils.openNewTab(a_window,url);
+        Alph.BrowserUtils.openNewTab(a_window,url);
     },
     
     /**
@@ -101,7 +101,7 @@ Alph.Util = {
      */
     sendFeedback: function()
     {
-        Alph.MozUtils.sendFeedback(window,Alph.Util.ALPHEIOS_URLS.support);
+        Alph.BrowserUtils.sendFeedback(window,Alph.Util.ALPHEIOS_URLS.support);
     },
     
     /**
@@ -262,7 +262,7 @@ Alph.Util = {
             var chrome_url = 'chrome://'+ a_ext + '/content/xslt/' + a_filename;
             var xmlDoc = document.implementation.createDocument("", "", null);
             xmlDoc.async = false;
-            Alph.MozUtils.log("Loading xslt at " + chrome_url);
+            Alph.BrowserUtils.log("Loading xslt at " + chrome_url);
             xmlDoc.load(chrome_url);
             xsltProcessor.importStylesheet(xmlDoc);
         }
@@ -272,11 +272,11 @@ Alph.Util = {
           // see https://bugzilla.mozilla.org/show_bug.cgi?id=422502
             try
             {
-                var pkg_path = Alph.MozUtils.getExtensionBasePath(a_ext);
+                var pkg_path = Alph.BrowserUtils.getExtensionBasePath(a_ext);
                 pkg_path.append('xslt');
                 pkg_path.append(a_filename);
                 var path_url = 'file:///' + pkg_path.path;
-                Alph.MozUtils.log("XHR Loading xslt at " + path_url);
+                Alph.BrowserUtils.log("XHR Loading xslt at " + path_url);
                 var p = new XMLHttpRequest();      
                 p.open("GET", path_url, false);
                 p.send(null);
@@ -285,7 +285,7 @@ Alph.Util = {
             catch(a_ee)
             {
                 // if that fails, we're out of luck
-                Alph.MozUtils.log("Unable to load stylesheet " + a_filename + " in " + a_ext + " : " + a_e + "," + a_ee);
+                Alph.BrowserUtils.log("Unable to load stylesheet " + a_filename + " in " + a_ext + " : " + a_e + "," + a_ee);
             }
         }
         return xsltProcessor;
