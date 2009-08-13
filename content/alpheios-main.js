@@ -97,6 +97,13 @@ Alph.main =
     d_stringBundle: null,
     
     /**
+     * main logger for the application
+     * @type Log4Moz.Logger
+     * @static
+     */
+    s_logger: Alph.BrowserUtils.getLogger('Alpheios.Main'), 
+    
+    /**
      * Initialize function for the class. Adds the onLoad event listener to the window
      * add adds a preferences observer on the alpheios preferences
      */
@@ -104,6 +111,7 @@ Alph.main =
     { 
         window.addEventListener("load", this.onLoad, false);
         Alph.BrowserUtils.getSvc('AlphPrefs').addObserver("", this.d_prefsObserver,false);
+        Alph.BrowserUtils.setLogLevel(Alph.BrowserUtils.getPref('log.logger.level'));
     },
 
     /**
@@ -181,7 +189,7 @@ Alph.main =
      */
     onUnLoad: function(a_event)
     {
-        Alph.BrowserUtils.log("Unloading window");
+        Alph.main.s_logger.debug("Unloading window");
  
         // iterate through the open tabs calling onTabClose on each
         // to make sure to cleanup the resources used by that tab
@@ -190,10 +198,10 @@ Alph.main =
         for (var i = 0; i < num; i++) {
             var bro = gBrowser.getBrowserAtIndex(i);
             try {
-                Alph.BrowserUtils.log("Closing tab " + bro.currentURI.spec);
+                Alph.main.s_logger.debug("Closing tab " + bro.currentURI.spec);
                 this.onTabClose(a_event,bro);
             } catch(e) {
-                Alph.BrowserUtils.log(e);
+                Alph.main.s_logger.error(e);
             }
         }
         gBrowser.mTabContainer
@@ -222,7 +230,7 @@ Alph.main =
      */
     onTabClose: function(a_event,a_bro)
     {
-        Alph.BrowserUtils.log("in onTabClose");
+        Alph.main.s_logger.debug("in onTabClose");
         if (typeof a_bro == "undefined")
         {
             // get the browser associated with the tab
@@ -449,7 +457,7 @@ Alph.main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000)
         detach_url = detach_url + "?_r=" + rand_num;
-        Alph.BrowserUtils.log("detach daemon at " + detach_url);
+        Alph.main.s_logger.info("detach daemon at " + detach_url);
         
         Alph.$.ajax(
             {
@@ -461,7 +469,7 @@ Alph.main =
                 error: 
                     function(a_req,a_text,a_error) 
                     {
-                        Alph.BrowserUtils.log("Error detaching Daemon : " + a_error);
+                        Alph.main.s_logger.error("Error detaching Daemon : " + a_error);
                     }
             }
         );
@@ -485,7 +493,7 @@ Alph.main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000)
         kill_url = detach_url + "?_r=" + rand_num;
-        Alph.BrowserUtils.log("kill daemon at " + detach_url);
+        Alph.main.s_logger.info("kill daemon at " + detach_url);
         
         Alph.$.ajax(
             {
@@ -497,7 +505,7 @@ Alph.main =
                 error: 
                     function(a_req,a_text,error) 
                     {
-                        Alph.BrowserUtils.log("Error killing daemon : " + error);
+                        Alph.main.s_logger.error("Error killing daemon : " + error);
                     }
             }
         );
@@ -601,7 +609,7 @@ Alph.main =
     onMhttpdStart: function(a_daemon_response)
     {
         var daemonPid = a_daemon_response.replace(/^\s+|\s+$/g, "");
-        Alph.BrowserUtils.log("Daemon Pid: " + daemonPid);
+        Alph.main.s_logger.info("Daemon Pid: " + daemonPid);
         
         var attach_url = Alph.main.getLocalDaemonHost() + ":"  + Alph.main.getLocalDaemonPort() + "/attach";
         
@@ -622,11 +630,11 @@ Alph.main =
                 url: attach_url,
                 //timeout: Alph.BrowserUtils.getPref("url.lexicon.timeout"), TODO - mhttpd timeout
                 success: 
-                    function() { Alph.BrowserUtils.log("Daemon attached at " + attach_url); },
+                    function() { Alph.main.s_logger.info("Daemon attached at " + attach_url); },
                 error:
                     function(a_req, a_status, a_error ) 
                     { 
-                        Alph.BrowserUtils.log("Daemon failed to attach: " + 
+                        Alph.main.s_logger.fatal("Daemon failed to attach: " + 
                             a_status || a_error); 
                     } 
             }
@@ -643,7 +651,7 @@ Alph.main =
      */
     alertMhttpdFailure: function(a_req,a_text,a_error)
     {
-        Alph.BrowserUtils.log("Unable to verify daemon start: " + a_error || a_text);
+        Alph.main.s_logger.fatal("Unable to verify daemon start: " + a_error || a_text);
         var err_msg = Alph.main.getString("alph-error-mhttpd-failure");
         alert(err_msg);
     },
@@ -658,7 +666,7 @@ Alph.main =
      */
     startMhttpd: function(a_req,a_text,a_error) 
     {
-        Alph.BrowserUtils.log("start daemon");
+        Alph.main.s_logger.info("start daemon");
         var cc = Components.classes;
         var ci = Components.interfaces;
 
@@ -684,12 +692,12 @@ Alph.main =
             {
                 var chromepkg = 
                     Alph.Languages.getLangTool(lang).getchromepkg();
-                Alph.BrowserUtils.log("setting up mhttpd for " + chromepkg);
+                Alph.main.s_logger.debug("setting up mhttpd for " + chromepkg);
                 var chrome_path = 
                     Alph.BrowserUtils.getExtensionBasePath(chromepkg);
                 
                 chrome_path.append("mhttpd.conf");
-                Alph.BrowserUtils.log("Reading file at " + chrome_path.path);
+                Alph.main.s_logger.debug("Reading file at " + chrome_path.path);
                 // open an input stream from file
                 var istream = cc["@mozilla.org/network/file-input-stream;1"]
                               .createInstance(Components.interfaces.nsIFileInputStream);
@@ -700,7 +708,7 @@ Alph.main =
                 var line = {}, hasmore;
                 do {
                     hasmore = istream.readLine(line);
-                    Alph.BrowserUtils.log("Read " + line.value);
+                    Alph.main.s_logger.debug("Read " + line.value);
                     var values = line.value.split(/\|/);
                     
                     var exe_info = values[1].split(/,/);
@@ -709,7 +717,7 @@ Alph.main =
                         Alph.BrowserUtils.getPlatformFile(exe_info,false,chromepkg,true);
                     if (exe_file == null)
                     {
-                        Alph.BrowserUtils.log(
+                        Alph.main.s_logger.error(
                             "Unable to find file at " + 
                             values[1] + " for package" + chromepkg);
                     }
@@ -1161,7 +1169,7 @@ Alph.main =
         {
             return;
         }
-        Alph.BrowserUtils.log("Executing " + cmd_id);
+        Alph.main.s_logger.debug("Executing " + cmd_id);
         if (lang_tool && lang_tool.getCmd(cmd_id))
         {
             lang_tool[(lang_tool.getCmd(cmd_id))](a_event);
@@ -1186,12 +1194,12 @@ Alph.main =
                 try 
                 {
                     var panel_obj = Alph.main.d_panels[panel_id];
-                    Alph.BrowserUtils.log("Observing ui event " + a_event + " for panel " + panel_id); 
+                    Alph.main.s_logger.debug("Observing ui event " + a_event + " for panel " + panel_id); 
                     panel_obj.observeUIEvent(bro,a_event,a_event_data);    
                 } 
                 catch (e)
                 {   
-                    Alph.BrowserUtils.log("Error observing ui event for panel " + panel_id + ":" + e);
+                    Alph.main.s_logger.error("Error observing ui event for panel " + panel_id + ":" + e);
                 }
             }
         );
@@ -1297,14 +1305,14 @@ Alph.main =
             // if Alpheios is not enabled, auto-enable it
             if (! this.isEnabled(bro))
             {
-                Alph.BrowserUtils.log("Auto-enabling alpheios for " + auto_lang);
+                Alph.main.s_logger.info("Auto-enabling alpheios for " + auto_lang);
                 this.autoToggle(bro,auto_lang);
                 return;
             }
             // if alpheios is enabled set to the right language for the prototype
             else if (this.isEnabled(bro) && cur_lang != auto_lang)
             {
-                Alph.BrowserUtils.log("Auto-switching alpheios to " + auto_lang);
+                Alph.main.s_logger.info("Auto-switching alpheios to " + auto_lang);
                 Alph.main.selectLanguage(auto_lang,true);
                 // selectLanguage calls onTabSelect which will re-call resetState
                 return;  
@@ -1473,7 +1481,7 @@ Alph.main =
                 } 
                 catch (e)
                 {   
-                    Alph.BrowserUtils.log("Unable to reset state for panel " + panel_id + ":" + e);
+                    Alph.main.s_logger.error("Unable to reset state for panel " + panel_id + ":" + e);
                 }
             }
         );
@@ -1497,7 +1505,7 @@ Alph.main =
         } 
         catch(exception)
         {
-            Alph.BrowserUtils.log("Error instantiating " +
+            Alph.main.s_logger.error("Error instantiating " +
                 panel_id + " with " + panel_class + ":" + exception);
         }
         
@@ -1740,7 +1748,7 @@ Alph.main =
                 if (this.d_handleRefresh)
                 {
                     this.d_handleRefresh = false;
-                    Alph.BrowserUtils.log("Handling refresh for " + this.d_lastUrlBase);
+                    Alph.main.s_logger.debug("Handling refresh for " + this.d_lastUrlBase);
                     var bro = Alph.main.getCurrentBrowser();
                     var doc = bro.contentDocument;
                     Alph.main.insertMetadata({target: doc});
@@ -1763,7 +1771,7 @@ Alph.main =
                                 } 
                                 catch (e)
                                 {   
-                                    Alph.BrowserUtils.log("Unable to refresh state for panel " + panel_id + ":" + e);
+                                    Alph.main.s_logger.error("Unable to refresh state for panel " + panel_id + ":" + e);
                                 }
                             }
                         );
@@ -1772,7 +1780,7 @@ Alph.main =
                 else if(this.d_handleLoad) 
                 {
                     this.d_handleLoad = false;
-                    Alph.BrowserUtils.log("Handling load for " + this.d_lastUrlBase);
+                    Alph.main.s_logger.debug("Handling load for " + this.d_lastUrlBase);
                     Alph.main.resetState(aWebProgress.DOMWindow);
                 }
            }
@@ -1784,7 +1792,6 @@ Alph.main =
            // This fires when the location bar changes; i.e load event is confirmed
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
-           // Alph.BrowserUtils.log("caught location change : " + aURI.spec);
            var new_url_base= aURI.spec.match(/([^#|\?]+)[#|\?]?/)[1]
            if (new_url_base == this.d_lastUrlBase)
            {
@@ -1866,8 +1873,8 @@ Alph.main =
                 a_lang = first_branch[1];
             }
         }
-        if (a_name.search(/popuptrigger$/) != -1)
-        {
+        if (a_name.match(/popuptrigger$/))
+        {   
             // iterate through the open browsers
             // updating to the trigger if alpheios 
             // is enabled and the current language is
@@ -1881,15 +1888,20 @@ Alph.main =
                     Alph.main.setXlateTrigger(bro,a_value);
                 }
             }
-        }
-        else if (a_name.search(/enable.toolbar$/) != -1)
+        }            
+        else if (a_name.match(/enable.toolbar$/))
         {
             Alph.main.toggleToolbar(a_value);
         }
-        else if (a_name.search(/toolbar.lookup$/) != -1)
+        else if (a_name.match(/toolbar.lookup$/))
         {
             Alph.main.enableTbLookup();
         }
+        else if (a_name.match(/logger.level/))
+        {
+            Alph.BrowserUtils.setLogLevel(a_value);
+        }
+
         if (typeof a_lang != 'undefined')
         {
             Alph.Languages.getLangTool(a_lang).observePrefChange(a_name,a_value);

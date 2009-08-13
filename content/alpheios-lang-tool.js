@@ -36,6 +36,13 @@ Alph.LanguageTool = function(a_language,a_properties)
 {
     this.d_sourceLanguage = a_language;
 
+    /**
+     * logger for the language
+     * @type Log4Moz.Logger
+     * @static
+     */
+    this.s_logger = Alph.BrowserUtils.getLogger('Alpheios.LanguageTool.'+ a_language);
+ 
     // TODO need to figure out which properties should be immutable.
     // Use of the function calls to Alph.BrowserUtils.getPref allows the properties
     // to change if the user modifies the preferences, but there may be
@@ -124,7 +131,7 @@ Alph.LanguageTool = function(a_language,a_properties)
             // is the method in the Alph.LanguageTool object?
             if (typeof this[method_name] == 'function')
             {
-                Alph.BrowserUtils.log("Calling " + method_name + " for " + a_language);
+                this.s_logger.debug("Calling " + method_name + " for " + a_language);
                 this[method_name]();
                 // TODO should we throw an error if the startup method returns
                 // false?
@@ -133,7 +140,7 @@ Alph.LanguageTool = function(a_language,a_properties)
             // as a string in the config?
             else
             {
-                Alph.BrowserUtils.log("Startup method " + method_name +
+                this.s_logger.warn("Startup method " + method_name +
                               " for " + a_language +
                               " not defined");
             }
@@ -156,7 +163,7 @@ Alph.LanguageTool.prototype.lexiconSetup = function()
     // read lexicon parameters
     // look first for lexicon-specific values and then, if not found,
     // for generic lexicon-independent values
-    Alph.BrowserUtils.log("Reading params for " + language);
+    this.s_logger.debug("Reading params for " + language);
     this.d_lexiconSearch = Array();
     var codeList;
     try 
@@ -324,7 +331,7 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
     {
         this.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
         {
-            Alph.BrowserUtils.log("Query word: " + a_alphtarget.getWord());
+            this.s_logger.info("Query word: " + a_alphtarget.getWord());
 
             var url =
                 Alph.BrowserUtils.getPref("url.lexicon",this.d_sourceLanguage) +
@@ -356,7 +363,7 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
     }
     else
     {
-        Alph.BrowserUtils.log("methods.lexicon invalid or undefined: " + lexicon_method);
+        this.s_logger.error("methods.lexicon invalid or undefined: " + lexicon_method);
     }
 }
 
@@ -389,7 +396,7 @@ Alph.LanguageTool.prototype.setContextHandler = function()
     }
     else
     {
-        Alph.BrowserUtils.log("No context_handler defined for " + this.d_sourceLanguage);
+        this.s_logger.info("No context_handler defined for " + this.d_sourceLanguage);
     }
 
 }
@@ -422,7 +429,7 @@ Alph.LanguageTool.prototype.setShiftHandler = function()
     }
     else
     {
-        Alph.BrowserUtils.log("No shift_handler defined for " + this.d_sourceLanguage);
+        this.s_logger.debug("No shift_handler defined for " + this.d_sourceLanguage);
     }
 }
 /**
@@ -458,7 +465,7 @@ function(a_ro, a_rngstr)
         /[.,;:!?'\"(){}\[\]\/\\\u00A0\u2010\u2011\u2012\u2013\u2014\u2015\u2018\u2019\u201C\u201D\u0387\n\r]/g,
         " ");
 
-    Alph.BrowserUtils.log("In doSpaceSeparatedWordSelection for " + a_rngstr);
+    this.s_logger.debug("In doSpaceSeparatedWordSelection for " + a_rngstr);
 
     // If the user selected whitespace in the margins of a range
     // just return.
@@ -788,7 +795,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     {
         params.xslt_params.show_only_matches = true;
     }
-    Alph.BrowserUtils.log("Handling inflections for " + params.showpofs);
+    this.s_logger.debug("Handling inflections for " + params.showpofs);
 
     // send the word endings to the declension table
     // if the window isn't already open, open it
@@ -821,7 +828,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
                     params,
                     Alph.Xlate.showLoadingMessage,[loading_node,loading_msg]
     );
-    Alph.BrowserUtils.log("Inflections window should have focus with "
+    this.s_logger.info("Inflections window should have focus with "
             + Alph.main.getStateObj().getVar("word"));
 }
 
@@ -893,7 +900,7 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc,a_name)
     // only add the stylesheet if it's not already there
     if (Alph.$("link[href='"+ chromecss + "']",a_doc).length == 0)
     {
-        Alph.BrowserUtils.log("adding stylesheet: " + chromecss);
+        this.s_logger.debug("adding stylesheet: " + chromecss);
         var css = document.createElementNS(
             "http://www.w3.org/1999/xhtml","link");
         css.setAttribute("rel", "stylesheet");
@@ -957,7 +964,7 @@ Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
 Alph.LanguageTool.prototype.getFeature = function(a_id)
 {
     var enabled = Alph.BrowserUtils.getPrefOrDefault("features."+a_id,this.d_sourceLanguage);
-    Alph.BrowserUtils.log("Feature " + a_id + " for " + this.d_sourceLanguage + " is " + enabled);
+    this.s_logger.debug("Feature " + a_id + " for " + this.d_sourceLanguage + " is " + enabled);
     return enabled;
 };
 
@@ -1154,7 +1161,7 @@ Alph.LanguageTool.prototype.defaultDictionaryLookup =
                 a_lemma[3] = lemma_id[1];
                 if (a_lemma[0])
                 {
-                    Alph.BrowserUtils.log("found id " + a_lemma[0] +
+                    lang_obj.s_logger.debug("found id " + a_lemma[0] +
                                   " for lemma " + a_lemma[1] +
                                   " in " + a_lemma[3]);
                 }
@@ -1232,7 +1239,7 @@ Alph.LanguageTool.prototype.defaultDictionaryLookup =
                     on_success =
                         function(a_html, a_dict_name)
                         {
-                            Alph.BrowserUtils.log("calling " + xform_method);
+                            lang_obj.s_logger.debug("calling " + xform_method);
                             a_html = lang_obj[xform_method](a_html);
                             a_success(a_html, a_dict_name);
                         }
@@ -1244,7 +1251,7 @@ Alph.LanguageTool.prototype.defaultDictionaryLookup =
 
                 // call dictionary
                 // but only use real completion for last item
-                Alph.BrowserUtils.log("Calling dictionary at " + url);
+                lang_obj.s_logger.debug("Calling dictionary at " + url);
                 lang_obj.doDefaultDictionaryLookup(
                     code,
                     url,
@@ -1702,7 +1709,7 @@ Alph.LanguageTool.prototype.supportsLanguage = function(a_lang)
     }
     catch(a_e)
     {
-        Alph.BrowserUtils.log("No language codes registered for " + this.d_sourceLanguage);
+        this.s_logger.warn("No language codes registered for " + this.d_sourceLanguage);
         supported = false;
     }
     return supported;

@@ -30,6 +30,13 @@
 Alph.Site = {
     
     /**
+     * logger for the object
+     * @type Log4Moz.Logger
+     * @private
+     */
+    s_logger: Alph.BrowserUtils.getLogger('Alpheios.Site'),
+    
+    /**
      * Check to see if this site supports the pedagogical functionality
      * @param {Document} a_doc the content document for the site
      * @return true if the site supports the pedagogical functionality, false if not
@@ -85,7 +92,7 @@ Alph.Site = {
             {
                 var key = 'alpheios-auto-enable-'+lang;
                 var sites = Alph.BrowserUtils.getPref('sites.autoenable',lang).split(',');
-                Alph.BrowserUtils.log("Registering sites for " + lang + ":" + sites);
+                this.s_logger.info("Registering sites for " + lang + ":" + sites);
                 sites.forEach(
                     function(a_url)
                     {
@@ -94,7 +101,7 @@ Alph.Site = {
                         if (Alph.PermissionMgr.testPermission(uri,key)
                             == Alph.PermissionMgr.UNKNOWN_ACTION)
                         {
-                            Alph.BrowserUtils.log("Registering " + a_url);
+                            Alph.Site.s_logger.info("Registering " + a_url);
                             Alph.PermissionMgr.add(uri,key,Alph.PermissionMgr.ALLOW_ACTION)
                         }
                     }
@@ -102,7 +109,7 @@ Alph.Site = {
             }
             catch(a_e)
             {
-                Alph.BrowserUtils.log("Not registering sites for " + lang + ":"+ a_e);
+                this.s_logger.warn("Not registering sites for " + lang + ":"+ a_e);
                 // quiety ignore missing preference
             }
         }
@@ -268,7 +275,7 @@ Alph.Site = {
         }
         catch(a_e)
         {
-            Alph.BrowserUtils.log("Unable to update menu with new mode " + a_e);
+            this.s_logger.error("Unable to update menu with new mode " + a_e);
         }
     },
     
@@ -431,7 +438,7 @@ Alph.Site = {
                 {
                     Alph.$("#alpheios-loading-interlinear",
                         toggle_elem.ownerDocument).remove();
-                    Alph.BrowserUtils.log("Unable to parse translation: " + a_e);
+                    Alph.Site.s_logger.error("Unable to parse translation: " + a_e);
                 }
             );                  
         } else {
@@ -493,7 +500,7 @@ Alph.Site = {
         }
         catch(a_e)
         {
-            Alph.BrowserUtils.log("Error toggling alignment: " + a_e);
+            Alph.Site.s_logger.error("Error toggling alignment: " + a_e);
         }
     },
     
@@ -528,8 +535,7 @@ Alph.Site = {
             {
                 var next_offset = 0;
         
-                var start = (new Date()).getTime();
-                Alph.BrowserUtils.log("Starting interlinear " + start);
+                Alph.Site.s_logger.debug("Start inserting interlinear.");
                 // add the aligned text to each source word
                 a_words.forEach(
                     function(parent)
@@ -599,7 +605,7 @@ Alph.Site = {
                 );
                 a_end_callback();
                 var end = (new Date()).getTime();
-                Alph.BrowserUtils.log("Total time to insert interlinear: " + (end-start));
+                Alph.Site.s_logger.debug("Done inserting interlinear.");
             };
         };
         var thread = new populate_thread();
@@ -686,7 +692,7 @@ Alph.Site = {
             }
             else 
             {
-                Alph.BrowserUtils.log("Loading alignment from " + align_url + "...");
+                Alph.Site.s_logger.info("Loading alignment from " + align_url + "...");
             }
         }
         r.open("GET", align_url);

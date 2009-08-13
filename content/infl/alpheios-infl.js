@@ -25,12 +25,19 @@
  * @singleton
  */
 Alph.Infl = {
-         /**
+    /**
      * An XSLT Processor for the xml verb conjugation data
      * @private
      * @type XSLTProcessor
      */
     xsltProcessor: null,
+    
+    /**
+     * logger for the window
+     * @type Log4Moz.Logger
+     * @static
+     */
+    s_logger: Alph.BrowserUtils.getLogger('Alpheios.Infl'), 
 
     /**
      * Transforms xml text adhering to the alpheios verb conj schema to html
@@ -68,12 +75,12 @@ Alph.Infl = {
             var start = (new Date()).getTime();
             inflHTML = this.xsltProcessor.transformToDocument(xmlRef);
             var end = (new Date()).getTime();
-            Alph.BrowserUtils.log("Transformation time: " + (end-start));
+            this.s_logger.debug("Transformation time: " + (end-start));
 
         }
         catch (e)
         {
-            Alph.BrowserUtils.log(e);
+            this.s_logger.error(e);
         }
         return inflHTML;
     },
@@ -304,22 +311,15 @@ Alph.Infl = {
 
         // populate the title of the declension table
         var title = '';
-        try
+        if (typeof a_link_target.title == 'undefined')
         {
-            if (typeof a_link_target.title == 'undefined')
-            {
-                title = Alph.BrowserUtils.getString(str_props,'alph-infl-title-'+showpofs);
-            }
-            else
-            {   
-                title = Alph.BrowserUtils.getString(str_props,a_link_target.title);
-            }
+            title = Alph.BrowserUtils.getString(str_props,'alph-infl-title-'+showpofs);
+        }
+        else
+        {   
+            title = Alph.BrowserUtils.getString(str_props,a_link_target.title);
+        }
         
-        }
-        catch(a_e)
-        {
-            Alph.BrowserUtils.log("No title string defined for " + showpofs);
-        }
         $("#alph-inflect-title span.title",topdoc).html(title);
         
         // add a link to the index
@@ -336,25 +336,17 @@ Alph.Infl = {
             }
         );
         
-        var start = (new Date()).getTime();
-        
         // replace the table header text
         $(".header-text",topdoc).each( 
             function(e) { Alph.Infl.replaceString(this,str_props) } );
         
-        var end = (new Date()).getTime();
-        Alph.BrowserUtils.log("Translation time: " + (end-start));
+        this.s_logger.debug("Header strings translated.");
 
         // for each ending in the table, highlight it if there's a matching suffix
         // in the link source but only if we haven't been asked not to look for matches
-        start = end;
-        
-        
         var all_cols = $("col",a_tbl);
         
-        end = (new Date()).getTime();
-        Alph.BrowserUtils.log("Endings Processed: " + (end-start));
-        start=end;
+        this.s_logger.debug("Endings Processed");
         
         if (  ! a_link_target.suppress_match) {
             var col_parents = [];
@@ -375,9 +367,7 @@ Alph.Infl = {
                     }                       }
             
             );
-            end = (new Date()).getTime();
-            Alph.BrowserUtils.log("Endings Highlighted: " + (end-start));
-            start=end;
+            this.s_logger.debug("Endings Highlighted.");
             
             var sib_cols = Alph.Infl.findSibCols(col_parents,all_cols);
                         
@@ -408,8 +398,7 @@ Alph.Infl = {
             Alph.Infl.expandTable(a_tbl,topdoc);            
         }
         end = (new Date()).getTime();
-        Alph.BrowserUtils.log("Selected Endings Displayed: " + (end-start));
-        start=end;
+        this.s_logger.debug("Selected Endings Displayed.");
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted
         
@@ -461,19 +450,14 @@ Alph.Infl = {
             }
         );
 
-        end = (new Date()).getTime();
-        Alph.BrowserUtils.log("Handlers Added: " + (end-start));
-        start=end;
+        this.s_logger.debug("Handlers Added");
         
         var collapsed = a_link_target.lang_tool.handleInflectionDisplay(a_tbl,str_props,a_link_target);
         this.enableExpandCols(collapsed,str_props,a_tbl);
         
-        var start = (new Date()).getTime();
-        
         this.hideEmptyCols(a_tbl,all_cols);
         
-        var end = (new Date()).getTime();
-        Alph.BrowserUtils.log("Hiding time: " + (end-start));
+        this.s_logger.debug("Cols hidden");
     },
     
     /**
@@ -618,7 +602,7 @@ Alph.Infl = {
     {
         $(".loading",a_doc).show();
         var newpofs = $(":selected",a_elem).val();
-        Alph.BrowserUtils.log("Switching to " + newpofs);
+        Alph.Info.s_logger.debug("Switching to " + newpofs);
         a_lang_tool.
             handleInflections(a_e,a_node,{showpofs: newpofs});
     },
@@ -717,17 +701,10 @@ Alph.Infl = {
     replaceString: function(a_elem,a_props)
     {
         var text = jQuery.trim($(a_elem).text());
-        try 
+        var newtext = Alph.BrowserUtils.getString(a_props,text);
+        if (newtext)
         {
-            var newtext = Alph.BrowserUtils.getString(a_props,text);
-            if (newtext)
-            {
-                $(a_elem).text(newtext);        
-            }
-        } 
-        catch(e)
-        {
-            Alph.BrowserUtils.log("Couldn't find string for " + text);   
+            $(a_elem).text(newtext);        
         }  
     },
     
@@ -1037,7 +1014,7 @@ Alph.Infl = {
                         }
                         catch(e)
                         {
-                            Alph.BrowserUtils.log("Invalid colspan");
+                            Alph.Infl.s_logger.error("Invalid colspan");
                         }
                         
                         if (typeof realIndex != "undefined" && 

@@ -3,8 +3,15 @@
 <!ENTITY alpheios.prefs.advanced "Advanced">
 <!ENTITY alpheios.prefs.advanced.label "Advanced...">
 <!ENTITY alpheios.prefs.features "General">
-<!ENTITY alpheios.prefs.debug "Debugging">
-<!ENTITY alpheios.prefs.debug.enable "Enable Console Debugging">
+<!ENTITY alpheios.prefs.log.level "Console Log Level">
+<!ENTITY alpheios.prefs.log.level.fatal "Fatal">
+<!ENTITY alpheios.prefs.log.level.error "Error">
+<!ENTITY alpheios.prefs.log.level.warn "Warn">
+<!ENTITY alpheios.prefs.log.level.info "Info">
+<!ENTITY alpheios.prefs.log.level.config "Config">
+<!ENTITY alpheios.prefs.log.level.debug "Debug">
+<!ENTITY alpheios.prefs.log.level.trace "Trace">
+<!ENTITY alpheios.prefs.log.level.all "All">
 <!ENTITY alpheios.prefs.includecontext "Extract Surrounding Context From Word">
 <!ENTITY alpheios.prefs.popuptrigger "Mouse action to trigger lookup:">
 <!ENTITY alpheios.prefs.popuptrigger.default "Default mouse action for lookup:">

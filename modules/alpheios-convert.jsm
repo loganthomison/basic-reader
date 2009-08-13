@@ -27,8 +27,16 @@
  * This object should be imported into the namespace of the importing class
  */
 const EXPORTED_SYMBOLS = ['Convert'];
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 
 Convert = {
+    
+    /**
+     * main logger for the Convert object
+     * @type Log4Moz.Logger
+     * @static
+     */
+    s_logger: BrowserUtils.getLogger('Alpheios.Convert'), 
     
     /**
      * bind a new method to the Convert object

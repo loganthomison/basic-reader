@@ -288,7 +288,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
                 }
                 catch(a_e)
                 {
-                    Alph.BrowserUtils.log("Error closing window " + a_e)
+                    Alph.main.s_logger.error("Error closing window " + a_e)
                 }
                 // TODO - need to figure out how we want to handle detached panels
                 // across multiple tabs
@@ -376,7 +376,7 @@ Alph.Panel.prototype.detach = function()
             );
     } catch(a_e) 
     {
-        Alph.BrowserUtils.log("Error detaching panel: " + a_e);
+        Alph.main.s_logger.error("Error detaching panel: " + a_e);
     }
   
     return this.updateStatus(Alph.Panel.STATUS_SHOW);
@@ -796,7 +796,7 @@ Alph.Panel.prototype.windowOpen = function()
     }
     catch (a_e)
     {
-        Alph.BrowserUtils.log("Error checking panel window " + a_e);
+        Alph.main.s_logger.error("Error checking panel window " + a_e);
         // FF 3.5 throws an error checking properties on closed window objects   
     }
     return open;

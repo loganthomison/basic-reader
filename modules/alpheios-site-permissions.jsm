@@ -29,6 +29,7 @@
  */
 var EXPORTED_SYMBOLS = ["PermissionMgr"];
 
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 /**
  * @singleton
  */
@@ -134,9 +135,7 @@ PermissionMgr =
         }
         catch(a_e)
         {
-            Components.classes["@mozilla.org/consoleservice;1"]
-                      .getService(Components.interfaces.nsIConsoleService)
-                      .logStringMessage('alpheios: failure testing permissions for host ' 
+            BrowserUtils.debug('failure testing permissions for host ' 
                         + a_uri.spec + ' : ' + a_e);
         }
         return permission;

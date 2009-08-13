@@ -48,7 +48,7 @@ Alph.Dict.prototype = new Alph.Panel();
  */
 Alph.Dict.prototype.init = function(a_panel_state)
 {
-    Alph.BrowserUtils.log("dict panel init");
+    Alph.main.s_logger.debug("dict panel init");
     // initialize the contents and css objects
     // these are objects rather than arryas so that
     // we can have different state per named dictionary if appropriate
@@ -83,7 +83,7 @@ Alph.Dict.prototype.resetContents = function(a_panel_state,a_old_state)
     if (typeof a_old_state != "undefined" &&
         a_old_state.last_request != null && a_old_state.last_request.pending)
     {
-        Alph.BrowserUtils.log("interrupting dictionary request");
+        Alph.main.s_logger.debug("interrupting dictionary request");
         a_old_state.last_request.interrupted = true;
     }
 
@@ -172,7 +172,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     if ((a_event_type == Alph.Constants.EVENTS.SHOW_DICT)  && 
         (panel_state.status == Alph.Panel.STATUS_HIDE))
     {
-        Alph.BrowserUtils.log("Opening dictionary window");
+        Alph.main.s_logger.debug("Opening dictionary window");
         this.open();
         return;
     }
@@ -278,7 +278,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
                     'alpheios-dict-' + panel_state.dicts[bro_id]);
                 panel_state.dicts[bro_id] = null;
             }
-            Alph.BrowserUtils.log("No dictionary defined " + dictionary_callback);
+            Alph.main.s_logger.warn("No dictionary defined " + dictionary_callback);
         }
         else
         {
@@ -326,7 +326,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
                     function ()
                     {
                         request.pending = false;
-                        Alph.BrowserUtils.log("Request complete: " + lemmas.join(', '));
+                        Alph.main.s_logger.debug("Request complete: " + lemmas.join(', '));
                     }
                 );
 
@@ -334,8 +334,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
             catch(a_e)
             {
                 request.pending = false;
-                Alph.BrowserUtils.log(
-                    "Error calling dictionary: " + a_e);
+                Alph.main.s_logger.error("Error calling dictionary: " + a_e);
                 var err_str = '<div class="error">' +
                                       a_e +
                               '</div>';
@@ -423,7 +422,7 @@ Alph.Dict.prototype.displayDictionary = function(
     }
     else
     {
-        Alph.BrowserUtils.log("State reset while waiting for dictionary");
+        Alph.main.s_logger.debug("State reset while waiting for dictionary");
         // if the loading message for this request is still showing, replace
         // it with a request interuppted message
         Alph.$("#alph-dict-loading[alph-request-id=" + a_request.id + "]",alph_window)
@@ -490,7 +489,7 @@ Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
 
     if (typeof a_doc_state.contents == "undefined")
     {
-        Alph.BrowserUtils.log("initializing dictionary document");
+        Alph.main.s_logger.debug("initializing dictionary document");
         a_doc_state = { css: null, contents: null };
         a_doc_state.contents =
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");

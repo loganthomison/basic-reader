@@ -133,14 +133,12 @@ Datafile.prototype =
         var beg = 0;
         var end = this.d_data.length - 1;
 
-        BrowserUtils.log("a_key="+a_key);
         // while data still remains
         while (beg < end)
         {
             // find line containing midpoint of remaining data
             mid = this.d_data.lastIndexOf('\n', (beg + end) >> 1) + 1;
             midStr = this.d_data.substr(mid, tlen);
-            BrowserUtils.log("midStr="+midStr);
             // if too high, restrict to first half
             if (a_key < midStr)
                 end = mid - 1;
@@ -152,10 +150,6 @@ Datafile.prototype =
                 break;
         }
         
-        BrowserUtils.log("beg="+beg);
-        BrowserUtils.log("end="+end);
-        BrowserUtils.log("mid="+mid);
-
         // if found, back up to first line with key
         if (beg < end)
         {
@@ -168,8 +162,6 @@ Datafile.prototype =
                 // if preceding line has different key then done,
                 // else back up to preceding line
                 midStr = this.d_data.substr(prec, tlen);
-                BrowserUtils.log("Midstr="+midStr);
-                BrowserUtils.log("key="+a_key);
                 if (a_key != midStr)
                     break;
                 mid = prec;

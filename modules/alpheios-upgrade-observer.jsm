@@ -27,6 +27,8 @@
  */
 var EXPORTED_SYMBOLS = ["Upgrader"];
 
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
+
 /**
  * @singleton
  */
@@ -42,9 +44,7 @@ Upgrader =
     {
         if (a_topic == "em-action-requested") 
         {
-             Components.classes["@mozilla.org/consoleservice;1"]
-                      .getService(Components.interfaces.nsIConsoleService)
-                      .logStringMessage("alpheios: Observing " + a_data);
+            BrowserUtils.debug("Observing " + a_data);
             a_subject.QueryInterface(Components.interfaces.nsIUpdateItem);
             if (typeof this.d_pkgids[a_subject.id] != "undefined") 
             {
@@ -114,9 +114,7 @@ Upgrader =
                 my_obj.registerPkg(a_pkg.id, a_pkg.callback);
             }
         );
-        Components.classes["@mozilla.org/consoleservice;1"]
-                      .getService(Components.interfaces.nsIConsoleService)
-                      .logStringMessage('registering upgrade observer');
+        BrowserUtils.debug('registering upgrade observer');
         var observerService =
             Components.classes["@mozilla.org/observer-service;1"].
             getService(Components.interfaces.nsIObserverService);

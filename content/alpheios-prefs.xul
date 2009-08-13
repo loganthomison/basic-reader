@@ -64,7 +64,7 @@
           label="&alpheios.prefs.advanced;" 
           image="chrome://alpheios/skin/prefs/emblem-system.png">
         <preferences>
-            <preference id="pref-debug" name="extensions.alpheios.debug" type="bool"/>
+            <preference id="pref-log-level" name="extensions.alpheios.log.logger.level" type="string"/>
             <preference id="pref-trigger" name="extensions.alpheios.popuptrigger" type="string"/>
             <preference id="pref-dictionaries-full-timeout" 
                         name="extensions.alpheios.methods.dictionary.full.default.timeout" 
@@ -81,8 +81,21 @@
         </preferences>
         <vbox id="alpheios-prefs-adv-set" flex="1">
             <groupbox>
-                <caption label="&alpheios.prefs.debug;"/>
-                <checkbox id="debug" label="&alpheios.prefs.debug.enable;" preference="pref-debug"/>
+                <caption label="&alpheios.prefs.log.level;"/>
+                <menulist id="log-levels" 
+                         label="&alpheios.prefs.log.level;" 
+                         preference="pref-log-level">
+                    <menupopup>
+                    <menuitem value="Fatal" label="&alpheios.prefs.log.level.fatal;"/>
+                    <menuitem value="Error" label="&alpheios.prefs.log.level.error;"/>
+                    <menuitem value="Warn" label="&alpheios.prefs.log.level.warn;"/>
+                    <menuitem value="Info" label="&alpheios.prefs.log.level.info;"/>
+                    <menuitem value="Config" label="&alpheios.prefs.log.level.config;"/>
+                    <menuitem value="Debug" label="&alpheios.prefs.log.level.debug;"/>                    
+                    <menuitem value="Trace" label="&alpheios.prefs.log.level.trace;"/>
+                    <menuitem value="All" label="&alpheios.prefs.log.level.all;"/>
+                    </menupopup>
+                </menulist>
             </groupbox>
             <groupbox>
                 <caption label="&alpheios.prefs.popuptrigger.default;" />

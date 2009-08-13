@@ -26,6 +26,7 @@
  * This object should be imported into the namespace of the importing class
  */
 var EXPORTED_SYMBOLS = ["Uninstaller"];
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 
 /**
  * @singleton
@@ -125,9 +126,7 @@ Uninstaller =
                 my_obj.registerPkg(a_id);
             }
         );
-        Components.classes["@mozilla.org/consoleservice;1"]
-                      .getService(Components.interfaces.nsIConsoleService)
-                      .logStringMessage('registering uninstall observer');
+        BrowserUtils.debug('registering uninstall observer');
         var observerService =
             Components.classes["@mozilla.org/observer-service;1"].
             getService(Components.interfaces.nsIObserverService);

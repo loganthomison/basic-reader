@@ -33,11 +33,14 @@ const CC = Components.classes;
 const CI = Components.interfaces;
 const CU = Components.utils;
 
+CU.import("resource://alpheios/ext/log4moz.js");
+
 /**
  * Alpheios Browser-Specific Utility functions
  * @singleton
  */
 BrowserUtils = {
+    
     
     /**
      * Holds nsILocalFile objects for the local directory of each 
@@ -49,17 +52,41 @@ BrowserUtils = {
     d_extensionBasePaths: {},
     
     /**
-     * Log a string message to the javascript console.
-     * Only logs the message if the extensions.alpheios.debug 
-     * preference is enabled
+     * main logger for the BrowserUtils object
+     * @type Log4Moz.Logger
+     * @static
+     */
+    s_logger: Log4Moz.repository.getLogger('Alpheios.BrowserUtils'), 
+    
+    
+    /**
+     * Get a logger under the requested name
+     * @param {String} a_name logger name
+     * @return the logger
+     * @type Log4Moz.Logger 
+     */
+    getLogger: function(a_name)
+    {
+        return Log4Moz.repository.getLogger(a_name);
+    },
+    
+    /**
+     * set the log level for the applications
+     * for now, only supporting this being set at the root logger level not
+     * individually per log type
+     */
+    setLogLevel: function(a_level)
+    {
+        Log4Moz.repository.rootLogger.level = Log4Moz.Level[a_level];    
+    },
+    
+    /**
+     * General method for logging a debugging message to the javascript console,
+     * using the root logger
      * @param {String} a_msg the message to be logged
      */
-    log: function(a_msg) {
-        var isDebug = this.getPref("debug");
-        if (! isDebug ) {
-            return;
-        }
-        BrowserSvc.getSvc('Console').logStringMessage('alpheios:' + a_msg);
+    debug: function(a_msg) {
+        this.s_logger.debug(a_msg);
     },
     
     /**
@@ -149,7 +176,7 @@ BrowserUtils = {
         else if (type == Components.interfaces.nsIPrefBranch.PREF_BOOL)
             BrowserSvc.getSvc('AlphPrefs').setBoolPref(a_name, a_value);
         else
-            this.log("Invalid preference type for " + a_name + "(" + type + ":" + typeof a_value + ")")
+            this.s_logger.error("Invalid preference type for " + a_name + "(" + type + ":" + typeof a_value + ")")
             // fall through behavior is to not set the pref if we don't know what type it is
     },
     
@@ -219,12 +246,12 @@ BrowserUtils = {
             }
             else
             {
-                this.log("Not a directory: " + base_file_dir.path);
+                this.s_logger.error("Not a directory: " + base_file_dir.path);
             }
         }
         catch(e)
         {
-            this.log("Error reading " + base_file_dir.path + ":" + e);
+            this.s_logger.error("Error reading " + base_file_dir.path + ":" + e);
             return null;
         }
         
@@ -268,7 +295,7 @@ BrowserUtils = {
                 }
                 catch(a_e)
                 {
-                    this.log("Error checking path " + avail_path + ":",a_e);
+                    this.s_logger.error("Error checking path " + avail_path + ":",a_e);
                 }
             }
             i++;
@@ -279,10 +306,10 @@ BrowserUtils = {
             if (file.exists())
             {
                 // if we found the file, return it
-                this.log("Found requested file at " + file.path);
+                this.s_logger.debug("Found requested file at " + file.path);
                 // set the the file to be executable
                 file.permissions = 0755;
-                this.log("Permissions "  + file.permissions);
+                this.s_logger.debug("Permissions "  + file.permissions);
                 return file;
             }
     
@@ -290,7 +317,7 @@ BrowserUtils = {
         
         // if we got here, we couldn't find the file
         // report the last path used
-        this.log("File not found: " + a_base_path + " " + a_filename);
+        this.s_logger.error("File not found: " + a_base_path + " " + a_filename);
         return null;
     },
 
@@ -320,12 +347,12 @@ BrowserUtils = {
             var url =
                 BrowserSvc.getSvc('IO').newURI("chrome://" + a_ext_pkg + "/content/","UTF-8",null);
             var pkg_path = BrowserSvc.getSvc("ChromeReg").convertChromeURL(url).spec;
-            this.log("Converted chrome url: " + pkg_path);
+            this.s_logger.debug("Converted chrome url: " + pkg_path);
             // remove the chrome dir and everything after it 
             pkg_path = pkg_path.substring(0,pkg_path.indexOf('/chrome'));
             // remove the jar prefix
             pkg_path = pkg_path.replace(/^jar:/,'');
-            this.log("Cleaned chrome url: " + pkg_path);
+            this.s_logger.debug("Cleaned chrome url: " + pkg_path);
             base_path.initWithFile(BrowserSvc.getSvc('Protocol').getFileFromURLSpec(pkg_path));
             this.d_extensionBasePaths[a_ext_pkg] = base_path;
                 
@@ -359,7 +386,7 @@ BrowserUtils = {
         }
         catch(a_e)
         {
-            this.log("Error retrieving installed extensions:" + a_e);
+            this.s_logger.error("Error retrieving installed extensions:" + a_e);
         }
         return alph_pkgs;
     },
@@ -410,7 +437,7 @@ BrowserUtils = {
                     break;
                 }
             } catch(e) {
-                this.log("Error switch browser tab: " + e);
+                this.s_logger.error("Error switch browser tab: " + e);
             }
         }
         return succeeded;
@@ -457,7 +484,7 @@ BrowserUtils = {
      */
     readFile: function(a_uri,a_charset)
     {
-        this.log("Reading file from file system: " + a_uri);
+        this.s_logger.debug("Reading file from file system: " + a_uri);
         var input_stream = BrowserSvc.getSvc('InputStream');
         var channel = BrowserSvc.getSvc('IO').newChannel(a_uri,null,null);
         var input = channel.open();
@@ -605,6 +632,12 @@ BrowserSvc = {
                     .getService(CI.nsIPrefService)
                     .getBranch("extensions.alpheios.");
         this.AlphPrefs.QueryInterface(CI.nsIPrefBranch2);
+
+        // initialize the Log4Moz service
+        let formatter = new Log4Moz.BasicFormatter();
+        let root = Log4Moz.repository.rootLogger;
+        let capp = new Log4Moz.ConsoleAppender(formatter);
+        root.addAppender(capp);
     },
     
     /**

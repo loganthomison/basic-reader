@@ -262,7 +262,7 @@ Alph.Util = {
             var chrome_url = 'chrome://'+ a_ext + '/content/xslt/' + a_filename;
             var xmlDoc = document.implementation.createDocument("", "", null);
             xmlDoc.async = false;
-            Alph.BrowserUtils.log("Loading xslt at " + chrome_url);
+            Alph.BrowserUtils.debug("Loading xslt at " + chrome_url);
             xmlDoc.load(chrome_url);
             xsltProcessor.importStylesheet(xmlDoc);
         }
@@ -276,7 +276,7 @@ Alph.Util = {
                 pkg_path.append('xslt');
                 pkg_path.append(a_filename);
                 var path_url = 'file:///' + pkg_path.path;
-                Alph.BrowserUtils.log("XHR Loading xslt at " + path_url);
+                Alph.BrowserUtils.debug("XHR Loading xslt at " + path_url);
                 var p = new XMLHttpRequest();      
                 p.open("GET", path_url, false);
                 p.send(null);
@@ -285,7 +285,7 @@ Alph.Util = {
             catch(a_ee)
             {
                 // if that fails, we're out of luck
-                Alph.BrowserUtils.log("Unable to load stylesheet " + a_filename + " in " + a_ext + " : " + a_e + "," + a_ee);
+                Alph.BrowserUtils.debug("Unable to load stylesheet " + a_filename + " in " + a_ext + " : " + a_e + "," + a_ee);
             }
         }
         return xsltProcessor;
