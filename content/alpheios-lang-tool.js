@@ -72,7 +72,7 @@ Alph.LanguageTool = function(a_language,a_properties)
             {
                 // individual language may override the popuptrigger,
                 // but they don't have to
-                return Alph.BrowserUtils.getPrefOrDefault("popuptrigger",a_language);
+                return Alph.BrowserUtils.getPref("popuptrigger",a_language);
             },
         usemhttpd:
             function()
@@ -97,7 +97,7 @@ Alph.LanguageTool = function(a_language,a_properties)
         pofs:
             function()
             {
-                var pofs = Alph.BrowserUtils.getPrefOrDefault("partsofspeech",a_language);
+                var pofs = Alph.BrowserUtils.getPref("partsofspeech",a_language);
                 if (pofs)
                 {
                     return pofs.split(/,/);
@@ -963,7 +963,7 @@ Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
  */
 Alph.LanguageTool.prototype.getFeature = function(a_id)
 {
-    var enabled = Alph.BrowserUtils.getPrefOrDefault("features."+a_id,this.d_sourceLanguage);
+    var enabled = Alph.BrowserUtils.getPref("features."+a_id,this.d_sourceLanguage);
     this.s_logger.debug("Feature " + a_id + " for " + this.d_sourceLanguage + " is " + enabled);
     return enabled;
 };
@@ -976,7 +976,7 @@ Alph.LanguageTool.prototype.getFeature = function(a_id)
  */
 Alph.LanguageTool.prototype.getCmd = function(a_cmd)
 {
-    return Alph.BrowserUtils.getPrefOrDefault("cmds."+a_cmd,this.d_sourceLanguage);
+    return Alph.BrowserUtils.getPref("cmds."+a_cmd,this.d_sourceLanguage);
 };
 
 /**
@@ -1114,7 +1114,7 @@ Alph.LanguageTool.prototype.getDictionaryCallback = function()
     if (this.hasDictionary())
     {
         dict_method =
-            Alph.BrowserUtils.getPrefOrDefault(
+            Alph.BrowserUtils.getPref(
                 "methods.dictionary.full.default",
                 this.d_sourceLanguage);
     }

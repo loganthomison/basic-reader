@@ -91,41 +91,39 @@ BrowserUtils = {
     
     /**
      * Get a preference from the extensions.alpheios branch
+     * @param {String} a_name the preference
      * @param {String} a_lang the language branch (optional)
-     * @return the preference (one of int, string or boolean)
+     * @return the preference (one of int, string or boolean, or undefined)
      */
-    getPref: function(name,a_lang)
+    getPref: function(a_name,a_lang)
     {
-
-        if (typeof a_lang != 'undefined')
+        var lookup_name = a_name;
+        if (typeof a_lang != 'undefined' && a_lang != null)
         {
-            name = a_lang + '.' + name;
+            lookup_name = a_lang + '.' + a_name;
         }
-        
-        //TODO - handle missing prefs? 
-        var type = BrowserSvc.getSvc('AlphPrefs').getPrefType(name);
+         
+        var prefSvc = BrowserSvc.getSvc('AlphPrefs');
+        var type = prefSvc.getPrefType(lookup_name);
+
+        // if the preference isn't defined and we were asked for a 
+        // a language specific preference, look to see if a default
+        // has been defined
+        if (type == CI.nsIPrefBranch.PREF_INVALID && typeof a_lang != 'undefined' && a_lang != null)
+        {
+            lookup_name = a_name; 
+            type = prefSvc.getPrefType(lookup_name);
+        }
+        var ret_value;        
         if (type == CI.nsIPrefBranch.PREF_STRING)
-            return BrowserSvc.getSvc('AlphPrefs').getCharPref(name);
+            ret_value = prefSvc.getCharPref(lookup_name);
         else if (type == CI.nsIPrefBranch.PREF_INT)
-            return BrowserSvc.getSvc('AlphPrefs').getIntPref(name);
+            ret_value = prefSvc.getIntPref(lookup_name);
         else if (type == CI.nsIPrefBranch.PREF_BOOL)
-            return BrowserSvc.getSvc('AlphPrefs').getBoolPref(name);
+            ret_value = prefSvc.getBoolPref(lookup_name);
+        return ret_value;
     },
-    
-    /**
-     * Gets a language specific preference or the default alpheios preference 
-     * if the language specific preference is not defined.
-     * @param {String} a_name the preference name
-     * @param {String} a_lang the language
-     * @return the preference from the language, or if not defined, the default 
-     * from the alpheios package. (one of int, string or boolean)
-     */
-    getPrefOrDefault: function(a_name, a_lang)
-    {
-        return this.getPref(a_name,a_lang)
-            || this.getPref(a_name);
-    },
-    
+        
     /**
      * Set a preference in the extensions.alpheios branch
      * @param {String} a_name the name of the preference
