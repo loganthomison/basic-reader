@@ -15,7 +15,7 @@
 
     <commandset id="mainCommandSet">
         <command id="alpheios-morph-toggle-cmd" 
-             oncommand="Alph.main.togglePanel(event,'alph-morph-panel');"
+             oncommand="Alph.Main.togglePanel(event,'alph-morph-panel');"
              observes="alph-morph-status" />
         <command
             id="alpheios-morph-inflect-cmd" 

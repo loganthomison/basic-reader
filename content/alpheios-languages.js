@@ -28,7 +28,7 @@
  * The Alph.Languages object holds
  * the instantiated instances of the {@link Alph.LanguageTool}
  * objects for each supported language.
- * It is populated by {@link Alph.main#set_languages}
+ * It is populated by {@link Alph.Main#set_languages}
  */
 Alph.Languages = 
 {

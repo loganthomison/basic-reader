@@ -171,7 +171,7 @@ Alph.Quiz =
         var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
 
-        var pofs_list = a_params.lang_tool.getpofs();
+        var pofs_list = a_params.lang_tool.getPofs();
         
         var valid_pofs = $('.alph-pofs',a_params.source_node).attr('context');
    

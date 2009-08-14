@@ -35,7 +35,7 @@ Alph.Interactive = {
     queryVisible: function(a_bro)
     {
         var query_win =
-            Alph.main.getStateObj(a_bro).getVar("windows")['alph-query-window'];
+            Alph.Main.getStateObj(a_bro).getVar("windows")['alph-query-window'];
         var window_open = false;
         try 
         {
@@ -55,7 +55,7 @@ Alph.Interactive = {
      */
     enabled: function(a_bro)
     {
-        return Alph.main.getMode() == Alph.Constants.LEVELS.LEARNER;
+        return Alph.Main.getMode() == Alph.Constants.LEVELS.LEARNER;
 
     },
     
@@ -73,9 +73,9 @@ Alph.Interactive = {
             return;
         }
         
-        var browser = Alph.BrowserUtils.browserForDoc(window,a_topdoc) || Alph.main.getCurrentBrowser();
-        var lang_tool = Alph.main.getLanguageTool(browser);
-        var pofs_list = lang_tool.getpofs();
+        var browser = Alph.BrowserUtils.browserForDoc(window,a_topdoc) || Alph.Main.getCurrentBrowser();
+        var lang_tool = Alph.Main.getLanguageTool(browser);
+        var pofs_list = lang_tool.getPofs();
         var valid_pofs = Alph.$('#alph-text .alph-pofs',popup).attr('context');
         var has_pofs = false;
         for (var p_i = 0; p_i < pofs_list.length; p_i++)
@@ -94,7 +94,7 @@ Alph.Interactive = {
         {
             Alph.$(popup).removeClass("alpheios-inline-query").removeClass("query-pending");
             Alph.$(".alph-word-first",popup)
-                .prepend('<div class="alpheios-hint">' + Alph.main.getString('alph-query-notsupported') + '</div>');
+                .prepend('<div class="alpheios-hint">' + Alph.Main.getString('alph-query-notsupported') + '</div>');
             return;
         }
         var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');
@@ -109,7 +109,7 @@ Alph.Interactive = {
         var params =
         {
             lang_tool: lang_tool,
-            main_str: Alph.main.d_stringBundle,
+            main_str: Alph.Main.d_stringBundle,
             source_node: Alph.$("#alph-text",popup).get(0),
             source_align: source_align || [],
             transform: Alph.Xlate.transform,
@@ -118,7 +118,7 @@ Alph.Interactive = {
         // if the translation panel is open, offer interactive identification
         // of definitions, unless the dependency tree display was the source of the
         // selection
-        if (Alph.main.d_panels['alph-trans-panel'].isVisibleInline()
+        if (Alph.Main.d_panels['alph-trans-panel'].isVisibleInline()
             && Alph.$("#dependency-tree",a_topdoc).length == 0)
         {
             if (source_align.length > 0)
@@ -128,17 +128,17 @@ Alph.Interactive = {
                 Alph.$(popup).addClass("alpheios-inline-query");
                 Alph.$("#alph-text",popup).append(
                     '<div id="alph-inline-query-instruct">' +
-                    Alph.main.getString("alph-inline-query-instruct",[selected_word]) +
+                    Alph.Main.getString("alph-inline-query-instruct",[selected_word]) +
                     '</div>' +
                     '<div id="alph-align-answer-prompt"/>' + 
                     '<div id="alph-inline-query-correct">'+
                     '<span class="alph-inline-query-heading">' +
-                    Alph.main.getString("alph-inline-query-correct") +
+                    Alph.Main.getString("alph-inline-query-correct") +
                     '</span>' +
                     '</div>' +
                     '<div id="alph-inline-query-incorrect">'+
                     '<span class="alph-inline-query-heading">' +
-                    Alph.main.getString("alph-inline-query-incorrect") +
+                    Alph.Main.getString("alph-inline-query-incorrect") +
                     '</span>' +
                     '</div>'
                 );
@@ -147,7 +147,7 @@ Alph.Interactive = {
                 params.type = 'infl_query';
                 params.aligned_ids = [];
                 params.aligned_defs = [];
-                Alph.main.d_panels['alph-trans-panel'].enableInteractiveQuery(params);
+                Alph.Main.d_panels['alph-trans-panel'].enableInteractiveQuery(params);
             }
             // if the word isn't aligned, just display the query window
             else
@@ -226,12 +226,12 @@ Alph.Interactive = {
         if (! matched)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(Alph.main.getString("alph-query-incorrect"));
+                .html(Alph.Main.getString("alph-query-incorrect"));
         }
         else if (params.aligned_ids.length < params.source_align.length)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(Alph.main.getString("alph-query-more"));
+                .html(Alph.Main.getString("alph-query-more"));
         }
         
         if (params.aligned_ids.length == params.source_align.length)
@@ -372,7 +372,7 @@ Alph.Interactive = {
         }
         if (correct)
         {
-            alert(Alph.main.getString("alph-query-correct"));
+            alert(Alph.Main.getString("alph-query-correct"));
             Alph.$('.alph-decl',
                 a_params.query_parent).css('display','inline');
             Alph.$('.alph-conj',
@@ -388,7 +388,7 @@ Alph.Interactive = {
         }
         else
         {
-            alert(Alph.main.getString("alph-query-incorrect"));
+            alert(Alph.Main.getString("alph-query-incorrect"));
             Alph.$(a_ending).addClass('incorrect');
             return false;
         }    
@@ -402,7 +402,7 @@ Alph.Interactive = {
      {
         if (this.queryVisible())
         {
-            Alph.main.getStateObj(a_bro).getVar("windows")['alph-query-window'].close();
+            Alph.Main.getStateObj(a_bro).getVar("windows")['alph-query-window'].close();
         }
      },
      
@@ -416,7 +416,7 @@ Alph.Interactive = {
         var doc = null;
         if (this.queryVisible())
         {
-            var win = Alph.main.getStateObj().getVar("windows")['alph-query-window'];
+            var win = Alph.Main.getStateObj().getVar("windows")['alph-query-window'];
             doc = win.$("#alph-query-frame").get(0).contentDocument;
         }
         return doc;

@@ -88,7 +88,7 @@ Alph.Panel.prototype.resetToDefault = function()
     // if a preference is stored, use it
     var status_pref = this.getStatusPrefSetting();
     
-    var lang = Alph.main.getStateObj().getVar("current_language");
+    var lang = Alph.Main.getStateObj().getVar("current_language");
     var status;
     // use the global prefs unless we're overriding for this language
     if (Alph.BrowserUtils.getPref("panels.use.defaults",lang))
@@ -141,7 +141,7 @@ Alph.Panel.prototype.resetState = function(a_bro)
     this.resetContents(panel_state,old_state);
          
     // just auto hide everything if alpheios is disabled
-    if ( ! Alph.main.isEnabled(a_bro))
+    if ( ! Alph.Main.isEnabled(a_bro))
     {
         this.updateStatus(this.hide(true));
     }
@@ -184,7 +184,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
     // NOTE - do this before changing the state of the panels
     // so that any event handlers which need to know the new
     // state get the correct value from the state object
-    var bro = Alph.main.getCurrentBrowser();
+    var bro = Alph.Main.getCurrentBrowser();
     var panel_state = this.getBrowserState(bro);
     
     var old_status = panel_state.status;
@@ -288,7 +288,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
                 }
                 catch(a_e)
                 {
-                    Alph.main.s_logger.error("Error closing window " + a_e)
+                    Alph.Main.s_logger.error("Error closing window " + a_e)
                 }
                 // TODO - need to figure out how we want to handle detached panels
                 // across multiple tabs
@@ -312,7 +312,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
 
     {
         // TODO support per url preferences ?   
-        var lang = Alph.main.getStateObj(bro).getVar("current_language");
+        var lang = Alph.Main.getStateObj(bro).getVar("current_language");
         if (lang != "")
         {
             // if we're using the defaults, store to defaults
@@ -376,7 +376,7 @@ Alph.Panel.prototype.detach = function()
             );
     } catch(a_e) 
     {
-        Alph.main.s_logger.error("Error detaching panel: " + a_e);
+        Alph.Main.s_logger.error("Error detaching panel: " + a_e);
     }
   
     return this.updateStatus(Alph.Panel.STATUS_SHOW);
@@ -394,7 +394,7 @@ Alph.Panel.prototype.restore = function()
         this.d_panelWindow = null;
     }
     
-    var panel_state = this.getBrowserState(Alph.main.getCurrentBrowser());
+    var panel_state = this.getBrowserState(Alph.Main.getCurrentBrowser());
     this.updateStatus(panel_state.status);
 }
 
@@ -478,7 +478,7 @@ Alph.Panel.prototype.open = function()
  */
 Alph.Panel.prototype.toggle = function()
 {
-    var bro = Alph.main.getCurrentBrowser();
+    var bro = Alph.Main.getCurrentBrowser();
     var panel_state = this.getBrowserState(bro);
     
     if (panel_state.status == Alph.Panel.STATUS_SHOW)
@@ -533,7 +533,7 @@ Alph.Panel.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
  */
 Alph.Panel.prototype.getBrowserState = function(a_bro)
 {
-  var panel_state = Alph.main.getStateObj(a_bro).getVar("panels");
+  var panel_state = Alph.Main.getStateObj(a_bro).getVar("panels");
   if (typeof panel_state[this.d_panelId] == "undefined")
   {
     panel_state[this.d_panelId] = {};
@@ -740,13 +740,13 @@ Alph.Panel.prototype.resizePanelWindow = function(a_width,a_height)
 Alph.Panel.executeLangCommand = function(a_event,a_panel_id)
 {
     var panel_obj;
-    if (typeof Alph.main == "undefined")
+    if (typeof Alph.Main == "undefined")
     {
-        panel_obj = window.opener.Alph.main.d_panels[a_panel_id];
+        panel_obj = window.opener.Alph.Main.d_panels[a_panel_id];
     }   
     else
     {
-        panel_obj = Alph.main.d_panels[a_panel_id];    
+        panel_obj = Alph.Main.d_panels[a_panel_id];    
     }
     
     // if the panel is detached, need to jump through some hoops
@@ -776,11 +776,11 @@ Alph.Panel.executeLangCommand = function(a_event,a_panel_id)
             }
         );
     }
-    // otherwise we can just pass it to the Alph.main.executeLangCommand function
+    // otherwise we can just pass it to the Alph.Main.executeLangCommand function
     // to handle
     else
     {
-        Alph.main.executeLangCommand(a_event);
+        Alph.Main.executeLangCommand(a_event);
     }
 };
 
@@ -796,7 +796,7 @@ Alph.Panel.prototype.windowOpen = function()
     }
     catch (a_e)
     {
-        Alph.main.s_logger.error("Error checking panel window " + a_e);
+        Alph.Main.s_logger.error("Error checking panel window " + a_e);
         // FF 3.5 throws an error checking properties on closed window objects   
     }
     return open;

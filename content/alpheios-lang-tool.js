@@ -50,13 +50,13 @@ Alph.LanguageTool = function(a_language,a_properties)
     // the object.
     var default_properties =
     {
-        contextForward:
+        ContextForward:
             function()
             {
                 return Alph.BrowserUtils.getPref("context_forward",a_language)
                     || 0;
             },
-        contextBack:
+        ContextBack:
             function()
             {
                 return Alph.BrowserUtils.getPref("context_back",a_language)
@@ -72,19 +72,19 @@ Alph.LanguageTool = function(a_language,a_properties)
             {
                 return a_language;
             },
-        popuptrigger:
+        PopupTrigger:
             function()
             {
                 // individual language may override the popuptrigger,
                 // but they don't have to
                 return Alph.BrowserUtils.getPref("popuptrigger",a_language);
             },
-        usemhttpd:
+        UseMhttpd:
             function()
             {
                 return Alph.BrowserUtils.getPref("usemhttpd",a_language);
             },
-        grammarlinks:
+        GrammarLinks:
             function()
             {
                 var grammarlinklist = {};
@@ -99,7 +99,7 @@ Alph.LanguageTool = function(a_language,a_properties)
                 }
                 return grammarlinklist;
             },
-        pofs:
+        Pofs:
             function()
             {
                 var pofs = Alph.BrowserUtils.getPref("partsofspeech",a_language);
@@ -382,7 +382,7 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
  */
 Alph.LanguageTool.prototype.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
 {
-    a_onerror(Alph.main.getString("alph-error-nolexicon",[this.d_sourceLanguage]));
+    a_onerror(Alph.Main.getString("alph-error-nolexicon",[this.d_sourceLanguage]));
 };
 
 /**
@@ -514,8 +514,8 @@ function(a_ro, a_rngstr)
      * We also need to be able to pull surrounding context for text
      * nodes that are broken up by formatting tags (<br/> etc))
      */
-    var context_forward = this.getcontextForward();
-    var context_back = this.getcontextBack();
+    var context_forward = this.getContextForward();
+    var context_back = this.getContextBack();
 
     var context_str = null;
     var context_pos = 0;
@@ -615,8 +615,8 @@ function(a_ro, a_rngstr)
      * We also need to be able to pull surrounding context for text
      * nodes that are broken up by formatting tags (<br/> etc))
      */
-    var context_forward = this.getcontextForward();
-    var context_back = this.getcontextBack();
+    var context_forward = this.getContextForward();
+    var context_back = this.getContextBack();
 
     var context_str = null;
     var context_pos = 0;
@@ -695,7 +695,7 @@ Alph.LanguageTool.prototype.convertString = function(a_str)
 Alph.LanguageTool.prototype.grammarContext = function(a_doc)
 {
     var myobj=this;
-    var links = this.getgrammarlinks();
+    var links = this.getGrammarLinks();
 
     for (var link_name in links)
     {
@@ -731,7 +731,7 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
     var targetURL = Alph.BrowserUtils.getPref("url.grammar",this.d_sourceLanguage) || "";
     targetURL = targetURL.replace(/\<ITEM\>/, a_target || "");
 
-    var grammar_loading_msg = Alph.main.getString("alph-loading-grammar");
+    var grammar_loading_msg = Alph.Main.getString("alph-loading-grammar");
     var features =
     {
         screen: Alph.BrowserUtils.getPref("grammar.window.loc")
@@ -811,7 +811,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         screen: Alph.BrowserUtils.getPref("shift.window.loc"),
     }
     // add a callback to hide the loading message
-    var loading_msg = Alph.main.getString("alph-loading-inflect");
+    var loading_msg = Alph.Main.getString("alph-loading-inflect");
 
     var loading_node;
     if (Alph.$(a_node).length >0)
@@ -833,7 +833,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
                     Alph.Xlate.showLoadingMessage,[loading_node,loading_msg]
     );
     this.s_logger.info("Inflections window should have focus with "
-            + Alph.main.getStateObj().getVar("word"));
+            + Alph.Main.getStateObj().getVar("word"));
 }
 
 /**
@@ -1084,7 +1084,7 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
     var link = '';
     if (this.hasDictionary())
     {
-        var dict_alt_text = Alph.main.getString('alph-dictionary-link');
+        var dict_alt_text = Alph.Main.getString('alph-dictionary-link');
         link = '<div class="alph-tool-icon alpheios-button alph-dict-link" ' +
                'href="#alph-dict" title="' + dict_alt_text + '">' +
                '<img src="' + Alph.BrowserUtils.getStyleUrl() + '/icons/wordlist_16.png" ' +
@@ -1351,7 +1351,7 @@ Alph.LanguageTool.prototype.getLemmaId = function(a_lemma_key)
 Alph.LanguageTool.prototype.getString = function(a_name,a_replace)
 {
 
-    return Alph.main.getLanguageString(this.d_sourceLanguage,a_name,a_replace)
+    return Alph.Main.getLanguageString(this.d_sourceLanguage,a_name,a_replace)
 }
 
 /**
@@ -1366,7 +1366,7 @@ Alph.LanguageTool.prototype.getStringOrDefault = function(a_name,a_replace)
     var str = this.getString(a_name,a_replace);
     if (str == '')
     {
-        str = Alph.main.getString(a_name,a_replace);
+        str = Alph.Main.getString(a_name,a_replace);
     }
     return str;
 }
@@ -1392,7 +1392,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     if (a_target.getTreebankQuery() &&
         Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length == 0)
     {
-        var diagram_alt_text = Alph.main.getString('alph-diagram-link');
+        var diagram_alt_text = Alph.Main.getString('alph-diagram-link');
         Alph.$('' +
             '<div class="alph-tool-icon alpheios-button alph-diagram-link" ' +
             'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+
@@ -1428,7 +1428,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         Alph.$('#alph-word-tools .alph-dict-link',a_node).click(
             function(a_event)
             {
-                Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_DICT);
+                Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_DICT);
             }
         );
     }
@@ -1436,7 +1436,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     // add the inflection tool, if any
     if (this.getFeature('alpheios-inflect') && this.canInflect(a_node))
     {
-        var inflect_alt_text = Alph.main.getString('alph-inflect-link');
+        var inflect_alt_text = Alph.Main.getString('alph-inflect-link');
         Alph.$("#alph-word-tools",a_node).append(
             '<div class="alph-tool-icon alpheios-button alph-inflect-link" ' +
             'href="#alpheios-inflect" title="' + inflect_alt_text + '">' +
@@ -1444,7 +1444,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             'alt="' + inflect_alt_text + '"/>' + 
             '<div class="alpheios-icon-label">' + inflect_alt_text + '</div></div>'
         );
-        var loading_msg = Alph.main.getString("alph-loading-inflect");
+        var loading_msg = Alph.Main.getString("alph-loading-inflect");
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
             function(a_e)
             {
@@ -1458,7 +1458,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     if (Alph.$("#alph-word-tools",a_node).children().length > 0)
     {
         if (Alph.$("#alph-word-tools",a_node).prepend(
-            '<span class="alpheios-toolbar-label">' + Alph.main.getString("alph-tools")
+            '<span class="alpheios-toolbar-label">' + Alph.Main.getString("alph-tools")
             + '</span>')
         );
     }
@@ -1501,7 +1501,7 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
         {
             if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument) || from_tree)
             {
-                var loading_msg = Alph.main.getString("alph-loading-inflect");
+                var loading_msg = Alph.Main.getString("alph-loading-inflect");
                 Alph.Xlate.showLoadingMessage([tools,loading_msg]);
                 lang_tool.handleInflections(a_e,a_node);
             }
@@ -1517,7 +1517,7 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
         {
             if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument) || from_tree)
             {
-                Alph.main.broadcastUiEvent(
+                Alph.Main.broadcastUiEvent(
                     Alph.Constants.EVENTS.SHOW_DICT);
             }
             else
@@ -1539,9 +1539,9 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
 */
 Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
 {
-    var form = Alph.main.getString("alph-morph-form");
-    var stem = Alph.main.getString("alph-morph-stem");
-    var suffix = Alph.main.getString("alph-morph-suffix");
+    var form = Alph.Main.getString("alph-morph-form");
+    var stem = Alph.Main.getString("alph-morph-stem");
+    var suffix = Alph.Main.getString("alph-morph-suffix");
     var icon_url = Alph.BrowserUtils.getStyleUrl() + '/icons/';
     Alph.$(".alph-term",a_node).each(
         function()
@@ -1585,12 +1585,12 @@ Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
                             if (Alph.$(this).nextAll(".alph-"+title[1]).length > 0)
                             {
                                 name =
-                                    Alph.main.getString("alph-morph-" +title[1] + '-plural');
+                                    Alph.Main.getString("alph-morph-" +title[1] + '-plural');
                             }
                             else
                             {
                                 name =
-                                    Alph.main.getString("alph-morph-" +title[1]);
+                                    Alph.Main.getString("alph-morph-" +title[1]);
                             }
                             // only display attributes for which we have explicitly
                             // defined strings, and which we haven't already added

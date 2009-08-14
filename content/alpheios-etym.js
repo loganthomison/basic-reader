@@ -48,7 +48,7 @@ Alph.Etymology.prototype = new Alph.Panel();
  */
 Alph.Etymology.prototype.init = function(a_panel_state)
 {
-    Alph.main.s_logger.debug("etymology panel init");
+    Alph.Main.s_logger.debug("etymology panel init");
     // hack to hold etymology data until we have a real service
     this.d_tempData = {};
     
@@ -111,7 +111,7 @@ Alph.Etymology.prototype.initDocument = function(a_doc,a_doc_state)
     
     if (typeof a_doc_state.contents == "undefined")
     {
-        Alph.main.s_logger.debug("initializing etymology document");
+        Alph.Main.s_logger.debug("initializing etymology document");
         a_doc_state = { css: null, contents: null };
         a_doc_state.contents = a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
         a_doc_state.contents.setAttribute("id", "alph-window");
@@ -140,7 +140,7 @@ Alph.Etymology.prototype.initDocument = function(a_doc,a_doc_state)
 Alph.Etymology.prototype.show = function()
 {
     var panel_obj = this;
-    var bro = Alph.main.getCurrentBrowser();
+    var bro = Alph.Main.getCurrentBrowser();
     var panel_state = this.getBrowserState(bro);
     if (this.d_panelWindow != null)
     {
@@ -246,7 +246,7 @@ Alph.Etymology.prototype.getEtymData = function()
 {
     // initialize the etymology lookup data object
     // this is a temporary hack until we have a real etymology service
-    var language_tool = Alph.main.getLanguageTool();
+    var language_tool = Alph.Main.getLanguageTool();
     if (typeof language_tool != "undefined")
     {
         var language_key = language_tool.getLanguage();
@@ -254,7 +254,7 @@ Alph.Etymology.prototype.getEtymData = function()
         {
             try 
             {
-                Alph.main.s_logger.debug("Loading etymology file for " + language_key);
+                Alph.Main.s_logger.debug("Loading etymology file for " + language_key);
                 var data = document.implementation.createDocument("", "", null);
                 data.async = false;
                 var url = Alph.BrowserUtils.getContentUrl(language_key)+ "/testetym.xml";
@@ -264,7 +264,7 @@ Alph.Etymology.prototype.getEtymData = function()
             catch(e)
             {
                 this.d_tempData[language_key] = null;
-                Alph.main.s_logger.error("Error loading etymology file for " + language_key);
+                Alph.Main.s_logger.error("Error loading etymology file for " + language_key);
             }
         }
         return this.d_tempData[language_key];

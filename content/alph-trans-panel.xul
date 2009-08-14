@@ -24,7 +24,7 @@
     <commandset id="mainCommandSet">
         <command 
             id="alpheios-trans-toggle-cmd" 
-            oncommand="Alph.main.togglePanel(event,'alph-trans-panel');"
+            oncommand="Alph.Main.togglePanel(event,'alph-trans-panel');"
             observes="alph-trans-status"/>
          <command 
             id="alpheios-trans-toggle-inter-trans-cmd" 

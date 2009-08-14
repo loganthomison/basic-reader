@@ -63,20 +63,20 @@
         
 	<commandset id="mainCommandSet">
 		<command id="alpheios-toggle-cmd" 
-                 oncommand="Alph.main.alphInlineToggle();"
+                 oncommand="Alph.Main.alphInlineToggle();"
                  observes="alpheios-auto-enable-status" />
         <command id="alpheios-lang-cmd" 
-                 oncommand="Alph.main.selectLanguage(event.target.value,true);"
+                 oncommand="Alph.Main.selectLanguage(event.target.value,true);"
                  observes="alpheios-auto-enable-status"/>
         <command id="alpheios-lookup-cmd" 
-                 oncommand="Alph.main.doTbLookup();"/>
+                 oncommand="Alph.Main.doTbLookup();"/>
         <command 
             id="alpheios-inflect-cmd" 
-            oncommand="Alph.main.executeLangCommand(event);" 
+            oncommand="Alph.Main.executeLangCommand(event);" 
             observes="alpheios-inflect"/>
         <command
             id="alpheios-grammar-cmd" 
-            oncommand="Alph.main.executeLangCommand(event);" 
+            oncommand="Alph.Main.executeLangCommand(event);" 
             observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
             oncommand="Alph.BrowserUtils.openDialog(
@@ -95,9 +95,9 @@
     	<command id="alpheios-site-cmd"
             oncommand="Alph.Util.openAlpheiosLink(window,'main');"/>
         <command id="alpheios-level-learner-cmd"
-            oncommand="Alph.main.setMode(null,'learner');"/>
+            oncommand="Alph.Main.setMode(null,'learner');"/>
         <command id="alpheios-level-reader-cmd"
-            oncommand="Alph.main.setMode(null,'reader');"/>
+            oncommand="Alph.Main.setMode(null,'reader');"/>
     </commandset>
 
     <!-- FF context and tools menu overlays disabled for now 
@@ -262,7 +262,7 @@
             <toolbaritem id="alpheios-lookup-text-tbitem" observes="alpheios-learner-disabled">
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"
-                    onkeypress="Alph.main.doTbLookup(event);"
+                    onkeypress="Alph.Main.doTbLookup(event);"
                     observes="alpheios-lookup-enabled"
                     tooltiptext="&alpheios-morph-lookup-tooltip;"/>
             </toolbaritem>

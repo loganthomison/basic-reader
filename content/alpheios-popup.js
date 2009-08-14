@@ -69,7 +69,7 @@ Alph.Xlate = {
         }
         catch (e)
         {
-            Alph.main.s_logger.error(e);
+            Alph.Main.s_logger.error(e);
         }
         return wordHTML;
     },
@@ -116,7 +116,7 @@ Alph.Xlate = {
          * However, this does not seem to work the same for the dbleclick event
          * so this should be limited to use of the mousemove trigger.
          */
-        if ( Alph.main.getXlateTrigger() == 'mousemove' &&
+        if ( Alph.Main.getXlateTrigger() == 'mousemove' &&
              ! is_svg_text &&
              (a_e.explicitOriginalTarget.nodeType != 3) &&
              !("form" in a_e.target))
@@ -187,7 +187,7 @@ Alph.Xlate = {
             if (testchar == 32 || testchar == 9 || testchar == 10 || testchar == 160)
             {
                 ++ro;
-                Alph.main.s_logger.debug("Advancing range offset past whitespace.");
+                Alph.Main.s_logger.debug("Advancing range offset past whitespace.");
             }
             else
             {
@@ -202,7 +202,7 @@ Alph.Xlate = {
             this.clearSelection();
             return;
         }
-        var alphtarget = Alph.main.getLanguageTool().findSelection(ro,rngstr);
+        var alphtarget = Alph.Main.getLanguageTool().findSelection(ro,rngstr);
 
         // if we couldn't identify the target word, return without doing anything
         if (! alphtarget.getWord())
@@ -221,7 +221,7 @@ Alph.Xlate = {
         // unless we're in query  mode and the popup isn't showing,
         // in which case selecting the same word
         // again should act like a reset
-        var alph_state = Alph.main.getStateObj();
+        var alph_state = Alph.Main.getStateObj();
         var lastSelection = alph_state.getVar("lastSelection");
         if (alphtarget.equals(lastSelection) )
         {
@@ -231,7 +231,7 @@ Alph.Xlate = {
             }
             else if (Alph.Interactive.enabled())
             {
-                Alph.Interactive.closeQueryDisplay(Alph.main.getCurrentBrowser());
+                Alph.Interactive.closeQueryDisplay(Alph.Main.getCurrentBrowser());
             }
         }
 
@@ -276,7 +276,7 @@ Alph.Xlate = {
             {
                 treebank_url =
                     Alph.Site.getTreebankUrl(
-                        Alph.main.getCurrentBrowser().contentDocument);
+                        Alph.Main.getCurrentBrowser().contentDocument);
             }
             if (treebank_url)
             {
@@ -314,13 +314,13 @@ Alph.Xlate = {
      */
     translationError: function (a_msg,a_doc_array)
     {
-        var err_msg = Alph.main.getString("alph-loading-error",[a_msg ]);
-        Alph.main.s_logger.error("Query Response (Error): " + err_msg);
-        //if (Alph.main.useLocalDaemon() &&
-        //    typeof Alph.main.getCurrentBrowser()
+        var err_msg = Alph.Main.getString("alph-loading-error",[a_msg ]);
+        Alph.Main.s_logger.error("Query Response (Error): " + err_msg);
+        //if (Alph.Main.useLocalDaemon() &&
+        //    typeof Alph.Main.getCurrentBrowser()
         //                  .alpheios.daemonPid == "undefined")
         //{
-        //    err_msg = err_msg + '<br/>' + Alph.main.getString("alph-error-mhttpd-notstarted");
+        //    err_msg = err_msg + '<br/>' + Alph.Main.getString("alph-error-mhttpd-notstarted");
         //}
 
         // the first document in the array is the main one
@@ -341,7 +341,7 @@ Alph.Xlate = {
                 );
            }
        );
-       Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
+       Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
     },
 
     /**
@@ -355,7 +355,7 @@ Alph.Xlate = {
      * @param a_lang_tool the Alph.Language object which initiated the lookup
      */
     showTranslation: function(a_xml,a_alphtarget,a_doc_array,a_lang_tool) {
-        Alph.main.s_logger.debug("Query response:" + a_xml);
+        Alph.Main.s_logger.debug("Query response:" + a_xml);
 
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
@@ -368,7 +368,7 @@ Alph.Xlate = {
                 && (Alph.$(".alph-unknown",wordHTML).size() == 0)
                 && (Alph.$(".alph-error",wordHTML).size() == 0)))
         {
-            Alph.main.s_logger.warn("No valid entries to display.");
+            Alph.Main.s_logger.warn("No valid entries to display.");
             a_doc_array.forEach(
                 function(a_doc)
                 {
@@ -462,7 +462,7 @@ Alph.Xlate = {
         // disambiguate if treebank is available
         if (disambiguate_id)
         {
-            Alph.main.s_logger.debug("Disambiguating ..." +
+            Alph.Main.s_logger.debug("Disambiguating ..." +
                           a_alphtarget.getTreebankQuery());
             // send asynchronous request to the lexicon service
             Alph.$.ajax(
@@ -473,7 +473,7 @@ Alph.Xlate = {
                     dataType: 'html',
                     error: function(req,textStatus,errorThrown)
                     {
-                        Alph.main.s_logger.error("Error disambiguating morphology: " +
+                        Alph.Main.s_logger.error("Error disambiguating morphology: " +
                                       textStatus||errorThrown);
                         a_doc_array.forEach(
                             function(a_doc)
@@ -492,7 +492,7 @@ Alph.Xlate = {
                                 }
                             }
                         );
-                        Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
+                        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
                     },
                     success: function(data, textStatus)
                     {
@@ -508,7 +508,7 @@ Alph.Xlate = {
         }
         else
         {
-            Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
+            Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
             Alph.Interactive.openQueryDisplay(a_topdoc,a_alphtarget);
         }
 
@@ -528,7 +528,7 @@ Alph.Xlate = {
                                  a_doc_array,
                                  a_lang_tool)
      {
-        Alph.main.s_logger.debug("Query response:" + a_xml);
+        Alph.Main.s_logger.debug("Query response:" + a_xml);
 
         // the first document in the array is the main one
         var a_topdoc = a_doc_array[0];
@@ -555,7 +555,7 @@ Alph.Xlate = {
                     }
                 }
             );
-            Alph.main.s_logger.warn("No treebank entries to display.");
+            Alph.Main.s_logger.warn("No treebank entries to display.");
         }
         else
         {
@@ -587,7 +587,7 @@ Alph.Xlate = {
                                 "] #alph-text",a_doc);
                 if (popup.length == 0)
                 {
-                    Alph.main.s_logger.warn("Discarding disamibuguation " + a_req_id);
+                    Alph.Main.s_logger.warn("Discarding disamibuguation " + a_req_id);
                     continue;
                 }
 
@@ -640,14 +640,14 @@ Alph.Xlate = {
                     }
                     else
                     {
-                        Alph.main.s_logger.warn("Can't find entry matching treebank lemma: " + new_hdwd);
+                        Alph.Main.s_logger.warn("Can't find entry matching treebank lemma: " + new_hdwd);
                     }
                     // if entries with matching part of speech and lemma were
                     // found, just use the new entry -- we'll lose details
                     // on the inflection but they wouldn't be right anyway
                     if (pofs_match_set.length == 0)
                     {
-                        Alph.main.s_logger.warn("Can't find entry matching treebank lemma: " + new_hdwd
+                        Alph.Main.s_logger.warn("Can't find entry matching treebank lemma: " + new_hdwd
                             + " and pofs: " + new_pofs);
                         final_word_set.push(
                             Alph.$(new_entry).parent(".alph-word").clone(true));
@@ -874,7 +874,7 @@ Alph.Xlate = {
         }
 
         Alph.$("#alph-window-anchor",a_topdoc).focus();
-        Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);            
+        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);            
         Alph.Interactive.openQueryDisplay(a_doc_array[0],a_alphtarget);
     },
 
@@ -894,9 +894,9 @@ Alph.Xlate = {
         var a_y = a_e.screenY;
         var pageX = a_e.pageX;
         var pageY = a_e.pageY;
-        var lang_tool = Alph.main.getLanguageTool();
+        var lang_tool = Alph.Main.getLanguageTool();
         const topdoc = a_elem.ownerDocument;
-        var alph_state = Alph.main.getStateObj();
+        var alph_state = Alph.Main.getStateObj();
         var popup;
         // check the alpheios state object for the prior element
         if (alph_state.getVar("lastElem"))
@@ -907,7 +907,7 @@ Alph.Xlate = {
         // the current one, remove it from the prior document
         if (popup && (topdoc != alph_state.getVar("lastElem").ownerDocument))
         {
-            this.removePopup(Alph.main.getCurrentBrowser());
+            this.removePopup(Alph.Main.getCurrentBrowser());
             popup = null;
         }
 
@@ -990,7 +990,7 @@ Alph.Xlate = {
             }
             catch(e)
             {
-                Alph.main.s_logger.error("Error getting frame coords: " + e);
+                Alph.Main.s_logger.error("Error getting frame coords: " + e);
             }
         }
 
@@ -998,7 +998,7 @@ Alph.Xlate = {
         popup.style.maxWidth = "600px";
 
         /* reset the contents of the popup */
-        var xlate_loading = Alph.main.getString("alph-loading-translation",[a_alphtarget.getWord()]);
+        var xlate_loading = Alph.Main.getString("alph-loading-translation",[a_alphtarget.getWord()]);
         Alph.$("#alph-text",popup).remove();
         Alph.$("#alph-window",topdoc).get(0).removeAttribute("alpheios-pending");
         Alph.$("#alph-window",topdoc).append(
@@ -1027,7 +1027,7 @@ Alph.Xlate = {
 
         var doc_array = [topdoc];
         
-        Alph.main.d_panels['alph-morph-panel'].getCurrentDoc().forEach(
+        Alph.Main.d_panels['alph-morph-panel'].getCurrentDoc().forEach(
             function(a_doc)
             {
                 lang_tool.addStyleSheet(a_doc);
@@ -1035,7 +1035,7 @@ Alph.Xlate = {
                 doc_array.push(a_doc);
             }
         );
-        Alph.main.d_panels['alph-dict-panel'].getCurrentDoc().forEach(
+        Alph.Main.d_panels['alph-dict-panel'].getCurrentDoc().forEach(
             function(a_doc)
             {
                 lang_tool.addStyleSheet(a_doc);
@@ -1078,14 +1078,14 @@ Alph.Xlate = {
         Alph.$("#alph-text",topdoc).remove();
         this.clearSelection(topdoc);
         // remove the last word from the state
-        var alph_state = Alph.main.getStateObj();
+        var alph_state = Alph.Main.getStateObj();
         if (alph_state.getVar("enabled"))
         {
             alph_state.setVar("lastWord", null);
             alph_state.setVar("lastSelection",null);
 
         }
-        Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.HIDE_POPUP);
+        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.HIDE_POPUP);
         // keep the last element in the state, so that we can find
         // the popup (and stylesheets) again
     },
@@ -1117,14 +1117,14 @@ Alph.Xlate = {
     closeSecondaryWindows: function(a_bro)
     {
         // return if the extension isn't enabled for this browser
-        if (! Alph.main.isEnabled(a_bro))
+        if (! Alph.Main.isEnabled(a_bro))
         {
             return;
         }
-        var windows = Alph.main.getStateObj(a_bro).getVar("windows");
+        var windows = Alph.Main.getStateObj(a_bro).getVar("windows");
         for (var win in windows)
         {
-            Alph.main.s_logger.debug("Checking status of window " + win);
+            Alph.Main.s_logger.debug("Checking status of window " + win);
             try {
                 if (typeof windows[win] != "undefined" && windows[win] != null && ! windows[win].closed)
                 {
@@ -1133,7 +1133,7 @@ Alph.Xlate = {
                 }
             } catch(a_e)
             {
-                Alph.main.s_logger.error("Error closing window " + win + " : " + a_e);
+                Alph.Main.s_logger.error("Error closing window " + win + " : " + a_e);
                 windows[win] = null;
             }
         }
@@ -1172,7 +1172,7 @@ Alph.Xlate = {
         // so if arguments are being passed to the new window,
         // just proceed as if opening a new window
         var windows =
-            Alph.main.getStateObj(Alph.main.getCurrentBrowser())
+            Alph.Main.getStateObj(Alph.Main.getCurrentBrowser())
             .getVar("windows");
 
         var a_window = windows[a_name];
@@ -1194,7 +1194,7 @@ Alph.Xlate = {
         }
         catch (a_e)
         {
-            Alph.main.s_logger.error("Error checking window status for " + a_name + " : " + a_e);
+            Alph.Main.s_logger.error("Error checking window status for " + a_name + " : " + a_e);
         }
         try {
             open_new_window = (typeof a_window == "undefined" || 
@@ -1204,7 +1204,7 @@ Alph.Xlate = {
         }
         catch (a_e)
         {
-            Alph.main.s_logger.error("Error checking open window status for " + a_name + " : " + a_e);
+            Alph.Main.s_logger.error("Error checking open window status for " + a_name + " : " + a_e);
         }
 
         // if the window exists already, is open, has the same location
@@ -1213,7 +1213,7 @@ Alph.Xlate = {
         // rather than reloading the window
         if (update_args)
         {
-            Alph.main.s_logger.debug("Calling update_args_callback for window " + a_name);
+            Alph.Main.s_logger.debug("Calling update_args_callback for window " + a_name);
             a_window.arguments[0].updateArgsCallback(a_window_args);
         }
         // if the window doesn't exist, or is closed, or has arguments
@@ -1222,7 +1222,7 @@ Alph.Xlate = {
         else if (open_new_window)
         {
 
-            Alph.main.s_logger.debug("Opening new window named: " + a_name);
+            Alph.Main.s_logger.debug("Opening new window named: " + a_name);
             // add a loading message to notify the user we're loading
             // the grammar - really this should come from a
             // stringbundle if we're going to keep it
@@ -1277,7 +1277,7 @@ Alph.Xlate = {
                     if ( bottom_y < 0 ){
                         bottom_y = window.screenY;
                     }
-                    Alph.main.s_logger.debug("Screen: " + a_features[prop]);
+                    Alph.Main.s_logger.debug("Screen: " + a_features[prop]);
                     switch(a_features[prop])
                     {
                         case "topright":
@@ -1357,7 +1357,7 @@ Alph.Xlate = {
                 a_window.location.hash != ''
                 )
             {
-                Alph.main.s_logger.debug("Replacing location hash with " + target_hash);
+                Alph.Main.s_logger.debug("Replacing location hash with " + target_hash);
                 a_window.location.hash = target_hash;
             }
             // otherwise, just replace the location and allow the window
@@ -1366,7 +1366,7 @@ Alph.Xlate = {
             // shouldn't be necessary
             else
             {
-                Alph.main.s_logger.debug("Replacing location with " + a_url);
+                Alph.Main.s_logger.debug("Replacing location with " + a_url);
                 a_window.location = a_url;
 
             }
@@ -1374,7 +1374,7 @@ Alph.Xlate = {
         }
         // now focus the window
         a_window.focus();
-        Alph.main.s_logger.info("Secondary window should have focus at "+ a_url);
+        Alph.Main.s_logger.info("Secondary window should have focus at "+ a_url);
         windows[a_name] = a_window;
         return a_window;
     },
@@ -1394,7 +1394,7 @@ Alph.Xlate = {
 
             // also check the morphology panel (dictionary window doesn't 
             // contain any links to new windows)
-            Alph.main.d_panels['alph-morph-panel'].getCurrentDoc().forEach
+            Alph.Main.d_panels['alph-morph-panel'].getCurrentDoc().forEach
             (
                 function(a_doc)
                 {
@@ -1411,7 +1411,7 @@ Alph.Xlate = {
         }
         catch(e)
         {
-            Alph.main.s_logger.error("Error hiding loading message: " + e);
+            Alph.Main.s_logger.error("Error hiding loading message: " + e);
         }
     },
 
@@ -1447,7 +1447,7 @@ Alph.Xlate = {
 
         if (typeof a_lang_tool == "undefined")
         {
-            a_lang_tool = Alph.main.getLanguageTool();
+            a_lang_tool = Alph.Main.getLanguageTool();
         }
         if (a_lang_tool)
         {
@@ -1457,7 +1457,7 @@ Alph.Xlate = {
         Alph.$("#alph-window",last_doc).remove();
 
         // also clear the morphology and dictionary panels
-        Alph.main.d_panels['alph-morph-panel'].getCurrentDoc().forEach(
+        Alph.Main.d_panels['alph-morph-panel'].getCurrentDoc().forEach(
             function(a_doc)
             {
                 Alph.$("#alph-window",a_doc).html("");
@@ -1467,7 +1467,7 @@ Alph.Xlate = {
                 }            
             }
         );
-        Alph.main.d_panels['alph-dict-panel'].getCurrentDoc().forEach(
+        Alph.Main.d_panels['alph-dict-panel'].getCurrentDoc().forEach(
             function(a_doc)
             {
                 Alph.$("#alph-window",a_doc).html("");
@@ -1478,7 +1478,7 @@ Alph.Xlate = {
             }
         );
 
-        Alph.main.broadcastUiEvent(Alph.Constants.EVENTS.REMOVE_POPUP);
+        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.REMOVE_POPUP);
 
      },
 
@@ -1502,7 +1502,7 @@ Alph.Xlate = {
      getLastDoc: function()
      {
         var lastdoc;
-        var lastElem = Alph.main.getStateObj().getVar("lastElem");
+        var lastElem = Alph.Main.getStateObj().getVar("lastElem");
         if ( lastElem != null )
         {
             lastdoc = lastElem.ownerDocument;
@@ -1510,7 +1510,7 @@ Alph.Xlate = {
         if (typeof lastdoc == "undefined" || lastdoc == null)
         {
             // default to the window content document which is the majority case
-            lastdoc = Alph.main.getCurrentBrowser().contentDocument;
+            lastdoc = Alph.Main.getCurrentBrowser().contentDocument;
         }
         return lastdoc;
      },
@@ -1533,7 +1533,7 @@ Alph.Xlate = {
         {
             //TODO sometimes we get a null defaultView. Need to figure
             // out why and fix, rather than just logging it.
-            Alph.main.s_logger.error("no default view");
+            Alph.Main.s_logger.error("no default view");
         }
      },
 

@@ -54,7 +54,7 @@ Alph.Translation.prototype = new Alph.Panel();
 Alph.Translation.prototype.show = function()
 {
     var panel_obj = this;
-    var bro = Alph.main.getCurrentBrowser();
+    var bro = Alph.Main.getCurrentBrowser();
     //TODO - eventually should be able to pick the translation url
     // up from the user's preferences for the basic reader
     
@@ -62,7 +62,7 @@ Alph.Translation.prototype.show = function()
     var trans_url = Alph.Site.getTranslationUrl(bro.contentDocument);
     if (trans_url)
     {
-        Alph.main.s_logger.info("loading translation from " + trans_url);
+        Alph.Main.s_logger.info("loading translation from " + trans_url);
         
         var trans_doc = 
                 Alph.$("browser",this.d_panelElem).get(0).contentDocument;  
@@ -80,7 +80,7 @@ Alph.Translation.prototype.show = function()
                 }
                 else 
                 {
-                    Alph.Translation.handleError(Alph.main.getString("alph-loading-misc")
+                    Alph.Translation.handleError(Alph.Main.getString("alph-loading-misc")
                         ,trans_doc);
                 }
             }
@@ -112,7 +112,7 @@ Alph.Translation.prototype.show = function()
    else
    {
         Alph.Translation.handleError(
-            Alph.main.getString("alph-error-notranslation"),
+            Alph.Main.getString("alph-error-notranslation"),
             Alph.$("browser",this.d_panelElem).get(0).contentDocument
         );
    }
@@ -162,14 +162,14 @@ Alph.Translation.prototype.handleRefresh = function(a_bro)
 {
     var panel_state = this.getBrowserState(a_bro);
     var doc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
-    Alph.main.s_logger.debug("handling refresh in trans panel");
+    Alph.Main.s_logger.debug("handling refresh in trans panel");
     // if the translation panel is showing and the the previous load
     // was interrupted, we'll have an error in the document.  if the page
     // is refreshed, we should try to load the document again. See bug 309.
     if (panel_state.status == Alph.Panel.STATUS_SHOW && 
         Alph.$("#alph-trans-error",doc).length > 0)
     {
-        var msg = Alph.main.getString("alph-trans-reload");
+        var msg = Alph.Main.getString("alph-trans-reload");
         Alph.Translation.handleError(msg,doc);
         this.resetState();
     }
@@ -249,7 +249,7 @@ Alph.Translation.toggleInterlinear = function(a_event)
 Alph.Translation.showInterlinear = function()
 {
     var panel = Alph.$("#alph-trans-panel");
-    var browser_doc = Alph.main.getCurrentBrowser().contentDocument;
+    var browser_doc = Alph.Main.getCurrentBrowser().contentDocument;
     var trans_doc =  
             Alph.$("browser",panel).get(0).contentDocument;
     
@@ -290,12 +290,12 @@ Alph.Translation.loadUrl = function(a_event,a_urlbar) {
     {
         // the panel should already be intialized by the time the user tries to load
         // a url but if not, just quiety log the error
-        var panel_state = (Alph.main.getStateObj().getVar("panels"))["alph-trans-panel"];
+        var panel_state = (Alph.Main.getStateObj().getVar("panels"))["alph-trans-panel"];
         panel_state.external_url = a_urlbar.value;
     }
     catch(e)
     {
-        Alph.main.s_logger.error("Unable to update trans panel state with external url: " + e);
+        Alph.Main.s_logger.error("Unable to update trans panel state with external url: " + e);
     }
     
     // clear the value from the url bar if it's set to "about:blank"
@@ -326,7 +326,7 @@ Alph.Translation.prototype.toggleParallelAlignment = function(a_elem,a_type,a_on
     }
     else
     {
-        parallel_doc = Alph.main.getCurrentBrowser().contentDocument;
+        parallel_doc = Alph.Main.getCurrentBrowser().contentDocument;
     }
  
     // the source text element uses the "nrefs" attribute to identify the

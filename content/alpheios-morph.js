@@ -48,7 +48,7 @@ Alph.Morph.prototype = new Alph.Panel();
  */
 Alph.Morph.prototype.init = function(a_panel_state)
 {
-    Alph.main.s_logger.debug("morph panel init");
+    Alph.Main.s_logger.debug("morph panel init");
     // initialize the contents array
     a_panel_state.contents = {};
     a_panel_state.css = {};

@@ -150,9 +150,9 @@ Alph.Site = {
         }
         
         this.enableToolbar(a_doc);
-        var bro = Alph.main.getCurrentBrowser();
-        var trigger = Alph.main.getXlateTrigger(bro);
-        this.addTriggerHint(bro,a_doc,trigger,Alph.main.getLanguageTool(bro));
+        var bro = Alph.Main.getCurrentBrowser();
+        var trigger = Alph.Main.getXlateTrigger(bro);
+        this.addTriggerHint(bro,a_doc,trigger,Alph.Main.getLanguageTool(bro));
     },
     
     /**
@@ -217,7 +217,7 @@ Alph.Site = {
                 var mode = this.getAttribute('alpheios-value');
                 if (mode)
                 {
-                    Alph.main.setMode(null,mode);
+                    Alph.Main.setMode(null,mode);
                 }
             }
         );
@@ -268,7 +268,7 @@ Alph.Site = {
                         .addClass("alpheios-current");
                     Alph.$("body",a_doc).attr("alpheios-level",a_mode);
                     ;
-                    Alph.$("body",(Alph.main.d_panels['alph-trans-panel'].getCurrentDoc())[0])
+                    Alph.$("body",(Alph.Main.d_panels['alph-trans-panel'].getCurrentDoc())[0])
                         .attr("alpheios-level",a_mode);
                 }
             );
@@ -314,7 +314,7 @@ Alph.Site = {
     {
         // 'this' is the toolbar element
         var panel_status = 
-            Alph.main.togglePanel(a_event,a_event.data.alpheios_panel_id);
+            Alph.Main.togglePanel(a_event,a_event.data.alpheios_panel_id);
     },
     
     /**
@@ -415,7 +415,7 @@ Alph.Site = {
         var words = Alph.$(".alpheios-word-wrap",toggle_elem.ownerDocument).get();
         if (checked)
         {
-            var loading_msg = Alph.main.getString("alph-loading-interlinear");
+            var loading_msg = Alph.Main.getString("alph-loading-interlinear");
             Alph.$(toggle_elem)
                 .after('<div id="alpheios-loading-interlinear">' + loading_msg + '</div>');
                 
@@ -469,7 +469,7 @@ Alph.Site = {
         // don't do alignment highlighting for quiz mode,
         // or if the translation panel is not open
         if (Alph.Interactive.enabled() || 
-            ! Alph.main.d_panels['alph-trans-panel'].isVisibleInline())
+            ! Alph.Main.d_panels['alph-trans-panel'].isVisibleInline())
         {
             return;
         }
@@ -482,7 +482,7 @@ Alph.Site = {
             {
                 Alph.$(a_elem).after(
                     '<span class="alpheios-aligned-nomatch alpheios-tooltip">' + 
-                    Alph.main.getString("alph-align-nomatch") +
+                    Alph.Main.getString("alph-align-nomatch") +
                     '</span>');
             }
         }
@@ -495,7 +495,7 @@ Alph.Site = {
         
         // toggle the selection of the parallel aligned text
         try {
-            var panel_obj = Alph.main.d_panels['alph-trans-panel'];
+            var panel_obj = Alph.Main.d_panels['alph-trans-panel'];
             panel_obj.toggleParallelAlignment(a_elem,a_type,a_on);
         }
         catch(a_e)
@@ -713,7 +713,7 @@ Alph.Site = {
         if (a_event_type == Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER)
         {
             this.addTriggerHint(
-                a_bro,doc,a_event_data.new_trigger,Alph.main.getLanguageTool(a_bro));
+                a_bro,doc,a_event_data.new_trigger,Alph.Main.getLanguageTool(a_bro));
         }
         // observe change to config setting which enables interlinear
         else if (a_event_type == Alph.Constants.EVENTS.UPDATE_PREF 
@@ -734,7 +734,7 @@ Alph.Site = {
      */
     addTriggerHint: function(a_bro,a_doc,a_trigger,a_lang_tool)
     {
-        var mode = Alph.main.getStateObj(a_bro).getVar("level");
+        var mode = Alph.Main.getStateObj(a_bro).getVar("level");
         var hint_prop = 'alph-trigger-hint-'+a_trigger+'-'+mode;
         var lang = a_lang_tool.getLanguageString();
         var hint = a_lang_tool.getStringOrDefault(hint_prop,[lang]);

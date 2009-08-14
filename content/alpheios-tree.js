@@ -60,9 +60,9 @@ Alph.Tree.prototype.getDetachChrome = function()
 Alph.Tree.prototype.init = function()
 {
     // add the popup trigger handler to the tree browser
-    var trigger = Alph.main.getLanguageTool().getpopuptrigger();
+    var trigger = Alph.Main.getLanguageTool().getPopupTrigger();
     Alph.$("browser",this.d_panelElem).get(0).
-        addEventListener(trigger, Alph.main.doXlateText, false);
+        addEventListener(trigger, Alph.Main.doXlateText, false);
 };
 
 /**
@@ -74,7 +74,7 @@ Alph.Tree.prototype.init = function()
 Alph.Tree.prototype.show = function()
 {
     var panel_obj = this;
-    var bro = Alph.main.getCurrentBrowser();
+    var bro = Alph.Main.getCurrentBrowser();
     var treeDoc = Alph.$("browser",this.d_panelElem).get(0).contentDocument;
 
     // clear out the prior tree and any error
@@ -84,7 +84,7 @@ Alph.Tree.prototype.show = function()
     
     // reset the language-specific stylesheet
     Alph.$("link.alpheios-language-css",treeDoc).remove();
-    var lang_tool = Alph.main.getLanguageTool(bro);
+    var lang_tool = Alph.Main.getLanguageTool(bro);
     lang_tool.addStyleSheet(treeDoc);
 
     var svgError = "";
@@ -96,21 +96,21 @@ Alph.Tree.prototype.show = function()
     var word;
     if (! treebankUrl)
     {
-        Alph.$("#tree-error",treeDoc).html(Alph.main.getString("alph-error-tree-notree")
+        Alph.$("#tree-error",treeDoc).html(Alph.Main.getString("alph-error-tree-notree")
         );
         this.updatePanelWindow({},'alph-tree-body');
     }
     else if (! Alph.Xlate.popupVisible() && ! Alph.Interactive.queryVisible())
     {
         // Just add the default message to the display
-        Alph.$("#tree-error",treeDoc).html(Alph.main.getString("alph-info-tree-select"));
+        Alph.$("#tree-error",treeDoc).html(Alph.Main.getString("alph-info-tree-select"));
         this.updatePanelWindow({},'alph-tree-body');
     }
     else
     {
         try
         {
-            var last_elem = Alph.main.getStateObj(bro).getVar("lastElem");
+            var last_elem = Alph.Main.getStateObj(bro).getVar("lastElem");
             tbrefs = Alph.$(last_elem).attr("tbrefs");
             // if the selected element doesn't have a tbrefs attribute,
             // look for the first parent element that does
@@ -128,7 +128,7 @@ Alph.Tree.prototype.show = function()
         }
         catch(a_e)
         {
-            Alph.main.s_logger.error("Error identifying sentence and id: " + a_e);
+            Alph.Main.s_logger.error("Error identifying sentence and id: " + a_e);
         }
 
         //var sentence  = Alph.$(".alph-proto-sentence",bro.contentDocument);
@@ -136,7 +136,7 @@ Alph.Tree.prototype.show = function()
         if (! sentence )
         {
             // Just add the default message to the display
-            Alph.$("#tree-error",treeDoc).html(Alph.main.getString("alph-error-tree-notree"));
+            Alph.$("#tree-error",treeDoc).html(Alph.Main.getString("alph-error-tree-notree"));
             this.updatePanelWindow({},'alph-tree-body');
         }
         else
@@ -152,9 +152,9 @@ Alph.Tree.prototype.show = function()
                     error: function(req,textStatus,errorThrown)
                     {
                         Alph.$("#tree-error",treeDoc).html(
-                            Alph.main.getString("alph-error-tree-notree")
+                            Alph.Main.getString("alph-error-tree-notree")
                         );
-                        Alph.main.s_logger.error("Error retrieving treebank diagram: "
+                        Alph.Main.s_logger.error("Error retrieving treebank diagram: "
                             + textStatus ||errorThrown);
                         panel_obj.updatePanelWindow({},'alph-tree-body');
                     },
@@ -185,7 +185,7 @@ Alph.Tree.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     // listen for the window and the xlate trigger change events
     if (a_event_type == Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER)
     {
-        Alph.main.s_logger.debug("Tree panel handling event " + a_event_type);
+        Alph.Main.s_logger.debug("Tree panel handling event " + a_event_type);
         var new_trigger = a_event_data.new_trigger;
         var old_trigger = a_event_data.old_trigger;
         var pw_bro = null;
@@ -200,28 +200,28 @@ Alph.Tree.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
         if (old_trigger)
         {
             Alph.$("browser",this.d_panelElem).get(0).
-                removeEventListener(old_trigger, Alph.main.doXlateText,false);
+                removeEventListener(old_trigger, Alph.Main.doXlateText,false);
             if (pw_bro)
             {
-                pw_bro.removeEventListener(old_trigger, Alph.main.doXlateText,false);
+                pw_bro.removeEventListener(old_trigger, Alph.Main.doXlateText,false);
             }
         }
         Alph.$("browser",this.d_panelElem).get(0).
-            addEventListener(new_trigger, Alph.main.doXlateText,false);
+            addEventListener(new_trigger, Alph.Main.doXlateText,false);
         if (pw_bro)
         {
-            pw_bro.addEventListener(new_trigger, Alph.main.doXlateText,false);
+            pw_bro.addEventListener(new_trigger, Alph.Main.doXlateText,false);
         }
-        Alph.Tree.updateHint(this,a_bro,Alph.main.getLanguageTool(a_bro),true);
+        Alph.Tree.updateHint(this,a_bro,Alph.Main.getLanguageTool(a_bro),true);
     }
     else if (a_event_type == Alph.Constants.EVENTS.LOAD_TREE_WINDOW)
     {
         this.open();
-        var trigger = Alph.main.getXlateTrigger();
+        var trigger = Alph.Main.getXlateTrigger();
         this.d_panelWindow
             .Alph.$("#" + this.d_panelId + " browser")
             .get(0)
-            .addEventListener(trigger, Alph.main.doXlateText,false);
+            .addEventListener(trigger, Alph.Main.doXlateText,false);
     }
     
     return;
@@ -258,11 +258,11 @@ Alph.Tree.prototype.parseTree = function(a_svgXML, a_ids)
                                textSize,
                                keySize,
                                fontSize);
-        //Alph.main.s_logger.debug("SVG: " + XMLSerializer().serializeToString(svgXML));
+        //Alph.Main.s_logger.debug("SVG: " + XMLSerializer().serializeToString(svgXML));
         Alph.Tree.highlightFirst(treeDoc, a_ids);
         Alph.Tree.highlightWord(treeDoc, a_ids[0]);
         Alph.Tree.scrollToFocus(treeDoc);
-//        Alph.main.s_logger.debug("SVG: " + XMLSerializer().serializeToString(svgXML));
+//        Alph.Main.s_logger.debug("SVG: " + XMLSerializer().serializeToString(svgXML));
 
         // jQuery doesn't seem to support retrieving svg nodes by class
         // or attribute, so just get by tag name and retrieve the attribute
@@ -331,7 +331,7 @@ Alph.Tree.prototype.parseTree = function(a_svgXML, a_ids)
     }
     catch(e)
     {
-        Alph.main.s_logger.error(e);
+        Alph.Main.s_logger.error(e);
     }
 
 
@@ -384,7 +384,7 @@ Alph.Tree.prototype.updatePanelWindow = function(a_panel_state,a_browser_id,a_br
                 }
                 catch(a_e)
                 {
-                    Alph.main.s_logger.error("Error parsing window size: " + a_e);
+                    Alph.Main.s_logger.error("Error parsing window size: " + a_e);
                 }
 
                 this.d_panelWindow.focus();
@@ -416,7 +416,7 @@ Alph.Tree.positionTree = function(a_container, a_fontSize)
     var numChildren = arcLineNodes.size();
     if (childNodes.size() != 2 * numChildren)
     {
-        Alph.main.s_logger.error("Bad tree count: " + numChildren +
+        Alph.Main.s_logger.error("Bad tree count: " + numChildren +
                       "/" + childNodes.size());
     }
 
@@ -1064,9 +1064,9 @@ Alph.Tree.preOpenCheck = function()
 {
     if (! Alph.Xlate.popupVisible() && ! Alph.Interactive.queryVisible())
     {
-        var trigger = Alph.main.getXlateTrigger(Alph.main.getCurrentBrowser());
+        var trigger = Alph.Main.getXlateTrigger(Alph.Main.getCurrentBrowser());
         var hint_prop = 'alph-tree-trigger-hint-'+ trigger;
-        var lang_tool = Alph.main.getLanguageTool();
+        var lang_tool = Alph.Main.getLanguageTool();
         var lang = lang_tool.getLanguageString();
         var hint = lang_tool.getStringOrDefault(hint_prop,[lang]);
         alert(hint);
@@ -1074,7 +1074,7 @@ Alph.Tree.preOpenCheck = function()
     }
     else
     {
-        Alph.main.d_panels['alph-tree-panel'].open()
+        Alph.Main.d_panels['alph-tree-panel'].open()
     }
 };
 
@@ -1088,8 +1088,8 @@ Alph.Tree.preOpenCheck = function()
 Alph.Tree.updateHint = function(a_panel_obj,a_bro,a_lang_tool,a_update_window)
 {
     var treeDoc = Alph.$("browser",a_panel_obj.d_panelElem).get(0).contentDocument;
-    var trigger = Alph.main.getXlateTrigger(a_bro);
-    var mode = Alph.main.getStateObj(a_bro).getVar("level");
+    var trigger = Alph.Main.getXlateTrigger(a_bro);
+    var mode = Alph.Main.getStateObj(a_bro).getVar("level");
     var tree_hint = a_lang_tool.getStringOrDefault('alph-tree-hint',[]);
     var trigger_hint_prop = 'alph-trigger-hint-'+ trigger + '-'+mode;
     var lang = a_lang_tool.getLanguageString();
@@ -1133,7 +1133,7 @@ Alph.Tree.scrollToFocus= function(a_doc)
                     }
                     catch (a_e)
                     {
-                        Alph.main.s_logger.error("Invalid coordinates: " + a_e);
+                        Alph.Main.s_logger.error("Invalid coordinates: " + a_e);
                     }
                 }
             }

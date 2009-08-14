@@ -13,10 +13,10 @@
 <window id="alph-tree-window" title="&alpheios-tree-toolbar-label;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         windowtype="alph-window"
-        onload="window.opener.Alph.main.broadcastUiEvent(window.opener.Alph.Constants.EVENTS.LOAD_TREE_WINDOW);"
-        onunload="window.opener.Alph.main.d_panels['alph-tree-panel']
+        onload="window.opener.Alph.Main.broadcastUiEvent(window.opener.Alph.Constants.EVENTS.LOAD_TREE_WINDOW);"
+        onunload="window.opener.Alph.Main.d_panels['alph-tree-panel']
                     .updateStatus(
-                        window.opener.Alph.main.d_panels['alph-tree-panel'].hide()
+                        window.opener.Alph.Main.d_panels['alph-tree-panel'].hide()
                     );">;
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
