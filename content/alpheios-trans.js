@@ -69,7 +69,7 @@ Alph.Translation.prototype.show = function()
         // jQuery can't handle a request to chrome which doesn't return expected
         // http headers --- this is a temporary hack to allow the interlinear
         // prototype to be run locally
-        if (  trans_url.indexOf('chrome://') == 0 )
+        if (  Alph.BrowserUtils.isBrowserUrl(trans_url))
         {
             var r = new XMLHttpRequest();
             r.onreadystatechange = function()

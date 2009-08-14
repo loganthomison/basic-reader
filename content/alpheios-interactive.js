@@ -189,7 +189,7 @@ Alph.Interactive = {
         var query_win = 
               Alph.Xlate.openSecondaryWindow(
               "alph-query-window",
-              "chrome://alpheios/content/query/alpheios-query.xul",
+              Alph.BrowserUtils.getContentUrl() + "/query/alpheios-query.xul",
               features,  
               a_params
             );

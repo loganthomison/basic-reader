@@ -62,10 +62,15 @@ Alph.LanguageTool = function(a_language,a_properties)
                 return Alph.BrowserUtils.getPref("context_back",a_language)
                     || 0;
             },
-        chromepkg:
+        PkgName:
             function()
             {
-                return Alph.BrowserUtils.getPref("chromepkg",a_language) || "alpheios";
+                return Alph.BrowserUtils.getPkgName(a_language);
+            },
+        Language:
+            function()
+            {
+                return a_language;
             },
         popuptrigger:
             function()
@@ -781,10 +786,9 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     if (typeof params.showpofs == 'undefined')
     {
         params.xml_url =
-                "chrome://"
-                + this.getchromepkg()
-                + "/content/inflections/alph-infl-index.xml";
-        params.xslt_processor = Alph.Util.getXsltProcessor('alpheios','alph-infl-index.xsl');
+            Alph.BrowserUtils.getContentUrl(this.d_sourceLanguage)
+            + "/inflections/alph-infl-index.xml";
+        params.xslt_processor = Alph.Util.getXsltProcessor('alph-infl-index.xsl');
     }
     params.source_node = a_node;
 
@@ -823,7 +827,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
      
     Alph.Xlate.openSecondaryWindow(
                     "alph-infl-table",
-                    "chrome://alpheios/content/infl/alpheios-infl.xul",
+                    Alph.BrowserUtils.getContentUrl() + "/infl/alpheios-infl.xul",
                     features,
                     params,
                     Alph.Xlate.showLoadingMessage,[loading_node,loading_msg]
@@ -889,23 +893,23 @@ Alph.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
  */
 Alph.LanguageTool.prototype.addStyleSheet = function(a_doc,a_name)
 {
-    var chromepkg = this.getchromepkg();
-    var chromecss = "chrome://" + chromepkg + "/skin/";
+    var pkgname = this.getPkgName();
+    var css_url = Alph.BrowserUtils.getStyleUrl(this.d_sourceLanguage);
     if (typeof a_name == "undefined")
     {
-        a_name = chromepkg;
+        a_name = pkgname;
     }
-    chromecss = chromecss + a_name + ".css"
+    css_url = css_url + '/' + a_name + ".css"
     
     // only add the stylesheet if it's not already there
-    if (Alph.$("link[href='"+ chromecss + "']",a_doc).length == 0)
+    if (Alph.$("link[href='"+ css_url + "']",a_doc).length == 0)
     {
-        this.s_logger.debug("adding stylesheet: " + chromecss);
+        this.s_logger.debug("adding stylesheet: " + css_url);
         var css = document.createElementNS(
             "http://www.w3.org/1999/xhtml","link");
         css.setAttribute("rel", "stylesheet");
         css.setAttribute("type", "text/css");
-        css.setAttribute("href", chromecss);
+        css.setAttribute("href", css_url);
         css.setAttribute("id", a_name + "-css");
         css.setAttribute("class","alpheios-lang-css");
         Alph.$("head",a_doc).append(css);
@@ -922,14 +926,14 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc,a_name)
  */
 Alph.LanguageTool.prototype.removeStyleSheet = function(a_doc,a_name)
 {
-    var chromepkg = this.getchromepkg();
-    var chromecss = "chrome://" + chromepkg + "/skin/";
+    var pkgname = this.getPkgName();
+    var css_url = Alph.BrowserUtils.getStyleUrl(this.d_sourceLanguage);
     if (typeof a_name == "undefined")
     {
-        a_name = chromepkg;
+        a_name = pkgname;
     }
-    chromecss = chromecss + a_name + ".css"
-    Alph.$("link[href='"+chromecss + "']",a_doc).remove();
+    css_url = css_url + '/' + a_name + ".css"
+    Alph.$("link[href='"+css_url + "']",a_doc).remove();
 };
 
 /**
@@ -987,8 +991,7 @@ Alph.LanguageTool.prototype.getCmd = function(a_cmd)
  */
 Alph.LanguageTool.prototype.getIndexFile = function(a_docid)
 {
-    var chromepkg = this.getchromepkg();
-    return "chrome://" + chromepkg + "/content/index_files/" + a_docid;
+    return Alph.BrowserUtils.getContentUrl(this.d_sourceLanguage) + "/index_files/" + a_docid;
 };
 
 /**
@@ -1084,7 +1087,7 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
         var dict_alt_text = Alph.main.getString('alph-dictionary-link');
         link = '<div class="alph-tool-icon alpheios-button alph-dict-link" ' +
                'href="#alph-dict" title="' + dict_alt_text + '">' +
-               '<img src="chrome://alpheios/skin/icons/wordlist_16.png" ' +
+               '<img src="' + Alph.BrowserUtils.getStyleUrl() + '/icons/wordlist_16.png" ' +
                'alt="' + dict_alt_text + '"/>' + 
                '<div class="alpheios-icon-label">' + dict_alt_text + '</div></div>';
     }
@@ -1378,6 +1381,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
 {
     var lang_tool = this;
 
+    var icon_url = Alph.BrowserUtils.getStyleUrl() + '/icons/'; 
     var tools_node = Alph.$("#alph-word-tools",a_node);
     if (Alph.BrowserUtils.getPref('smallicons'))
     {
@@ -1392,7 +1396,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         Alph.$('' +
             '<div class="alph-tool-icon alpheios-button alph-diagram-link" ' +
             'href="#alpheios-diagram" title="' + diagram_alt_text + '">'+
-            '<img src="chrome://alpheios/skin/icons/diagram_16.png"' +
+            '<img src="' + icon_url + 'diagram_16.png"' +
             ' alt="' + diagram_alt_text + '" />' + 
             '<div class="alpheios-icon-label">' + diagram_alt_text + '</div></div>',a_node)
             .appendTo(tools_node);
@@ -1436,7 +1440,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         Alph.$("#alph-word-tools",a_node).append(
             '<div class="alph-tool-icon alpheios-button alph-inflect-link" ' +
             'href="#alpheios-inflect" title="' + inflect_alt_text + '">' +
-            '<img src="chrome://alpheios/skin/icons/inflection_16.png" ' +
+            '<img src="' + icon_url + 'inflection_16.png" ' +
             'alt="' + inflect_alt_text + '"/>' + 
             '<div class="alpheios-icon-label">' + inflect_alt_text + '</div></div>'
         );
@@ -1538,6 +1542,7 @@ Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
     var form = Alph.main.getString("alph-morph-form");
     var stem = Alph.main.getString("alph-morph-stem");
     var suffix = Alph.main.getString("alph-morph-suffix");
+    var icon_url = Alph.BrowserUtils.getStyleUrl() + '/icons/';
     Alph.$(".alph-term",a_node).each(
         function()
         {
@@ -1545,7 +1550,7 @@ Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
             var message = (suff_elem.length == 0 || suff_elem.text() == '')
                 ?  form : stem + "+" + suffix;
             var help_node = Alph.$('<span class="alph-form-end"/>',a_node);
-            help_node.append(Alph.$('<span class="alph-help-link"><img src="chrome://alpheios/skin/icons/information-16.png" alt="Info" /></span>',
+            help_node.append(Alph.$('<span class="alph-help-link"><img src="' + icon_url + 'information-16.png" alt="Info" /></span>',
                 a_node).hover(
                    function()
                    {
@@ -1605,7 +1610,9 @@ Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
             if (atts.length > 0)
             {
                 var message = atts.join(',');
-                Alph.$(this).append('<span class="alph-infl-end"><span class="alph-help-link"><img src="chrome://alpheios/skin/icons/information-16.png" alt="Info" /></span></span>');
+                Alph.$(this).append(
+                    '<span class="alph-infl-end"><span class="alph-help-link">' + 
+                    '<img src="' + icon_url + 'information-16.png" alt="Info" /></span></span>');
 
                 Alph.$('.alph-help-link',this).hover(
                     function()

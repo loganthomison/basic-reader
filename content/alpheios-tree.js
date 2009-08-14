@@ -50,7 +50,7 @@ Alph.Tree.prototype = new Alph.Panel();
  */
 Alph.Tree.prototype.getDetachChrome = function()
 {
-    return 'chrome://alpheios/content/alpheios-tree-window.xul';
+    return Alph.BrowserUtils.getContentUrl() + '/alpheios-tree-window.xul';
 };
 
 /**

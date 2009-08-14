@@ -102,7 +102,7 @@ LanguageToolFactory =
      */
     getStringBundle: function(a_lang)
     {
-        var chromepkg = BrowserUtils.getPref("chromepkg",a_lang);
-        return new StringBundle("chrome://" + chromepkg + "/locale/alpheios-"+a_lang+'.properties');
+        var pkg_url = BrowserUtils.getPkgUrl(a_lang);
+        return new StringBundle(pkg_url + "/locale/alpheios-"+a_lang+'.properties');
     }
 };

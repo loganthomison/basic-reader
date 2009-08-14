@@ -202,10 +202,8 @@ Alph.Infl = {
         // named per part of speech
         if (typeof url == "undefined")
         {
-            url =
-                'chrome://' +
-                link_target.lang_tool.getchromepkg() + 
-                '/content/inflections/alph-infl-' + base_pofs + '.html';
+            url = Alph.BrowserUtils.getContentUrl(lang_tool.getLanguage())
+                + '/inflections/alph-infl-' + base_pofs + '.html';
         }
         $(infl_browser).attr("src",url);        
     },
@@ -602,7 +600,7 @@ Alph.Infl = {
     {
         $(".loading",a_doc).show();
         var newpofs = $(":selected",a_elem).val();
-        Alph.Info.s_logger.debug("Switching to " + newpofs);
+        Alph.Infl.s_logger.debug("Switching to " + newpofs);
         a_lang_tool.
             handleInflections(a_e,a_node,{showpofs: newpofs});
     },

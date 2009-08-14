@@ -502,7 +502,7 @@ Alph.Prefs = {
             var hbox = Alph.Util.makeXUL('hbox',null,[],[]);
             var command_str = 
                     'document.documentElement.openSubDialog(' + 
-                    '"chrome://alpheios/content/alpheios-dict-prefs-adv.xul","",' + 
+                    '"' + Alph.BrowserUtils.getContentUrl() +  '/alpheios-dict-prefs-adv.xul","",' + 
                     '{lang: "' + lang + '"}' +
                     ');'
             hbox.appendChild(

@@ -499,7 +499,7 @@ Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","link");
         a_doc_state.css.setAttribute("rel", "stylesheet");
         a_doc_state.css.setAttribute("type", "text/css");
-        a_doc_state.css.setAttribute("href", "chrome://alpheios/skin/alph-dict.css");
+        a_doc_state.css.setAttribute("href",  Alph.BrowserUtils.getStyleUrl() + "/alph-dict.css");
         a_doc_state.css.setAttribute("id", "alpheios-dict-css");
         a_doc_state.dict = null;
 
@@ -520,7 +520,7 @@ Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
  */
 Alph.Dict.prototype.getDetachChrome = function()
 {
-    return 'chrome://alpheios/content/alpheios-dict-window.xul';
+    return Alph.BrowserUtils.getContentUrl() + '/alpheios-dict-window.xul';
 };
 
 /**

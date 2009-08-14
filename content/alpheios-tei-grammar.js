@@ -204,11 +204,7 @@ Alph.TeiGrammar = {
      getBaseUrl: function(a_lang_tool)
      {
         //TODO - eventually need to support multiple grammars per language
-        var url = 
-            'chrome://' 
-                + a_lang_tool.getchromepkg() 
-                + '/content/grammar/';
-        return url;
+        return Alph.BrowserUtils.getContentUrl(a_lang_tool.getLanguage()) + '/grammar/';
      }
 }
 

@@ -605,7 +605,67 @@ BrowserUtils = {
     getSvc: function(a_name)
     {
         return BrowserSvc.getSvc(a_name);        
-    }
+    },
+    
+    /**
+     * Get the name of an installed package
+     * @param {String} a_lang the language (optional, if not supplied the base
+     *                 library package name is returned)
+     * @return the package name
+     * @type String
+     */
+    getPkgName: function(a_lang)
+    {
+        return this.getPref("chromepkg",a_lang) || 'alpheios';   
+    },
+    
+    /**
+     * Get the base url for an installed package
+     * @param {String) a_lang the language (optional, if not supplied,
+     *                        the base library url is returned)
+     * @return the base package url
+     * @type String     
+     */
+    getPkgUrl: function(a_lang)
+    {
+        var protocol = 'chrome://';
+        return protocol + this.getPkgName(a_lang);
+    },
+
+    /**
+     * Get the url of the content directory of an installed package
+     * @param {String) a_lang the language (optional, if not supplied,
+     *                        the base library url is returned)
+     * @return the package content url
+     * @type String     
+     */
+    getContentUrl: function(a_lang)
+    {
+        return this.getPkgUrl(a_lang) + '/content';
+    },
+    
+    /**
+     * Get the url of the style directory of an installed package
+     * @param {String) a_lang the language (optional, if not supplied,
+     *                        the base library url is returned)
+     * @return the package style url
+     * @type String     
+     */
+    getStyleUrl: function(a_lang)
+    {
+        return this.getPkgUrl(a_lang) + '/skin';
+    },
+    
+     /**
+     * Check to see if a url is for a browser resource
+     * @param {String} a_url the url string
+     * @return true if its a chrome or resource url otherwise false
+     * @type Boolean
+     */
+    isBrowserUrl: function(a_url)
+    {
+        return a_url.match(/^(chrome|resource):/);
+    },
 };
 
 BrowserSvc = {

@@ -118,7 +118,7 @@ Alph.Etymology.prototype.initDocument = function(a_doc,a_doc_state)
         a_doc_state.css = a_doc.createElementNS("http://www.w3.org/1999/xhtml","link");                
         a_doc_state.css.setAttribute("rel", "stylesheet");
         a_doc_state.css.setAttribute("type", "text/css");
-        a_doc_state.css.setAttribute("href", "chrome://alpheios/skin/alph-etym.css");
+        a_doc_state.css.setAttribute("href", Alph.BrowserUtils.getStyleUrl() + "/alph-etym.css");
         a_doc_state.css.setAttribute("id", "alpheios-etym-css");
         
     }
@@ -168,7 +168,7 @@ Alph.Etymology.prototype.show = function()
  */
 Alph.Etymology.prototype.getDetachChrome = function()
 {
-    return 'chrome://alpheios/content/alpheios-etym-window.xul';   
+    return Alph.BrowserUtils.getContentUrl() + '/alpheios-etym-window.xul';   
 }
 
 /**
@@ -249,25 +249,25 @@ Alph.Etymology.prototype.getEtymData = function()
     var language_tool = Alph.main.getLanguageTool();
     if (typeof language_tool != "undefined")
     {
-        var chromepkg = language_tool.getchromepkg();
-        if (typeof this.d_tempData[chromepkg] == "undefined")
+        var language_key = language_tool.getLanguage();
+        if (typeof this.d_tempData[language_key] == "undefined")
         {
             try 
             {
-                Alph.main.s_logger.debug("Loading etymology file for " + chromepkg);
+                Alph.main.s_logger.debug("Loading etymology file for " + language_key);
                 var data = document.implementation.createDocument("", "", null);
                 data.async = false;
-                var chrome_url = "chrome://" + chromepkg + "/content/testetym.xml";
-                data.load(chrome_url);
-                this.d_tempData[chromepkg] = data;
+                var url = Alph.BrowserUtils.getContentUrl(language_key)+ "/testetym.xml";
+                data.load(url);
+                this.d_tempData[language_key] = data;
             }
             catch(e)
             {
-                this.d_tempData[chromepkg] = null;
-                Alph.main.s_logger.error("Error loading etymology file for " + chromepkg);
+                this.d_tempData[language_key] = null;
+                Alph.main.s_logger.error("Error loading etymology file for " + language_key);
             }
         }
-        return this.d_tempData[chromepkg];
+        return this.d_tempData[language_key];
     }
     return null;
 }

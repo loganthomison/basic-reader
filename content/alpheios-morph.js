@@ -207,7 +207,7 @@ Alph.Morph.prototype.observeUIEvent = function(a_bro,a_event_type)
  */
 Alph.Morph.prototype.getDetachChrome = function()
 {
-    return 'chrome://alpheios/content/alpheios-morph-window.xul';
+    return Alph.BrowserUtils.getContentUrl() + '/alpheios-morph-window.xul';
 };
 
 

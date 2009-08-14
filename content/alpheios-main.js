@@ -691,7 +691,7 @@ Alph.main =
             if (Alph.Languages.getLangTool(lang).getusemhttpd())
             {
                 var chromepkg = 
-                    Alph.Languages.getLangTool(lang).getchromepkg();
+                    Alph.Languages.getLangTool(lang).getPkgName();
                 Alph.main.s_logger.debug("setting up mhttpd for " + chromepkg);
                 var chrome_path = 
                     Alph.BrowserUtils.getExtensionBasePath(chromepkg);
@@ -1349,7 +1349,7 @@ Alph.main =
                 {
                     Alph.BrowserUtils.openDialog(
                         window,
-                        'chrome://alpheios/content/dialogs/leaving-site.xul', 
+                        Alph.BrowserUtils.getContentUrl() + '/dialogs/leaving-site.xul', 
                         'alpheios-leaving-dialog'); 
                 }
             }

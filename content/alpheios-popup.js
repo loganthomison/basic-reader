@@ -59,7 +59,7 @@ Alph.Xlate = {
         /* initialze the xsltProcessor if we haven't done so already */
         if (this.d_xsltProcessor == null)
         {
-            this.d_xsltProcessor = Alph.Util.getXsltProcessor('alpheios','alpheios.xsl');
+            this.d_xsltProcessor = Alph.Util.getXsltProcessor('alpheios.xsl');
         }
         var wordHTML = '';
         try
@@ -914,16 +914,17 @@ Alph.Xlate = {
         // popup element not found or removed, so create a new one
         if (!popup)
         {
+            var style_url = Alph.BrowserUtils.getStyleUrl();
             // add the base alpheios stylesheet
             var css = topdoc.createElementNS("http://www.w3.org/1999/xhtml",
                                              "link");
             css.setAttribute("rel", "stylesheet");
             css.setAttribute("type", "text/css");
-            css.setAttribute("href", "chrome://alpheios/skin/alpheios.css");
+            css.setAttribute("href", style_url + "/alpheios.css");
             css.setAttribute("class", "alpheios-css");
             Alph.$("head",topdoc).append(css);
             var css_os = Alph.$(css).clone()
-                .attr("href","chrome://alpheios/skin/alpheios-os.css");
+                .attr("href", style_url + "/alpheios-os.css");
             Alph.$("head",topdoc).append(css_os);
 
 

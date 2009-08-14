@@ -40,7 +40,7 @@ Components.utils.import("resource://alpheios/alpheios-datafile.jsm",Alph);
 // See http://docs.jquery.com/Core/jQuery.noConflict#extreme
 // Note, we may run into problems if we want to use any jQuery plugins,
 // in which case it might be sufficient to skip the extreme flag
-Alph.BrowserUtils.loadJavascript("chrome://alpheios/content/jquery-1.2.6-alph.js",Alph);
+Alph.BrowserUtils.loadJavascript(Alph.BrowserUtils.getContentUrl() + "/jquery-1.2.6-alph.js",Alph);
 Alph.$ = jQuery.noConflict(true);    
 
 /**
@@ -242,28 +242,28 @@ Alph.Util = {
     {
         return (
             a_url.match(/^http:\/\/(localhost|127\.0\.0\.1)/) || 
-            a_url.match(/^chrome:/));
+            Alph.BrowserUtils.isBrowserUrl(a_url));
     },
     
     /**
      * get xslt processor
-     * @param {String} a_ext_name the name of the extension
      * @param {String} a_filename the name of the xslt file to import
+     * @param {String} a_lang optional language-specific indicator
      * @return a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
      * @type XSLTProcessor
      */
-     getXsltProcessor: function(a_ext,a_filename)
+     getXsltProcessor: function(a_filename,a_lang)
     {
         var xsltProcessor = new XSLTProcessor();
         
         // first try to load and import using a chrome url
         try
         {
-            var chrome_url = 'chrome://'+ a_ext + '/content/xslt/' + a_filename;
+            var xslt_url = Alph.BrowserUtils.getContentUrl(a_lang) + '/xslt/' + a_filename;
             var xmlDoc = document.implementation.createDocument("", "", null);
             xmlDoc.async = false;
-            Alph.BrowserUtils.debug("Loading xslt at " + chrome_url);
-            xmlDoc.load(chrome_url);
+            Alph.BrowserUtils.debug("Loading xslt at " + xslt_url);
+            xmlDoc.load(xslt_url);
             xsltProcessor.importStylesheet(xmlDoc);
         }
         catch(a_e)
@@ -272,7 +272,7 @@ Alph.Util = {
           // see https://bugzilla.mozilla.org/show_bug.cgi?id=422502
             try
             {
-                var pkg_path = Alph.BrowserUtils.getExtensionBasePath(a_ext);
+                var pkg_path = Alph.BrowserUtils.getExtensionBasePath(Alph.BrowserUtils.getPkgName(a_lang));
                 pkg_path.append('xslt');
                 pkg_path.append(a_filename);
                 var path_url = 'file:///' + pkg_path.path;
@@ -285,7 +285,7 @@ Alph.Util = {
             catch(a_ee)
             {
                 // if that fails, we're out of luck
-                Alph.BrowserUtils.debug("Unable to load stylesheet " + a_filename + " in " + a_ext + " : " + a_e + "," + a_ee);
+                Alph.BrowserUtils.debug("Unable to load stylesheet " + a_filename + " for " + a_lang + " : " + a_e + "," + a_ee);
             }
         }
         return xsltProcessor;

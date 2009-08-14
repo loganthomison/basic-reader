@@ -48,9 +48,8 @@ Alph.Quiz =
         
         var params = window.arguments[0];
         var template_src = 
-            "chrome://"
-                + params.lang_tool.getchromepkg()
-                + "/content/query/template.js";
+            Alph.BrowserUtils.getContentUrl(params.lang_tool.getLanguage())
+                + "/query/template.js";
         Alph.BrowserUtils.loadJavascript(template_src,this.d_queryTemplate);
         this.d_mainStr = params.main_str;
         var query_doc = $("#alph-query-frame").get(0).contentDocument;
@@ -116,14 +115,14 @@ Alph.Quiz =
         var query_doc = 
             $("#alph-query-frame").get(0).contentDocument;
 
+        var main_css_url = Alph.BrowserUtils.getStyleUrl();
         var lang_css_url =  
-            "chrome://"
-            + a_params.lang_tool.getchromepkg()
-            + "/content/query/template.css";
+            Alph.BrowserUtils.getContentUrl(a_params.lang_tool.getLanguage())
+                + "/query/template.css";
 
         $("head",query_doc).append(
-            '<link type="text/css" rel="stylesheet" href="chrome://alpheios/skin/alpheios.css"/>' +
-            '<link type="text/css" rel="stylesheet" href="chrome://alpheios/skin/alph-query.css"/>' +
+            '<link type="text/css" rel="stylesheet" href="' + main_css_url + '/alpheios.css"/>' +
+            '<link type="text/css" rel="stylesheet" href="' + main_css_url + '/alph-query.css"/>' +
             '<link type="text/css" rel="stylesheet" href="' + lang_css_url + '"/>'
         );
         
