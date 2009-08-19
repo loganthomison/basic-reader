@@ -1483,6 +1483,28 @@ Alph.LanguageTool.prototype.add_word_tools = function(a_node, a_target)
             }
         );
     }
+    
+    if (this.getFeature('alpheios-speech'))
+    {
+        var alt_text = strings.getString('alph-speech-link');
+        var loading_msg = strings.getString("alph-loading-speech");
+        var link = Alph.$(
+            '<div class="alph-tool-icon alpheios-button alph-speech-link" ' +
+            'href="#alpheios-speech" title="' + alt_text + '">' +
+            '<img src="chrome://alpheios/skin/icons/speech_16.png" ' +
+            'alt="' + alt_text + '"/>' + 
+            '<div class="alpheios-icon-label">' + alt_text + '</div></div>',a_node
+        );
+        Alph.$(link).click(
+            function(a_e)
+            {
+                Alph.xlate.showLoadingMessage([tools_node,loading_msg]);
+                lang_tool.handleSpeech(a_e,a_node);
+                return false;
+            }
+        );
+        Alph.$("#alph-word-tools",a_node).append(link);
+    }
 
     if (Alph.$("#alph-word-tools",a_node).children().length > 0)
     {
@@ -1747,4 +1769,27 @@ Alph.LanguageTool.prototype.supports_language = function(a_lang)
         supported = false;
     }
     return supported;
-}
+};
+
+Alph.LanguageTool.prototype.handleSpeech= function(a_event,a_node)
+{
+    var form = Alph.$(".alph-word",a_node).attr("context");
+    Alph.util.log("Speak word: " + form);
+    var url = Alph.util.getPref("url.speech",this.source_language);
+    url = url.replace(/\<WORD\>/,encodeURIComponent(form));
+    // send asynchronous request to the speech service
+    Alph.util.log("Speech url " + url);
+    Alph.$.ajax(
+    {
+        type: "GET",
+        url: url,
+        timeout: Alph.util.getPrefOrDefault("url.speech.timeout",this.source_language),
+        error: function(req,textStatus,errorThrown)
+        {
+            Alph.xlate.hideLoadingMessage(a_node.ownerDocument);
+            Alph.util.log("Error handling speech request: " + textStatus + ' ' + errorThrown);
+        },
+        success: function(data, textStatus)
+        { Alph.xlate.hideLoadingMessage(a_node.ownerDocument); }
+    });
+};

@@ -741,46 +741,11 @@ Alph.main =
             {
                 var chromepkg = 
                     Alph.Languages.get_lang_tool(lang).getchromepkg();
-                Alph.util.log("setting up mhttpd for " + chromepkg);
-                var chrome_path = 
-                    Alph.util.getExtensionBasePath(chromepkg);
-                
-                chrome_path.append("mhttpd.conf");
-                Alph.util.log("Reading file at " + chrome_path.path);
-                // open an input stream from file
-                var istream = cc["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-                istream.init(chrome_path, 0x01, 0444, 0);
-                istream.QueryInterface(ci.nsILineInputStream);
-
-                // read lines into array
-                var line = {}, hasmore;
-                do {
-                    hasmore = istream.readLine(line);
-                    Alph.util.log("Read " + line.value);
-                    var values = line.value.split(/\|/);
-                    
-                    var exe_info = values[1].split(/,/);
-                    // translate the exe file path
-                    var exe_file = 
-                        Alph.util.getPlatformFile(exe_info,false,chromepkg,true);
-                    if (exe_file == null)
-                    {
-                        Alph.util.log(
-                            "Unable to find file at " + 
-                            values[1] + " for package" + chromepkg);
-                    }
-                    else
-                    {
-                        values[1] = exe_file.path;
-
-                        // put the values back together
-                        mhttpd_conf_lines.push(values.join('|'));
-                    }
-                } while(hasmore);
-                istream.close();
-            }
+                Alph.main.read_mhttpd_conf(chromepkg,mhttpd_conf_lines);
+             }
         }
+        // add the basic conf
+        Alph.main.read_mhttpd_conf('alpheios',mhttpd_conf_lines);
 
         var keywords = Alph.util.getPref("mhttpd.keywords") || "";
         var config = daemon.parent.clone();
@@ -816,6 +781,48 @@ Alph.main =
                     Alph.main.on_mhttpd_start,
                     Alph.main.alert_mhttpd_failure)
             },Alph.main.daemonCheckDelay);
+    },
+    
+    /**
+     * reads a mhttpd conf file
+     */
+    read_mhttpd_conf: function(a_chromepkg,a_lines)
+    {
+        var chrome_path = Alph.util.getExtensionBasePath(a_chromepkg);
+        chrome_path.append("mhttpd.conf");
+        Alph.util.log("Reading file at " + chrome_path.path);
+        // open an input stream from file
+        var istream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                        .createInstance(Components.interfaces.nsIFileInputStream);
+        istream.init(chrome_path, 0x01, 0444, 0);
+        istream.QueryInterface(Components.interfaces.nsILineInputStream);
+
+        // read lines into array
+        var line = {}, hasmore;
+        do {
+            hasmore = istream.readLine(line);
+            Alph.util.log("Read " + line.value);
+            var values = line.value.split(/\|/);
+            
+            var exe_info = values[1].split(/,/);
+            // translate the exe file path
+            var exe_file = 
+            Alph.util.getPlatformFile(exe_info,false,a_chromepkg,true);
+            if (exe_file == null)
+            {
+                Alph.util.log(
+                    "Unable to find file at " + 
+                    values[1] + " for package" + a_chromepkg);
+            }
+            else
+            {
+                values[1] = exe_file.path;
+
+                // put the values back together
+                a_lines.push(values.join('|'));
+            }
+        } while(hasmore);
+        istream.close();
     },
     
     /**

@@ -15,10 +15,10 @@
               value="/Program Files/Apache Group/Apache2/htdocs/alpheios_devbuilds" />
 	<property name="docs.deploy.dir"
 	          value="/test/docs/${app.name}"/>
-	<property name="release.id" value="1.0alpha1" />
+	<property name="release.id" value="1.0alpha2d" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
 	<property name="package" value="${app.name}-${release.id}.xpi"/>
-	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img"/>
+	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img,espeak"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 	
@@ -107,6 +107,7 @@
 			<fileset dir="${src.dir}">
 				<include name="chrome.manifest" />
 				<include name="install.rdf" />
+				<include name="mhttpd.conf" />
 				<include name="defaults/**" />
 				<include name="modules/**" />
 				<include name="xslt/**" />

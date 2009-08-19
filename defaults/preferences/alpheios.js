@@ -35,3 +35,5 @@ pref("extensions.alpheios.methods.dictionary.full.default.timeout",5000);
 pref("extensions.alpheios.partsofspeech","noun,adjective,verb,adverb,pronoun,article,preposition,conjunction,verb_participle");
 pref("extensions.alpheios.smallicons",false);
 pref("extensions.alpheios.disable.remote",false);
+pref("extensions.alpheios.url.speech.timeout",5000);
+pref("extensions.alpheios.enable.toolbar",false);
