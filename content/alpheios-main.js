@@ -34,8 +34,7 @@
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-constants.jsm",Alph);
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-xfer-state.jsm",Alph);
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
-Alph.BrowserUtils.importResource("resource://alpheios/alpheios-uninstaller.jsm",Alph);
-Alph.BrowserUtils.importResource("resource://alpheios/alpheios-upgrade-observer.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-pkgmgr-observer.jsm",Alph);
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
 
 /**
@@ -123,18 +122,26 @@ Alph.Main =
     onLoad: function()
     {
         Alph.Main.d_stringBundle = Alph.$("#alpheios-strings").get(0);
-        // register the uninstaller for the installed Alpheios packages
-        Alph.Uninstaller.registerObserver(
-            Alph.$.map(Alph.BrowserUtils.getAlpheiosPackages(),function(a){return a.id}));
-        // register an upgrade observer for this package ---
-        // if we're upgrading the basic libraries, we need to make sure to kill the 
-        // mhttpd daemon before the browser restarts. Bug 308.
-        Alph.Upgrader.registerObserver(
+        // Register an uninstaller to clear all alpheios preferences
+        // when the Basic Libraries package is uninstalled. This includes
+        // any language-specific preferences.  
+        // TODO eventually we may want to ask the user if it's okay and
+        // give them a chance to export/backup their preferences first 
+        Alph.PkgMgr.registerObserver(
+            Alph.PkgMgr.TYPE_UNINSTALL,
+            [{id: Alph.Main.d_extensionGUID, 
+                callback: Alph.BrowserUtils.clearPrefs
+             }
+            ]);
+        // Add an observer to make sure the mhttpd daemon is killed whenever the 
+        // Firefox application quits (all windows, not just a single window)
+        Alph.PkgMgr.registerObserver(
+            Alph.PkgMgr.TYPE_QUIT,
             [{id: Alph.Main.d_extensionGUID, 
               callback: Alph.Main.killLocalDaemon
              }
             ]);
-
+        Alph.PkgMgr.start();
         window.addEventListener("unload", function(e) { Alph.Main.onUnLoad(e); },false);
         gBrowser
             .addEventListener("DOMContentLoaded", function(event) { Alph.Main.firstLoad(event) }, false);
@@ -802,7 +809,7 @@ Alph.Main =
             {           
                 var a_lang = lang_list[i];
                 Alph.Languages.addLangTool(a_lang,Alph.LanguageToolFactory.createInstance(a_lang,Alph));
-             
+                
                 // add menu items to the various language menus for this language
                 var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
                 var menuitem = Alph.Util.makeXUL(
@@ -1290,6 +1297,7 @@ Alph.Main =
             {
                 auto_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
             }
+            this.s_logger.debug("Page language is " + auto_lang);
         }
         else
         {
@@ -1368,7 +1376,7 @@ Alph.Main =
             this.toggleToolbar();
         }
         
-        if (ped_site)
+        if (ped_site && this.isEnabled(bro))
         {
             // these functions should only be called after Alpheios has been auto-toggled
             // on because otherwise they get done twice via the send call to resetState
@@ -1752,7 +1760,7 @@ Alph.Main =
                     var bro = Alph.Main.getCurrentBrowser();
                     var doc = bro.contentDocument;
                     Alph.Main.insertMetadata({target: doc});
-                    if (Alph.Site.isPedSite(doc))
+                    if (Alph.Site.isPedSite(doc) && Alph.Main.isEnabled(bro))
                     {
                         // update the site functionality and toolbar
                         Alph.Site.setupPage(doc,Alph.Translation.INTERLINEAR_TARGET_SRC);

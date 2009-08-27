@@ -32,6 +32,12 @@ Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 Convert = {
     
     /**
+     * UnicodeConverter service
+     * @static
+     */
+    d_uConverter: BrowserUtils.getSvc('UnicodeConverter'),
+    
+    /**
      * main logger for the Convert object
      * @type Log4Moz.Logger
      * @static
@@ -40,6 +46,8 @@ Convert = {
     
     /**
      * bind a new method to the Convert object
+     * Note - method code must NOT reference the Alph namespace 
+     * as this object is shared across windows
      * @param {String} the name of the method
      * @param {Function} the function body
      */

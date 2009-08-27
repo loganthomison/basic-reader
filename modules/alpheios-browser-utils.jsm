@@ -179,6 +179,14 @@ BrowserUtils = {
     },
     
     /**
+     * Clear all the preferences in the extensions.alpheios branch
+     */
+    clearPrefs: function()
+    {
+        BrowserSvc.getSvc('AlphPrefs').deleteBranch('');
+    },
+    
+    /**
      * Gets an nsILocalFile object from a platform-specific subdirectory
      * @param {Array} a_file_info a 2-item array:
      *                   [0] = base directory off of the main extension dir
