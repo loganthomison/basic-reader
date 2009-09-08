@@ -1454,6 +1454,28 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             }
         );
     }
+    
+    if (this.getFeature('alpheios-speech'))
+    {
+        var alt_text = Alph.Main.getString('alph-speech-link');
+        var loading_msg = Alph.Main.getString("alph-loading-speech");
+        var link = Alph.$(
+            '<div class="alph-tool-icon alpheios-button alph-speech-link" ' +
+            'href="#alpheios-speech" title="' + alt_text + '">' +
+            '<img src="chrome://alpheios/skin/icons/speech_16.png" ' +
+            'alt="' + alt_text + '"/>' + 
+            '<div class="alpheios-icon-label">' + alt_text + '</div></div>',a_node
+        );
+        Alph.$(link).click(
+            function(a_e)
+            {
+                Alph.Xlate.showLoadingMessage([tools_node,loading_msg]);
+                lang_tool.handleSpeech(a_e,a_node);
+                return false;
+            }
+        );
+        Alph.$("#alph-word-tools",a_node).append(link);
+    }
 
     if (Alph.$("#alph-word-tools",a_node).children().length > 0)
     {
@@ -1720,4 +1742,27 @@ Alph.LanguageTool.prototype.supportsLanguage = function(a_lang)
         supported = false;
     }
     return supported;
-}
+};
+
+Alph.LanguageTool.prototype.handleSpeech= function(a_event,a_node)
+{
+    var lang_obj = this;
+    var form = Alph.$(".alph-word",a_node).attr("context");
+    this.s_logger.debug("Speak word: " + form);
+    var url = Alph.BrowserUtils.getPref("url.speech",this.d_sourceLanguage);
+    url = url.replace(/\<WORD\>/,encodeURIComponent(form));
+    // send asynchronous request to the speech service
+    this.s_logger.debug("Speech url " + url);
+    Alph.$.ajax(
+    {
+        type: "GET",
+        url: url,
+        timeout: Alph.BrowserUtils.getPref("url.speech.timeout",lang_obj.d_sourceLanguage),
+        error: function(req,textStatus,errorThrown)
+        {
+            Alph.Xlate.hideLoadingMessage(a_node.ownerDocument);
+        },
+        success: function(data, textStatus)
+        { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument); }
+    });
+};

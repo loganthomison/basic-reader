@@ -697,48 +697,13 @@ Alph.Main =
             var lang = lang_list[i]; 
             if (Alph.Languages.getLangTool(lang).getUseMhttpd())
             {
-                var chromepkg = 
-                    Alph.Languages.getLangTool(lang).getPkgName();
-                Alph.Main.s_logger.debug("setting up mhttpd for " + chromepkg);
-                var chrome_path = 
-                    Alph.BrowserUtils.getExtensionBasePath(chromepkg);
-                
-                chrome_path.append("mhttpd.conf");
-                Alph.Main.s_logger.debug("Reading file at " + chrome_path.path);
-                // open an input stream from file
-                var istream = cc["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-                istream.init(chrome_path, 0x01, 0444, 0);
-                istream.QueryInterface(ci.nsILineInputStream);
-
-                // read lines into array
-                var line = {}, hasmore;
-                do {
-                    hasmore = istream.readLine(line);
-                    Alph.Main.s_logger.debug("Read " + line.value);
-                    var values = line.value.split(/\|/);
-                    
-                    var exe_info = values[1].split(/,/);
-                    // translate the exe file path
-                    var exe_file = 
-                        Alph.BrowserUtils.getPlatformFile(exe_info,false,chromepkg,true);
-                    if (exe_file == null)
-                    {
-                        Alph.Main.s_logger.error(
-                            "Unable to find file at " + 
-                            values[1] + " for package" + chromepkg);
-                    }
-                    else
-                    {
-                        values[1] = exe_file.path;
-
-                        // put the values back together
-                        mhttpd_conf_lines.push(values.join('|'));
-                    }
-                } while(hasmore);
-                istream.close();
-            }
+                var pkg = 
+                    Alph.BrowserUtils.getPkgName(lang);
+                Alph.Main.readMhttpdConf(pkg,mhttpd_conf_lines);
+             }
         }
+        // add the basic conf
+        Alph.Main.readMhttpdConf('alpheios',mhttpd_conf_lines);
 
         var keywords = Alph.BrowserUtils.getPref("mhttpd.keywords") || "";
         var config = daemon.parent.clone();
@@ -774,6 +739,53 @@ Alph.Main =
                     Alph.Main.onMhttpdStart,
                     Alph.Main.alertMhttpdFailure)
             },Alph.Main.d_daemonCheckDelay);
+    },
+    
+    /**
+     * reads a mhttpd conf file
+     * @param {String} a_pkg package name
+     * @param {Array} a_lines the array of lines to which to append the file contents
+     */
+    readMhttpdConf: function(a_pkg,a_lines)
+    {
+        Alph.Main.s_logger.debug("setting up mhttpd for " + a_pkg);
+        var chrome_path = 
+            Alph.BrowserUtils.getExtensionBasePath(a_pkg);
+        
+        chrome_path.append("mhttpd.conf");
+        Alph.Main.s_logger.debug("Reading file at " + chrome_path.path);
+        // open an input stream from file
+        var istream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                      .createInstance(Components.interfaces.nsIFileInputStream);
+        istream.init(chrome_path, 0x01, 0444, 0);
+        istream.QueryInterface(Components.interfaces.nsILineInputStream);
+
+        // read lines into array
+        var line = {}, hasmore;
+        do {
+            hasmore = istream.readLine(line);
+            Alph.Main.s_logger.debug("Read " + line.value);
+            var values = line.value.split(/\|/);
+            
+            var exe_info = values[1].split(/,/);
+            // translate the exe file path
+            var exe_file = 
+                Alph.BrowserUtils.getPlatformFile(exe_info,false,a_pkg,true);
+            if (exe_file == null)
+            {
+                Alph.Main.s_logger.error(
+                    "Unable to find file at " + 
+                    values[1] + " for package" + a_pkg);
+            }
+            else
+            {
+                values[1] = exe_file.path;
+
+                // put the values back together
+                a_lines.push(values.join('|'));
+            }
+        } while(hasmore);
+        istream.close();
     },
     
     /**
