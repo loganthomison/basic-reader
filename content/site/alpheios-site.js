@@ -32,14 +32,18 @@ Alph.site = {
     /**
      * Check to see if this site supports the pedagogical functionality
      * @param {Document} a_doc the content document for the site
-     * @return true if the site supports the pedagogical functionality, false if not
-     * @type Boolean
+     * @return the language supported by the document if it's a pedagogical site, otherwise null
+     * @type String
      */
     is_ped_site: function(a_doc)
-    {             
-        return((Alph.$("meta[name=alpheios-pedagogical-text]",a_doc).length > 0)
-                ? true : false);
-      
+    {       
+        var page_lang = null;
+        if (Alph.$("meta[name=alpheios-pedagogical-text]",a_doc).length > 0)
+        {
+            page_lang = a_doc.documentElement.getAttribute("xml:lang") ||
+                        a_doc.documentElement.getAttribute("lang");
+        }
+        return page_lang;
     },
     
     /**
@@ -69,6 +73,24 @@ Alph.site = {
         return allowed_lang;
     },
     
+    /**
+     * Check to see if the site is one we which has declared some text to be
+     * activated for alpheios
+     * @param nsIURI a_url the url object
+     * @return the language of the alpheios-enabled text (or null if none)
+     * @type String
+     */
+    is_mixed_site: function(a_doc)
+    {
+        var enabled_text = Alph.$('.alpheios-enabled-text',a_doc);
+        var enabled_lang = null;
+        if (enabled_text.length > 0)
+        {
+            // TODO eventually need to support multiple languages per page
+            enabled_lang = Alph.$(enabled_text).attr("xml:lang") || Alph.$(enabled_text).attr("lang");
+        }
+        return enabled_lang;
+    },
     /**
      * register sites for automatic support
      */
@@ -146,6 +168,15 @@ Alph.site = {
         var bro = Alph.main.getCurrentBrowser();
         var trigger = Alph.main.getXlateTrigger(bro);
         this.add_trigger_hint(bro,a_doc,trigger,Alph.main.getLanguageTool(bro));
+        // run site-defined alpheios enabled event handler
+        var callback_elem = Alph.$("#alpheios-enabled-callback",a_doc).get(0);
+        if (callback_elem)
+        {
+            var evt = a_doc.createEvent("Events");
+            evt.initEvent("AlpheiosEnabled", true, false);
+            callback_elem.dispatchEvent(evt);
+        }
+
     },
     
     /**

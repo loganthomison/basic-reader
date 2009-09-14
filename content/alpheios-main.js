@@ -294,6 +294,7 @@ Alph.main =
         
         a_bro.addEventListener("keydown", this.onKeyDown, true);
         this.get_state_obj(a_bro).set_var("enabled",true);
+        
         if (! this.has_languages)
         {
             var err_msg = 
@@ -1361,24 +1362,19 @@ Alph.main =
         // that case is the browser linked from ...
         var bro = Alph.main.getCurrentBrowser();
         
-        var ped_site = 
-            Alph.site.is_ped_site(bro.contentDocument);
+        var ped_site = Alph.site.is_ped_site(bro.contentDocument);
+        var mixed_site = false;
+        
         var auto_lang = null;
         
         var cur_lang = this.get_state_obj(bro).get_var("current_language");
         if (ped_site)
         {     
-            // retrieve the language from the html element of the content document
-            auto_lang = bro.contentDocument.documentElement.getAttribute("xml:lang")
-                            || bro.contentDocument.documentElement.getAttribute("lang");
-            
-            // for backwards compatibility, 
-            // if the document itself doesn't specify the language, then check the 
-            // translation url div
-            if (auto_lang == null)
-            {
-                auto_lang = Alph.$("#alph-trans-url",bro.contentDocument).attr("src_lang");
-            }
+            auto_lang = ped_site;            
+        }
+        else if (mixed_site = Alph.site.is_mixed_site(bro.contentDocument))
+        {
+            auto_lang = mixed_site;
         }
         else
         {
@@ -1454,7 +1450,7 @@ Alph.main =
             this.toggle_toolbar();
         }
         
-        if (ped_site)
+        if ((ped_site || mixed_site) && this.is_enabled(bro))
         {
             // these functions should only be called after Alpheios has been auto-toggled
             // on because otherwise they get done twice via the send call to reset_state
@@ -1884,7 +1880,8 @@ Alph.main =
                     var bro = Alph.main.getCurrentBrowser();
                     var doc = bro.contentDocument;
                     Alph.main.insert_metadata({target: doc});
-                    if (Alph.site.is_ped_site(doc))
+                    if ((Alph.site.is_ped_site(doc) || Alph.site.is_mixed_site(doc))
+                        && Alph.main.is_enabled(bro))
                     {
                         // update the site functionality and toolbar
                         Alph.site.setup_page(doc,Alph.Translation.INTERLINEAR_TARGET_SRC);
@@ -1925,7 +1922,7 @@ Alph.main =
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
            // Alph.util.log("caught location change : " + aURI.spec);
-           var new_url_base= aURI.spec.match(/([^#|\?]+)[#|\?]?/)[1]
+           var new_url_base= aURI.spec.match(/([^#]+)[#]?/)[1]
            if (new_url_base == this.last_url_base)
            {
             this.handle_refresh = true;

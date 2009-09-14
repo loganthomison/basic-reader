@@ -109,15 +109,14 @@ Alph.Translation.prototype.show = function()
                 }   
             );
         }
+        return Alph.Panel.STATUS_SHOW;
    }
    else
    {
-        Alph.Translation.handle_error(
-            Alph.$("#alpheios-strings").get(0).getString("alph-error-notranslation"),
-            Alph.$("browser",this.panel_elem).get(0).contentDocument
-        );
+        // no translation, so just hide the panel
+        Alph.util.log("no translation url defined");
+        return panel_obj.hide(true);
    }
-   return Alph.Panel.STATUS_SHOW;
 };
 
 /**
