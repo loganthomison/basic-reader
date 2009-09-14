@@ -15,9 +15,9 @@
               value="/Program Files/Apache Group/Apache2/htdocs/alpheios_devbuilds" />
 	<property name="docs.deploy.dir"
 	          value="/test/docs/${app.name}"/>
-	<property name="release.id" value="1.0alpha2d" />
+	<property name="release.id" value="1.0alpha3" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
-	<property name="package" value="${app.name}-${release.id}.xpi"/>
+	<property name="package" value="${app.name}-latest.xpi"/>
 	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img,espeak"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>

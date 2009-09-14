@@ -37,3 +37,4 @@ pref("extensions.alpheios.smallicons",false);
 pref("extensions.alpheios.disable.remote",false);
 pref("extensions.alpheios.url.speech.timeout",5000);
 pref("extensions.alpheios.enable.toolbar",false);
+pref("extensions.alpheios.survey.url","http://www.surveymonkey.com/s.aspx?sm=IG7mAWG026Z4JYB_2f5dsXEw_3d_3d");
