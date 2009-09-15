@@ -693,7 +693,7 @@ Alph.Panel.prototype.getCurrentDoc = function(a_bro)
             if (panel_obj.windowOpen())
             {
                 var pw_bro =
-                    panel_obj.panel_window.document.getElementById(this.id);
+                    panel_obj.d_panelWindow.document.getElementById(this.id);
                 if (pw_bro)
                 {
                     docs.push(pw_bro.contentDocument);
