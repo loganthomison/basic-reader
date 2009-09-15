@@ -108,15 +108,14 @@ Alph.Translation.prototype.show = function()
                 }   
             );
         }
+        return Alph.Panel.STATUS_SHOW;
    }
    else
    {
-        Alph.Translation.handleError(
-            Alph.Main.getString("alph-error-notranslation"),
-            Alph.$("browser",this.d_panelElem).get(0).contentDocument
-        );
+        // no translation, so just hide the panel
+        Alph.Main.s_logger.warn("No translation url defined");
+        return panel_obj.hide(true);
    }
-   return Alph.Panel.STATUS_SHOW;
 };
 
 /**

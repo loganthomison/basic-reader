@@ -134,6 +134,15 @@ Alph.Xlate = {
             this.clearSelection();
             return;
         }
+        
+        // in a mixed site, ignore everything except explicity enabled text
+        if (Alph.Site.isMixedSite(rp.ownerDocument) && 
+            (! Alph.$(a_e.explicitOriginalTarget).hasClass('alpheios-enabled-text')) &&
+               Alph.$(a_e.explicitOriginalTarget).parents('.alpheios-enabled-text').length == 0)
+        {
+            this.clearSelection();
+            return;
+        }
 
         /* The rangeParent is going to be a #text node.
          * Get the parentNode of the text node for use in traversing

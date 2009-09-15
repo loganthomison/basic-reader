@@ -395,7 +395,7 @@ Alph.Infl = {
         else {
             Alph.Infl.expandTable(a_tbl,topdoc);            
         }
-        end = (new Date()).getTime();
+        
         this.s_logger.debug("Selected Endings Displayed.");
         // if we didn't have any suffixes, just display the whole table
         // with nothing highlighted

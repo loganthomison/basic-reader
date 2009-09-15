@@ -22,7 +22,6 @@
                       src="chrome://alpheios/locale/alpheios.properties"/>
     </stringbundleset>
 
-  <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
   <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
   <script type="application/x-javascript" src="chrome://alpheios/content/dialogs/alpheios-dlg.js" />  
   <vbox flex="1">
