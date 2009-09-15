@@ -128,7 +128,7 @@ Alph.Morph.prototype.init_document = function(a_doc,a_doc_state)
         a_doc_state.css = Alph.$("link[rel=stylesheet]",a_doc).clone();
     }
     Alph.$("#alph-window",a_doc).remove();
-    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone(true));
+    Alph.$("body",a_doc).html(Alph.$(a_doc_state.contents).clone(true));
     Alph.$("link[rel=stylesheet]",a_doc).remove();
     Alph.$("head",a_doc).append(Alph.$(a_doc_state.css).clone());
     return a_doc_state;
