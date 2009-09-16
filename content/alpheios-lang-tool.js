@@ -797,7 +797,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
 
     if (params.query_mode)
     {
-        params.xslt_params.show_only_matches = true;
+        params.xslt_params.e_showOnlyMatches = true;
     }
     this.s_logger.debug("Handling inflections for " + params.showpofs);
 
