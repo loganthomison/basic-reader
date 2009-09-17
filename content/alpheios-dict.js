@@ -24,21 +24,16 @@
  */
 
 
-/**
- * @class The Alph.Dict class is the representation of the dictionary definition
- * panel.
- * @constructor
+/** 
+ * @class Dictionary Panel implementation
+ * @augments Alph.Panel
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
- * @see Alph.Panel
  */
 Alph.Dict = function(a_panel)
 {
     Alph.Panel.call(this,a_panel);
 };
 
-/**
- * @ignore
- */
 Alph.Dict.prototype = new Alph.Panel();
 
 /**
@@ -118,7 +113,7 @@ Alph.Dict.prototype.resetContents = function(a_panel_state,a_old_state)
  * Dictionary panel specific implementation of
  * {@link Alph.Panel#show} - makes sure the
  * browser document has been initialized
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Dict.prototype.show = function()
@@ -479,7 +474,7 @@ Alph.Dict.prototype.updatePanelWindow =
  * @param {Document} a_doc the content document
  * @param {Object} a_doc_state the state object for this browser. If not supplied
  *                 a new state object will be created
- * @return {Object} the state object for this browser
+ * @returns {Object} the state object for this browser
  */
 Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
 {
@@ -515,7 +510,7 @@ Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
 /**
  * Dictionary panel specific implementation of
  * {@link Alph.Panel#get_detach_chrome}
- * @return the chrome url as a string
+ * @returns the chrome url as a string
  * @type String
  */
 Alph.Dict.prototype.getDetachChrome = function()
@@ -541,7 +536,7 @@ Alph.Dict.updateDictBrowseCmd = function()
 
 /**
  * Browse the current dictionary
- * @param {Event} a_ the event which triggered the request
+ * @param {Event} a_event the event which triggered the request
  * @param {String} a_panel_id the id of the originating panel
  */
 Alph.Dict.browseDictionary = function(a_event,a_panel_id)

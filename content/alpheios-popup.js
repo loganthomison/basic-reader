@@ -34,8 +34,7 @@
 
 
 /**
- * Alph.Xlate contains the generic popup functionality
- * @singleton
+ * @class Alph.Xlate contains the generic popup functionality
  */
 Alph.Xlate = {
 
@@ -51,7 +50,7 @@ Alph.Xlate = {
      * TODO transform stylesheet may need to be language specific
      * @private
      * @param {String} a_text the text to be transformed
-     * @return an HTML Node containing the transformed text
+     * @returns an HTML Node containing the transformed text
      * @type Node
      */
     transform: function(a_text)
@@ -1162,7 +1161,7 @@ Alph.Xlate = {
      *                              a_start_call callback
      *  @param {function} a_load_call optional callback to be installed as an
      *                                onload event handler in the new window
-     *  @return the window
+     *  @returns the window
      */
     openSecondaryWindow: function(
         a_name,
@@ -1494,7 +1493,7 @@ Alph.Xlate = {
      /**
       * Determines if the popup is currently being displayed,
       * based upon the lastElem object in the alpheios state variable
-      * @return true if it was found and visible, otherwise false
+      * @returns true if it was found and visible, otherwise false
       * @type Boolean
       */
      popupVisible: function()
@@ -1505,7 +1504,7 @@ Alph.Xlate = {
 
      /**
       * get the document object for the last shown popup
-      * @return the Document object
+      * @returns the Document object
       * @type Document
       */
      getLastDoc: function()

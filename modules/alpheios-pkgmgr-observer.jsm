@@ -1,7 +1,9 @@
 /**
  * @fileoverview This module is used for observing package level browser 
- * events for Alpheios extensions
- * @version $Id: $
+ * events for Alpheios extensions. Exports a single symbol, PgkMgr, which
+ * must be imported into the namespace of the importing class.
+ *
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -22,17 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This module exports a single symbol, PkgMgr.
- * This object should be imported into the namespace of the importing class
- */
 var EXPORTED_SYMBOLS = ["PkgMgr"];
 
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 
 /**
- * @singleton
- * implements nsIObserver interface
+ * @class implements nsIObserver interface
  * @see https://developer.mozilla.org/en/nsIObserver
  * @see https://developer.mozilla.org/en/Observer_Notifications
  */

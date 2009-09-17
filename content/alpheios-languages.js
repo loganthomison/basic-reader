@@ -23,22 +23,34 @@
  */
  
 /**
- * @singleton
- * 
- * The Alph.Languages object holds
- * the instantiated instances of the {@link Alph.LanguageTool}
- * objects for each supported language.
- * It is populated by {@link Alph.Main#set_languages}
+ * @class Container for the instantiated instances of the {@link Alph.LanguageTool}
+ * objects for each supported language. 
  */
 Alph.Languages = 
 {
+    /**
+     * the list of supported languages
+     * @private
+     */
     d_langList: [],
     
+    /**
+     * get a language tool
+     * @param {String} a_lang the language key
+     * @returns the language tool
+     * @type {Alph.LanguageTool}
+     */
     getLangTool: function(a_lang)
     {
         return this[a_lang];
     },
     
+    /**
+     * check to see if a language is supported
+     * @param {String} a_lang the language key
+     * @returns true or false
+     * @type Boolean
+     */
     hasLang: function(a_lang)
     {        
         if (typeof this[a_lang] == "undefined")
@@ -51,11 +63,21 @@ Alph.Languages =
         }
     },
     
+    /**
+     * get the list of supported languages
+     * @returns list of supported languages
+     * @type Array
+     */
     getLangList: function()
     {
         return this.d_langList;
     },
     
+    /**
+     * add a supported language
+     * @param {String} a_lang the language key
+     * @param {Alph.LanguageTool} the language tool
+     */
     addLangTool: function(a_lang,a_lang_tool)
     {
         if (typeof this[a_lang] == "undefined")
@@ -66,9 +88,10 @@ Alph.Languages =
     },
     
     /**
-     * Get the key in to the Languages object for the supplied language_code
+     * Get the key in to the Languages object for the supplied language code
      * @param {String} a_code the language code
-     * @return the key in to the Languages object for this code, or '' if none found 
+     * @returns the key in to the Languages object for this code, or '' if none found
+     * @type String 
      */
     mapLanguage: function(a_code)
     {

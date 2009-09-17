@@ -25,11 +25,10 @@
 
 
 /**
- * @class The Alph.Morph class is the representation of the morphology
- * panel.
+ * @class Morphology Panel implementation
+ * @augments Alph.Panel
  * @constructor
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
- * @see Alph.Panel
  */
 Alph.Morph = function(a_panel)
 {
@@ -58,7 +57,7 @@ Alph.Morph.prototype.init = function(a_panel_state)
 /**
  * Morph panel specific implementation of
  * {@link Alph.Panel#show}
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Morph.prototype.show = function()
@@ -110,7 +109,7 @@ Alph.Morph.prototype.resetContents = function(a_panel_state)
  * @param {Document} a_doc the content document
  * @param {Object} a_doc_state the state object for this browser. If not supplied
  *                 a new state object will be created
- * @return {Object} the state object for this browser
+ * @returns {Object} the state object for this browser
  */
 Alph.Morph.prototype.initDocument = function(a_doc,a_doc_state)
 {
@@ -202,7 +201,7 @@ Alph.Morph.prototype.observeUIEvent = function(a_bro,a_event_type)
 /**
  * Morph panel specific implementation of
  * {@link Alph.Panel#getDetachChrome}
- * @return the chrome url as a string
+ * @returns the chrome url as a string
  * @type String
  */
 Alph.Morph.prototype.getDetachChrome = function()
@@ -215,7 +214,7 @@ Alph.Morph.prototype.getDetachChrome = function()
  * Morph panel specific implementation of
  * {@link Alph.Panel#getCurrentLanguage}
  * @param {Browser} a_panel_bro the panel browser we want the language for 
- * @return the language used to create the contents of the supplied panel browser 
+ * @returns the language used to create the contents of the supplied panel browser 
  * @type String
  */
 Alph.Morph.prototype.getCurrentLanguage = function(a_panel_bro)

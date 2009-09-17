@@ -1,6 +1,6 @@
 /**
- * @fileoverview About dialog funcitons
- * @version $Id: alpheios-about.js 746 2009-02-06 15:20:09Z BridgetAlmas $
+ * @fileoverview XUL dialog functionality
+ * @version $Id$
  *   
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -21,8 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+/**
+ * @class XUL dialog functionality
+ */
 Alph.Dialogs = 
 {
+     /**
+      * onload handler for the about dialog
+      */
      loadAbout: function()
      {
         // populate the Alpheios site link
@@ -45,6 +51,9 @@ Alph.Dialogs =
         );
     },
     
+    /**
+     * onload handler for the leaving site dialog
+     */
     loadLeavingSite: function()
     {
         // add the survey link if there is one

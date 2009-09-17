@@ -1,7 +1,9 @@
 /**
  * @fileoverview Defines miscellaneous constants for the Alpheios extensions.
+ * This module exports a single symbol, Constants, which must be imported into 
+ * the namespace of the importing class.
  *
- * @version $Id: alpheios-languages.js 1623 2009-06-19 20:21:53Z BridgetAlmas $
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -22,15 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- /**
- * This module exports a single symbol, Constants
- * This object should be imported into the namespace of the importing class
- */
 const EXPORTED_SYMBOLS = ['Constants'];
 
+/**
+ * @class Alpheios Application Constants
+ */
 Constants = {
     /**
      * Event types
+     * @constant
      */
     EVENTS: 
         {
@@ -46,6 +48,7 @@ Constants = {
 
     /**
      * Levels (modes)
+     * @constant
      */
     LEVELS: 
     {

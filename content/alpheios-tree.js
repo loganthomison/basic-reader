@@ -25,11 +25,9 @@
 
 
 /**
- * @class The Alph.Tree class is the representation of the Treeology
- * panel.
- * @constructor
+ * @class Tree (Diagram) Panel implementation 
+ * @augments Alph.Panel
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
- * @see Alph.Panel
  */
 Alph.Tree = function(a_panel)
 {
@@ -45,7 +43,7 @@ Alph.Tree.prototype = new Alph.Panel();
 /**
  * Tree panel specific implementation of
  * {@link Alph.Panel#getDetachChrome}
- * @return the chrome url as a string
+ * @returns the chrome url as a string
  * @type String
  */
 Alph.Tree.prototype.getDetachChrome = function()
@@ -68,7 +66,7 @@ Alph.Tree.prototype.init = function()
 /**
  * Tree panel specific implementation of
  * {@link Alph.Panel#show}
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Tree.prototype.show = function()
@@ -402,7 +400,7 @@ Alph.Tree.prototype.updatePanelWindow = function(a_panel_state,a_browser_id,a_br
  *
  * @param a_container SVG group containing tree
  * @param {int} a_fontSize size of font in pixels
- * @return size of tree, center line of root element, and width of root node
+ * @returns size of tree, center line of root element, and width of root node
  * @type Array
  */
 Alph.Tree.positionTree = function(a_container, a_fontSize)
@@ -606,7 +604,7 @@ Alph.Tree.positionTree = function(a_container, a_fontSize)
  * @param a_doc the document
  * @param {int} a_width width of tree
  * @param {int} a_fontSize size of font in pixels
- * @return size of text
+ * @returns size of text
  * @type Array
  */
 Alph.Tree.positionText = function(a_doc, a_width, a_fontSize)
@@ -669,7 +667,7 @@ Alph.Tree.positionText = function(a_doc, a_width, a_fontSize)
  *
  * @param a_doc the document
  * @param {int} a_fontSize size of font in pixels
- * @return size of key
+ * @returns size of key
  * @type Array
  */
 Alph.Tree.positionKey = function(a_doc, a_fontSize)

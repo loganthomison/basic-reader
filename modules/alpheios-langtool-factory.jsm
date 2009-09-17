@@ -1,8 +1,10 @@
 /**
  * @fileoverview Factory class to hold and instantiate LanguageTool objects 
- * for the installed Alpheios language extensions
+ * for the installed Alpheios language extensions.
+ * This module exports a single symbol, LanguageToolFactory
+ * which must be imported into the namespace of the importing class
  *  
- * @version $Id: alpheios-languages.js 1623 2009-06-19 20:21:53Z BridgetAlmas $
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -23,21 +25,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- /**
- * This module exports a single symbol, LanguageToolFactory
- * This object should be imported into the namespace of the importing class
- */
 var EXPORTED_SYMBOLS = ["LanguageToolFactory"];
 
 Components.utils.import('resource://alpheios/alpheios-browser-utils.jsm');
 Components.utils.import('resource://alpheios/ext/StringBundle.jsm');
 
 /**
- * @singleton
- * 
- * The LanguageToolFactory object holds
- * the list of supported Alpheios languages and the corresponding Language Tool object class 
- * for each
+ * @class Factory class to hold and instantiate LanguageTool objects 
+ *        for the installed Alpheios language extensions
  */
 LanguageToolFactory = 
 {

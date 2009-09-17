@@ -20,8 +20,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+ /**
+  * @class Grammar window javascript for Tei formated grammar documents.
+  */
 Alph.TeiGrammar = {
 
+    /**
+     * path to the index for this grammar
+     * @private
+     */
     d_indexFile: null,
     
     /**
@@ -196,9 +204,9 @@ Alph.TeiGrammar = {
      
      /**
       * get the base url for the current grammar
-      * @param {Alph.LanguageTool) a_lang_tool the LanguageTool which produced
+      * @param {Alph.LanguageTool} a_lang_tool the LanguageTool which produced
       *                                        the current grammar window
-      * @return the url for the current grammar
+      * @returns the url for the current grammar
       * @type String
       */
      getBaseUrl: function(a_lang_tool)

@@ -1,7 +1,9 @@
 /**
- * @fileoverview conversion utility functions are encaspulated in the Alph.convert object
- * namespace. 
- * @version $Id: alpheios-conversions.js 1901 2009-08-06 13:49:48Z BridgetAlmas $
+ * @fileoverview This module defines text conversion utility functions.   
+ * Exports a single symbol, Convert, which must be imported into the namespace 
+ * of the importing class.
+ *
+ * @version $Id$
  *   
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -22,13 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- /**
- * This module exports a single symbol, Convert
- * This object should be imported into the namespace of the importing class
- */
 const EXPORTED_SYMBOLS = ['Convert'];
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 
+/**
+ * @class text conversion utility functions 
+ */
 Convert = {
     
     /**

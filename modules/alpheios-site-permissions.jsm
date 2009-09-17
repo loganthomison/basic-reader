@@ -1,8 +1,10 @@
 /**
  * @fileoverview This module is used for storing Alpheios permissions for specific sites
  * The interface is based on that of nsIPermissionManager but the implementation supports
- * paths as well as domains
- * @version $Id: $
+ * paths as well as domains. Exports a single symbol, PermissionMgr, which
+ * must be imported into the namespace of the importing class.
+ * 
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -23,39 +25,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This module exports a single symbol, PermissionMgr.
- * This object should be imported into the namespace of the importing class
- */
 var EXPORTED_SYMBOLS = ["PermissionMgr"];
 
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
+
 /**
- * @singleton
+ * @class container for Alpheios permissions for specific sites
+ * The interface is based on that of nsIPermissionManager but the implementation supports
+ * paths as well as domains
  */
 PermissionMgr =
 {
     /**
      * URI is not registered for the requested permission
      * @type int 0
+     * @constant
      */
     UNKNOWN_ACTION: 0,
     
     /**
      * Action is allowed
      * @type int
-     *  
+     * @constant
      */
     ALLOW_ACTION: 1,
     
     /**
      * Action is not allowed
      * @type int 0
+     * @constant
      */
     DENY_ACTION: 2,
     
     /**
      * the array of sites and permissions
+     * @private
      */
     d_sites: Array(),
     

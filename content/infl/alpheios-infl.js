@@ -1,6 +1,6 @@
 /**
  * @fileoverview Handler for the Alpheios Inflection Table window
- * @version $Id $
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -22,9 +22,10 @@
  */
 
 /**
- * @singleton
+ * @class Inflection Window functionality
  */
 Alph.Infl = {
+    
     /**
      * An XSLT Processor for the xml verb conjugation data
      * @private
@@ -44,7 +45,7 @@ Alph.Infl = {
      * TODO transform stylesheet may need to be language specific
      * @private
      * @param {Node} a_target
-     * @return an HTML Node containing the transformed text
+     * @returns an HTML Node containing the transformed text
      * @type Node
      */
     transform: function(a_target)
@@ -462,7 +463,7 @@ Alph.Infl = {
      * Handler for the "Full Table" link to show all columns in the table.
      * @param {HTMLElement} a_tbl the table
      * @param {Document} a_doc the Document containing the table
-     * @param {Boolean{ a_hide_empty flag to indicate whether or not to hide empty cells
+     * @param {Boolean} a_hide_empty flag to indicate whether or not to hide empty cells
      */
     expandTable: function(a_tbl,a_topdoc,a_hide_empty) {
         $("th",a_tbl).css("display","table-cell");
@@ -644,7 +645,7 @@ Alph.Infl = {
      * @param {Element} a_elem the target of the action
      * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced 
      *                                        the inflection table
-     * @return false if this is a reference link we can follow, otherwise true to
+     * @returns false if this is a reference link we can follow, otherwise true to
      *         allow event propogation
      */
     followReflink: function(a_e,a_elem,a_lang_tool)
@@ -751,7 +752,7 @@ Alph.Infl = {
      * Finds sibling columns 
      * @param {Array} a_cols a list of column indices
      * @param {Array} a_all_cols a list of all the Column cells in the table 
-     * @return array of sibling column indices
+     * @returns array of sibling column indices
      * @type Array
      */
     findSibCols: function(a_cols,a_all_cols)
@@ -1100,7 +1101,7 @@ Alph.Infl = {
      * @param {Element} a_elem the target of the action
      * @param {Alph.LanguageTool} a_lang_tool the LanguageTool object which produced 
      *                                        the inflection table
-     * @return false 
+     * @returns false 
      */
     doLanguageSpecificFeature: function(a_event,a_elem,a_lang_tool)
     {

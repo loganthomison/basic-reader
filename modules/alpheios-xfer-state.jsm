@@ -1,8 +1,11 @@
 /**
  * @fileoverview This module is used for storing Alpheios state variables which
- * must be shared by all browsers and windows.
- * @version $Id: $
+ * must be shared by all browsers and windows. Exports a single symbol, XFRState,
+ * which must be imported into the namespace of the importing class.
  * 
+ * @version $Id$
+ *
+ *
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
@@ -22,14 +25,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This module exports a single symbol, XFRState.
- * This object should be imported into the namespace of the importing class
- */
 var EXPORTED_SYMBOLS = ["XFRState"];
 
 /**
- * @singleton
+ * @class container for state values to be shared across browser windows
  */
 XFRState =
 {

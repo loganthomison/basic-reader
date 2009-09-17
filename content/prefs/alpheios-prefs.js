@@ -26,7 +26,7 @@ Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
 
  /**
- * @singleton
+ * @class Preferences Dialog functionality
  */
 Alph.Prefs = {
 
@@ -265,7 +265,7 @@ Alph.Prefs = {
      * the values of these preferences are not simple booleans, need
      * to return the correct Alph.Panel static variable for the state
      * @param {XULElement} a_cbx the XUL Checkbox element for the panel preference
-     * @return one of Alph.Panel.STATUS_SHOW or Alph.Panel.STATUS_HIDE
+     * @returns one of Alph.Panel.STATUS_SHOW or Alph.Panel.STATUS_HIDE
      * @type int
      */
     updatePanelPref: function(a_cbx)

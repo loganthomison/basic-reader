@@ -25,11 +25,9 @@
 
 
 /**
- * @class The Alph.Etymology class is the representation of the Etymology
- * panel.
- * @constructor
+ * @class Etymology Panel implementation (prototype)
+ * @augments Alph.Panel
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
- * @see Alph.Panel
  */
 Alph.Etymology = function(a_panel)
 {
@@ -134,7 +132,7 @@ Alph.Etymology.prototype.initDocument = function(a_doc,a_doc_state)
  * Etymology panel specific implementation of 
  * {@link Alph.Panel#show} - makes sure the 
  * browser document has been initialized 
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Etymology.prototype.show = function()
@@ -163,7 +161,7 @@ Alph.Etymology.prototype.show = function()
 /**
  * Etymology panel specific implementation of 
  * {@link Alph.Panel#getDetachChrome}
- * @return the chrome url as a string
+ * @returns the chrome url as a string
  * @type String
  */
 Alph.Etymology.prototype.getDetachChrome = function()
@@ -240,7 +238,7 @@ Alph.Etymology.prototype.observeUIEvent = function(a_bro,a_event_type)
 
 /**
  * Get the etymology data -- hack until we have a real etymology service
- * @return the etymology data for the current language or null 
+ * @returns the etymology data for the current language or null 
  */
 Alph.Etymology.prototype.getEtymData = function()
 {

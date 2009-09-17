@@ -24,7 +24,7 @@
  */
 
 /**
- * @singleton
+ * @class Controls quiz mode functionality.
  */
 Alph.Interactive = {
 
@@ -50,7 +50,7 @@ Alph.Interactive = {
     
     /**
      * Check to see if interactive features are enabled
-     * @return true if the current level is Alph.Constants.LEVELS.LEARNER, otherwise false
+     * @returns true if the current level is Alph.Constants.LEVELS.LEARNER, otherwise false
      * @type boolean
      */
     enabled: function(a_bro)
@@ -331,7 +331,7 @@ Alph.Interactive = {
      * @param {Element} a_ending the HTML element containing the inflected form or ending
      * @param {Object} a_params the params object that was passed to the inflection table
      *                          window (which contains all the context for the window)
-     * @return true if the selection was correct, otherwise false
+     * @returns true if the selection was correct, otherwise false
      * @type boolean
      */
      checkInflection: function(a_ending,a_params)
@@ -408,7 +408,7 @@ Alph.Interactive = {
      
      /**
       * get the query document
-      * @return the query document
+      * @returns the query document
       * @type Document
       */
      getQueryDoc: function()

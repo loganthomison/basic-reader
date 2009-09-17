@@ -1,8 +1,10 @@
 /**
- * @fileoverview This file contains the BrowserUtils and BrowserSvc objects
- * which contain code and services specific to the Mozilla platform
+ * @fileoverview This module contains the BrowserUtils and BrowserSvc objects
+ * which contain code and services specific to the Mozilla platform. 
+ * Exports a single symbol, BrowserUtils which must be imported into the 
+ * namespace of the importing class.
  *
- * @version $Id $
+ * @version $Id$
  * 
  * Copyright 2008 Cantus Foundation
  * http://alpheios.net
@@ -22,11 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */    
- 
- /**
- * This module exports a single symbol, BrowserUtils.
- * This object should be imported into the namespace of the importing class
- */
+  
 const EXPORTED_SYMBOLS = ['BrowserUtils'];
 
 const CC = Components.classes;
@@ -36,8 +34,7 @@ const CU = Components.utils;
 CU.import("resource://alpheios/ext/log4moz.js");
 
 /**
- * Alpheios Browser-Specific Utility functions
- * @singleton
+ * @class Alpheios Browser-Specific Utility functions
  */
 BrowserUtils = {
     
@@ -629,7 +626,7 @@ BrowserUtils = {
     
     /**
      * Get the base url for an installed package
-     * @param {String) a_lang the language (optional, if not supplied,
+     * @param {String} a_lang the language (optional, if not supplied,
      *                        the base library url is returned)
      * @return the base package url
      * @type String     
@@ -642,7 +639,7 @@ BrowserUtils = {
 
     /**
      * Get the url of the content directory of an installed package
-     * @param {String) a_lang the language (optional, if not supplied,
+     * @param {String} a_lang the language (optional, if not supplied,
      *                        the base library url is returned)
      * @return the package content url
      * @type String     
@@ -654,7 +651,7 @@ BrowserUtils = {
     
     /**
      * Get the url of the style directory of an installed package
-     * @param {String) a_lang the language (optional, if not supplied,
+     * @param {String} a_lang the language (optional, if not supplied,
      *                        the base library url is returned)
      * @return the package style url
      * @type String     
@@ -676,8 +673,16 @@ BrowserUtils = {
     },
 };
 
+/**
+ * @class Browser Services
+ * @private  
+ */
 BrowserSvc = {
     
+    /**
+     * supported services
+     * @private
+     */
     d_svcs: 
     {
         UnicodeConverter: ['@mozilla.org/intl/scriptableunicodeconverter','nsIScriptableUnicodeConverter'],
@@ -690,7 +695,7 @@ BrowserSvc = {
     },
      
     /**
-     * Initialization code for the Svcs object 
+     * Initialization code for the Svcs object
      */
     init: function() {
         this.AlphPrefs = 

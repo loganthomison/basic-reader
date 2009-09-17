@@ -25,11 +25,9 @@
 
 
 /**
- * @class The Alph.Translation class is the representation of the translation
- * panel.
- * @constructor
+ * @class Translation Panel implementation
+ * @augments Alph.Panel
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
- * @see Alph.Panel
  */
 Alph.Translation = function(a_panel)
 {
@@ -48,7 +46,7 @@ Alph.Translation.prototype = new Alph.Panel();
 /**
  * Translation panel specific implementation of 
  * {@link Alph.Panel#show}
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Translation.prototype.show = function()

@@ -2,7 +2,7 @@
  * @fileoverview This file contains the Alph.Util class with the 
  * Alpheios utility functions which are not specific to the Mozilla framework
  *
- * @version $Id $
+ * @version $Id$
  * 
  * Copyright 2008 Cantus Foundation
  * http://alpheios.net
@@ -26,14 +26,20 @@
 
 // initialize the namespace
 if (typeof Alph == "undefined") {
+    /**
+     * @namespace the global namespace for the Alpheios extension all functions and objects are defined
+     *            in (or imported into) the Alpha namespace. 
+     */
     Alph = {};
 }
+
 
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm",Alph);
 Components.utils.import("resource://alpheios/alpheios-convert.jsm",Alph);
 Components.utils.import("resource://alpheios/alpheios-datafile.jsm",Alph);
 
-// load the jQuery library in the scope of the Alph object
+
+// load the jQuery library in the scope of the Alph namespace
 // and call jQuery.noConflict(extreme) to revert control of the
 // $ and jQuery to whichever library first implemented it (to
 // avoid stepping on the toes of any other extensions).
@@ -44,8 +50,7 @@ Alph.BrowserUtils.loadJavascript(Alph.BrowserUtils.getContentUrl() + "/jquery-1.
 Alph.$ = jQuery.noConflict(true);    
 
 /**
- * Alph.Util contains the Alpheios utility functions
- * @singleton
+ * @class Alpheios utility functions
  */
 Alph.Util = {
 
@@ -165,7 +170,7 @@ Alph.Util = {
     /** 
      * check to see if the supplied element is in view
      * @param {Element} a_el the element
-     * @return true if in view, otherwise false
+     * @returns true if in view, otherwise false
      * @type Boolean
      */
     inViewPort: function(a_el) {
@@ -194,7 +199,7 @@ Alph.Util = {
      * check to see if the supplied element is 'below the fold'
      * of the viewport 
      * @param {Element} a_el the element
-     * @return the # of pixels out of view
+     * @returns the # of pixels out of view
      * @type Boolean
      */
     belowTheFold: function(a_el) {
@@ -215,7 +220,7 @@ Alph.Util = {
      * check to see if the supplied element is 'right of screen'
      * of the viewport 
      * @param {Element} a_el the element
-     * @return the # of pixels out of view
+     * @returns the # of pixels out of view
      * @type int
      */
     rightOfScreen: function(a_el) {
@@ -235,7 +240,7 @@ Alph.Util = {
     /**
      * Check to see if a url is a local url
      * @param {String} a_url the url string
-     * @return true if its a localhost or chrome url otherwise false
+     * @returns true if its a localhost or chrome url otherwise false
      * @type Boolean
      */
     isLocalUrl: function(a_url)
@@ -249,7 +254,7 @@ Alph.Util = {
      * get xslt processor
      * @param {String} a_filename the name of the xslt file to import
      * @param {String} a_lang optional language-specific indicator
-     * @return a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
+     * @returns a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
      * @type XSLTProcessor
      */
      getXsltProcessor: function(a_filename,a_lang)

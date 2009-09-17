@@ -25,7 +25,7 @@
  */
 
 /**
- * @singleton
+ * @class functionality injected into sites which are tagged as supporting Alpheios  
  */
 Alph.Site = {
     
@@ -39,7 +39,7 @@ Alph.Site = {
     /**
      * Check to see if this site supports the pedagogical functionality
      * @param {Document} a_doc the content document for the site
-     * @return the language supported by the document if it's a pedagogical site, otherwise null
+     * @returns the language supported by the document if it's a pedagogical site, otherwise null
      * @type String
      */
     isPedSite: function(a_doc)
@@ -57,7 +57,7 @@ Alph.Site = {
      * Check to see if the site is one we have registered automatic
      * support for
      * @param nsIURI a_url the url object
-     * @return the language we have registered for this site, or null if it
+     * @returns the language we have registered for this site, or null if it
      *         is not registered
      * @type String
      */
@@ -84,7 +84,7 @@ Alph.Site = {
      * Check to see if the site is one we which has declared some text to be
      * activated for alpheios
      * @param nsIURI a_url the url object
-     * @return the language of the alpheios-enabled text (or null if none)
+     * @returns the language of the alpheios-enabled text (or null if none)
      * @type String
      */
     isMixedSite: function(a_doc)
@@ -686,7 +686,7 @@ Alph.Site = {
      *                           as the first parameter)
      * @param Function a_error error callback (gets the error message as the
      *                         first parameter
-     * @return the alignment document, parsed as xhtml+xml
+     * @returns the alignment document, parsed as xhtml+xml
      * @type Document
      */
     loadAlignment: function(a_src_doc,a_success,a_error)
@@ -775,7 +775,7 @@ Alph.Site = {
     /**
      * Get the treebank url for the document, if any
      * @param {Document} a_doc the document
-     * @return the url or null if not defined
+     * @returns the url or null if not defined
      * @type {String}
      */
     getTreebankUrl: function(a_doc)
@@ -795,7 +795,7 @@ Alph.Site = {
     /**
      * Get the treebank diagram url for the document, if any
      * @param {Document} a_doc the document
-     * @return the url or null if not defined
+     * @returns the url or null if not defined
      * @type {String}
      */
     getTreebankDiagramUrl: function(a_doc)
@@ -816,7 +816,7 @@ Alph.Site = {
     /**
      * Get the aligned translation url for the document, if any
      * @param {Document} a_doc the document
-     * @return the url or null if not defined
+     * @returns the url or null if not defined
      * @type {String}
      */
     getTranslationUrl: function(a_doc)

@@ -83,7 +83,7 @@ Alph.State.prototype.persist = function(a_name)
 /**
  * Get a state variable
  * @param {String} a_name the name of the variable
- * @return the value or null if the variable wasn't found
+ * @returns the value or null if the variable wasn't found
  * @throws an Error if the variable hasn't been declared
  */
 

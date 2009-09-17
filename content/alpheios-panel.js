@@ -26,7 +26,6 @@
  * a usage of the alpheiosPanel tag in the interface.  This class is intended
  * as an abstract class, and is expected to be subclassed for all uses of the 
  * alpheiospanel tag. 
- * 
  * @constructor
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
  */
@@ -78,7 +77,7 @@ Alph.Panel.prototype.init = function()
 /**
  * Resets the panel state (open/closed) to the correct default
  * for the panel.
- * @return the new panel status (should be one of 
+ * @returns the new panel status (should be one of 
  *              Alph.Panel.STATUS_SHOW, Alph.Panel.STATUS_HIDE 
  *              Alph.Panel.STATUS_AUTOHIDE)
  * @type int
@@ -116,7 +115,7 @@ Alph.Panel.prototype.resetToDefault = function()
  * current browser (or to default if this is the first time called
  * for the browser session).
  * @param {Browser} a_bro browser object
- * @return the new panel status (should be one of 
+ * @returns the new panel status (should be one of 
  *              Alph.Panel.STATUS_SHOW, Alph.Panel.STATUS_HIDE 
  *              Alph.Panel.STATUS_AUTOHIDE)
  * @type int
@@ -167,7 +166,7 @@ Alph.Panel.prototype.handleRefresh = function(a_bro)
  * @param {int} a_status the new panel status (should be one of 
  *              Alph.Panel.STATUS_SHOW, Alph.Panel.STATUS_HIDE 
  *              Alph.Panel.STATUS_AUTOHIDE)
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Panel.prototype.updateStatus = function(a_status)
@@ -343,7 +342,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
 
 /**
  * Show (open) the panel.
- * @return {@link Alph.Panel#STATUS_SHOW} if the conditions were met
+ * @returns {@link Alph.Panel#STATUS_SHOW} if the conditions were met
  * to show the panel. Otherwise {@link Alph.Panel#STATUS_AUTOHIDE}
  * @type int  
  */
@@ -416,7 +415,7 @@ Alph.Panel.prototype.updatePanelWindow =
  * @param {Boolean} a_autoflag flag to indicate that the panel is being
  *                  hidden by the application rather than the user. If not
  *                  supplied, by the user is assumed.
- * @return {@link.Alph.Panel#AUTO_HIDE} or {@link Alph.Panel#STATUS_HIDE}
+ * @returns {@link.Alph.Panel#AUTO_HIDE} or {@link Alph.Panel#STATUS_HIDE}
  *         (depending upon the value of the a_autoflag param) if the 
  *         conditions were met to show the panel. Otherwise should
  *         return the current panel status.
@@ -453,7 +452,7 @@ Alph.Panel.prototype.hide = function(a_autoflag)
 
 /**
  * Open the panel or panel window
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Panel.prototype.open = function()
@@ -473,7 +472,7 @@ Alph.Panel.prototype.open = function()
 
 /**
  * Toggle the state of the panel (hide if shown, and vice-versa)
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Panel.prototype.toggle = function()
@@ -528,7 +527,7 @@ Alph.Panel.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
 /**
  * Get the panel state for the current browser object
  * @param {Browser} a_bro the current browser
- * @return the panel state object
+ * @returns the panel state object
  * @type Object
  */
 Alph.Panel.prototype.getBrowserState = function(a_bro)
@@ -564,7 +563,7 @@ Alph.Panel.prototype.getStatusPrefSetting = function()
 
 /**
  * Get the chrome url for the detached version of the panel
- * @return chrome url string
+ * @returns chrome url string
  * @type String
  */
 Alph.Panel.prototype.getDetachChrome = function()
@@ -657,7 +656,7 @@ Alph.Panel.prototype.toggleSectionSplitter = function(a_splitter,a_open_panel)
  * Get the language that was used to populate the supplied 
  * browser in the panel. Implementation is panel specific
  * @param {Browser} a_panel_bro the panel browser we want the language for
- * @return the language used to populate a_panel_bro (or null if not known)
+ * @returns the language used to populate a_panel_bro (or null if not known)
  * @type String
  */
 Alph.Panel.prototype.getCurrentLanguage = function(a_panel_bro)
@@ -668,7 +667,7 @@ Alph.Panel.prototype.getCurrentLanguage = function(a_panel_bro)
 /**
  * Check to see if the panel is currently visible and inline
  * @param {Browser} a_bro the current browser
- * @return true or false
+ * @returns true or false
  * @type Boolean
  */
 Alph.Panel.prototype.isVisibleInline = function(a_bro)
@@ -678,7 +677,7 @@ Alph.Panel.prototype.isVisibleInline = function(a_bro)
 
 /**
  * Get the current document shown in the panel
- * @return the array of content documents for the panel and panel_window
+ * @returns the array of content documents for the panel and panel_window
  * @type Array{Document}
  */
 Alph.Panel.prototype.getCurrentDoc = function(a_bro)

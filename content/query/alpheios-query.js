@@ -32,7 +32,7 @@
  */
 
 /**
- * @singleton
+ * @class Quiz Window functionality
  */
 Alph.Quiz =
 {

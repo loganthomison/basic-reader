@@ -38,13 +38,15 @@ Alph.BrowserUtils.importResource("resource://alpheios/alpheios-pkgmgr-observer.j
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
 
 /**
- * @singleton
+ * @class Alpheios application controller
  */
 Alph.Main =
 {
     
-    // id of this extension
-    // TODO we can probably remove this now
+    /**
+     *id of this extension
+     * TODO we can probably remove this now
+     */
     d_extensionGUID: "{4816253c-3208-49d8-9557-0745a5508299}",
         
     /**

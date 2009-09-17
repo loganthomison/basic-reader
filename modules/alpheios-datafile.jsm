@@ -1,6 +1,10 @@
 /**
- * @fileoverview Datafile - access data from file
- *  
+ * @fileoverview Access data from a sorted file. Supports binary search.  
+ * Exports a single symbol, Datafile, which must be imported into the 
+ * namespace of the importing class.
+ *
+ * @version $Id$
+ *
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
@@ -20,10 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This module exports a single symbol, Datafile
- * This object should be imported into the namespace of the importing class
- */
 const EXPORTED_SYMBOLS = ['Datafile'];
 
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");

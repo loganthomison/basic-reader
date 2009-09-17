@@ -1,7 +1,7 @@
 /**
  * @fileoverview This file defines the Alph.SourceSelection class prototype.
  *
- * @version $Id $
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -131,7 +131,7 @@ Alph.SourceSelection.prototype.d_treebankQuery = null;
 
 /**
  * gets the selected 'word'
- * @return the word
+ * @returns the word
  * @type String
  */
 Alph.SourceSelection.prototype.getWord = function()
@@ -142,7 +142,7 @@ Alph.SourceSelection.prototype.getWord = function()
 /**
  * get the offset in the original string which represents 
  * the selected word starting position
- * @return the word starting position
+ * @returns the word starting position
  * @type int 
  */
 Alph.SourceSelection.prototype.getWordStart = function()
@@ -153,7 +153,7 @@ Alph.SourceSelection.prototype.getWordStart = function()
 /**
  * get the offset in the original string which represents 
  * the selected word ending position
- * @return the word ending position
+ * @returns the word ending position
  * @type int 
  */
 Alph.SourceSelection.prototype.getWordEnd = function()
@@ -163,7 +163,7 @@ Alph.SourceSelection.prototype.getWordEnd = function()
 
 /**
  * get the surrounding context 
- * @return the surrounding context
+ * @returns the surrounding context
  * @type String
  */
 Alph.SourceSelection.prototype.getContext = function()
@@ -174,7 +174,7 @@ Alph.SourceSelection.prototype.getContext = function()
 /**
  * get the offset of the selected word in  
  * the surrounding context
- * @return the word offset
+ * @returns the word offset
  * @type int 
  */
 Alph.SourceSelection.prototype.getContextPos = function()
@@ -184,7 +184,7 @@ Alph.SourceSelection.prototype.getContextPos = function()
 
 /**
  * get the rangeParent of the selection
- * @return the range parent
+ * @returns the range parent
  * @type Node 
  */
 Alph.SourceSelection.prototype.getRangeParent = function(a_parent)
@@ -194,7 +194,7 @@ Alph.SourceSelection.prototype.getRangeParent = function(a_parent)
 
 /**
  * get the treebankQuery for the selection
- * @return the treebank query url
+ * @returns the treebank query url
  * @type String
  */
 Alph.SourceSelection.prototype.getTreebankQuery = function()
@@ -283,7 +283,7 @@ Alph.SourceSelection.prototype.convertWord = function(a_callback)
  * compare this instance against another Alph.SourceSelection
  * instance to see if they are equal
  * @param {Alph.SourceSelection} a_other other instance
- * @return true or false
+ * @returns true or false
  * @type Boolean
  */
 Alph.SourceSelection.prototype.equals = function(a_other)

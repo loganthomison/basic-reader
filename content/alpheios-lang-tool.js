@@ -289,6 +289,9 @@ Alph.LanguageTool.prototype.setFindSelection = function()
                          this.d_sourceLanguage) || 'word';
     if (base_unit == 'word')
     {
+        /**
+         * @ignore
+         */
         this.findSelection = function(a_ro, a_rangstr)
             {
                 var alphtarget = this.doSpaceSeparatedWordSelection(a_ro, a_rangstr);
@@ -297,6 +300,9 @@ Alph.LanguageTool.prototype.setFindSelection = function()
     }
     else if (base_unit == 'character')
     {
+        /**
+         * @ignore
+         */
         this.findSelection = function(a_ro, a_rangstr)
             {
                 var alphtarget = this.doCharacterBasedWordSelection(a_ro, a_rangstr);
@@ -314,7 +320,7 @@ Alph.LanguageTool.prototype.setFindSelection = function()
  * which encompass the range offset (to be fed to a lexicon tool).
  * @param {int} a_ro the range offset
  * @param {String} a_rngstr the string of characters containing the range offset
- * @return {Alph.SourceSelection} {@link Alph.SourceSelection} object
+ * @returns {Alph.SourceSelection} {@link Alph.SourceSelection} object
  */
 Alph.LanguageTool.prototype.findSelection = function(a_ro, a_rngstr)
 {
@@ -334,6 +340,9 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
         Alph.BrowserUtils.getPref("methods.lexicon",this.d_sourceLanguage);
     if (lexicon_method == 'webservice')
     {
+        /**
+         * @ignore
+         */
         this.lexiconLookup = function(a_alphtarget,a_onsuccess,a_onerror)
         {
             this.s_logger.info("Query word: " + a_alphtarget.getWord());
@@ -816,11 +825,17 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     var loading_node;
     if (Alph.$(a_node).length >0)
     {
+        /**
+         * @ignore
+         */
         params.callback = function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) };
         loading_node = Alph.$("#alph-word-tools",a_node).get(0);
     }
     else
     {
+        /**
+         * @ignore
+         */
         params.callback = function() {};
         loading_node = {};
     }
@@ -865,7 +880,7 @@ Alph.LanguageTool.prototype.canInflect = function(a_node)
  * @private
  * @param {int} a_ro the range offset for the selection
  * @param {String} a_rngstr the enclosing string
- * @return true if in the margin, false if not
+ * @returns true if in the margin, false if not
  * @type Boolean
  */
 Alph.LanguageTool.prototype.selectionInMargin = function(a_ro, a_rngstr)
@@ -952,7 +967,7 @@ Alph.LanguageTool.prototype.postTransform = function(a_node)
  * properties of the target word.
  * @param {Node} a_node the node containing the target word
  * @param {String} a_params optional requested parameters
- * @return the parameters object for the inflection window
+ * @returns the parameters object for the inflection window
  */
 Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
 {
@@ -963,7 +978,7 @@ Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
 /**
  * Method which checks the availability of a specific feature
  * @param {String} a_id the id of the feature
- * @return {Boolean} true if enabled, otherwise false
+ * @returns {Boolean} true if enabled, otherwise false
  */
 Alph.LanguageTool.prototype.getFeature = function(a_id)
 {
@@ -975,7 +990,7 @@ Alph.LanguageTool.prototype.getFeature = function(a_id)
 /**
  * Method which returns the requested command
  * @param {String} a_cmd the name of the command
- * @return {String} the name of the function associated with the command
+ * @returns {String} the name of the function associated with the command
  *                  or undefined.
  */
 Alph.LanguageTool.prototype.getCmd = function(a_cmd)
@@ -1006,7 +1021,7 @@ Alph.LanguageTool.prototype.handleInflectionDisplay = function(a_tbl)
 
 /**
  * Check to see if one or more full dictionaries are available
- * @return true if a dictionary is available, false if not
+ * @returns true if a dictionary is available, false if not
  * @type Boolean
  */
 Alph.LanguageTool.prototype.hasDictionary = function()
@@ -1054,7 +1069,7 @@ Alph.LanguageTool.prototype.hasDictionary = function()
 
 /**
  * Get the browse url of the current dictionary
- * @return the browse url of the dictionary or null if none defined
+ * @returns the browse url of the dictionary or null if none defined
  * @type String
  */
 Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
@@ -1076,7 +1091,7 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
 
 /**
  * Get html for a link to the current dictionary
- * @return html to add to an element to produce a link to the dictionary
+ * @returns html to add to an element to produce a link to the dictionary
  * @type String
  */
 Alph.LanguageTool.prototype.getDictionaryLink = function()
@@ -1100,13 +1115,13 @@ Alph.LanguageTool.prototype.getDictionaryLink = function()
  * definition for a lemma or list of lemmas. The HTML produced by the lookup
  * method should include a separate div for each lemma, with an attribute named
  * 'lemma' set to the name of the lemma.
- * @return {function} a function which accepts the following parameters:
+ * @returns {function} a function which accepts the following parameters:
  *                      {String} a_dict_name dictionary_name,
  *                      {Array}  a_lemmas list of lemmas
  *                      {function} a_success callback function for successful lookup
  *                      {function} a_error callback function for error
  *                      {function} a_complete callback function upon completion
- * @return {Object} null if no default dictionary is defined for the language
+ * @returns {Object} null if no default dictionary is defined for the language
  */
 Alph.LanguageTool.prototype.getDictionaryCallback = function()
 {
@@ -1333,7 +1348,7 @@ Alph.LanguageTool.prototype.observePrefChange = function(a_name,a_value)
 /**
  * Get the unique id for a lemma from a dictionary index file
  * @param {String} a_lemma_key the lemma key
- * @return {Array} (lemma id, dict code) or (null, null) if not found
+ * @returns {Array} (lemma id, dict code) or (null, null) if not found
  */
 Alph.LanguageTool.prototype.getLemmaId = function(a_lemma_key)
 {
@@ -1345,7 +1360,7 @@ Alph.LanguageTool.prototype.getLemmaId = function(a_lemma_key)
  * Get a language-specific string property
  * @param {String} a_name the name of the property
  * @param {Array} a_replace Optional list of replacement strings
- * @return the requested string (or empty string if not found)
+ * @returns the requested string (or empty string if not found)
  * @type String
  */
 Alph.LanguageTool.prototype.getString = function(a_name,a_replace)
@@ -1358,7 +1373,7 @@ Alph.LanguageTool.prototype.getString = function(a_name,a_replace)
  * Get a language specific string, or the default string for all languages
  * @param {String} a_name the name of the property
  * @param {Array} a_replace Optional list of replacement strings
- * @return the requested string (or empty string if not found)
+ * @returns the requested string (or empty string if not found)
  * @type String
 */
 Alph.LanguageTool.prototype.getStringOrDefault = function(a_name,a_replace)
@@ -1493,7 +1508,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
  * tools require that the current browser tab be the same as the one which
  * did the lookup in the first place
  * @param {Node} a_node the source node which produced the query display
- * @return {Element} the Element containing the tools 
+ * @returns {Element} the Element containing the tools 
  */
 Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
 {
@@ -1702,7 +1717,7 @@ Alph.LanguageTool.prototype.matchInfl = function(a_match_infl, a_infls)
 
 /**
  * Get the string to be used in the interface for this language
- * @return the string to be used in the interface for this language
+ * @returns the string to be used in the interface for this language
  * @type String
  */
 Alph.LanguageTool.prototype.getLanguageString = function()
@@ -1718,7 +1733,7 @@ Alph.LanguageTool.prototype.getLanguageString = function()
 /**
  * Check to see if the supplied language code is supported by this tool
  * @param {String} a_code the language code
- * @return true if supported false if not
+ * @returns true if supported false if not
  * @type Boolean
  */
 Alph.LanguageTool.prototype.supportsLanguage = function(a_lang)
