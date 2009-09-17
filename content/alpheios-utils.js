@@ -27,8 +27,8 @@
 // initialize the namespace
 if (typeof Alph == "undefined") {
     /**
-     * @namespace the global namespace for the Alpheios extension all functions and objects are defined
-     *            in (or imported into) the Alpha namespace. 
+     * @namespace the global namespace for the Alpheios extension. All functions and objects are defined
+     *            in (or imported into)this namespace. 
      */
     Alph = {};
 }

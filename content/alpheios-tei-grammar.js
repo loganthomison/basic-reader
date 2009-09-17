@@ -1,5 +1,5 @@
 /**
- * Javascript functions for Tei Formatted Grammar Documents
+ * @fileoverview Javascript functions for Tei Formatted Grammar Documents
  * $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
