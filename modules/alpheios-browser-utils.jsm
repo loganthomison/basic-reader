@@ -671,6 +671,70 @@ BrowserUtils = {
     {
         return a_url.match(/^(chrome|resource):/);
     },
+    /**
+     * get xslt processor
+     * @param {String} a_filename the name of the xslt file to import
+     * @param {String} a_lang optional language-specific indicator
+     * @returns a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
+     * @type XSLTProcessor
+     */
+     getXsltProcessor: function(a_filename,a_lang)
+    {
+        // module code doesn't have access to the browser window object under the global 
+        // scope .. need to get a recent window to have access to browser window methods
+        var recent_win = this.getMostRecentWindow();
+        var xsltProcessor = new recent_win.XSLTProcessor();
+        
+        // first try to load and import using a chrome url
+        try
+        {
+            var xslt_url = this.getContentUrl(a_lang) + '/xslt/' + a_filename;
+            var xmlDoc = recent_win.document.implementation.createDocument("", "", null);
+            xmlDoc.async = false;
+            this.debug("Loading xslt at " + xslt_url);
+            xmlDoc.load(xslt_url);
+            xsltProcessor.importStylesheet(xmlDoc);
+        }
+        catch(a_e)
+        {
+          // if that fails, try loading directly from the filesystem using XMLHttpRequest   
+          // see https://bugzilla.mozilla.org/show_bug.cgi?id=422502
+            try
+            {
+                var pkg_path = this.getExtensionBasePath(this.getPkgName(a_lang));
+                pkg_path.append('xslt');
+                pkg_path.append(a_filename);
+                var path_url = 'file:///' + pkg_path.path;
+                this.debug("XHR Loading xslt at " + path_url);
+                var p = new recent_win.XMLHttpRequest();      
+                p.open("GET", path_url, false);
+                p.send(null);
+                xsltProcessor.importStylesheet(p.responseXML);
+            }
+            catch(a_ee)
+            {
+                // if that fails, we're out of luck
+                this.debug("Unable to load stylesheet " + a_filename + " for " + a_lang + " : " + a_e + "," + a_ee);
+            }
+        }
+        return xsltProcessor;
+    },
+    
+    /**
+     * get the most recent browser window from the nsIWindowMediator service
+     * @param {String} a_type the window type (optional)
+     * @return the most recent browser window
+     * @type Window
+     */
+    getMostRecentWindow: function(a_type)
+    {
+        if (typeof a_type == "undefined")
+        {
+            a_type = null;
+        }
+        return BrowserSvc.getSvc('WinMediator').getMostRecentWindow(a_type);
+    }
+    
 };
 
 /**
@@ -691,7 +755,8 @@ BrowserSvc = {
         Console: ["@mozilla.org/consoleservice;1",'nsIConsoleService'],
         Protocol: ["@mozilla.org/network/protocol;1?name=file",'nsIFileProtocolHandler'],
         ExtMgr: ["@mozilla.org/extensions/manager;1",'nsIExtensionManager'],
-        InputStream: ["@mozilla.org/scriptableinputstream;1",'nsIScriptableInputStream'] 
+        InputStream: ["@mozilla.org/scriptableinputstream;1",'nsIScriptableInputStream'],
+        WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"]
     },
      
     /**

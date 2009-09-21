@@ -250,49 +250,5 @@ Alph.Util = {
             Alph.BrowserUtils.isBrowserUrl(a_url));
     },
     
-    /**
-     * get xslt processor
-     * @param {String} a_filename the name of the xslt file to import
-     * @param {String} a_lang optional language-specific indicator
-     * @returns a new XSLTProcessor object with the named stylesheet imported from the xslt directory of the extension 
-     * @type XSLTProcessor
-     */
-     getXsltProcessor: function(a_filename,a_lang)
-    {
-        var xsltProcessor = new XSLTProcessor();
-        
-        // first try to load and import using a chrome url
-        try
-        {
-            var xslt_url = Alph.BrowserUtils.getContentUrl(a_lang) + '/xslt/' + a_filename;
-            var xmlDoc = document.implementation.createDocument("", "", null);
-            xmlDoc.async = false;
-            Alph.BrowserUtils.debug("Loading xslt at " + xslt_url);
-            xmlDoc.load(xslt_url);
-            xsltProcessor.importStylesheet(xmlDoc);
-        }
-        catch(a_e)
-        {
-          // if that fails, try loading directly from the filesystem using XMLHttpRequest   
-          // see https://bugzilla.mozilla.org/show_bug.cgi?id=422502
-            try
-            {
-                var pkg_path = Alph.BrowserUtils.getExtensionBasePath(Alph.BrowserUtils.getPkgName(a_lang));
-                pkg_path.append('xslt');
-                pkg_path.append(a_filename);
-                var path_url = 'file:///' + pkg_path.path;
-                Alph.BrowserUtils.debug("XHR Loading xslt at " + path_url);
-                var p = new XMLHttpRequest();      
-                p.open("GET", path_url, false);
-                p.send(null);
-                xsltProcessor.importStylesheet(p.responseXML);
-            }
-            catch(a_ee)
-            {
-                // if that fails, we're out of luck
-                Alph.BrowserUtils.debug("Unable to load stylesheet " + a_filename + " for " + a_lang + " : " + a_e + "," + a_ee);
-            }
-        }
-        return xsltProcessor;
-    }
+    
 };

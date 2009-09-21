@@ -1,5 +1,5 @@
 /**
- * @fileoverview This module defines text conversion utility functions.   
+ * @fileoverview This module defines general text conversion utility functions.   
  * Exports a single symbol, Convert, which must be imported into the namespace 
  * of the importing class.
  *
@@ -28,33 +28,21 @@ const EXPORTED_SYMBOLS = ['Convert'];
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 
 /**
- * @class text conversion utility functions 
+ * @class text conversion utility functions
+ *        subclass to add language-specific methods 
  */
-Convert = {
+Convert = function(){
     
     /**
      * UnicodeConverter service
      * @static
      */
-    d_uConverter: BrowserUtils.getSvc('UnicodeConverter'),
+    this.d_uConverter= BrowserUtils.getSvc('UnicodeConverter');
     
     /**
      * main logger for the Convert object
      * @type Log4Moz.Logger
      * @static
      */
-    s_logger: BrowserUtils.getLogger('Alpheios.Convert'), 
-    
-    /**
-     * bind a new method to the Convert object
-     * Note - method code must NOT reference the Alph namespace 
-     * as this object is shared across windows
-     * @param {String} the name of the method
-     * @param {Function} the function body
-     */
-    bind: function(a_name,a_func)
-    {
-        this[a_name] = a_func;
-    },
-    
-}
+    this.s_logger = BrowserUtils.getLogger('Alpheios.Convert');
+}    

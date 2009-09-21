@@ -58,7 +58,7 @@ Alph.Xlate = {
         /* initialze the xsltProcessor if we haven't done so already */
         if (this.d_xsltProcessor == null)
         {
-            this.d_xsltProcessor = Alph.Util.getXsltProcessor('alpheios.xsl');
+            this.d_xsltProcessor = Alph.BrowserUtils.getXsltProcessor('alpheios.xsl');
         }
         var wordHTML = '';
         try

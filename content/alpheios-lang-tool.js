@@ -125,6 +125,7 @@ Alph.LanguageTool = function(a_language,a_properties)
     this.setLexiconLookup();
     this.setContextHandler();
     this.setShiftHandler();
+    this.loadConverter();
 
     var startup_methods = Alph.BrowserUtils.getPref("methods.startup",a_language);
     if (typeof startup_methods != "undefined")
@@ -153,6 +154,16 @@ Alph.LanguageTool = function(a_language,a_properties)
     }
 
     this.lexiconSetup();
+};
+
+/**
+ * loads the converter object
+ * by default loads the base Alph.Convert object
+ * override to use a language-specific converter
+ */
+Alph.LanguageTool.prototype.loadConverter = function()
+{
+    this.d_converter = new Alph.Convert();  
 };
 
 /**
@@ -661,20 +672,21 @@ function(a_ro, a_rngstr)
  * Generic method to apply any necessary conversion
  * to the source text selection.
  * Delegates to a language-specific
- * conversion method in the Alph.Convert namespace.
+ * conversion method.
  * @private
  * @param {Alph.SourceSelection} a_alphtarget the object returned by {@link #findSelection}
  */
 Alph.LanguageTool.prototype.handleConversion = function(a_alphtarget)
 {
+    var self = this;
     var convert_method =
         Alph.BrowserUtils.getPref("methods.convert",this.d_sourceLanguage);
 
     if (convert_method != null
-        && typeof Alph.Convert[convert_method] == 'function'
+        && typeof this.d_converter[convert_method] == 'function'
         && a_alphtarget.getWord())
     {
-        a_alphtarget.convertWord( function(a_word) { return Alph.Convert[convert_method](a_word); } );
+        a_alphtarget.convertWord( function(a_word) { return self.d_converter[convert_method](a_word); } );
     }
 
     return a_alphtarget;
@@ -686,9 +698,9 @@ Alph.LanguageTool.prototype.convertString = function(a_str)
         Alph.BrowserUtils.getPref("methods.convert",this.d_sourceLanguage);
 
     if (convert_method != null
-        && typeof Alph.convert[convert_method] == 'function')
+        && typeof this.d_converter[convert_method] == 'function')
     {
-        a_str = Alph.convert[convert_method](a_str);
+        a_str = this.d_converter[convert_method](a_str);
     }
     return a_str;
 }
@@ -797,7 +809,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         params.xml_url =
             Alph.BrowserUtils.getContentUrl(this.d_sourceLanguage)
             + "/inflections/alph-infl-index.xml";
-        params.xslt_processor = Alph.Util.getXsltProcessor('alph-infl-index.xsl');
+        params.xslt_processor = Alph.BrowserUtils.getXsltProcessor('alph-infl-index.xsl');
     }
     params.source_node = a_node;
 
