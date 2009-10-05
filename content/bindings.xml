@@ -58,9 +58,9 @@
                 document.getAnonymousElementByAttribute(this, "anonid", "panelDetachButton");
             this.detachButton.setAttribute("oncommand", 
                 "document.getElementById('" + this.panel_id + "').detach()");
-            if (typeof Alph.main != 'undefined')
+            if (typeof Alph.Main != 'undefined')
             {
-                Alph.main.panelBound(this);
+                Alph.Main.panelBound(this);
             }
             else
             {
@@ -71,9 +71,9 @@
             <method name="toggle">
                 <body><![CDATA[
             var panelObj;
-            if (typeof Alph.main != "undefined")
+            if (typeof Alph.Main != "undefined")
             {
-                panelObj = Alph.main.panels[this.panel_id];
+                panelObj = Alph.Main.d_panels[this.panel_id];
                 if (typeof panelObj != "undefined")
                 {
                     panelObj.toggle();
@@ -84,9 +84,9 @@
             <method name="detach">
                 <body><![CDATA[
             var panelObj;
-            if (typeof Alph.main != "undefined")
+            if (typeof Alph.Main != "undefined")
             {
-                panelObj = Alph.main.panels[this.panel_id];
+                panelObj = Alph.Main.d_panels[this.panel_id];
                 if (typeof panelObj != "undefined")
                 {
                     panelObj.detach();
@@ -97,9 +97,9 @@
             <method name="get_panel_ctl">
                 <body><![CDATA[
             var panelObj;
-            if (typeof Alph.main != "undefined")
+            if (typeof Alph.Main != "undefined")
             {
-                return Alph.main.panels[this.panel_id];
+                return Alph.Main.d_panels[this.panel_id];
             }
             ]]></body>
             </method>

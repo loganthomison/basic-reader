@@ -6,7 +6,8 @@
 	<property name="dist.dir" value="${alpheios.basedir}/dist" />
 	<property name="docs.dir" value="${alpheios.basedir}/docs/api" />
 	<property name="perl.path" value="C:/perl/bin/perl.exe" />
-	<property name="jsdoc.path" value="C:/JSDoc-1.10.2/jsdoc.pl" />
+	<property name="java.path" value="C:/windows/system32/java.exe" />
+	<property name="jsdoc.path" value="C:/jsdoc_toolkit-2.3.0/jsdoc-toolkit" />
 	<property name="app.name" value="alpheios-basic" />
 	<property name="ff.test.dir" value="/test" />
 	<property name="ext.test.dir" 
@@ -15,7 +16,7 @@
               value="/Program Files/Apache Group/Apache2/htdocs/alpheios_devbuilds" />
 	<property name="docs.deploy.dir"
 	          value="/test/docs/${app.name}"/>
-	<property name="release.id" value="1.0alpha3" />
+	<property name="release.id" value="1.0alpha4" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
 	<property name="package" value="${app.name}-latest.xpi"/>
 	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img,espeak"/>
@@ -257,8 +258,11 @@
 	<!-- prepare.docs prepartes the generated api documentation files -->
 	<target name="prepare.docs">
 		<mkdir dir="${docs.dir}" />
-		<exec dir="${src.dir}" executable="${perl.path}">
-			<arg line="${jsdoc.path} -p -d ${docs.dir} -project-name Alpheios --no-lexical-privates content modules"/>
+		<exec dir="${src.dir}" executable="${java.path}">
+			<arg line="-jar ${jsdoc.path}/jsrun.jar 
+				${jsdoc.path}/app/run.js 
+			    ${src.dir}/content ${src.dir}/modules 
+				-t=${jsdoc.path}/templates/jsdoc -d=${docs.dir} -v -p -E='jquery|ext\\' -x=js,jsm -r=5"/>
 		</exec>
 	</target>
 	

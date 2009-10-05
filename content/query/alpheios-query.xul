@@ -9,13 +9,13 @@
 <window id="alpheiosQuery"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         title="&alpheios.query.full.title;"
-        buttons="accept" onload="Alph_Quiz.load_query_window();" 
+        buttons="accept" onload="Alph.Quiz.loadQueryWindow();" 
         onaccept="this.close();">
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery.tablehover.pack.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/query/alpheios-query.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/site/alpheios-site.js" />
     
     <stringbundleset id="stringbundleset">
         <stringbundle id="alpheios-strings" 

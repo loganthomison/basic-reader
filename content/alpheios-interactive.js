@@ -24,18 +24,18 @@
  */
 
 /**
- * @singleton
+ * @class Controls quiz mode functionality.
  */
-Alph.interactive = {
+Alph.Interactive = {
 
 
     /**
      * Check to see if the query window is currently visible
      */
-    query_visible: function(a_bro)
+    queryVisible: function(a_bro)
     {
         var query_win =
-            Alph.main.get_state_obj(a_bro).get_var("windows")['alph-query-window'];
+            Alph.Main.getStateObj(a_bro).getVar("windows")['alph-query-window'];
         var window_open = false;
         try 
         {
@@ -50,12 +50,12 @@ Alph.interactive = {
     
     /**
      * Check to see if interactive features are enabled
-     * @return true if the current level is Alph.main.levels.LEARNER, otherwise false
+     * @returns true if the current level is Alph.Constants.LEVELS.LEARNER, otherwise false
      * @type boolean
      */
     enabled: function(a_bro)
     {
-        return Alph.main.get_mode() == Alph.main.levels.LEARNER;
+        return Alph.Main.getMode() == Alph.Constants.LEVELS.LEARNER;
 
     },
     
@@ -73,10 +73,9 @@ Alph.interactive = {
             return;
         }
         
-        var browser = Alph.util.browser_for_doc(a_topdoc) || Alph.main.getCurrentBrowser();
-        var lang_tool = Alph.main.getLanguageTool(browser);
-        var str = Alph.$("#alpheios-strings").get(0)
-        var pofs_list = lang_tool.getpofs();
+        var browser = Alph.BrowserUtils.browserForDoc(window,a_topdoc) || Alph.Main.getCurrentBrowser();
+        var lang_tool = Alph.Main.getLanguageTool(browser);
+        var pofs_list = lang_tool.getPofs();
         var valid_pofs = Alph.$('#alph-text .alph-pofs',popup).attr('context');
         var has_pofs = false;
         for (var p_i = 0; p_i < pofs_list.length; p_i++)
@@ -95,7 +94,7 @@ Alph.interactive = {
         {
             Alph.$(popup).removeClass("alpheios-inline-query").removeClass("query-pending");
             Alph.$(".alph-word-first",popup)
-                .prepend('<div class="alpheios-hint">' + str.getString('alph-query-notsupported') + '</div>');
+                .prepend('<div class="alpheios-hint">' + Alph.Main.getString('alph-query-notsupported') + '</div>');
             return;
         }
         var source_align = Alph.$(a_target.getRangeParent()).parents().attr('nrefs');
@@ -110,45 +109,45 @@ Alph.interactive = {
         var params =
         {
             lang_tool: lang_tool,
-            main_str: str,
+            main_str: Alph.Main.d_stringBundle,
             source_node: Alph.$("#alph-text",popup).get(0),
             source_align: source_align || [],
-            transform: Alph.xlate.transform,
+            transform: Alph.Xlate.transform,
 
         }
         // if the translation panel is open, offer interactive identification
         // of definitions, unless the dependency tree display was the source of the
         // selection
-        if (Alph.main.panels['alph-trans-panel'].is_visible_inline()
+        if (Alph.Main.d_panels['alph-trans-panel'].isVisibleInline()
             && Alph.$("#dependency-tree",a_topdoc).length == 0)
         {
             if (source_align.length > 0)
             {
                 var selected_word = Alph.$(".alph-word",popup).attr("context");
-                var src_lang = lang_tool.source_language; 
+                var src_lang = lang_tool.d_sourceLanguage; 
                 Alph.$(popup).addClass("alpheios-inline-query");
                 Alph.$("#alph-text",popup).append(
                     '<div id="alph-inline-query-instruct">' +
-                    str.getFormattedString("alph-inline-query-instruct",[selected_word]) +
+                    Alph.Main.getString("alph-inline-query-instruct",[selected_word]) +
                     '</div>' +
                     '<div id="alph-align-answer-prompt"/>' + 
                     '<div id="alph-inline-query-correct">'+
                     '<span class="alph-inline-query-heading">' +
-                    str.getString("alph-inline-query-correct") +
+                    Alph.Main.getString("alph-inline-query-correct") +
                     '</span>' +
                     '</div>' +
                     '<div id="alph-inline-query-incorrect">'+
                     '<span class="alph-inline-query-heading">' +
-                    str.getString("alph-inline-query-incorrect") +
+                    Alph.Main.getString("alph-inline-query-incorrect") +
                     '</span>' +
                     '</div>'
                 );
-                Alph.xlate.reposition_popup(Alph.$(popup).removeClass("query-pending"));
+                Alph.Xlate.repositionPopup(Alph.$(popup).removeClass("query-pending"));
             
                 params.type = 'infl_query';
                 params.aligned_ids = [];
                 params.aligned_defs = [];
-                Alph.main.panels['alph-trans-panel'].enable_interactive_query(params);
+                Alph.Main.d_panels['alph-trans-panel'].enableInteractiveQuery(params);
             }
             // if the word isn't aligned, just display the query window
             else
@@ -188,9 +187,9 @@ Alph.interactive = {
                 scrollbars: "yes"
             };
         var query_win = 
-              Alph.xlate.openSecondaryWindow(
+              Alph.Xlate.openSecondaryWindow(
               "alph-query-window",
-              "chrome://alpheios/content/query/alpheios-query.xul",
+              Alph.BrowserUtils.getContentUrl() + "/query/alpheios-query.xul",
               features,  
               a_params
             );
@@ -205,7 +204,7 @@ Alph.interactive = {
         var selection = this;
         
         // make each word in the alignment only selectable once
-        Alph.$(selection).unbind('click',Alph.interactive.checkAlignedSelect);
+        Alph.$(selection).unbind('click',Alph.Interactive.checkAlignedSelect);
         
         var params = a_event.data;
         
@@ -227,12 +226,12 @@ Alph.interactive = {
         if (! matched)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(Alph.$("#alpheios-strings").get(0).getString("alph-query-incorrect"));
+                .html(Alph.Main.getString("alph-query-incorrect"));
         }
         else if (params.aligned_ids.length < params.source_align.length)
         {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
-                .html(Alph.$("#alpheios-strings").get(0).getString("alph-query-more"));
+                .html(Alph.Main.getString("alph-query-more"));
         }
         
         if (params.aligned_ids.length == params.source_align.length)
@@ -240,7 +239,7 @@ Alph.interactive = {
             Alph.$("#alph-align-answer-prompt",params.source_node.ownerDocument)
                 .html('');
             Alph.$("#alph-window",params.source_node.ownerDocument).css("display","none");
-            Alph.interactive.openQueryWindow(params);
+            Alph.Interactive.openQueryWindow(params);
         }
         else
         {
@@ -332,7 +331,7 @@ Alph.interactive = {
      * @param {Element} a_ending the HTML element containing the inflected form or ending
      * @param {Object} a_params the params object that was passed to the inflection table
      *                          window (which contains all the context for the window)
-     * @return true if the selection was correct, otherwise false
+     * @returns true if the selection was correct, otherwise false
      * @type boolean
      */
      checkInflection: function(a_ending,a_params)
@@ -373,7 +372,7 @@ Alph.interactive = {
         }
         if (correct)
         {
-            alert(Alph.$("#alpheios-strings").get(0).getString("alph-query-correct"));
+            alert(Alph.Main.getString("alph-query-correct"));
             Alph.$('.alph-decl',
                 a_params.query_parent).css('display','inline');
             Alph.$('.alph-conj',
@@ -389,7 +388,7 @@ Alph.interactive = {
         }
         else
         {
-            alert(Alph.$("#alpheios-strings").get(0).getString("alph-query-incorrect"));
+            alert(Alph.Main.getString("alph-query-incorrect"));
             Alph.$(a_ending).addClass('incorrect');
             return false;
         }    
@@ -401,23 +400,23 @@ Alph.interactive = {
       */
      closeQueryDisplay: function(a_bro)
      {
-        if (this.query_visible())
+        if (this.queryVisible())
         {
-            Alph.main.get_state_obj(a_bro).get_var("windows")['alph-query-window'].close();
+            Alph.Main.getStateObj(a_bro).getVar("windows")['alph-query-window'].close();
         }
      },
      
      /**
       * get the query document
-      * @return the query document
+      * @returns the query document
       * @type Document
       */
      getQueryDoc: function()
      {
         var doc = null;
-        if (this.query_visible())
+        if (this.queryVisible())
         {
-            var win = Alph.main.get_state_obj().get_var("windows")['alph-query-window'];
+            var win = Alph.Main.getStateObj().getVar("windows")['alph-query-window'];
             doc = win.$("#alph-query-frame").get(0).contentDocument;
         }
         return doc;

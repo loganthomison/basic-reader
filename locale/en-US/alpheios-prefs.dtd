@@ -3,8 +3,15 @@
 <!ENTITY alpheios.prefs.advanced "Advanced">
 <!ENTITY alpheios.prefs.advanced.label "Advanced...">
 <!ENTITY alpheios.prefs.features "General">
-<!ENTITY alpheios.prefs.debug "Debugging">
-<!ENTITY alpheios.prefs.debug.enable "Enable Console Debugging">
+<!ENTITY alpheios.prefs.log.level "Console Log Level">
+<!ENTITY alpheios.prefs.log.level.fatal "Fatal">
+<!ENTITY alpheios.prefs.log.level.error "Error">
+<!ENTITY alpheios.prefs.log.level.warn "Warn">
+<!ENTITY alpheios.prefs.log.level.info "Info">
+<!ENTITY alpheios.prefs.log.level.config "Config">
+<!ENTITY alpheios.prefs.log.level.debug "Debug">
+<!ENTITY alpheios.prefs.log.level.trace "Trace">
+<!ENTITY alpheios.prefs.log.level.all "All">
 <!ENTITY alpheios.prefs.includecontext "Extract Surrounding Context From Word">
 <!ENTITY alpheios.prefs.popuptrigger "Mouse action to trigger lookup:">
 <!ENTITY alpheios.prefs.popuptrigger.default "Default mouse action for lookup:">
@@ -20,7 +27,6 @@
 <!ENTITY alpheios.prefs.bottom.right "Bottom Right">
 <!ENTITY alpheios.prefs.default.language "Preferred Language">
 <!ENTITY alpheios.prefs.panels.default "Panel Defaults">
-<!ENTITY alpheios.prefs.panels.use.defaults "Use Global Defaults">
 <!ENTITY alpheios.prefs.panels.restore.defaults "Restore Defaults">
 <!ENTITY alpheios.prefs.panels.sticky "Interface Changes Sticky">
 <!ENTITY alpheios.prefs.panel.name "Panel Name">
@@ -41,9 +47,6 @@
 <!ENTITY advanced.accesskey "a">
 <!ENTITY alpheios.prefs.interlinear "Interlinear Translation">
 <!ENTITY alpheios.prefs.interlinear.enable "Enable Interlinear Translation (Alpheios Enhanced Texts only) EXPERIMENTAL">
-<!ENTITY alpheios.prefs.url.morph "Morphology Service URL:">
-<!ENTITY alpheios.prefs.url.morph.request "Morphology Service Request Parameters:">
-<!ENTITY alpheios.prefs.url.morph.timeout "Morphology Service Timeout (ms):">
 <!ENTITY alpheios.prefs.popuptrigger.mousemove "mousemove">
 <!ENTITY alpheios.prefs.popuptrigger.dblclick "dblclick">
 <!ENTITY alpheios.prefs.timeouts.default "Default Request Timeouts">

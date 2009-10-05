@@ -9,7 +9,7 @@
 <window id="alph-infl-window" title="&alpheios.infl.window.title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         windowtype="alph-window"
-        onload="Alph.infl.onLoad();">
+        onload="Alph.Infl.onLoad();">
         
     <stringbundleset id="stringbundleset">
         <stringbundle id="alpheios-strings" 
@@ -17,11 +17,12 @@
         <stringbundle id="alph-infl-strings"
                       src="chrome://alpheios/locale/alpheios-infl.properties"/>
     </stringbundleset>
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-infl.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/infl/alpheios-infl.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery-1.2.6-alph.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery.tablehover.pack.js" />
 
     <vbox flex="1">
-        <browser id="alph-infl-browser" type="content-primary" src="chrome://alpheios/content/infl-loading.html" flex="1"/>
+        <browser id="alph-infl-browser" type="content-primary" src="chrome://alpheios/content/infl/infl-loading.html" flex="1"/>
     </vbox>   
 </window>

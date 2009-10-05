@@ -15,11 +15,11 @@
 
     <commandset id="mainCommandSet">
         <command id="alpheios-morph-toggle-cmd" 
-             oncommand="Alph.main.toggle_panel(event,'alph-morph-panel');"
+             oncommand="Alph.Main.togglePanel(event,'alph-morph-panel');"
              observes="alph-morph-status" />
         <command
             id="alpheios-morph-inflect-cmd" 
-            oncommand="Alph.Panel.execute_lang_command(event,'alph-morph-panel');" 
+            oncommand="Alph.Panel.executeLangCommand(event,'alph-morph-panel');" 
             observes="alpheios-inflect"/>
     </commandset>
              
@@ -45,7 +45,7 @@
                 id="alph-morph-body"
                 flex="1"
                 type="content"
-                src="chrome://alpheios/content/alph-morph.html"
+                src="chrome://alpheios/content/html/alph-morph.html"
                 class="alph-lexicon-output"/>
         </alpheiosPanel>
     </hbox>

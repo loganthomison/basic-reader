@@ -1,8 +1,10 @@
 /**
  * @fileoverview This module is used for storing Alpheios permissions for specific sites
  * The interface is based on that of nsIPermissionManager but the implementation supports
- * paths as well as domains
- * @version $Id: $
+ * paths as well as domains. Exports a single symbol, PermissionMgr, which
+ * must be imported into the namespace of the importing class.
+ * 
+ * @version $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
@@ -23,40 +25,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This module exports a single symbol, PermissionMgr.
- * This object should be imported into the namespace of the importing class
- */
 var EXPORTED_SYMBOLS = ["PermissionMgr"];
 
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
+
 /**
- * @singleton
+ * @class container for Alpheios permissions for specific sites
+ * The interface is based on that of nsIPermissionManager but the implementation supports
+ * paths as well as domains
  */
 PermissionMgr =
 {
     /**
      * URI is not registered for the requested permission
      * @type int 0
+     * @constant
      */
     UNKNOWN_ACTION: 0,
     
     /**
      * Action is allowed
      * @type int
-     *  
+     * @constant
      */
     ALLOW_ACTION: 1,
     
     /**
      * Action is not allowed
      * @type int 0
+     * @constant
      */
     DENY_ACTION: 2,
     
     /**
      * the array of sites and permissions
+     * @private
      */
-    m_sites: Array(),
+    d_sites: Array(),
     
     /**
      * add or change a permission for a specific uri
@@ -73,18 +78,18 @@ PermissionMgr =
         {
             path = '/';
         }
-        if (typeof this.m_sites[a_key] == "undefined")
+        if (typeof this.d_sites[a_key] == "undefined")
         {
-            this.m_sites[a_key] = Array();
+            this.d_sites[a_key] = Array();
         }
-        if (typeof this.m_sites[a_key][host] == "undefined")
+        if (typeof this.d_sites[a_key][host] == "undefined")
         {
-            this.m_sites[a_key][host] = [];
+            this.d_sites[a_key][host] = [];
         }
         var found = false;
-        for (var i=0; i<this.m_sites[a_key][host].length; i++)
+        for (var i=0; i<this.d_sites[a_key][host].length; i++)
         {
-            var r_path = this.m_sites[a_key][host][i];
+            var r_path = this.d_sites[a_key][host][i];
             if (r_path[0] == path)
             {
                 // if the url was already registered, update the permission
@@ -95,7 +100,7 @@ PermissionMgr =
         // if the url was not found, add it
         if (! found)
         {
-          this.m_sites[a_key][host].push([path,a_permission]);
+          this.d_sites[a_key][host].push([path,a_permission]);
         }
     },
     
@@ -118,11 +123,11 @@ PermissionMgr =
                 path = '/';
             }
             
-            if (typeof this.m_sites[a_key] != "undefined" && typeof this.m_sites[a_key][host] != "undefined")
+            if (typeof this.d_sites[a_key] != "undefined" && typeof this.d_sites[a_key][host] != "undefined")
             {
-                for (var i=0; i<this.m_sites[a_key][host].length; i++)
+                for (var i=0; i<this.d_sites[a_key][host].length; i++)
                 {
-                    var r_path_obj = this.m_sites[a_key][host][i];
+                    var r_path_obj = this.d_sites[a_key][host][i];
                     var regex = new RegExp('^'+r_path_obj[0])
                     if (regex.exec(path))
                     {
@@ -134,9 +139,7 @@ PermissionMgr =
         }
         catch(a_e)
         {
-            Components.classes["@mozilla.org/consoleservice;1"]
-                      .getService(Components.interfaces.nsIConsoleService)
-                      .logStringMessage('alpheios: failure testing permissions for host ' 
+            BrowserUtils.debug('failure testing permissions for host ' 
                         + a_uri.spec + ' : ' + a_e);
         }
         return permission;
@@ -149,10 +152,10 @@ PermissionMgr =
      */
     remove: function(a_host,a_key)
     {
-        if (typeof this.m_sites[a_key] != "undefined" 
-            && typeof this.m_sites[a_key][a_host] != "undefined")
+        if (typeof this.d_sites[a_key] != "undefined" 
+            && typeof this.d_sites[a_key][a_host] != "undefined")
         {
-            delete this.m_sites[a_key][a_host];
+            delete this.d_sites[a_key][a_host];
         }
     }
 }

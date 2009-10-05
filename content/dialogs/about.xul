@@ -13,31 +13,29 @@
 <dialog id="alpheios-about-dialog"
         title="&alpheios-about-title;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        buttons="accept" onload="Alph.about.load_about();" onaccept="this.close();">
-
-  <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
-  <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-about.js" />
+        buttons="accept" onload="Alph.Dialogs.loadAbout();" onaccept="this.close();">
+  <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />  
+  <script type="application/x-javascript" src="chrome://alpheios/content/dialogs/alpheios-dlg.js" />
   
-  <stringbundleset id="aboutSet">
-    <stringbundle id="extensionsStrings" src="chrome://mozapps/locale/extensions/extensions.properties"/>
-
-  </stringbundleset>
+   <stringbundleset id="stringbundleset">
+        <stringbundle id="alpheios-strings" 
+                      src="chrome://alpheios/locale/alpheios.properties"/>
+   </stringbundleset>
 
   <vbox flex="1">
     <hbox>
         <label class="site-link" id="alpheios-site-link" 
-               onclick="window.opener.Alph.util.open_alpheios_link('main');"/>
+               onclick="Alph.Util.openAlpheiosLink(window.opener,'main');"/>
     </hbox>
     <groupbox id="alpheios-extension-list">
         <caption class="alpheios-about-extensions" label="&alpheios-about-versions;"/>
     </groupbox>
     <hbox>
         <label class="site-link" id="alpheios-feedback-link"
-               onclick="window.opener.Alph.util.send_feedback();"
+               onclick="Alph.Util.sendFeedback();"
                value="&alpheios.menu.feedback;"/>
     </hbox>
   </vbox>
-
     
   <separator id="groove" class="groove"/>
 

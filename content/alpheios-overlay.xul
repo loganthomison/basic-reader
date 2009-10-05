@@ -21,19 +21,14 @@
                       src="chrome://alpheios/locale/alpheios.properties"/>
     </stringbundleset>
 
-    
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-main.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-languages.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-state.js" />
-	<script type="application/x-javascript" src="chrome://alpheios/content/alpheios-main.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-popup.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-lang-tool.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-conversions.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-src-select.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-panel.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-linking.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-prototype.js" />
-    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-datafile.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-interactive.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/site/alpheios-site.js" />
 
@@ -68,35 +63,41 @@
         
 	<commandset id="mainCommandSet">
 		<command id="alpheios-toggle-cmd" 
-                 oncommand="Alph.main.alph_inlineToggle();"
+                 oncommand="Alph.Main.alphInlineToggle();"
                  observes="alpheios-auto-enable-status" />
         <command id="alpheios-lang-cmd" 
-                 oncommand="Alph.main.select_language(event.target.value,true);"
+                 oncommand="Alph.Main.selectLanguage(event.target.value,true);"
                  observes="alpheios-auto-enable-status"/>
         <command id="alpheios-lookup-cmd" 
-                 oncommand="Alph.main.do_tb_lookup();"/>
+                 oncommand="Alph.Main.doTbLookup();"/>
         <command 
             id="alpheios-inflect-cmd" 
-            oncommand="Alph.main.execute_lang_command(event);" 
+            oncommand="Alph.Main.executeLangCommand(event);" 
             observes="alpheios-inflect"/>
         <command
             id="alpheios-grammar-cmd" 
-            oncommand="Alph.main.execute_lang_command(event);" 
+            oncommand="Alph.Main.executeLangCommand(event);" 
             observes="alpheios-grammar"/>
         <command id="alpheios-options-cmd" 
-            oncommand="Alph.main.show_options();"/>
+            oncommand="Alph.BrowserUtils.openDialog(
+                window,
+                'chrome://alpheios/content/alpheios-prefs.xul', 
+                'alpheios-options-dialog');"/>
         <command id="alpheios-feedback-cmd"
-            oncommand="Alph.util.send_feedback();"/>
+            oncommand="Alph.Util.sendFeedback();"/>
         <command id="alpheios-help-cmd"
-            oncommand="Alph.util.open_alpheios_link('help');"/>
+            oncommand="Alph.Util.openAlpheiosLink(window,'help');"/>
         <command id="alpheios-about-cmd"
-            oncommand="Alph.main.show_about();"/>
+            oncommand="Alph.BrowserUtils.openDialog(
+                window,
+                'chrome://alpheios/content/dialogs/about.xul', 
+                'alpheios-about-dialog');"/>
     	<command id="alpheios-site-cmd"
-            oncommand="Alph.util.open_alpheios_link('main');"/>
+            oncommand="Alph.Util.openAlpheiosLink(window,'main');"/>
         <command id="alpheios-level-learner-cmd"
-            oncommand="Alph.main.set_mode(null,'learner');"/>
+            oncommand="Alph.Main.setMode(null,'learner');"/>
         <command id="alpheios-level-reader-cmd"
-            oncommand="Alph.main.set_mode(null,'reader');"/>
+            oncommand="Alph.Main.setMode(null,'reader');"/>
     </commandset>
 
     <!-- FF context and tools menu overlays disabled for now 
@@ -219,8 +220,13 @@
                 tooltiptext="&alpheios.menu.lang.tooltip;"
                 type="menu">
                 <menupopup 
-                    id="alpheios-lang-popup-mm" 
-                    onpopupshowing="Alph.main.update_main_menu_languages()"/>
+                    id="alpheios-lang-popup-mm">
+                    <menuitem id="alpheios-mm-lang-none"
+                          label="&alpheios.lang.none;"
+                          hidden="true"
+                          type="checkbox"
+                          value=""/>
+                </menupopup>
             </toolbarbutton>
             <toolbarbutton
                 id="alpheios-level-button-reader"
@@ -256,7 +262,7 @@
             <toolbaritem id="alpheios-lookup-text-tbitem" observes="alpheios-learner-disabled">
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"
-                    onkeypress="Alph.main.do_tb_lookup(event);"
+                    onkeypress="Alph.Main.doTbLookup(event);"
                     observes="alpheios-lookup-enabled"
                     tooltiptext="&alpheios-morph-lookup-tooltip;"/>
             </toolbaritem>

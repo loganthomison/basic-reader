@@ -1,6 +1,10 @@
 /**
- * @fileoverview Alph.Datafile - access data from file
- *  
+ * @fileoverview Access data from a sorted file. Supports binary search.  
+ * Exports a single symbol, Datafile, which must be imported into the 
+ * namespace of the importing class.
+ *
+ * @version $Id$
+ *
  * Copyright 2008-2009 Cantus Foundation
  * http://alpheios.net
  * 
@@ -20,54 +24,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const EXPORTED_SYMBOLS = ['Datafile'];
+
+Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
+
 /**
- * @class Alph.Datafile contains the datafile lookup functionality.
+ * @class Datafile contains the datafile lookup functionality.
  * @constructor
  *
  * @param {String} a_url URL to read
  * @param {String} a_charset character set (or null for no conversion)
  */
-Alph.Datafile = function(a_url, a_charset)
+Datafile = function(a_url, a_charset)
 {
-    Alph.util.log("Loading file " + a_url);
-
     // save parameters for possible future reload
-    this.url = a_url;
-    this.charset = a_charset;
-    this.separator = '|';
-    this.specialFlag = '@';
+    this.d_url = a_url;
+    this.d_charset = a_charset;
+    this.d_separator = '|';
+    this.d_specialFlag = '@';
 
-    var ios = Components.classes["@mozilla.org/network/io-service;1"]
-                        .getService(Components.interfaces.nsIIOService);
-    var ss = Components.classes["@mozilla.org/scriptableinputstream;1"]
-                       .getService(Components.interfaces
-                                             .nsIScriptableInputStream);
-    var ch = ios.newChannel(this.url, null, null);
-    var inp = ch.open();
-    ss.init(inp);
-    if (!this.charset)
-    {
-        this.data = ss.read(inp.available());
-    }
-    else
-    {
-        var conv =
-            Components.classes['@mozilla.org/intl/scriptableunicodeconverter']
-                      .createInstance(Components.interfaces
-                                                .nsIScriptableUnicodeConverter);
-        conv.charset = this.charset;
-        var buffer = ss.read(inp.available());
-        this.data = conv.ConvertToUnicode(buffer);
-    }
-    ss.close();
-    inp.close();
+    this.d_data = BrowserUtils.readFile(a_url,a_charset);
 
     // make sure file ends with newline
-    if (this.data[this.data.length - 1] != '\n')
-        this.data += '\n';
+    if (this.d_data[this.d_data.length - 1] != '\n')
+        this.d_data += '\n';
 }
 
-Alph.Datafile.prototype =
+Datafile.prototype =
 {
     /**
      * get data
@@ -77,7 +60,7 @@ Alph.Datafile.prototype =
      */
     getData: function()
     {
-        return this.data;
+        return this.d_data;
     },
 
     /**
@@ -88,7 +71,7 @@ Alph.Datafile.prototype =
      */
     getSeparator: function()
     {
-        return this.separator;
+        return this.d_separator;
     },
 
     /**
@@ -98,7 +81,7 @@ Alph.Datafile.prototype =
      */
     setSeparator: function(a_separator)
     {
-        this.separator = a_separator;
+        this.d_separator = a_separator;
     },
 
     /**
@@ -109,7 +92,7 @@ Alph.Datafile.prototype =
      */
     getSpecialHandlingFlag: function()
     {
-        return this.specialFlag;
+        return this.d_specialFlag;
     },
 
     /**
@@ -119,7 +102,7 @@ Alph.Datafile.prototype =
      */
     setSpecialHandlingFlag: function(a_specialFlag)
     {
-        this.specialFlag = a_specialFlag;
+        this.d_specialFlag = a_specialFlag;
     },
 
     /**
@@ -140,7 +123,7 @@ Alph.Datafile.prototype =
      */
     binarySearch: function(a_key)
     {
-        a_key += this.separator;
+        a_key += this.d_separator;
 
         const tlen = a_key.length;
         var mid;
@@ -148,26 +131,25 @@ Alph.Datafile.prototype =
 
         // start with entire range of data
         var beg = 0;
-        var end = this.data.length - 1;
+        var end = this.d_data.length - 1;
 
         // while data still remains
         while (beg < end)
         {
             // find line containing midpoint of remaining data
-            mid = this.data.lastIndexOf('\n', (beg + end) >> 1) + 1;
-            midStr = this.data.substr(mid, tlen);
-
+            mid = this.d_data.lastIndexOf('\n', (beg + end) >> 1) + 1;
+            midStr = this.d_data.substr(mid, tlen);
             // if too high, restrict to first half
             if (a_key < midStr)
                 end = mid - 1;
             // if too low, restrict to second half
             else if (a_key > midStr)
-                beg = this.data.indexOf('\n', mid) + 1;
+                beg = this.d_data.indexOf('\n', mid) + 1;
             // if equal, done
             else
                 break;
         }
-
+        
         // if found, back up to first line with key
         if (beg < end)
         {
@@ -175,11 +157,11 @@ Alph.Datafile.prototype =
             while (mid >= 2)
             {
                 // find start of preceding line
-                prec = this.data.lastIndexOf('\n', mid - 2) + 1;
+                var prec = this.d_data.lastIndexOf('\n', mid - 2) + 1;
 
                 // if preceding line has different key then done,
                 // else back up to preceding line
-                midStr = this.data.substr(prec, tlen);
+                midStr = this.d_data.substr(prec, tlen);
                 if (a_key != midStr)
                     break;
                 mid = prec;
@@ -206,28 +188,28 @@ Alph.Datafile.prototype =
     findData: function(a_key)
     {
         // if key not found at all, return empty string
-        start = this.binarySearch(a_key);
+        var start = this.binarySearch(a_key);
         if (start == -1)
             return null;
 
         const tlen = a_key.length;
-        end = start;
+        var end = start;
 
         // while more lines remain
-        while (end < this.data.length)
+        while (end < this.d_data.length)
         {
             // find start of next line
-            end = this.data.indexOf('\n', end) + 1;
+            end = this.d_data.indexOf('\n', end) + 1;
             if (end == 0)
-                end = this.data.length;
+                end = this.d_data.length;
 
             // if next line has different key then done,
             // else include this line in output
-            test = this.data.substr(end, tlen);
+            var test = this.d_data.substr(end, tlen);
             if (a_key != test)
                 break;
         }
 
-        return this.data.substring(start, end);
+        return this.d_data.substring(start, end);
     }
 };

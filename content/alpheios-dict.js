@@ -24,21 +24,16 @@
  */
 
 
-/**
- * @class The Alph.Dict class is the representation of the dictionary definition
- * panel.
- * @constructor
+/** 
+ * @class Dictionary Panel implementation
+ * @augments Alph.Panel
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
- * @see Alph.Panel
  */
 Alph.Dict = function(a_panel)
 {
     Alph.Panel.call(this,a_panel);
 };
 
-/**
- * @ignore
- */
 Alph.Dict.prototype = new Alph.Panel();
 
 /**
@@ -48,7 +43,7 @@ Alph.Dict.prototype = new Alph.Panel();
  */
 Alph.Dict.prototype.init = function(a_panel_state)
 {
-    Alph.util.log("dict panel init");
+    Alph.Main.s_logger.debug("dict panel init");
     // initialize the contents and css objects
     // these are objects rather than arryas so that
     // we can have different state per named dictionary if appropriate
@@ -59,7 +54,7 @@ Alph.Dict.prototype.init = function(a_panel_state)
 
     // pointer to last XHR issued in this panel for the browser
     a_panel_state.last_request = null;
-    this.reset_contents(a_panel_state);
+    this.resetContents(a_panel_state);
 
 
 };
@@ -67,13 +62,13 @@ Alph.Dict.prototype.init = function(a_panel_state)
 
 /**
  * Dict panel specific implementation of
- * {@link Alph.Panel#reset_contents}
+ * {@link Alph.Panel#resetContents}
  * Refreshes the contents of the alph-window div and the css stylesheet
  * links as appropriate per the state of the current browser
  * @param {Object} a_panel_state the current panel state
  * @param {Object} a_old state (optional) - the prior panel state
  */
-Alph.Dict.prototype.reset_contents = function(a_panel_state,a_old_state)
+Alph.Dict.prototype.resetContents = function(a_panel_state,a_old_state)
 {
 
     // if the state was request while a request was pending
@@ -83,18 +78,18 @@ Alph.Dict.prototype.reset_contents = function(a_panel_state,a_old_state)
     if (typeof a_old_state != "undefined" &&
         a_old_state.last_request != null && a_old_state.last_request.pending)
     {
-        Alph.util.log("interrupting dictionary request");
+        Alph.Main.s_logger.debug("interrupting dictionary request");
         a_old_state.last_request.interrupted = true;
     }
 
     var panel_obj = this;
-    Alph.$("browser",this.panel_elem).each(
+    Alph.$("browser",this.d_panelElem).each(
         function(i)
         {
             var doc = this.contentDocument;
             var id = this.id;
             var doc_state =
-                panel_obj.init_document(
+                panel_obj.initDocument(
                     doc,
                     { contents: a_panel_state.contents[id],
                       css: a_panel_state.css[id],
@@ -109,7 +104,7 @@ Alph.Dict.prototype.reset_contents = function(a_panel_state,a_old_state)
                 a_panel_state.dicts[id] = doc_state.dict;
 
             }
-            panel_obj.update_panel_window(a_panel_state,id);
+            panel_obj.updatePanelWindow(a_panel_state,id);
         }
     );
 };
@@ -118,34 +113,34 @@ Alph.Dict.prototype.reset_contents = function(a_panel_state,a_old_state)
  * Dictionary panel specific implementation of
  * {@link Alph.Panel#show} - makes sure the
  * browser document has been initialized
- * @return the new panel status
+ * @returns the new panel status
  * @type int
  */
 Alph.Dict.prototype.show = function()
 {
     var panel_obj = this;
     // update the browse command for the current dictionary
-    Alph.Dict.update_dict_browse_cmd();
+    Alph.Dict.updateDictBrowseCmd();
 
-    var bro = Alph.main.getCurrentBrowser();
+    var bro = Alph.Main.getCurrentBrowser();
     
     // we need to update the contents of the panel window here
     // to make sure the window contains the latest contents from the
     // real panel. The window calls the show method upon load.
-    if (this.panel_window != null)
+    if (this.d_panelWindow != null)
     {
-        var panel_state = this.get_browser_state(bro);
+        var panel_state = this.getBrowserState(bro);
         // update each of the browsers in the panel window
-        Alph.$("#" + this.panel_id + " browser").each(
+        Alph.$("#" + this.d_panelId + " browser").each(
             function(a_i)
             {
                 var bro_id = this.id;
-                panel_obj.update_panel_window(panel_state,bro_id,a_i);
+                panel_obj.updatePanelWindow(panel_state,bro_id,a_i);
             }
         );
         
         // focus the panel window if present
-        this.panel_window.focus();
+        this.d_panelWindow.focus();
     }
     return Alph.Panel.STATUS_SHOW;
 };
@@ -159,19 +154,20 @@ Alph.Dict.prototype.show = function()
  * @param a_event_type the event type
  * @param a_event_data optional event data object
  */
-Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
+Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
 {
     var panel_obj = this;
-    var panel_state = this.get_browser_state(a_bro);
+    var panel_state = this.getBrowserState(a_bro);
 
     // if a dictionary link was clicked and the panel/window isn't open
     // then open it. If the panel is detached, the onload handler for the window
     // will result in observe_ui_event being called again with the LOAD_DICT_WINDOW
     // event to do the actual lookup. If the panel is inline, then the update_status 
     // call will come in without an event. Both situations are handled below.
-    if ((a_event_type == Alph.main.events.SHOW_DICT)  && 
+    if ((a_event_type == Alph.Constants.EVENTS.SHOW_DICT)  && 
         (panel_state.status == Alph.Panel.STATUS_HIDE))
     {
+        Alph.Main.s_logger.debug("Opening dictionary window");
         this.open();
         return;
     }
@@ -180,12 +176,12 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     // we may eventually want to implement this as a tabbed browser
     // with one tab/browser per dictionary for multiple dictionaries
     var bro_id = 'alph-dict-body';
-    var dict_bro = Alph.$("browser#" + bro_id,this.panel_elem).get(0);
+    var dict_bro = Alph.$("browser#" + bro_id,this.d_panelElem).get(0);
     var doc = dict_bro.contentDocument;
 
     
     // if the popup is being closed, clear the contents and state of the panel
-    if (a_event_type == Alph.main.events.REMOVE_POPUP)
+    if (a_event_type == Alph.Constants.EVENTS.REMOVE_POPUP)
     {
         Alph.$(".loading",doc).remove();
         Alph.$(".alph-dict-block",doc).remove();
@@ -195,7 +191,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             Alph.$("#alph-window",doc).clone();
         panel_state.css[bro_id] =
             Alph.$("link[rel=stylesheet]",doc).clone();
-        this.update_panel_window(panel_state,bro_id);
+        this.updatePanelWindow(panel_state,bro_id);
         return;
     }
     
@@ -207,8 +203,8 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     // - this method has been called from a change in panel status, in which
     //   case the event type will be undefined
     var do_lookup = 
-       (  a_event_type == Alph.main.events.LOAD_DICT_WINDOW ||
-          a_event_type == Alph.main.events.SHOW_DICT ||
+       (  a_event_type == Alph.Constants.EVENTS.LOAD_DICT_WINDOW ||
+          a_event_type == Alph.Constants.EVENTS.SHOW_DICT ||
           typeof a_event_type == "undefined"  
        );
     if (! do_lookup )
@@ -216,7 +212,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
         return;
     }
     
-    var language_tool = Alph.main.getLanguageTool(a_bro);
+    var language_tool = Alph.Main.getLanguageTool(a_bro);
     // we should always have a language_tool here, but
     // if not just do nothing and return quietly
     if (typeof language_tool == "undefined")
@@ -225,13 +221,13 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     }
 
     // get a callback to the current dictionary
-    var dictionary_callback = language_tool.get_dictionary_callback();
+    var dictionary_callback = language_tool.getDictionaryCallback();
 
     
     // if the dictionary browser has the class "alph-lexicon-output"
     // the alph-window element in its content document will be updated
     // with the output of the morphology lookup for the currently selected
-    // word by Alph.xlate.showTranslation
+    // word by Alph.Xlate.showTranslation
     var alph_window = Alph.$("#alph-window",doc).get(0);
 
     // remove any prior dictionary entries or loading messages
@@ -277,7 +273,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
                     'alpheios-dict-' + panel_state.dicts[bro_id]);
                 panel_state.dicts[bro_id] = null;
             }
-            Alph.util.log("No dictionary defined " + dictionary_callback);
+            Alph.Main.s_logger.warn("No dictionary defined " + dictionary_callback);
         }
         else
         {
@@ -293,9 +289,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             Alph.$(alph_window).append(
                     '<div id="alph-dict-loading" class="loading" ' +
                         'alph-request-id="' + request_id + '">'
-                    + Alph.$("#alpheios-strings").get(0)
-                          .getFormattedString("alph-searching-dictionary",
-                            [lemma_list])
+                    + Alph.Main.getString("alph-searching-dictionary",[lemma_list])
                     + "</div>");
 
             var request = { pending: true, id: request_id };
@@ -313,7 +307,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
                     lemmas,
                     function(a_data,a_dict_name)
                     {
-                        panel_obj.display_dictionary(
+                        panel_obj.displayDictionary(
                             language_tool,a_bro,doc,a_data,lemmas,a_dict_name,request);
                     },
                     function(a_error,a_dict_name)
@@ -321,13 +315,13 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
                         var err_str = '<div class="error">' +
                                       a_error +
                                       '</div>';
-                        panel_obj.display_dictionary(
+                        panel_obj.displayDictionary(
                             language_tool,a_bro,doc,err_str,lemmas,a_dict_name,request);
                     },
                     function ()
                     {
                         request.pending = false;
-                        Alph.util.log("Request complete: " + lemmas.join(', '));
+                        Alph.Main.s_logger.debug("Request complete: " + lemmas.join(', '));
                     }
                 );
 
@@ -335,12 +329,11 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
             catch(a_e)
             {
                 request.pending = false;
-                Alph.util.log(
-                    "Error calling dictionary: " + a_e);
+                Alph.Main.s_logger.error("Error calling dictionary: " + a_e);
                 var err_str = '<div class="error">' +
                                       a_e +
                               '</div>';
-                panel_obj.display_dictionary(
+                panel_obj.displayDictionary(
                      language_tool,a_bro,doc,err_str,lemmas,'',request);
             }
         }
@@ -351,7 +344,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
     panel_state.css[bro_id] =
         Alph.$("link[rel=stylesheet]",doc).clone();
 
-    this.update_panel_window(panel_state,bro_id);
+    this.updatePanelWindow(panel_state,bro_id);
 };
 
 /**
@@ -365,7 +358,7 @@ Alph.Dict.prototype.observe_ui_event = function(a_bro,a_event_type,a_event_data)
  * @param String a_dict_name the name of the dictionary used
  * @param {Object} a_request state object for the total request (all lemmas)
  */
-Alph.Dict.prototype.display_dictionary = function(
+Alph.Dict.prototype.displayDictionary = function(
     a_lang_tool,
     a_bro,
     a_doc,
@@ -380,7 +373,7 @@ Alph.Dict.prototype.display_dictionary = function(
 
     var bro_id = 'alph-dict-body';
 
-    var panel_state = this.get_browser_state(a_bro);
+    var panel_state = this.getBrowserState(a_bro);
 
     // make sure we didn't switch tabs while waiting for the response
     if (! a_request.interrupted)
@@ -420,18 +413,17 @@ Alph.Dict.prototype.display_dictionary = function(
             Alph.$("link[rel=stylesheet]",a_doc).clone();
         panel_state.dicts[bro_id] = a_dict_name;
 
-        this.update_panel_window(panel_state,bro_id);
+        this.updatePanelWindow(panel_state,bro_id);
     }
     else
     {
-        Alph.util.log("State reset while waiting for dictionary");
+        Alph.Main.s_logger.debug("State reset while waiting for dictionary");
         // if the loading message for this request is still showing, replace
         // it with a request interuppted message
         Alph.$("#alph-dict-loading[alph-request-id=" + a_request.id + "]",alph_window)
             .after(
                 '<div class="alpheios-message">' +
-                Alph.$("#alpheios-strings").get(0)
-                    .getString("alph-error-request-interrupt") +
+                Alph.Main.getString("alph-error-request-interrupt") +
                 '</div>')
             .remove();
     }
@@ -448,26 +440,26 @@ Alph.Dict.prototype.display_dictionary = function(
  * @param {String} a_browser_id the id of the browser to update
  * @param {String} a_browser_index the index of the browser to update
  */
-Alph.Dict.prototype.update_panel_window =
+Alph.Dict.prototype.updatePanelWindow =
     function(a_panel_state,a_browser_id,a_browser_index)
 {
-    if (this.window_open())
+    if (this.windowOpen())
     {
         try
         {
             var pw_bro =
-                this.panel_window
-                    .Alph.$("#" + this.panel_id + " browser#"+a_browser_id)
+                this.d_panelWindow
+                    .Alph.$("#" + this.d_panelId + " browser#"+a_browser_id)
                     .get(0);
             if (pw_bro)
             {
                 var pw_doc = pw_bro.contentDocument;
-                this.init_document(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
+                this.initDocument(pw_doc,{ contents: a_panel_state.contents[a_browser_id],
                                             css: a_panel_state.css[a_browser_id],
                                             dict: a_panel_state.dicts[a_browser_id]
                                           }
                                   );
-                this.panel_window.focus();
+                this.d_panelWindow.focus();
             }
          } catch(a_e)
          {
@@ -482,9 +474,9 @@ Alph.Dict.prototype.update_panel_window =
  * @param {Document} a_doc the content document
  * @param {Object} a_doc_state the state object for this browser. If not supplied
  *                 a new state object will be created
- * @return {Object} the state object for this browser
+ * @returns {Object} the state object for this browser
  */
-Alph.Dict.prototype.init_document = function(a_doc,a_doc_state)
+Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
 {
 
     // if we haven't the initialized the contents of this browser for
@@ -492,7 +484,7 @@ Alph.Dict.prototype.init_document = function(a_doc,a_doc_state)
 
     if (typeof a_doc_state.contents == "undefined")
     {
-        Alph.util.log("initializing dictionary document");
+        Alph.Main.s_logger.debug("initializing dictionary document");
         a_doc_state = { css: null, contents: null };
         a_doc_state.contents =
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","div");
@@ -502,7 +494,7 @@ Alph.Dict.prototype.init_document = function(a_doc,a_doc_state)
             a_doc.createElementNS("http://www.w3.org/1999/xhtml","link");
         a_doc_state.css.setAttribute("rel", "stylesheet");
         a_doc_state.css.setAttribute("type", "text/css");
-        a_doc_state.css.setAttribute("href", "chrome://alpheios/skin/alph-dict.css");
+        a_doc_state.css.setAttribute("href",  Alph.BrowserUtils.getStyleUrl() + "/alph-dict.css");
         a_doc_state.css.setAttribute("id", "alpheios-dict-css");
         a_doc_state.dict = null;
 
@@ -518,21 +510,21 @@ Alph.Dict.prototype.init_document = function(a_doc,a_doc_state)
 /**
  * Dictionary panel specific implementation of
  * {@link Alph.Panel#get_detach_chrome}
- * @return the chrome url as a string
+ * @returns the chrome url as a string
  * @type String
  */
-Alph.Dict.prototype.get_detach_chrome = function()
+Alph.Dict.prototype.getDetachChrome = function()
 {
-    return 'chrome://alpheios/content/alpheios-dict-window.xul';
+    return Alph.BrowserUtils.getContentUrl() + '/alpheios-dict-window.xul';
 };
 
 /**
  * Update the dictionary browse command for the current dictionary
  */
-Alph.Dict.update_dict_browse_cmd = function()
+Alph.Dict.updateDictBrowseCmd = function()
 {
     // update the browse command for the current dictionary
-    if (Alph.main.getLanguageTool().getDictionaryBrowseUrl() == null)
+    if (Alph.Main.getLanguageTool().getDictionaryBrowseUrl() == null)
     {
         Alph.$("#alpheios-dict-browse-cmd").attr("disabled",true);
     }
@@ -544,18 +536,17 @@ Alph.Dict.update_dict_browse_cmd = function()
 
 /**
  * Browse the current dictionary
- * @param {Event} a_ the event which triggered the request
+ * @param {Event} a_event the event which triggered the request
  * @param {String} a_panel_id the id of the originating panel
  */
-Alph.Dict.browse_dictionary = function(a_event,a_panel_id)
+Alph.Dict.browseDictionary = function(a_event,a_panel_id)
 {
 
-    var browse_url = Alph.main.getLanguageTool().getDictionaryBrowseUrl();
+    var browse_url = Alph.Main.getLanguageTool().getDictionaryBrowseUrl();
     if (browse_url != null)
     {
-        Alph.xlate.openSecondaryWindow(
-            Alph.$("#alpheios-strings").get(0)
-                          .getString("alph-dictionary-window"),
+        Alph.Xlate.openSecondaryWindow(
+            Alph.Main.getString("alph-dictionary-window"),
             browse_url,
             {  chrome: "no",
                dialog: "no",

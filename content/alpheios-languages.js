@@ -23,23 +23,35 @@
  */
  
 /**
- * @singleton
- * 
- * The Alph.Languages object holds
- * the instantiated instances of the {@link Alph.LanguageTool}
- * objects for each supported language.
- * It is populated by {@link Alph.main#set_languages}
+ * @class Container for the instantiated instances of the {@link Alph.LanguageTool}
+ * objects for each supported language. 
  */
 Alph.Languages = 
 {
-    lang_list: [],
+    /**
+     * the list of supported languages
+     * @private
+     */
+    d_langList: [],
     
-    get_lang_tool: function(a_lang)
+    /**
+     * get a language tool
+     * @param {String} a_lang the language key
+     * @returns the language tool
+     * @type {Alph.LanguageTool}
+     */
+    getLangTool: function(a_lang)
     {
         return this[a_lang];
     },
     
-    has_lang: function(a_lang)
+    /**
+     * check to see if a language is supported
+     * @param {String} a_lang the language key
+     * @returns true or false
+     * @type Boolean
+     */
+    hasLang: function(a_lang)
     {        
         if (typeof this[a_lang] == "undefined")
         {
@@ -51,50 +63,50 @@ Alph.Languages =
         }
     },
     
-    get_lang_list: function()
+    /**
+     * get the list of supported languages
+     * @returns list of supported languages
+     * @type Array
+     */
+    getLangList: function()
     {
-        return this.lang_list;
+        return this.d_langList;
     },
     
-    add_lang_tool: function(a_lang,a_lang_tool)
+    /**
+     * add a supported language
+     * @param {String} a_lang the language key
+     * @param {Alph.LanguageTool} the language tool
+     */
+    addLangTool: function(a_lang,a_lang_tool)
     {
         if (typeof this[a_lang] == "undefined")
         {
             this[a_lang] = a_lang_tool;
-            this.lang_list.push(a_lang);
+            this.d_langList.push(a_lang);
         }
     },
     
     /**
-     * Get the key in to the Languages object for the supplied language_code
+     * Get the key in to the Languages object for the supplied language code
      * @param {String} a_code the language code
-     * @return the key in to the Languages object for this code, or '' if none found 
+     * @returns the key in to the Languages object for this code, or '' if none found
+     * @type String 
      */
-    map_language: function(a_code)
+    mapLanguage: function(a_code)
     {
         var lang_key = '';
-        for (var i=0; i<this.lang_list.length;i++)
+        for (var i=0; i<this.d_langList.length;i++)
         {
-            var lang_tool = this.get_lang_tool(this.lang_list[i]);
-            if (a_code == this.lang_list[i] ||
-                lang_tool.supports_language(a_code)
+            var lang_tool = this.getLangTool(this.d_langList[i]);
+            if (a_code == this.d_langList[i] ||
+                lang_tool.supportsLanguage(a_code)
             )
             {
-                lang_key = this.lang_list[i];
+                lang_key = this.d_langList[i];
                 break;
             }
         }
         return lang_key;
     }
 };
-
-/**
- * @singleton
- * 
- * The Alph.LanguageToolSet object holds
- * language-specific prototypes derived from the 
- * base {@link Alph.LanguageTool} class.
- * It is populated by code in the external  
- * language-specific extensions, which are dependent upon Alpheios
- */
-Alph.LanguageToolSet = {};

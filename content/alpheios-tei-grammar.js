@@ -1,5 +1,5 @@
 /**
- * Javascript functions for Tei Formatted Grammar Documents
+ * @fileoverview Javascript functions for Tei Formatted Grammar Documents
  * $Id$
  * 
  * Copyright 2008-2009 Cantus Foundation
@@ -21,22 +21,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// initialize the Alph namespace
-if (typeof Alph == "undefined") {
-    Alph = {};
-}
- 
+ /**
+  * @class Grammar window javascript for Tei formated grammar documents.
+  */
+Alph.TeiGrammar = {
 
-Alph.tei_grammar = {
-
+    /**
+     * path to the index for this grammar
+     * @private
+     */
+    d_indexFile: null,
+    
     /**
      * onLoad 
      * load handler for the grammar window
      * @param {String} a_index name of the grammar index file
      */
     onLoad: function(a_index) {
-        var toc_doc = $("#alph-grammar-toc").get(0).contentDocument;
-        var content_browser = $("#alph-grammar-content");
+        var toc_doc = Alph.$("#alph-grammar-toc").get(0).contentDocument;
+        var content_browser = Alph.$("#alph-grammar-content");
         
         // Add a handler to main grammar content browser window 
         // which adds a click handler to the links in the grammar
@@ -46,8 +49,8 @@ Alph.tei_grammar = {
                 "DOMContentLoaded",
                 function() 
                 {
-                    $("a",this.contentDocument)
-                        .click(Alph.tei_grammar.contentClickHandler);
+                    Alph.$("a",this.contentDocument)
+                        .click(Alph.TeiGrammar.contentClickHandler);
                 },
                 true
                 );
@@ -56,8 +59,13 @@ Alph.tei_grammar = {
         var params;
         if (typeof window.arguments != "undefined")
         {
-            params=window.arguments[0];   
-
+            params=window.arguments[0];
+            if (this.d_indexFile == null)
+            {
+                this.d_indexFile = new Alph.Datafile(
+                    params.lang_tool.getIndexFile(a_index),null);
+                this.d_indexFile.setSeparator(',');
+            }
             // add a callback to the parameters object
             // which can be called by the opener code 
             // to reload the window with new arguments
@@ -66,34 +74,36 @@ Alph.tei_grammar = {
                 params.update_args_callback =
                     function(a_args)
                         {
-                            Alph.tei_grammar.set_start_href(a_args,a_index);
+                            Alph.TeiGrammar.setStartHref(a_args);
                         }
             }
-            this.set_start_href(params,a_index);            
+            this.setStartHref(params);            
         }
         
+
+        
         // hide the header in the toc
-        $("div.stdheader",toc_doc).css("display","none");
+        Alph.$("div.stdheader",toc_doc).css("display","none");
             
         // Add a click handler to the links in the toc: they set the 
         // src of the alph-grammar-content iframe
-        $("a.toc",toc_doc).click(
+        Alph.$("a.toc",toc_doc).click(
             function(a_e)
             {
-                return Alph.tei_grammar.tocClickHandler(a_e,this,params.lang_tool);
+                return Alph.TeiGrammar.tocClickHandler(a_e,this,params.lang_tool);
             }
         );
     
 
         // add the toggle widgets
-        $("li.toc:has(li)",toc_doc).prepend("<div class='toc-widget toc-closed'/>");
+        Alph.$("li.toc:has(li)",toc_doc).prepend("<div class='toc-widget toc-closed'/>");
         
         // hide the subcontents of the toc headings and only show toc_0 by default
-        $("li.toc",toc_doc).css("display","none");
-        $("li.toc:has(a.toc_0)",toc_doc).css("display","block");
+        Alph.$("li.toc",toc_doc).css("display","none");
+        Alph.$("li.toc:has(a.toc_0)",toc_doc).css("display","block");
         
         // Add a click handler to the toc widgets
-        $("div.toc-widget",toc_doc).click(Alph.tei_grammar.tocheadClickHandler);
+        Alph.$("div.toc-widget",toc_doc).click(Alph.TeiGrammar.tocheadClickHandler);
 
         // if a callback function was passed in in the window
         // arguments, execute it
@@ -113,14 +123,14 @@ Alph.tei_grammar = {
      */
     tocClickHandler: function(a_event,a_elem,a_lang_tool)
     {
-        var toc_doc = $("#alph-grammar-toc").get(0).contentDocument;
-        var href = $(a_elem).attr("href");
-        $("#alph-grammar-content").attr("src",
+        var toc_doc = Alph.$("#alph-grammar-toc").get(0).contentDocument;
+        var href = Alph.$(a_elem).attr("href");
+        Alph.$("#alph-grammar-content").attr("src",
                 
-                Alph.tei_grammar.get_base_url(a_lang_tool) + href 
+                Alph.TeiGrammar.getBaseUrl(a_lang_tool) + href 
             );
-        $('.highlighted',toc_doc).removeClass('highlighted');
-        $(a_elem).addClass('highlighted');
+        Alph.$('.highlighted',toc_doc).removeClass('highlighted');
+        Alph.$(a_elem).addClass('highlighted');
         return false;
     },
 
@@ -133,19 +143,19 @@ Alph.tei_grammar = {
     tocheadClickHandler: function(a_event)
     {
         // hide/show the child toc li items
-        var sib_uls = $(this).siblings("ul");
-        var sib_lis = $(">li",sib_uls);
-        if ($(sib_lis).css('display') == 'block') 
+        var sib_uls = Alph.$(this).siblings("ul");
+        var sib_lis = Alph.$(">li",sib_uls);
+        if (Alph.$(sib_lis).css('display') == 'block') 
         {
-            $(sib_lis).css("display", "none")
-            $(this).removeClass("toc-open");
-            $(this).addClass("toc-closed");
+            Alph.$(sib_lis).css("display", "none")
+            Alph.$(this).removeClass("toc-open");
+            Alph.$(this).addClass("toc-closed");
         }
         else
         {
-            $(sib_lis).css("display", "block")
-            $(this).removeClass("toc-closed");
-            $(this).addClass("toc-open");
+            Alph.$(sib_lis).css("display", "block")
+            Alph.$(this).removeClass("toc-closed");
+            Alph.$(this).addClass("toc-open");
         }
         
         // prevent event propagation
@@ -165,15 +175,12 @@ Alph.tei_grammar = {
     },
             
     /**
-     * set_start_href - set the location for the content window
+     * setStartHref - set the location for the content window
      * @param {Object} a_params object containing a target_href property 
      *                          which specifies the name of the target location in the 
      *                          grammar (according to the Alpheios morphological markup)
-     * @param {String} a_index name of the index file which contains the mapping of 
-     *                         the context supplied in the target_href to actual location
-     *                         in the grammar 
      */
-    set_start_href: function(a_params,a_index)
+    setStartHref: function(a_params)
      {
         // pick up the original target href for the grammar from the
         // window arguments
@@ -184,20 +191,12 @@ Alph.tei_grammar = {
                 a_params.target_href  : 
                 'preface';
         
-        // TODO - eventually, if we keep Alph.Linking, it
-        // should be made a JS Module singleton and 
-        // moved to the /modules directory eliminating the reference 
-        // to window.opener
-        var start_href_target = 
-            window.opener.Alph.linking.find_link_target(
-                start_href,
-                a_index,
-                a_params.lang_tool
-        );
-        if (typeof start_href_target != "undefined")
-        {
-            $("#alph-grammar-content").attr("src", 
-                  Alph.tei_grammar.get_base_url(a_params.lang_tool) 
+        var data = this.d_indexFile.findData(start_href); 
+        if (data != null)
+        {        
+            var start_href_target = data.split(this.d_indexFile.getSeparator(),2)[1]
+            Alph.$("#alph-grammar-content").attr("src", 
+                  Alph.TeiGrammar.getBaseUrl(a_params.lang_tool) 
                 + start_href_target
             );
         }
@@ -205,19 +204,15 @@ Alph.tei_grammar = {
      
      /**
       * get the base url for the current grammar
-      * @param {Alph.LanguageTool) a_lang_tool the LanguageTool which produced
+      * @param {Alph.LanguageTool} a_lang_tool the LanguageTool which produced
       *                                        the current grammar window
-      * @return the url for the current grammar
+      * @returns the url for the current grammar
       * @type String
       */
-     get_base_url: function(a_lang_tool)
+     getBaseUrl: function(a_lang_tool)
      {
         //TODO - eventually need to support multiple grammars per language
-        var url = 
-            'chrome://' 
-                + a_lang_tool.getchromepkg() 
-                + '/content/grammar/';
-        return url;
+        return Alph.BrowserUtils.getContentUrl(a_lang_tool.getLanguage()) + '/grammar/';
      }
 }
 

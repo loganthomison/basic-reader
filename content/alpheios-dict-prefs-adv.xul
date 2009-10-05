@@ -15,7 +15,7 @@
                       src="chrome://alpheios/locale/alpheios-prefs.properties"/>
     </stringbundleset>
     <prefpane id="alpheios-prefs-dict-advanced"
-              onpaneload="Alph.prefs.init_adv_dict_prefs();">
+              onpaneload="Alph.Prefs.initAdvDictPrefs();">
         <preferences/>
         <vbox id="alpheios-dict-tabs-advanced"/>
     </prefpane>

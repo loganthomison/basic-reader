@@ -7,7 +7,7 @@
         <prefpane id="alpheios-prefs-dictionaries" 
               label="&alpheios.prefs.dictionaries;" 
               image="chrome://alpheios/skin/icons/wordlist_32.png"
-              onpaneload="Alph.prefs.init_dict_prefs();"
+              onpaneload="Alph.Prefs.initDictPrefs();"
               insertafter="alpheios-prefs-features">
             <preferences/>
             <tabbox id="dict-prefs">

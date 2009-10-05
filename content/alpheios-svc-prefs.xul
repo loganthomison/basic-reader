@@ -10,11 +10,15 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     title="&alpheios.prefs.services.advanced;"
     dlgbuttons="accept,cancel">
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />
+
     <stringbundleset id="alpheios-prefs-stringbundleset">
       <stringbundle id="alpheios-prefs-strings" 
                       src="chrome://alpheios/locale/alpheios-prefs.properties"/>
     </stringbundleset>
-    <prefpane id="alpheios-prefs-svc-advanced">
+    <prefpane id="alpheios-prefs-svc-advanced"
+              onpaneload="Alph.Prefs.initSvcPrefs();">
         <preferences/>
         <tabbox id="alpheios-svc-tabs-advanced">
             <tabs id="alpheios-svc-prefs-tabs"/>

@@ -15,7 +15,7 @@
     </stringbundleset>    
     <prefpane id="alpheios-prefs-sites" 
           label="&alpheios.prefs.sites;" 
-          onpaneload="Alph.prefs.init_site_prefs();">
+          onpaneload="Alph.Prefs.initSitePrefs();">
         <preferences/>
         <tabbox id="site-prefs">
             <tabs id="site-prefs-language-tabs"/>
