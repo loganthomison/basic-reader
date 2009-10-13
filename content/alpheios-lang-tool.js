@@ -882,7 +882,7 @@ Alph.LanguageTool.prototype.handleInflectionsForMorphWindow = function(a_event,a
  */
 Alph.LanguageTool.prototype.canInflect = function(a_node)
 {
-    var params = this.getInflectionTable(a_node,{});
+    var params = this.getInflectionTable(a_node,{},true);
     return (typeof params.showpofs == 'string');
 }
 
@@ -979,9 +979,10 @@ Alph.LanguageTool.prototype.postTransform = function(a_node)
  * properties of the target word.
  * @param {Node} a_node the node containing the target word
  * @param {String} a_params optional requested parameters
+ * @param {Boolean} a_skipload optional flag to indicate the xslt load should be skipped
  * @returns the parameters object for the inflection window
  */
-Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params)
+Alph.LanguageTool.prototype.getInflectionTable = function(a_node, a_params, a_checkonly)
 {
     // no default behavior
     return;
