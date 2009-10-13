@@ -1676,6 +1676,12 @@ Alph.Main =
             this.setXlateTrigger(a_bro,trigger);
             // clear out any popup
             Alph.Xlate.removePopup(a_bro);    
+
+            // close the query window
+            if (a_mode == Alph.Constants.LEVELS.READER)
+            {
+                Alph.Interactive.closeQueryDisplay(a_bro);
+            }
         }
         var new_mode = this.getStateObj(a_bro).getVar("level");
         
