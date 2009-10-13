@@ -194,7 +194,9 @@ Alph.TeiGrammar = {
         var data = this.d_indexFile.findData(start_href); 
         if (data != null)
         {        
-            var start_href_target = data.split(this.d_indexFile.getSeparator(),2)[1]
+            // if multiple matches found, exact match should be 1st
+            var exact_match = data.split(/\n/)[0];
+            var start_href_target = exact_match.split(this.d_indexFile.getSeparator(),2)[1]
             Alph.$("#alph-grammar-content").attr("src", 
                   Alph.TeiGrammar.getBaseUrl(a_params.lang_tool) 
                 + start_href_target
