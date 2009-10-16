@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!-- $Revision$-->
-<!-- $BuildId: 904$-->
+<!-- $BuildId: 904+$-->
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 		xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:name>Alpheios Basic Libraries</em:name>
-		<em:version>1.0alpha4d.2199.20091016</em:version>
+		<em:version>1.0alpha4d.2200.20091016</em:version>
 		<em:description></em:description>
 		<em:creator>Cantus Foundation</em:creator>
 		<em:id>{4816253c-3208-49d8-9557-0745a5508299}</em:id>
@@ -28,7 +28,7 @@
 		<em:iconURL>chrome://alpheios/skin/icons/alpheios_32.ico</em:iconURL>
 		<em:homepageURL>http://alpheios.net</em:homepageURL>
 		<em:optionsURL>chrome://alpheios/content/alpheios-prefs.xul</em:optionsURL>
-		<em:updateURL>http://alpheios.net/xpi-updates/update.rdf</em:updateURL>
+		<em:updateURL>http://alpheios.net/xpi-updates/dev/update.rdf</em:updateURL>
 		<em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDOd5Mjthp4ZkEF0g6sF6fHbUb92PJTSSPxjjdsuDOXG9dUTVwIDjW183lTZawP7+4E8PmUeqVl5GCjKRCAhAXmSV+X/IYgSuiTOTjuXUJ/ylA9EGSo2dHVeGJ834XIKe5NK7NL08EFxst58vCASTViuMv5GpeIYtPvbj7PyXJ82QIDAQAB</em:updateKey>
 	</Description>
 </RDF>
