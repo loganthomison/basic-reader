@@ -55,7 +55,7 @@ Datafile.prototype =
     /**
      * get data
      *
-     * @return file contents
+     * @returns file contents
      * @type String
      */
     getData: function()
@@ -66,7 +66,7 @@ Datafile.prototype =
     /**
      * get separator string
      *
-     * @return separator string
+     * @returns separator string
      * @type String
      */
     getSeparator: function()
@@ -87,7 +87,7 @@ Datafile.prototype =
     /**
      * get special handling flag
      *
-     * @return special handling flag
+     * @returns special handling flag
      * @type String
      */
     getSpecialHandlingFlag: function()
@@ -118,7 +118,7 @@ Datafile.prototype =
      *
      * @param {String} a_key   key to search for
      * 
-     * @return offset of key in data or -1 if not found
+     * @returns offset of key in data or -1 if not found
      * @type int
      */
     binarySearch: function(a_key)

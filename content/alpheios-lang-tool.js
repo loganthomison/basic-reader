@@ -331,7 +331,8 @@ Alph.LanguageTool.prototype.setFindSelection = function()
  * which encompass the range offset (to be fed to a lexicon tool).
  * @param {int} a_ro the range offset
  * @param {String} a_rngstr the string of characters containing the range offset
- * @returns {Alph.SourceSelection} {@link Alph.SourceSelection} object
+ * @returns {@link Alph.SourceSelection} object
+ * @type Alph.SourceSelection
  */
 Alph.LanguageTool.prototype.findSelection = function(a_ro, a_rngstr)
 {

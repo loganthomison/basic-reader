@@ -54,6 +54,5 @@ Constants = {
     {
         LEARNER: 'learner',
         READER: 'reader',
-    },
-    
+    }    
 };

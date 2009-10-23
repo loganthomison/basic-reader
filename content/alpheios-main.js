@@ -36,6 +36,8 @@ Alph.BrowserUtils.importResource("resource://alpheios/alpheios-xfer-state.jsm",A
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-pkgmgr-observer.jsm",Alph);
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-data-manager.jsm",Alph);
+
 
 /**
  * @class Alpheios application controller
@@ -317,7 +319,7 @@ Alph.Main =
             // TODO - pick up language from source text
             a_lang = this.d_defaultLanguage;
         }
-        
+                
         // flag select language not to call onTabSelect
         // because it will be called later by the calling toggle method
         this.selectLanguage(a_lang,false);
@@ -330,6 +332,37 @@ Alph.Main =
                 this.startMhttpd);   
         }
         
+        // is the user data service ready?
+        var dmStatus = Alph.DataManager.ready();
+        switch(dmStatus)
+        {
+            case Alph.DataManager.CONFIRMRESTORE:
+            {
+                // TODO dialog for user to confirm 
+                // proceeding with restore or else
+                // continue without user features enabled
+                if (confirm("Ok to restore?"))
+                {
+                    if (! Alph.DataManager.restoreData())
+                    {
+                        alert("Restore failed.");
+                    }
+                }
+                break;
+            }
+            case Alph.DataManager.CONFIGURE:
+            {
+                // TODO offer uesr choice between 
+                // configuration screens for user data and backup 
+                // or proceeding without user features enabled
+                confirm("Configure the user data service?");
+                break;
+            }
+            default:
+            {
+                // nothing to do ?
+            }
+        }        
     },
 
     /**
@@ -371,6 +404,9 @@ Alph.Main =
             // detach daemon
             this.detachLocalDaemon();
         }
+        
+        // save the user's data
+        Alph.DataManager.saveData();
         
     },
 
@@ -1385,7 +1421,7 @@ Alph.Main =
             this.toggleToolbar();
         }
         
-    if ((ped_site || mixed_site) && this.isEnabled(bro))
+        if ((ped_site || mixed_site) && this.isEnabled(bro))
         {
             // these functions should only be called after Alpheios has been auto-toggled
             // on because otherwise they get done twice via the send call to resetState

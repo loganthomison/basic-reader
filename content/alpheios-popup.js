@@ -467,6 +467,23 @@ Alph.Xlate = {
         // TODO - we probably should reposition the popup now that we
         // know it's final size
 
+        /**
+         * TODO this is temporary until the actual wordlist implementation
+         * is figured out.   
+         */
+        var wordlist = Alph.DataManager.getDataObj('words',a_lang_tool.d_sourceLanguage,true);
+        wordlist.addForm(a_alphtarget.getWord());
+        Alph.$(".alph-dict",alphtext_node).each(
+            function()
+            {
+                var lemma = this.getAttribute('lemma-key');
+                if (lemma)
+                {
+                    wordlist.addLemma(lemma);
+                }
+            }
+        );
+        
         // disambiguate if treebank is available
         if (disambiguate_id)
         {
@@ -1052,7 +1069,6 @@ Alph.Xlate = {
             }
         );
 
-       
         // lookup the selection in the lexicon
         // pass a callback to showTranslation to populate
         // the popup and any other lexicon

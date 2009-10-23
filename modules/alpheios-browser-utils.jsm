@@ -27,9 +27,28 @@
   
 const EXPORTED_SYMBOLS = ['BrowserUtils'];
 
+/**
+ * Module scoped constants
+ */
 const CC = Components.classes;
 const CI = Components.interfaces;
 const CU = Components.utils;
+
+/** 
+ * File Permissions
+ */
+const PERMS_FILE = 0644;
+const PERMS_DIRECTORY = 0755;
+    
+/**
+ * File Modes
+ */
+const RDONLY  = 0x01;
+const WRONLY = 0x02;
+const RDWR = 0x04;
+const CREATE = 0x08;
+const APPEND = 0x10;
+const TRUNCATE = 0x20;
 
 CU.import("resource://alpheios/ext/log4moz.js");
 
@@ -508,6 +527,114 @@ BrowserUtils = {
     },
     
     /**
+     * execute a test on a local file
+     * @param {String} a_path the path to the file
+     * @param {String} a_test the optional test (supported values are 
+     *                 '<', '>'). if not specified test is exists
+     * @return test result (true or false)
+     * @type Boolean  
+     */
+    testLocalFile: function(a_path,a_test)
+    {   
+        var file = this.getLocalFile(a_path);
+        var result = false;
+        switch (a_test)
+        {
+            case '>':
+            {
+                result = file.exists() && file.isWritable();
+                break;
+            }
+            case '<':
+            {
+                result = file.exists() && file.isReadable();
+                break;
+            }
+            default :
+            {
+                result = file.exists();
+                break;
+            }
+        }
+        return result;
+    },
+    
+    /**
+     * read a local file
+     * @param a_pathOrFile the local file path or nsIFile object
+     * @param String a_charset optional charset for the file (defaults to UTF-8)
+     */
+    readLocalFile: function(a_pathOrFile,a_charset)
+    {
+        var ret = "";
+        if (!a_charset)
+        {
+            a_charset = "UTF-8";
+        }
+        try
+        {
+            var file = this.getLocalFile(a_pathOrFile);
+            if (!file.exists())
+            {
+                throw "Cannot open file for reading, file does not exist";
+            }
+            var fis = CC["@mozilla.org/network/file-input-stream;1"].
+                createInstance(CI.nsIFileInputStream);
+            fis.init(file, RDONLY, 0444, 0);
+            var stream = CC["@mozilla.org/intl/converter-input-stream;1"].
+                createInstance(CI.nsIConverterInputStream);
+            stream.init(fis, "UTF-8", 4096,
+                      CI.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
+    
+            
+            var str = {};
+            while (stream.readString(4096, str) != 0) {
+                ret += str.value;
+            }
+            stream.close();
+        }
+        catch(a_e)
+        {
+            this.s_logger.warn("Unable to read file at " + a_path + ": " + a_e);
+        }
+        return ret;  
+    },
+    
+    /**
+     * write a local file
+     * @param a_pathOrFile the local file path or nsIFile object
+     * @param String a_data the data to write to the file
+     * @param String a_charset optional charset for the file (defaults to UTF-8)
+     */
+    writeLocalFile: function(a_pathOrFile,a_data,a_charset)
+    {
+        if (!a_charset)
+        {
+            a_charset = "UTF-8";
+        }
+        try
+        {
+            var file = this.getLocalFile(a_pathOrFile);
+            
+            var fos = CC["@mozilla.org/network/file-output-stream;1"].
+              createInstance(CI.nsIFileOutputStream);
+            fos.init(file, 
+                WRONLY | CREATE | TRUNCATE, 
+                PERMS_FILE, 
+                0);
+            var stream = CC["@mozilla.org/intl/converter-output-stream;1"]
+                .createInstance(CI.nsIConverterOutputStream);
+            stream.init(fos, a_charset, 4096, 0x0000);
+            stream.writeString(a_data);
+            stream.close();
+        } 
+        catch(a_e)
+        {
+            this.s_logger.warn("Unable to write file at " + a_pathOrFile + ":" + a_e);
+        }
+    },
+    
+    /**
      * open a chrome dialog
      * @param {Window} a_window parent window
      * @param {String} a_url the chrome url
@@ -733,8 +860,267 @@ BrowserUtils = {
             a_type = null;
         }
         return BrowserSvc.getSvc('WinMediator').getMostRecentWindow(a_type);
-    }
+    },
     
+    /**
+     * get a list of data files under an alpheios user directory
+     * @param a_sub sub directory path
+     * @return the directory contents as an Array of Arrays of [filename,fullpath]
+     * @type Array
+     */
+    listDataFiles: function(a_sub)
+    {
+        var prof_dir = this.getDataDir(a_sub);
+        var entries = [];
+        var iter = prof_dir.directoryEntries;
+        while (iter.hasMoreElements())
+        {
+            var file = iter.getNext().QueryInterface(CI.nsILocalFile);
+            if (file && file.isFile())
+            {
+                entries.push([file.leafName,file.path]);
+            }
+        }
+        return entries;
+    },
+
+    /**
+     * get the path to a data directory
+     * @param a_sub subdirectory under the data directory (optional)
+     * @param a_create create directory it if it doesn't exist (optional)
+     * @return the data directory
+     * @type nsIFile
+     */
+    getDataDir: function(a_sub,a_create)
+    { 
+        var prof_dir = this.getSvc("DirSvc").get("ProfD", CI.nsIFile);
+        prof_dir.append("alpheios");
+        if (a_sub)
+        {
+            var pathParts = a_sub.split("/");
+            for (var i = 0; i < pathParts.length; i++)
+            {
+                prof_dir.append(pathParts[i]);
+            }
+        }
+        if (!prof_dir.exists() && a_create) 
+        {
+            prof_dir.create(CI.nsIFile.DIRECTORY_TYPE, PERMS_DIRECTORY);
+            //TODO handle create error
+        }
+        return prof_dir;
+    },
+    
+    /**
+     * remove the alpheios user data directory from the filesystem
+     * @param a_sub optional subdirectory if only a subdirectory to be removed
+     */
+    removeDataDir: function(a_sub)
+    {
+        var prof_dir = this.getDataDir(a_sub)
+        if( prof_dir.exists() ) 
+        {   
+           prof_dir.remove();
+        }
+    },
+    
+    /**
+     * Zip a data directory
+     * @param {String} a_zipPathOrFile target path (or nsIZipFile) of the zip file
+     * @param {nsIFile} a_srcDir optional source directory for the zip
+     *                  if not specified defaults to the default "alpheios" directory
+     *                  under the FF profile
+     * @throws Error upon failure
+     */
+    zipDataDir: function(a_zipPathOrFile,a_srcDir)
+    {
+        var errors = [];
+        if (! a_srcDir)
+        {
+            a_srcDir = this.getDataDir(null,true);
+        }
+
+        var installed = [];
+        var pkg_list = this.getAlpheiosPackages();
+        pkg_list.forEach(
+            function(a_item)
+            {
+                installed.push(a_item.id + ':' + a_item.version); 
+            }
+        );
+        
+        // add or overwrite to the version file in the directory
+        var version_file = a_srcDir.clone();
+        version_file.append("app_version.txt");
+        this.writeLocalFile(version_file,installed.join(","));
+        var zipFile = this.getLocalFile(a_zipPathOrFile);    
+        var zipW =  CC["@mozilla.org/zipwriter;1"].createInstance(CI.nsIZipWriter);
+        zipW.open(zipFile, RDWR | CREATE | TRUNCATE);
+        
+        // recurse through the files and subdirectories in the user data directory
+        var iter = a_srcDir.directoryEntries;
+        while (iter.hasMoreElements())
+        {
+            var entry = iter.getNext().QueryInterface(CI.nsILocalFile);
+            try 
+            {
+                this.recurseFile(
+                   entry,
+                   null,
+                   function(a_file,a_path)
+                   {
+                       if (a_file && a_file.isDirectory())
+                       {
+                           zipW.addEntryDirectory(a_path,a_file.lastModifiedTime,false);
+                       } else if (a_file && a_file.isFile())
+                       {
+                           zipW.addEntryFile(a_path, 
+                            CI.nsIZipWriter.COMPRESSION_DEFAULT, a_file, false);
+                       }
+                    });
+            } catch(a_err)
+            {
+                this.s_logger.error("Error writing zip file at " + a_zipPathOrFile + ":" + a_err);
+                errors.push(a_err);
+            }
+        }
+        zipW.close();
+        if (errors.length > 0)
+        {
+            throw errors.join(",");
+        }
+            
+    },
+    
+    /**
+     * Recursively examin a file or directory, performing callback it and each subdirectory and its files
+     * @param {nsIFile} a_fileOrDir nsIFile of type NORMAL_FILE_TYP or DIRECTORY_TYPE
+     * @param {String} a_parentPath the unix-style parent path for the file 
+     * @param {Function} a_callback callback to execute on each file 
+     *                             (takes the current file and path as arguments) 
+     */
+    recurseFile: function(a_fileOrDir, a_parentPath, a_callback)
+    {
+        var path = a_parentPath ? a_parentPath + "/" + a_fileOrDir.leafName
+                                   : a_fileOrDir.leafName;
+        if (a_fileOrDir && a_fileOrDir.isDirectory())
+        {
+            a_callback(a_fileOrDir,path);
+            var next_iter = a_fileOrDir.directoryEntries;
+            while (next_iter.hasMoreElements())
+            {
+                var next_file = next_iter.getNext().QueryInterface(CI.nsILocalFile);
+                this.recurseFile(next_file,path,a_callback)       
+            }
+        }
+        else if (a_fileOrDir && a_fileOrDir.isFile())
+        {
+            a_callback(a_fileOrDir,path);
+        }
+    },    
+        
+    
+    /**
+     * Unzip a user data package
+     * @param String a_zipPathOrFile the zip file path (or nsIFile)
+     * @param String a_targetDir the target directory for the extraction
+     *               (optional if not specified defaults to the alpheios data directory)
+     * @throws Error upon failure 
+     */
+    extractZipData: function(a_zipPathOrFile,a_targetDir)
+    {
+        var errors = [];
+        if (! a_targetDir)
+        {
+            a_targetDir = this.getDataDir(null,true);
+        }
+        var zipReader = CC["@mozilla.org/libjar/zip-reader;1"].createInstance(CI.nsIZipReader);
+        var zipFile = this.getLocalFile(a_zipPathOrFile);
+        zipReader.open(zipFile);
+        try {
+            zipReader.test(null);
+            // create directories first
+            var entries = zipReader.findEntries("*/");
+            while (entries.hasMore()) {
+                var entryName = entries.getNext();
+                var target = this.getZipEntryFile(entryName,a_targetDir);
+                if (!target.exists()) {
+                    try {
+                        target.create(CI.nsILocalFile.DIRECTORY_TYPE, PERMS_DIRECTORY);
+                    }
+                    catch (a_e) {
+                        this.s_logger.error("failed to create target directory from zip at " +
+                            target.path + ":" + a_e);
+                        errors.push(a_e);
+                    }
+                }
+            }
+            entries = zipReader.findEntries(null);
+            while (entries.hasMore()) {
+                var entryName = entries.getNext();
+                target = this.getZipEntryFile(entryName,a_targetDir);
+                if (target.exists())
+                {
+                    continue;
+                }
+                try {
+                    target.create(CI.nsILocalFile.NORMAL_FILE_TYPE, PERMS_FILE);
+                }
+                catch (a_e) {
+                    this.s_logger.error("failed to create target file from zip at " +
+                        target.path + ": " + a_e);
+                    errors.push(a_e);
+                }
+                zipReader.extract(entryName, target);
+            }
+        } catch(a_e)
+        {
+            this.s_logger.error("invalid zip at " + a_zipPathOrFile + ": " + a_e);
+            errors.push(a_e);
+        }
+        zipReader.close();
+        if (errors.length > 0)
+        {
+            throw errors.join(',');
+        }
+        
+    },
+
+    /**
+     * get an entry in a zip file as an nsIFile
+     * @param {String} a_path the path in the zip
+     * @param {nsIFile} a_targetDir the parent extraction directory
+     * @returns the zip entry as an nsIFile object
+     */
+    getZipEntryFile: function(a_path,a_targetDir) {
+        var itemLocation = a_targetDir.clone();
+        var parts = a_path.split("/");
+        for (var i = 0; i < parts.length; ++i)
+        {
+            itemLocation.append(parts[i]);
+        }
+        return itemLocation;
+    },
+    
+    /**
+     * get an nsILocalFile object given a path or a file
+     * @param a_pathOrFile (a String path or an nsIFile)
+     */
+    getLocalFile: function(a_pathOrFile)
+    {
+        var file;
+        if (a_pathOrFile instanceof CI.nsIFile)
+        {
+            file = a_pathOrFile;
+        }
+        else 
+        {
+            file = CC["@mozilla.org/file/local;1"].createInstance(CI.nsILocalFile);
+            file.initWithPath(a_pathOrFile);
+        }
+        return file;
+    }
+
 };
 
 /**
@@ -756,7 +1142,8 @@ BrowserSvc = {
         Protocol: ["@mozilla.org/network/protocol;1?name=file",'nsIFileProtocolHandler'],
         ExtMgr: ["@mozilla.org/extensions/manager;1",'nsIExtensionManager'],
         InputStream: ["@mozilla.org/scriptableinputstream;1",'nsIScriptableInputStream'],
-        WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"]
+        WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"],
+        DirSvc: ["@mozilla.org/file/directory_service;1","nsIProperties"]
     },
      
     /**
