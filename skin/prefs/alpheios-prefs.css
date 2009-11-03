@@ -34,3 +34,16 @@ label.cbxlabel {
 .site-enabled {
     font-weight: bold;
 }
+
+#alpheios-prefs-backup-restore-options {
+    display:none;
+}
+
+#alpheios-prefs-userdata-custom-options {
+    margin-left: 16px;
+}
+
+#alpheios-prefs-userdata-customize-info {
+    padding-left: 2em;
+}
+

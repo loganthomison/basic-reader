@@ -106,6 +106,57 @@ BrowserUtils = {
     },
     
     /**
+     * Get a filename preference from the extensions.alpheios branch
+     * @param {String} a_name the preference
+     * @param {String} a_lang the language branch (optional)
+     * @return the path to the file as an string
+     */
+    getLocalFilePref: function(a_name,a_lang)
+    {
+        var lookup_name = a_name;
+        if (typeof a_lang != 'undefined' && a_lang != null)
+        {
+            lookup_name = a_lang + '.' + a_name;
+        }
+         
+        var prefSvc = BrowserSvc.getSvc('AlphPrefs');
+        var path = null;
+        try {
+            var file = prefSvc.getComplexValue(lookup_name,CI.nsILocalFile);
+            path = file.path;
+        } catch(a_e)
+        {
+            this.s_logger.debug(a_name + " not defined as a valid file path: " + a_e);
+        }
+        return path;
+    },
+    
+    /**
+     * Set a filename preference in the extensions.alpheios branch
+     * @param {String} a_pref the preference
+     * @param {String} a_path the file path, or nsIFile object
+     * @param {String} a_lang the language branch (optional)
+     */
+    setLocalFilePref: function(a_name,a_pathOrFile,a_lang)
+    {
+        var lookup_name = a_name;
+        if (typeof a_lang != 'undefined' && a_lang != null)
+        {
+            lookup_name = a_lang + '.' + a_name;
+        }
+         
+        var prefSvc = BrowserSvc.getSvc('AlphPrefs');
+        try {
+            var file = this.getLocalFile(a_pathOrFile);
+            prefSvc.setComplexValue(lookup_name,CI.nsILocalFile,file);
+        } catch(a_e)
+        {
+            this.s_logger.debug(a_path + " not storable as a valid file path :" + a_e);
+        }
+    },
+
+    
+    /**
      * Get a preference from the extensions.alpheios branch
      * @param {String} a_name the preference
      * @param {String} a_lang the language branch (optional)
@@ -192,6 +243,27 @@ BrowserUtils = {
         else
             this.s_logger.error("Invalid preference type for " + a_name + "(" + type + ":" + typeof a_value + ")")
             // fall through behavior is to not set the pref if we don't know what type it is
+    },
+    
+    /**
+     * Reset a user preference in the extensions.alpheios branch
+     * @param {String} a_name the name of the preference
+     * @param {String} a_lang the language branch (optional)
+     */
+    resetPref: function(a_name, a_lang)
+    {
+        if (typeof a_lang != 'undefined')
+        {
+            a_name = a_lang + '.' + a_name;
+        }
+        try 
+        {   
+            BrowserSvc.getSvc('AlphPrefs').clearUserPref(a_name);
+        }
+        catch(a_e)
+        {
+            this.s_logger.debug("Unable to clear user value from " + a_name + ":" + a_e);
+        }
     },
     
     /**
@@ -530,7 +602,7 @@ BrowserUtils = {
      * execute a test on a local file
      * @param {String} a_path the path to the file
      * @param {String} a_test the optional test (supported values are 
-     *                 '<', '>'). if not specified test is exists
+     *                 '<', '>' or '<>'). if not specified test is exists
      * @return test result (true or false)
      * @type Boolean  
      */
@@ -542,12 +614,21 @@ BrowserUtils = {
         {
             case '>':
             {
-                result = file.exists() && file.isWritable();
+                // file is writeable if it exists and is writeable
+                // OR if it doesn't exist but parent path is writeable
+                result = 
+                    (file.exists() && file.isWritable()) ||
+                    (!file.exists() && file.parent.isWriteable());
                 break;
             }
             case '<':
             {
                 result = file.exists() && file.isReadable();
+                break;
+            }
+            case '<>':
+            {
+                result = file.exists() && file.isWritable() && file.isReadable();
                 break;
             }
             default :
@@ -557,6 +638,69 @@ BrowserUtils = {
             }
         }
         return result;
+    },
+    
+    /**
+     * Copy a local file to a new location
+     * @param a_srcPathOrFile the path to the src file (as a String or nsIFile object)
+     * @param a_toPathOrFile the file name for the new src file 
+     *                      (as a String, or as an nsIFile object. if a String, the parent directory
+     *                      of the src file will be used)
+     * @param {Boolean{ a_ovewrrite flag to request overrwrite if target file exists
+     */
+    copyLocalFile: function(a_srcPathOrFile,a_toPathOrFile,a_overrwrite)
+    {
+        var srcFile = this.getLocalFile((a_srcPathOrFile));
+        if (! srcFile.exists())
+        {
+            this.s_logger.debug("Source file at " + srcFile.path + " doesn't exist. Nothing to copy");
+            return;
+        }
+        // if the target file argument is a file, then use the full path
+        // otherwise, it's a file name and use the parent directory
+        var toFile = "";
+        var parentDir = null;
+        var newpath= null;
+        if (a_toPathOrFile instanceof CI.nsIFile)
+        {
+            toFile = a_toPathOrFile.leafName;
+            parentDir = a_toPathOrFile.parent;
+            newpath = a_toPathOrFile;
+        }
+        else
+        {
+            toFile = a_toPathOrFile;
+            parentDir = srcFile.parent;
+            var newpath = parentDir.clone();
+            newpath.append(toFile);
+        }
+        if (newpath.exists())
+        {
+            try 
+            {
+                if (a_overrwrite)
+                {
+                    newpath.remove(false);
+                    
+                }
+                else
+                {
+                     throw "Cannot copy to " + newpath.path + ": file exists"; 
+                }
+            }
+            catch(a_e)
+            {
+                this.s_logger.error(a_e);
+            }
+        }
+        try
+        {
+            srcFile.copyTo(parentDir,toFile);
+        }
+        catch(a_e)
+        {
+            this.s_logger.error(a_e);
+        }
     },
     
     /**
@@ -864,13 +1008,14 @@ BrowserUtils = {
     
     /**
      * get a list of data files under an alpheios user directory
-     * @param a_sub sub directory path
+     * @param {String} a_sub sub directory path
+     * @param {Boolean} a_create flag to create the data directory if it doesn't exist 
      * @return the directory contents as an Array of Arrays of [filename,fullpath]
      * @type Array
      */
-    listDataFiles: function(a_sub)
+    listDataFiles: function(a_sub,a_create)
     {
-        var prof_dir = this.getDataDir(a_sub);
+        var prof_dir = this.getDataDir(a_sub,a_create);
         var entries = [];
         var iter = prof_dir.directoryEntries;
         while (iter.hasMoreElements())
@@ -920,7 +1065,7 @@ BrowserUtils = {
         var prof_dir = this.getDataDir(a_sub)
         if( prof_dir.exists() ) 
         {   
-           prof_dir.remove();
+           prof_dir.remove(true);
         }
     },
     
@@ -1023,11 +1168,12 @@ BrowserUtils = {
     /**
      * Unzip a user data package
      * @param String a_zipPathOrFile the zip file path (or nsIFile)
+     * @param Boolean a_overwrite flag to allow files in targetDir to be overwritten
      * @param String a_targetDir the target directory for the extraction
      *               (optional if not specified defaults to the alpheios data directory)
      * @throws Error upon failure 
      */
-    extractZipData: function(a_zipPathOrFile,a_targetDir)
+    extractZipData: function(a_zipPathOrFile,a_overwrite,a_targetDir)
     {
         var errors = [];
         if (! a_targetDir)
@@ -1059,11 +1205,17 @@ BrowserUtils = {
             while (entries.hasMore()) {
                 var entryName = entries.getNext();
                 target = this.getZipEntryFile(entryName,a_targetDir);
-                if (target.exists())
+                // if the file already exists and we haven't been flagged to overwrite files
+                // or the file is a directory, just continue to the next file
+                if (target.exists() && (! a_overwrite || target.isDirectory()))
                 {
                     continue;
                 }
                 try {
+                    if (target.exists())
+                    { 
+                        target.remove(false);
+                    }
                     target.create(CI.nsILocalFile.NORMAL_FILE_TYPE, PERMS_FILE);
                 }
                 catch (a_e) {
@@ -1119,7 +1271,158 @@ BrowserUtils = {
             file.initWithPath(a_pathOrFile);
         }
         return file;
-    }
+    },
+    
+    /**
+     * Present dialog for selecting a directory/folder
+     * @param {Window} a_window the parent window
+     * @param {Event} a_event the initiating event
+     * @param {String} a_title the title for the dialog (string or key into properties)
+     * @param {Function} a_callback callback function called upon folder select or cancel
+     *                   callback args are the window, the event, the return code and the file 
+     * @param {Object} a_ctx the 'this' object for the callback 
+     * @param {String} a_defaultDir the default directory for the dialog (optional)
+     * @returns the return value from the callback function
+     */
+    doDirectoryPicker: function(a_window, a_event, a_title, a_callback, a_ctx, a_defaultDir)
+    {
+        var bundle = a_window.document.getElementById('alpheios-strings');
+        var title = this.getString(bundle,a_title) || a_title; 
+        var fp = CC["@mozilla.org/filepicker;1"].createInstance(CI.nsIFilePicker);
+        fp.init(a_window, title, CI.nsIFilePicker.modeGetFolder);       
+        if (a_defaultDir)
+        {
+            fp.displayDirectory = a_defaultDir;
+        }
+        var rv = fp.show();
+        var rc = (rv == CI.nsIFilePicker.returnOK || rv == CI.nsIFilePicker.returnReplace);
+        return a_callback.call(a_ctx,a_window,a_event,rc,fp.file);
+    },
+    
+    /**
+     * Present dialog for selecting a file
+     * @param {Window} a_window the parent window
+     * @param {Event} a_event the initiating event
+     * @param {String} a_title the title for the dialog (string or key into properties)
+     * @param {Function} a_callback callback function called upon file select or cancel
+     *                   callback args are the window, the event, the return code and the file path
+     * @param {Object} a_ctx the 'this' object for the callback 
+     * @param {String} a_defaultExt the default extension filter string for the dialog e.g. *.zip (optional)
+     * @param {String} a_defaultFile the default file name for the dialog (optional)
+     * @returns the return value from the callback function 
+     */
+    doFilePicker: function(a_window,a_event, a_title, a_callback,a_ctx,a_defaultExt,a_defaultFile)
+    {
+        var bundle = a_window.document.getElementById('alpheios-strings');
+        var title = this.getString(bundle,a_title) || a_title; 
+        var fp = CC["@mozilla.org/filepicker;1"].createInstance(CI.nsIFilePicker);
+        fp.init(a_window, title, CI.nsIFilePicker.modeOpen);       
+        if (a_defaultFile)
+        {
+            fp.defaultString  = a_defaultFile;
+        }
+        if (a_defaultExt)
+        {
+            fp.appendFilter(a_defaultExt,a_defaultExt);
+        }
+        else
+        {
+            fp.appendFilters(fp.filterAll);    
+        }
+        var rv = fp.show();
+        var rc = (rv == CI.nsIFilePicker.returnOK || rv == CI.nsIFilePicker.returnReplace);
+        return a_callback.call(a_ctx,a_window,a_event,rc,fp.file ? fp.file.path : null);
+    },
+    
+    /** 
+     * display an alert dialog
+     * @param {Window} a_window the parent window
+     * @param {String} a_title the title for the dialog (string or key into properties)
+     * @param {String} a_text the text contents for the dialog
+     */
+    doAlert: function(a_window,a_title,a_text)
+    {
+        var bundle = a_window.document.getElementById('alpheios-strings');
+        var title = this.getString(bundle,a_title) || a_title;
+        var text = this.getString(bundle,a_text) || a_text;
+        BrowserSvc.getSvc("Prompts").alert(a_window,title,text);
+    },
+
+    /** 
+     * display a confirmation dialog
+     * @param {Window} a_window the parent window
+     * @param {String} a_title the title for the dialog (string or key into properties)
+     * @param {String} a_text the text contents for the dialog
+     * @returns the result from the confirmation dialog 
+     *          (true if the user selected Ok, false if they selected Cancel)
+     */
+    doConfirm: function(a_window,a_title,a_text)
+    {
+        var bundle = a_window.document.getElementById('alpheios-strings');
+        var title = this.getString(bundle,a_title) || a_title;
+        var text = this.getString(bundle,a_text) || a_text;
+        var result = BrowserSvc.getSvc("Prompts").confirm(a_window,title,text);
+        return result;
+    },
+    
+    /**
+     * display a confirmation dialog with an OK, Cancel and 1 extra button
+     * @param {Window} a_window the parent window
+     * @param {String} a_title the title for the dialog (string or key into properties)
+     * @param {String} a_text the text contents for the dialog
+     * @param {String} a_extra the title for the extra button (string or key into properties)
+     * @param {int} a_default the default button (1 for OK, 1 for Cancel, 2 for the extra button)
+     * @returns the index of the pressed button (0 for OK, 1 for Cancel or Close, 2 for the extra button)
+     * @type int
+     */
+    doConfirmPlusOpt: function(a_window, a_title, a_text, a_extra, a_default)
+    {
+        var prompts = BrowserSvc.getSvc("Prompts");
+        var bundle = a_window.document.getElementById('alpheios-strings');
+        var title = this.getString(bundle,a_title) || a_title;
+        var text = this.getString(bundle,a_text) || a_text;
+        var extra = this.getString(bundle,a_extra) || a_extra;
+        var flags = 
+            prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_OK +
+            prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL  +
+            prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
+            // This value of flags will create 3 buttons. The first will be "OK", the
+            // second will "Cancel" and the third will be the value of extra
+            var button = 
+                prompts.confirmEx(a_window, title, text, flags, "", "", extra, null, {value:false});
+    },
+    
+    /**
+     * add a status message to a browser element
+     * @param {Window} a_window the browser window
+     * @param {String} a_elem_id the browser element id
+     * @param {String} a_message the message string (or key into properties)
+     */
+    setStatus: function(a_window,a_elem_id,a_message)
+    {
+        var elem = a_window.document.getElementById(a_elem_id);
+        if (elem)
+        {
+            var bundle = a_window.document.getElementById('alpheios-strings');
+            var msg = this.getString(bundle,a_message) || a_message;
+            elem.value = msg;
+        }
+    },
+    
+    /**
+     * clear a status message in a browser element
+     * @param {Window} a_window the browser window
+     * @param {String} a_elem_id the browser element id
+     */
+    clearStatus: function(a_window,a_elem_id)
+    {
+        var elem = a_window.document.getElementById(a_elem_id);
+        if (elem)
+        {
+            elem.value = "";
+        }
+    },
+    
 
 };
 
@@ -1143,7 +1446,8 @@ BrowserSvc = {
         ExtMgr: ["@mozilla.org/extensions/manager;1",'nsIExtensionManager'],
         InputStream: ["@mozilla.org/scriptableinputstream;1",'nsIScriptableInputStream'],
         WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"],
-        DirSvc: ["@mozilla.org/file/directory_service;1","nsIProperties"]
+        DirSvc: ["@mozilla.org/file/directory_service;1","nsIProperties"],
+        Prompts: ["@mozilla.org/embedcomp/prompt-service;1","nsIPromptService"]
     },
      
     /**

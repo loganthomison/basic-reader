@@ -24,7 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-const EXPORTED_SYMBOLS = ['Constants'];
+ EXPORTED_SYMBOLS = ['Constants'];
 
 /**
  * @class Alpheios Application Constants
@@ -54,5 +54,33 @@ Constants = {
     {
         LEARNER: 'learner',
         READER: 'reader',
-    }    
+    },    
+    
+    /**
+     * Preferences strings
+     */
+     DSVC_NONE: "none",
+     DSVC_LIST : "user.dataservices",
+     DSVC : "user.dataservice",
+     DTYPE_LIST : "user.datatypes",
+     DTYPE : "user.datatype",
+     RESOURCE : "resource",
+     CLASSNAME : "class",
+     DESCRIPTION: "description",
+     SAVE: "user.save",
+     BACKUP : "user.backup",
+     RESTORE : "user.restore",
+     CLEAR: "user.clear",
+     CONFIRM : "confirm",
+     KEEP : "keep",
+     INTERVAL : "interval",
+     ONAPPLOAD : "appload",
+     ONENABLE : "enable",
+     ONLOOKUP : "lookup",
+     NUMLOOKUPS : "lookup.num",
+     ONDISABLE : "disable",
+     ONAPPQUIT : "appquit",
+     ONREQUEST : "request",
+     DMODEL:  "user.model",
+     BACKUP_FILE: 'alpheios-backup.zip'
 };

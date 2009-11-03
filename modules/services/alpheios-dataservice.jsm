@@ -35,42 +35,44 @@ Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
  */
 DataService = function() { }  
 
-/**
- * DataService state constant: Configuration required
- * @constant
- * @type int
- */
-DataService.CONFIG_REQUIRED = 1;
 
 /**
- * DataService state constant: Configured
- * @constant
- * @type int
+ * gets the restored status of the DataService
+ * @returns true if data has been restored false if not 
+ * @type boolean
  */
-DataService.CONFIGURED = 2;
-
-/**
- * DataService state constant: Data Restored
- * @constant
- * @type int
- */
-DataService.RESTORED= 3;
-
-
-/**
- * gets the status of the DataService
- * @returns one of DataService.CONFIG_REQUIRED, DataService.CONFIGURED, DataService.RESTORED
- * @type int
- */
-DataService.prototype.getStatus = function()
+DataService.prototype.restored = function()
 {
     // nothing needs to be configured or restored -- always use 
     // whatever data is in the profile directory
-    return DataService.CONFIGURED;
+    return true;
 }
 
 /**
+ * Get a callback function to execute the data restore
+ * @returns restore callback which takes a single argument, the parent window 
+ * @type Function
+ */
+DataService.prototype.getRestoreCallback = function()
+{
+    return this.restore;
+}
+
+/**
+ * Get a callback function to execute the data backup
+ * @param {int} a_keep the number of old backups to keep
+ * @returns backup callback which takes a single argument, the parent window 
+ * @type Function
+ */
+DataService.prototype.getBackupCallback = function(a_keep)
+{
+    return this.backup;
+}
+
+
+/**
  * Restore the data from the configured restore location
+ * @param {Window} a_window the parent window
  * @returns true if restore succeeded false if not
  * @type Boolean
  */
@@ -84,6 +86,7 @@ DataService.prototype.restore = function()
 /**
  * Backs up the user data directory to a local zip file,
  * keeping the requested number of copies of old backups
+ * @param {Window} a_window the parent window
  * @param {int} a_keep the number of old copies to keep
  * @returns true if backup succeeded false if not
  * @type Boolean
@@ -96,23 +99,9 @@ DataService.prototype.backup = function(a_keep)
 }
 
 /**
- * Test to see if backup has been enabled for this data service type
- * @returns true or false
- * @type Boolean
+ * Clears any user-defined preferences for the service
  */
-DataService.prototype.backupEnabled = function()
+DataService.prototype.clearPrefs = function()
 {
-    // default service doesn't support backup
-    return false;
-}
-
-/**
- * Test to see if restore has been enabled for this data service type
- * @returns true or false
- * @type Boolean
- */
-DataService.prototype.restoreEnabled = function()
-{
-    // default service doesn't support restore
-    return false;
+    // no prefs, nothing to do 
 }

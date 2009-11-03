@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<!-- Alpheios User Data Preferences Overlay -->
+<overlay id="alpheios-user-data-prefs"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <prefpane id="alpheios-prefs-userdata">
+        <preferences id="prefs-userdata">
+            <preference id="pref-userdata-service" 
+                        name="extensions.alpheios.user.dataservice" type="string"/>
+            <preference id="pref-backup-keep" name="extensions.alpheios.user.backup.keep" type="int"/>
+            <preference id="pref-backup-interval" name="extensions.alpheios.user.backup.interval" type="string"/>
+            <preference id="pref-backup-interval-lookup-num" name="extensions.alpheios.user.backup.interval.lookup.num" type="int"/>
+            <preference id="pref-restore-interval" name="extensions.alpheios.user.restore.interval" type="string"/>
+            <preference id="pref-restore-confirm" name="extensions.alpheios.user.restore.confirm" type="bool"/>
+            <preference id="pref-userdata-clear-interval" name="extensions.alpheios.user.clear.interval" type="string"/>
+        </preferences>
+        <vbox id="alpheios-prefs-userdata-advanced">        
+            <label control="userdata-service-menu" value="&alpheios.prefs.userdata.service;"/>
+            <menulist id="userdata-service-menu" 
+                preference="pref-userdata-service" 
+                    onsyncfrompreference="Alph.Prefs.updateDataServiceList()">
+                <menupopup/>
+            </menulist>
+            <vbox id="alpheios-prefs-backup-restore-options">
+            <label control="clear-interval" value="&alpheios.prefs.clear.interval;"/>
+            <menulist id="clear-interval" 
+                 preference="pref-userdata-clear-interval">
+                <menupopup>
+                    <menuitem value="request" label="&alpheios.prefs.restore.interval.request;"/>
+                    <menuitem value="disable" label="&alpheios.prefs.backup.interval.disable;"/>
+                    <menuitem value="appquit" label="&alpheios.prefs.backup.interval.appquit;"/>
+                </menupopup>
+            </menulist>
+            <groupbox id="backup-options" flex="1">
+                <caption label="&alpheios.prefs.backup.options;"/>
+                <label control="backup-interval" value="&alpheios.prefs.backup.interval;"/>
+                <hbox>
+                    <menulist id="backup-interval" 
+                             preference="pref-backup-interval" 
+                             onsyncfrompreference="Alph.Prefs.updateBackupInterval();"
+                             flex="100">
+                        <menupopup>
+                            <menuitem value="lookup" label="&alpheios.prefs.backup.interval.lookup;"/>
+                            <menuitem value="disable" label="&alpheios.prefs.backup.interval.disable;"/>
+                            <menuitem value="appquit" label="&alpheios.prefs.backup.interval.appquit;"/>
+                            <menuitem value="request" label="&alpheios.prefs.backup.interval.request;"/>
+                        </menupopup>
+                    </menulist>
+                    <textbox id="backup-lookup-num" preference="pref-backup-interval-lookup-num" flex="1"/>
+                </hbox>
+                <hbox>
+                    <label value="&alpheios.prefs.backup.keep;" 
+                            control="backup-keep"/>
+                    <textbox id="backup-keep" preference="pref-backup-keep"/>
+                </hbox>
+                <label control="restore-interval" value="&alpheios.prefs.restore.interval;"/>
+                <menulist id="restore-inteval"  
+                         preference="pref-restore-interval">
+                    <menupopup>
+                        <menuitem value="request" label="&alpheios.prefs.restore.interval.request;"/>
+                        <menuitem value="enable" label="&alpheios.prefs.restore.interval.enable;"/>
+                        <menuitem value="appstart" label="&alpheios.prefs.restore.interval.appstart;"/>
+                    </menupopup>  
+                </menulist>
+                <checkbox id="restore-confirm" 
+                        label="&alpheios.prefs.restore.confirm;" 
+                        preference="pref-restore-confirm"/>
+            </groupbox>
+            </vbox>
+            <tabbox id="alpheios-prefs-userdata-service-tabbox">
+                <tabs id="alpheios-prefs-userdata-service-tabs"/>
+                <tabpanels id="alpheios-prefs-userdata-service-tabpanels"/>
+            </tabbox>
+        </vbox>
+    </prefpane>
+</overlay>

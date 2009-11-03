@@ -24,6 +24,8 @@
  */
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-langtool-factory.jsm",Alph);
 Alph.BrowserUtils.importResource("resource://alpheios/alpheios-site-permissions.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-constants.jsm",Alph);
+Alph.BrowserUtils.importResource("resource://alpheios/alpheios-data-manager.jsm",Alph);
 
  /**
  * @class Preferences Dialog functionality
@@ -990,5 +992,244 @@ Alph.Prefs = {
                     }
             }
         }
+    },
+    
+    /**
+     * Updates the user data service settings according to the selected
+     * user profile type
+     */
+    updateDataServiceSettings: function()
+    {
+        var selected_value = this.checkUserDataModel();
+        var dataservice_pref = document.getElementById('pref-userdata-service');
+        
+        switch(selected_value)
+        {
+            case 'custom':
+            {
+                // user configures data service settings
+                break;
+            }
+            case 'ffprofile':
+            {
+                // single user per ff profile, no backup/restore; 
+                // no data service, data just stored in the ff profile 
+                dataservice_pref.value = Alph.Constants.DSVC_NONE;
+                document.getElementById('pref-userdata-clear-interval').value = Alph.Constants.ONREQUEST;
+                document.getElementById('pref-restore-interval').value = "";
+                document.getElementById('pref-backup-interval').value = "";
+                break;
+            }
+            case 'ffprofileplus':
+            {
+                // single user per ff profile, backup/restore to zip
+                // local dataservice
+                // restore on request
+                // backup on app disable
+                // keep 5 backups
+                // clear only on request
+                dataservice_pref.value = 'local';
+                document.getElementById('pref-restore-interval').value = Alph.Constants.ONREQUEST;
+                document.getElementById('pref-backup-interval').value = Alph.Constants.ONDISABLE;
+                document.getElementById('pref-backup-keep').value = 5;
+                document.getElementById('pref-userdata-clear-interval').value = Alph.Constants.ONREQUEST;
+                document.getElementById('pref-restore-confirm').value = false;
+                break;
+            }
+            case 'shared':
+            {
+                // multiple users per ff profile, backup/restore to zip
+                // local dataservice
+                // restore on enable
+                // backup after 10 lookups 
+                // keep 10 backups
+                // clear on app disable
+                dataservice_pref.value = 'local';
+                document.getElementById('pref-restore-interval').value = Alph.Constants.ONENABLE;
+                document.getElementById('pref-backup-interval').value = Alph.Constants.ONLOOKUP;
+                document.getElementById('pref-backup-interval-lookup-num').value = 10;
+                document.getElementById('pref-backup-keep').value = 10;
+                document.getElementById('pref-userdata-clear-interval').value =Alph.Constants.ONDISABLE; 
+                document.getElementById('pref-restore-confirm').value = false;
+                break;
+            }
+            case 'disable':
+            {
+                // leave everything as-is so can reenable without reconfiguring?
+                break;
+            }
+            default:
+            {
+                // least intrusive settings are no backup/restore and clear only on request
+                dataservice_pref.value = Alph.Constants.DSVC_NONE;
+                document.getElementById('pref-userdata-clear-interval').value = Alph.Constants.ONREQUEST;
+                document.getElementById('pref-restore-interval').value = "";
+                document.getElementById('pref-backup-interval').value = "";
+                document.getElementById('pref-restore-confirm').value = false;
+                break;    
+            }
+        }
+        // update the interface element for the interval backup number
+        this.updateBackupInterval();
+        return selected_value;
+    },
+    
+    /**
+     * check the currently selected user data model and update the interface accordingly
+     * @returns the currently selected user data model
+     * @type String
+     */
+    checkUserDataModel: function()
+    {
+        var selected = Alph.$("radiogroup[preference=pref-user-model]").get(0).selectedItem;
+        if (selected.value == 'custom')
+        {
+            Alph.$("#alpheios-prefs-userdata-customize-info").get(0).setAttribute("collapsed",false);
+            Alph.$("#alpheios-prefs-userdata-advanced").get(0).setAttribute("collapsed",false);
+        }
+        else
+        {
+            Alph.$("#alpheios-prefs-userdata-customize-info").get(0).setAttribute("collapsed",true);
+            Alph.$("#alpheios-prefs-userdata-advanced").get(0).setAttribute("collapsed",true);
+        }
+        return selected.value;
+    },
+    
+    /**
+     * add the list of configured dataservices to menulist 
+     */
+    updateDataServiceList: function()
+    {
+        var menu = Alph.$("#userdata-service-menu");
+        var popup = Alph.$("menupopup",menu).get(0);
+
+        // clear out the popup
+        while (popup.hasChildNodes())
+            popup.removeChild(popup.firstChild);
+        
+        var selected_service = Alph.BrowserUtils.getPref(Alph.Constants.DSVC);      
+        var service_types = Alph.BrowserUtils.getPref(Alph.Constants.DSVC_LIST);
+        var selectedItem = 0;
+        if (service_types)
+        {
+            service_types.split(/,/).forEach(
+                function(a_type,a_i)
+                {
+                    var label = 
+                        Alph.BrowserUtils.getPref(
+                            [Alph.Constants.DSVC, a_type, Alph.Constants.DESCRIPTION].join('.'));
+                    var menuitem = Alph.Util.makeXUL(
+                        'menuitem','',['value','label'],[a_type,label]);
+                    Alph.$(popup).append(menuitem);
+                    if (a_type == selected_service)
+                    {
+                        selectedItem = a_i;
+                    }
+                }
+            );
+            Alph.$("#userdata-service-menu").select(Alph.Prefs.onDataServiceSelect);
+        }
+        menu.selectedIndex = selectedItem;
+    },
+    
+    /**
+     * updates the interface upon selection of a new dataservice
+     */
+    onDataServiceSelect: function()
+    {
+        var menu = Alph.$("#userdata-service-menu").get(0);
+        var selectedItem = menu.selectedItem;
+        var display_value;
+        if (selectedItem.value == 'none')
+        {
+            Alph.$("#alpheios-prefs-backup-restore-options").css("display",'none');
+            Alph.$("#alpheios-prefs-userdata-service-tabbox").get(0).setAttribute('hidden', true);
+        }
+        else
+        {   
+            Alph.$("#alpheios-prefs-backup-restore-options").css("display",'-moz-box');
+            Alph.$("#alpheios-prefs-userdata-service-tabbox").get(0).setAttribute('hidden', false);
+        }
+    },
+    
+    /**
+     * respond to a change in the backup interval according to user's interval selection
+     */
+    updateBackupInterval: function()
+    {
+        var menu = Alph.$("#backup-interval").get(0);
+        var selectedItem = menu.selectedItem;
+        var hide_lookup_num = (selectedItem.value != Alph.Constants.ONLOOKUP);
+        Alph.$("#backup-lookup-num").get(0).setAttribute("hidden",hide_lookup_num);
+    },
+        
+    /**
+     * callback from file picker dialog for data file
+     * updates the textbox with the path to the selected folder, appending
+     * the default backup file name
+     */
+    onDataFilePicked: function(a_window,a_event,a_rc,a_file)
+    {
+        var target = a_event.explicitOriginalTarget.id;
+        // target id is expected to be in the format 'browse-<id of control element for response>'
+        
+        if (a_file)
+        {
+            var match = target.match(/^browse-(.*)$/);
+            var control;
+            if (match)
+            {
+                var control_id = match[1];
+                control = Alph.$("#"+control_id).get(0);
+                var file_default = Alph.Constants.BACKUP_FILE;
+                a_file.append(file_default);
+            }
+            if (control)
+            {
+                var pref_id = control.getAttribute('preference');
+                document.getElementById(pref_id).value = a_file.path;
+            } 
+        }
+    },
+    
+    /**
+     * onsyncfrompreferences handler for the backup file 
+     * @returns the path to the file as formatted correction for the operating system
+     * @type String
+     */
+    getBackupFilePath: function()
+    {
+        var pref = Alph.$("#backup-file").get(0).getAttribute('preference');
+        var pref_name = document.getElementById(pref).name;
+        var path = "";
+        try
+        {
+            path = Alph.BrowserUtils.getLocalFilePref(pref_name);
+        }
+        catch (a_e)
+        {
+            // TODO log error
+        }
+        return path;
+    },
+    
+     /**
+     * onsynctopreferences handler for the backup file 
+     * @returns the path to the file as formatted correction for the operating system
+     * @type String
+     */
+    setBackupFile: function()
+    {
+        var str_path = Alph.$("#backup-file").get(0).value;
+        var file_path = "";
+        try
+        {
+            file_path = Alph.BrowserUtils.getLocalFile(str_path).path; 
+        }
+        catch(a_e)
+        {
+            // TODO log error    
+        }
+        return file_path;
     }
 };

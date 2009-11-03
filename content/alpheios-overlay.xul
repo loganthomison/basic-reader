@@ -59,6 +59,21 @@
                    class="alpheios-level-disable-notifier"
                    hidden="false"
                    disabled="false"/>
+        <broadcaster id="alpheios-user.backup-allowed"
+                   class="alpheios-userdata-request"
+                   hidden="true"
+                   disabled="true"/>
+        <broadcaster id="alpheios-user.restore-allowed"
+                   class="alpheios-userdata-request"
+                   hidden="true"
+                   disabled="true"/>
+        <broadcaster id="alpheios-user.clear-allowed"
+                   class="alpheios-userdata-request"
+                   hidden="true"
+                   disabled="true"/>
+        <broadcaster id ="alpheios-userdata-broadcaster"
+                     hidden="true"
+                     disabled="true"/>
     </broadcasterset>
         
 	<commandset id="mainCommandSet">
@@ -98,6 +113,15 @@
             oncommand="Alph.Main.setMode(null,'learner');"/>
         <command id="alpheios-level-reader-cmd"
             oncommand="Alph.Main.setMode(null,'reader');"/>
+        <command id="alpheios-user.backup-cmd"
+            oncommand="Alph.DataManager.backupData(window);"
+            observes="alpheios-user.backup-allowed"/>
+        <command id="alpheios-user.restore-cmd"
+            oncommand="Alph.DataManager.restoreData(window);"
+            observes="alpheios-user.restore-allowed"/>
+        <command id="alpheios-user.clear-cmd"
+            oncommand="Alph.DataManager.clearData();"
+            observes="alpheios-user.clear-allowed"/>
     </commandset>
 
     <!-- FF context and tools menu overlays disabled for now 
@@ -210,6 +234,31 @@
                         tooltiptext="&alpheios.menu.site.tooltip;"
                         command="alpheios-site-cmd"/>
                 </menupopup>
+            </toolbarbutton>
+            <toolbarbutton
+                id="alpheios-userdata-commands"
+                class="toolbarbutton-icon"
+                label="&alpheios.menu.userdata;"
+                tooltiptext="&alpheios.menu.userdata.tooltip;"
+                type="menu"
+                observes="alpheios-userdata-broadcaster">
+                <menupopup>
+                    <menuitem
+                        id="alpheios-user.backup-mm"
+                        label="&alpheios.menu.backup;"
+                        tooltiptext="&alpheios.menu.backup.tooltip;"
+                        command="alpheios-user.backup-cmd"/>
+                    <menuitem
+                        id="alpheios-user.restore-mm"
+                        label="&alpheios.menu.restore;"
+                        tooltiptext="&alpheios.menu.restore.tooltip;"
+                        command="alpheios-user.restore-cmd"/>
+                    <menuitem
+                        id="alpheios-user.clear-mm"
+                        label="&alpheios.menu.clear;"
+                        tooltiptext="&alpheios.menu.clear.tooltip;"
+                        command="alpheios-user.clear-cmd"/>
+                </menupopup>
             </toolbarbutton>               
             <toolbarbutton
                 id="alpheios-lang-button"
@@ -273,6 +322,7 @@
                 command="alpheios-help-cmd"/>
             <toolbarspring id="alpheios-toolbar-spring"/>
             <toolbaritem><label id="alpheios-toolbar-hint" value=""/></toolbaritem>
+            <toolbaritem><label id="alpheios-dataservice-status" value=""/></toolbaritem>
             <toolbarspring/>
             <toolbaritem class="alpheios-alpha-text"><label value="&alpheios.version.string;"/></toolbaritem>
             <toolbaritem id="alpheios-toolbar-status">

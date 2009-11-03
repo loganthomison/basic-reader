@@ -472,18 +472,20 @@ Alph.Xlate = {
          * is figured out.   
          */
         var wordlist = Alph.DataManager.getDataObj('words',a_lang_tool.d_sourceLanguage,true);
-        wordlist.addForm(a_alphtarget.getWord());
-        Alph.$(".alph-dict",alphtext_node).each(
-            function()
-            {
-                var lemma = this.getAttribute('lemma-key');
-                if (lemma)
+        if (wordlist)
+        {
+            wordlist.addForm(window,a_alphtarget.getWord());
+            Alph.$(".alph-dict",alphtext_node).each(
+                function()
                 {
-                    wordlist.addLemma(lemma);
+                    var lemma = this.getAttribute('lemma-key');
+                    if (lemma)
+                    {
+                        wordlist.addLemma(window,lemma);
+                    }
                 }
-            }
-        );
-        
+            );
+        }
         // disambiguate if treebank is available
         if (disambiguate_id)
         {

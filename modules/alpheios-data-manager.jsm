@@ -30,37 +30,9 @@ Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 Components.utils.import("resource://alpheios/alpheios-constants.jsm");
 Components.utils.import("resource://alpheios/services/alpheios-dataservice.jsm");
 
-/**
- * Module scoped constant strings
- */
-const DSVC_LIST = "user.dataservices";
-const DSVC = "user.dataservice";
-const DTYPE_LIST = "user.datatypes";
-const DTYPE = "user.datatype.";
-const RESOURCE = ".resource";
-const CLASSNAME = ".class";
-const BACKUP = "user.backup";
-const RESTORE = "user.restore";
-const KEEP = "keep";
-const INTERVAL = "interval";
-const ONAPPLOAD = "on_appload";
-const ONENABLE = "on_enable";
-const ONLOOKUP = "on_lookup";
-const ONDISABLE = "on_disable";
-const ONAPPQUIT = "on_appquit";
-
-
 DataManager = 
 {
         
-
-    /**
-     * Status constants
-     */
-    READY: 1,
-    CONFIGURE: 2,
-    CONFIRMRESTORE: 3,
-    
     /**
      * The current data service
      * @private
@@ -89,8 +61,15 @@ DataManager =
         
     /**
      * flag to indicate data objs have been setup
+     * @private
      */
     d_loaded: false,
+    
+    /**
+     * disabled status
+     * @private 
+     */
+    d_disabled: true,
     
     /**
      * logger for the DataManager class
@@ -106,7 +85,17 @@ DataManager =
      */
     init: function(a_force)
     {
+     
         var self = this;
+        var model = BrowserUtils.getPref(Constants.DMODEL);
+        if (! model || model == 'disable')
+        {
+            this.d_disabled = true;
+        }
+        else
+        {
+            this.d_disabled = false;
+        }
         // if we already initalied the data service just return
         if (this.d_dataService && ! a_force)
         {
@@ -114,11 +103,11 @@ DataManager =
             return;
         }
     
-        var datasvcs = BrowserUtils.getPref(DSVC_LIST);
+        var datasvcs = BrowserUtils.getPref(Constants.DSVC_LIST);
         datasvcs.split(/,/).forEach(
             function(a_svc)
             {
-                var resource = BrowserUtils.getPref(DSVC + "." + a_svc + RESOURCE);
+                var resource = BrowserUtils.getPref(Constants.DSVC + "." + a_svc + "." + Constants.RESOURCE);
                 try 
                 {
                     BrowserUtils.importResource(
@@ -126,17 +115,18 @@ DataManager =
                 }
                 catch (a_e)
                 {
-                       self.s_logger.warn("Unable to import dataservice resource " + resource + ": " + a_e);
+                       self.s_logger.warn(
+                        "Unable to import dataservice " + a_svc + " resource " + resource + ": " + a_e);
                 }
             }
         );
 
-        var datatypes = BrowserUtils.getPref(DTYPE_LIST);
+        var datatypes = BrowserUtils.getPref(Constants.DTYPE_LIST);
         datatypes.split(/,/).forEach(
             function(a_type)
             {
-                var classname = BrowserUtils.getPref(DTYPE + a_type + CLASSNAME);
-                var resource = BrowserUtils.getPref(DTYPE + a_type + RESOURCE);
+                var classname = BrowserUtils.getPref(Constants.DTYPE + "." + a_type + "." + Constants.CLASSNAME);
+                var resource = BrowserUtils.getPref(Constants.DTYPE + "." + a_type + "." + Constants.RESOURCE);
                 try {
                     BrowserUtils.importResource(
                         resource,self.d_dataTypes);
@@ -148,21 +138,18 @@ DataManager =
                 }
                 catch (a_e)
                 {
-                    self.s_logger.warn("Unable to import datatype resource " + resource +  ": " + a_e);
+                    self.s_logger.warn("Unable to import datatype " + a_type + " resource " 
+                        + resource +  ": " + a_e);
                 }
                     
             }
         );
 
-        var svc_type = BrowserUtils.getPref(DSVC);
-        var svc_class = BrowserUtils.getPref(DSVC + "." + svc_type + CLASSNAME);
+        var svc_type = BrowserUtils.getPref(Constants.DSVC);
+        var svc_class = BrowserUtils.getPref(Constants.DSVC + "." + svc_type + "." + Constants.CLASSNAME);
         
         var new_svc = null;
-        if (svc_type == 'default')
-        {
-            new_svc = new DataService();
-        }
-        else if (this.d_dataSvcTypes[svc_class])
+        if (this.d_dataSvcTypes[svc_class])
         {    
             new_svc = new this.d_dataSvcTypes[svc_class]();   
         }
@@ -171,52 +158,118 @@ DataManager =
             this.s_logger.fatal("Invalid data service type: " + svc_type);
         }
     
-        this.d_dataService = new_svc;    
+        this.s_logger.debug("Setting data service type: " + svc_type);
+        this.d_dataService = new_svc;
     },
     
     /**
-     * Checks if the Data Manager is ready to serve the user data
-     * @returns the DataManager status 
-     *          (one of CONFIGURE, CONFIRMRESTORE, or READY
-     * @type int
+     * Checks to see if the Data Manager is disabled
+     * @returns true if disabled, false if enabled
+     * @type Boolean
      */
-    ready: function()
+    disabled: function()
     {
-        var rc = null;
-        if (! this.d_dataService ||
-            (this.d_dataService.getStatus() == DataService.CONFIG_REQUIRED))
+        return this.d_disabled;
+    },
+    
+    /**
+     * Disable the data manager
+     * @param {Boolean} a_persist flag to indicate whether diabled status should be persisted to preferences 
+     */
+    disable: function(a_persist)
+    {
+        this.d_disabled = true;
+        if (a_persist)
         {
-            rc = DataManager.CONFIGURE; 
+            BrowserUtils.setPref(Constants.DMODEL,'disable');
         }
-        else if (this.d_dataService.getStatus() == DataService.CONFIGURED)
+    },
+
+    
+    /**
+     * respond to the Alpheios app being enabled, restoring and/or loading data
+     * if necessary 
+     * @param {Window} a_window the parent window in which Alpheios is being enabled
+     *                 child dialogs may be opened on this window
+     */
+    handleAppEnable: function(a_window)
+    {
+        // don't do anything if we're disabled
+        if (this.disabled())
         {
-            // check to see if we need to restore
-            if (this.d_dataService.restoreEnabled())
+            this.s_logger.warn("the DataManager is disabled");
+            return;
+        }
+        var restore_interval = BrowserUtils.getPref(Constants.RESTORE + "." + Constants.INTERVAL);
+        if (! this.d_dataService) 
+        {
+            // dataservice isn't configured
+            if (BrowserUtils.doConfirm(a_window,"alpheios-confirm-dialog","datamanager-configure"))
             {
-                rc = DataManager.CONFIRMRESTORE
+                BrowserUtils.openDialog(
+                    a_window,
+                    'chrome://alpheios/content/alpheios-prefs.xul', 
+                    'alpheios-options-dialog',
+                    {modal:"yes"});
+            }
+        }
+        // still no dataservice? disable data manager and return
+        if (! this.d_dataService)
+        {
+            this.disable(false);
+            BrowserUtils.doAlert(a_window,"alpheios-warning-dialog","datamanager-disabled");
+            return; 
+        }
+        // try to restore if 
+        // - the data hasn't yet been restored and restore not setup for only upon request; or
+        // - the data has been restored but we're configured to restore everytime the app is enabled
+        if ((! this.d_dataService.restored() && restore_interval != Constants.ONREQUEST) ||
+                 (this.d_dataService.restored() && restore_interval == Constants.ONENABLE))
+        {
+            this.s_logger.debug("Restore required " + this.d_dataService.restored() + "," + restore_interval);
+            var restore_callback = this.d_dataService.getRestoreCallback();
+            var restored = false;
+            var declined = false;
+            // user confirm required first
+            if (BrowserUtils.getPref(Constants.RESTORE + "." + Constants.CONFIRM))
+            {
+                if (BrowserUtils.doConfirm(a_window,"alpheios-confirm-dialog","restore-confirm"))
+                {   
+                    restored = restore_callback.call(this.d_dataService,a_window);
+                }
+                else
+                {
+                    declined = true;
+                }
             }
             else
             {
-                rc = DataManager.READY;
+                restored = restore_callback.call(this.d_dataService,a_window);
             }
-        }
-        else if (this.d_dataService.getStatus() == DataService.RESTORED)
-        {
-            if (BrowserUtils.getPref(RESTORE + "." + INTERVAL) == ONENABLE)
-            {    
-                    rc = DataManager.CONFIRMRESTORE;
-            }
-            else
+            // start fresh or disable data manager if restore wasn't successful
+            if (! restored && ! declined)
             {
-                    rc = DataManager.READY;
+                if (BrowserUtils.doConfirm(a_window,"alpheios-confirm-dialog","datamanager-confirm-newuser"))
+                {
+                    this.clearData();
+                }
+                else
+                {
+                    this.disable(false);
+                }
             }
         }
-        if (rc == DataManager.READY && ! this.d_loaded)
+        else
+        {
+            this.s_logger.debug("Restore not required " + this.d_dataService.restored() + "," + restore_interval);
+            // no action required, user data ready to be loaded
+            
+        }
+        if (!this.disabled() && ! this.d_loaded)
         {
             // make sure the data is up to date 
             this.loadData();            
         }
-        return rc;
     },
     
     /**
@@ -224,45 +277,77 @@ DataManager =
      */
     resetDataService: function()
     {
-        // if we're changing to a new service, backup and clear out the old data
-        if (this.d_dataService)
-        {
-          // backup and clear old data
-          this.d_dataService.clear();
-        }
+        this.s_logger.debug("Resetting Data Manager");
+        // save any in memory data
+        this.saveData();
+        
+        // flag to trigger data reload
+        this.d_loaded = false;
+        
         // re-initialize the DataManager
         this.init(true);
     },
         
     /**
-     * Restores the user data directory from a backup 
+     * Restores the user data directory from a backup
+     * @param {Window} a_window the current window 
      * @returns true if data was succesfully restored otherwise false
      * @type Boolean
      */
-    restoreData: function(a_app_state,a_force)
+    restoreData: function(a_window)
     {
-        var rc = false;
-        try
-        {      
-            this.d_dataService.restore() && this.loadData();
-            rc = true;
-        }
-        catch(a_e)
+        // don't do anything if the data manager is disabled
+        if (this.disabled())
         {
-            this.s_logger.fatal("Error loading user data " + a_e);
-        }        
-        return rc;
+            return true;
+        }
+        var restore_callback = this.d_dataService.getRestoreCallback();
+        if (restore_callback.call(this.d_dataService,a_window))
+        {
+            this.loadData();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    },
+    
+     /**
+     * Backs up the user data directory   
+     * @param {Window} a_window the current window
+     * @returns true if data was succesfully backed up otherwise false
+     * @type Boolean
+     */
+    backupData: function(a_window)
+    {
+        // don't do anything if the data manager is disabled
+        if (this.disabled())
+        {
+            return true;
+        }
+        this.saveData();
+        var keep = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.KEEP) || 0;
+        var backup_callback = this.d_dataService.getBackupCallback(keep);
+        return backup_callback.call(this.d_dataService,a_window);
     },
     
     
     /**
-     * Backup and clear the current user data
+     * Clear the current user data
      */
     clearData: function()
     {
-        var keep = BrowserUtils.getPref(BACKUP + "." + KEEP);
-        this.d_dataService.backup(keep || 0) && BrowserUtils.removeDataDir();
-        // TODO handle error clearing data
+        // clear any service-specific settings
+        try
+        {
+            this.d_dataService.clearPrefs();
+            BrowserUtils.removeDataDir();
+        }
+        catch(a_e)
+        {
+            this.s_logger.error("Error clearing user data: " + a_e);            
+        }
     },
     
     
@@ -271,11 +356,14 @@ DataManager =
      */
     loadData: function()
     {
+         // don't do anything if the data manager is disabled
+        if (this.disabled())
+        {
+            return;
+        }
         var self = this;
-        // kill the backup
-        this.configureBackup(false);
         this.s_logger.debug("Loading user data");
-        var datatypes = BrowserUtils.getPref(DTYPE_LIST);
+        var datatypes = BrowserUtils.getPref(Constants.DTYPE_LIST);
         datatypes.split(/,/).forEach(
             function(a_type)
             {
@@ -305,10 +393,7 @@ DataManager =
                 }
             }
         );
-        this.configureBackup(true);
-        this.d_loaded = true;
-        // make sure the backup is configured
-        
+        this.d_loaded = true;        
     },
     
     /**
@@ -316,8 +401,13 @@ DataManager =
      */
     saveData: function()
     {
+         // don't do anything if the data manager is disabled
+        if (this.disabled())
+        {
+            return;
+        }
         var self = this;
-        var datatypes = BrowserUtils.getPref(DTYPE_LIST);
+        var datatypes = BrowserUtils.getPref(Constants.DTYPE_LIST);
         datatypes.split(/,/).forEach(
             function(a_type)
             {
@@ -341,14 +431,59 @@ DataManager =
     },
 
     /**
-     * kick off or stop data backup threads
-     * @param {Boolean} a_start true to start false to stop
+     * respond to the Alpheios app being disabled, backing up or clearing data per confir
+     * @param {Window} a_window the parent window in which Alpheios is being disabled
+     *                 child dialogs may be opened on this window
      */
-    configureBackup: function(a_start)
+    handleAppDisable: function(a_window)
     {
-        // if interval, start thread
-        // if backup on disable, init onDisable handler
-        // init onAppQuit handler
+        var backup_interval = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.INTERVAL);
+        if (! this.disabled())
+        {
+            this.saveData();
+            // if backup interval is set to 'disable' or 'lookup' and the datamanager itself is not disabled
+            // execute a backup of the data
+            if (backup_interval == Constants.ONDISABLE || backup_interval == Constants.ONLOOKUP)
+            {
+                var keep = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.KEEP) || 0;
+                var backup_callback = this.d_dataService.getBackupCallback(keep);
+                backup_callback.call(this.d_dataService,a_window)
+            }
+            // if set to clear on disable, and the datamanager itself is not disabled
+            // clear the user data
+            var clear_interval = BrowserUtils.getPref(Constants.CLEAR + "." + Constants.INTERVAL);
+            if (clear_interval == Constants.ONDISABLE)
+            {
+                this.clearData();
+            }
+        }
+    },
+
+    /**
+     * respond to the Firefox App being closed
+     * @param {Window} a_window the parent window which is being closed
+     *                 child dialogs may be opened on this window
+     */
+    handleAppQuit: function(a_window)
+    {
+       var backup_interval = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.INTERVAL);
+       if ( ! this.disabled())
+       {
+           this.saveData();
+           if (backup_interval == Constants.ONAPPQUIT)
+           {
+                var keep = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.KEEP) || 0;
+                var backup_callback = this.d_dataService.getBackupCallback(keep);
+                backup_callback.call(this.d_dataService,a_window)
+           }
+           // if set to clear on appquit, and the datamanager itself is not disabled
+            // clear the user data
+            var clear_interval = BrowserUtils.getPref(Constants.CLEAR + "." + Constants.INTERVAL);
+            if (clear_interval == Constants.ONAPPQUIT)
+            {
+                this.clearData();
+            }
+        }
     },
     
     /**
@@ -359,7 +494,7 @@ DataManager =
      */
     getDataContainer: function(a_type)
     {
-        return this.dataObjs[a_type];   
+        return this.d_dataObjs[a_type];   
     },
     
     /**
@@ -372,6 +507,11 @@ DataManager =
      */
     getDataObj: function(a_type,a_key,a_create)
     {
+        // don't do anything if the data manager is disabled
+        if (this.disabled())
+        {
+            return null;
+        }
         var obj = null;
         if (this.d_dataObjs[a_type])
         {
@@ -415,7 +555,77 @@ DataManager =
      */
     addDataObj: function(a_type,a_key,a_obj)
     {
-        this.d_dataObjs[a_type].d_objs[a_key] = a_obj;   
+        // don't do anything if the data manager is disabled
+        if (this.disabled())
+        {
+            return;
+        }
+        this.d_dataObjs[a_type].d_objs[a_key] = a_obj;
+        
+        // add an observer to store changes to the data object every x accesses
+        var store_trigger = 
+            BrowserUtils.getPref([Constants.SAVE,Constants.INTERVAL,Constants.NUMLOOKUPS].join('.'));
+        a_obj.addSetterObserver(store_trigger,null,null);
+        
+        
+        // check to see if we need to add a backup observer to the object
+        var backup_interval = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.INTERVAL);
+        
+        // configured to backup after X data accesses?
+        if (backup_interval == Constants.ONLOOKUP)
+        {
+            var keep = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.KEEP) || 0;
+            var backup_callback = this.d_dataService.getBackupCallback(keep);
+            var lookup_num = 
+                BrowserUtils.getPref([Constants.BACKUP,Constants.INTERVAL,Constants.NUMLOOKUPS].join('.'));
+            a_obj.addSetterObserver(lookup_num,backup_callback,this.d_dataService);
+        }
+    },
+    
+    /**
+     * Update any application commands related to the user functionality
+     * @param {Window} a_window the application window
+     */
+    updateUserCommands: function(a_window)
+    {
+        var allowed = 0;
+        if (BrowserUtils.getPref(Constants.DMODEL) != 'disable')
+        {
+            [Constants.BACKUP,Constants.RESTORE,Constants.CLEAR].forEach(
+                function(a_type)
+                {
+                    var elem = a_window.document.getElementById('alpheios-' + a_type + '-allowed');
+                    if (elem)
+                    {
+                        if (BrowserUtils.getPref(a_type + "." + Constants.INTERVAL) == Constants.ONREQUEST)
+                        {
+                            allowed++;
+                            elem.setAttribute('hidden',false);
+                            elem.setAttribute('disabled',false);
+                        }
+                        else
+                        {
+                            elem.setAttribute('hidden',true);
+                            elem.setAttribute('disabled',true);
+                        }
+                    }
+                }
+            ); 
+        }
+        var all_commands = a_window.document.getElementById('alpheios-userdata-broadcaster');
+        if (all_commands)
+        {
+            if (allowed >0)
+            {
+                all_commands.setAttribute("hidden",false);
+                all_commands.setAttribute("disabled",false);
+            }
+            else
+            {
+                all_commands.setAttribute("hidden",true);
+                all_commands.setAttribute("disabled",true);
+            }
+        }
     }
 }
 DataManager.init();

@@ -134,7 +134,9 @@ Alph.Main =
         Alph.PkgMgr.registerObserver(
             Alph.PkgMgr.TYPE_UNINSTALL,
             [{id: Alph.Main.d_extensionGUID, 
-                callback: Alph.BrowserUtils.clearPrefs
+                callback: Alph.BrowserUtils.clearPrefs,
+                ctx: Alph.BrowserUtils,
+                params: []
              }
             ]);
         // Add an observer to make sure the mhttpd daemon is killed whenever the 
@@ -142,9 +144,21 @@ Alph.Main =
         Alph.PkgMgr.registerObserver(
             Alph.PkgMgr.TYPE_QUIT,
             [{id: Alph.Main.d_extensionGUID, 
-              callback: Alph.Main.killLocalDaemon
+              callback: Alph.Main.killLocalDaemon,
+              ctx: Alph.Main,
+              params: []
              }
             ]);
+        // Add an observer handler user data requirements on app quit
+        Alph.PkgMgr.registerObserver(
+            Alph.PkgMgr.TYPE_QUIT,
+            [{id: Alph.Main.d_extensionGUID, 
+              callback: Alph.DataManager.handleAppQuit,
+              ctx: Alph.DataManager,
+              params: [window]
+             }
+            ]
+        );
         Alph.PkgMgr.start();
         window.addEventListener("unload", function(e) { Alph.Main.onUnLoad(e); },false);
         gBrowser
@@ -189,6 +203,7 @@ Alph.Main =
         Alph.Main.d_hasLanguages = Alph.Main.setLanguages();
         // register any new auto-enable sites
         Alph.Site.registerSites();
+        Alph.DataManager.updateUserCommands(window);
         Alph.Main.showUpdateHelp();
     },
      
@@ -331,38 +346,7 @@ Alph.Main =
                 this.onMhttpdStart,
                 this.startMhttpd);   
         }
-        
-        // is the user data service ready?
-        var dmStatus = Alph.DataManager.ready();
-        switch(dmStatus)
-        {
-            case Alph.DataManager.CONFIRMRESTORE:
-            {
-                // TODO dialog for user to confirm 
-                // proceeding with restore or else
-                // continue without user features enabled
-                if (confirm("Ok to restore?"))
-                {
-                    if (! Alph.DataManager.restoreData())
-                    {
-                        alert("Restore failed.");
-                    }
-                }
-                break;
-            }
-            case Alph.DataManager.CONFIGURE:
-            {
-                // TODO offer uesr choice between 
-                // configuration screens for user data and backup 
-                // or proceeding without user features enabled
-                confirm("Configure the user data service?");
-                break;
-            }
-            default:
-            {
-                // nothing to do ?
-            }
-        }        
+        Alph.DataManager.handleAppEnable(window);
     },
 
     /**
@@ -383,6 +367,7 @@ Alph.Main =
         this.cleanup(a_bro);
         
         this.getStateObj(a_bro).setDisabled();
+        Alph.DataManager.handleAppDisable(window);
                 
     },
 
@@ -403,11 +388,7 @@ Alph.Main =
         {
             // detach daemon
             this.detachLocalDaemon();
-        }
-        
-        // save the user's data
-        Alph.DataManager.saveData();
-        
+        }        
     },
 
     /**
@@ -1961,6 +1942,10 @@ Alph.Main =
         {
             Alph.BrowserUtils.setLogLevel(a_value);
         }
+        else if (a_name.match(/user/))
+        {
+            Alph.DataManager.updateUserCommands(window);
+        }
 
         if (typeof a_lang != 'undefined')
         {
@@ -2003,7 +1988,7 @@ Alph.Main =
     getString: function(a_name,a_replace)
     {
         return Alph.BrowserUtils.getString(this.d_stringBundle,a_name,a_replace);
-    }
+    }    
 };
 
 Alph.Main.init();

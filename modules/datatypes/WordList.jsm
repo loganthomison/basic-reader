@@ -60,13 +60,15 @@ WordList.prototype.getDefault = function()
     return { d_forms: [], d_lemmas: [] };
 }
 
-WordList.prototype.addForm = function(a_word)
+WordList.prototype.addForm = function(a_window,a_word)
 {
+    this.observeSetter(a_window);
     this.d_dataObj.d_forms.push(a_word);
 }
 
-WordList.prototype.addLemma = function(a_lemma)
+WordList.prototype.addLemma = function(a_window,a_lemma)
 {
+    this.observeSetter(a_window);
     this.d_dataObj.d_lemmas.push(a_lemma);
 }
 

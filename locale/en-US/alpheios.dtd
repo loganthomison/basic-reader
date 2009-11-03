@@ -23,6 +23,12 @@
 <!ENTITY alpheios.menu.level.reader.tooltip "Alpheios Reading Mode">
 <!ENTITY alpheios.menu.level.learner "Quiz Mode">
 <!ENTITY alpheios.menu.level.learner.tooltip "Alpheios Quiz Mode">
+<!ENTITY alpheios.menu.backup "Backup User Data">
+<!ENTITY alpheios.menu.backup.tooltip "Backup User Data Now">
+<!ENTITY alpheios.menu.restore "Restore User Data">
+<!ENTITY alpheios.menu.restore.tooltip "Restore User Data Now">
+<!ENTITY alpheios.menu.clear "Clear User Data">
+<!ENTITY alpheios.menu.clear.tooltip "Clear User Data Now">
 <!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-view-label "View">
 <!ENTITY alpheios-view-tooltip "Alpheios Browser Panels">
@@ -53,3 +59,5 @@
 <!ENTITY alpheios.help "Help">
 <!ENTITY alpheios.help.tooltip "Open Alpheios User Guide">
 <!ENTITY alpheios.version.string "Alpha Version">
+<!ENTITY alpheios.menu.userdata "User Data">
+<!ENTITY alpheios.menu.userdata.tooltip "Uer Data Functions"> 

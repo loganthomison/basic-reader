@@ -41,9 +41,17 @@ DataType = function(a_file,a_charset)
     this.d_srcFile = a_file;
     this.d_charSet = a_charset;
     this.d_dataObj = null;
+    this.d_setCounter = 0;
+    this.d_setObservers = [];
     this.init();
 };
 
+/**
+ * Static loggger 
+ * @static
+ */
+DataType.s_logger = BrowserUtils.getLogger('Alpheios.DataType');
+ 
 /**
  * init method can be overridden in the derived classes
  * to perform type-specific initialization
@@ -115,4 +123,49 @@ DataType.prototype.getDefault = function()
     // default is just an empty object
     // override for type specific objects
     return {};
+}
+
+/**
+ * Add an observer function on x data sets
+ * @param {int} a_num the number of set accesses after which to execute the callback
+ * @param {Function} the a_lookup the callback to execute
+ * @param {Object} a_ctx the 'this' object context for the callback
+ */
+DataType.prototype.addSetterObserver = function(a_num,a_lookup,a_ctx)
+{
+   this.d_setObservers.push([0,a_num,a_lookup,a_ctx]);
+},
+
+/**
+ * observe a set access on the DataType object
+ * @param {Window} a_window the parent window which initiated the set action
+ */
+DataType.prototype.observeSetter = function(a_window)
+{
+    for (var i=0; i< this.d_setObservers.length; i++)
+    {
+        var counter = this.d_setObservers[i][0]++;
+        var trigger = this.d_setObservers[i][1];
+        var func = this.d_setObservers[i][2];
+        var ctx = this.d_setObservers[i][3];
+        if (counter >= trigger)
+        {
+            // reset the counter
+            this.d_setObservers[i][0] = 0;
+            try
+            {
+                // make sure latest data is saved
+                this.store();
+                if (typeof func == 'function')
+                {
+                    func.call(ctx,a_window);
+                }
+            }
+            catch(a_e)
+            {
+                DataType.s_logger.warn("Error observing setter callback for " + this.d_srcFile + ": " + a_e);
+            }
+        }
+    }
+       
 }

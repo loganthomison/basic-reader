@@ -118,12 +118,14 @@ PkgMgr =
      * register a package to observe
      * @param {String} a_type the type of observer (one of PkgMgr.TYPE_QUIT or PkgMgr.TYPE_UNINSTALL) 
      * @param {String} a_id the package id
-     * @param {Function} a_callback callback function to execute upon update 
+     * @param {Function} a_callback callback function to execute upon update
+     * @param {Function} a_ctx callback function context
+     * @param {Array} a_params callback function parameters 
      */
-    registerPkg : function(a_type,a_id,a_callback) 
+    registerPkg : function(a_type,a_id,a_callback,a_ctx,a_params) 
     {
         BrowserUtils.debug("registering observer " + a_type + " for " + a_id);
-        this.d_obs[a_type][a_id] = a_callback || function(){};
+        this.d_obs[a_type][a_id] = function() { a_callback.apply(a_ctx,a_params) } || function(){};
         
     },
     
@@ -145,7 +147,7 @@ PkgMgr =
             a_pkgs.forEach(
                 function(a_pkg)
                 {
-                    my_obj.registerPkg(a_type, a_pkg.id, a_pkg.callback);
+                    my_obj.registerPkg(a_type, a_pkg.id, a_pkg.callback, a_pkg.ctx, a_pkg.params);
                 }
             );
         }

@@ -6,14 +6,18 @@
 <prefwindow id="alpheios-prefs" title="&alpheios.prefs.preferences;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         buttons="accept,cancel"
-        type="prefwindow">
+        type="prefwindow"
+        ondialogaccept="Alph.DataManager.resetDataService()">
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />
 
     <stringbundleset id="alpheios-prefs-stringbundleset">
       <stringbundle id="alpheios-prefs-strings" 
                       src="chrome://alpheios/locale/alpheios-prefs.properties"/>
+      <stringbundle id="alpheios-strings" 
+                      src="chrome://alpheios/locale/alpheios.properties"/>
     </stringbundleset>
+    
     <prefpane id="alpheios-prefs-features" 
           label="&alpheios.prefs.features;" 
           image="chrome://alpheios/skin/icons/alpheios_32.ico"
@@ -135,6 +139,34 @@
                     accesskey="&sites.accesskey;"
                     oncommand="document.documentElement.openSubDialog('chrome://alpheios/content/alpheios-site-prefs.xul','',null)"/>
             </hbox>
+        </vbox>
+    </prefpane>
+    <prefpane id="alpheios-prefs-userdata" 
+          label="&alpheios.prefs.userdata;" 
+          image="chrome://alpheios/skin/prefs/user_32.png"
+          onpaneload=""
+          insertafter="alpheios-prefs-features">
+        <preferences id="prefs-userdata">
+            <preference id="pref-user-model" name="extensions.alpheios.user.model" type="string"/>
+        </preferences>
+        <groupbox>
+            <caption label="&alpheios.prefs.userdata.model;"/>
+            <radiogroup preference="pref-user-model" 
+                        onsyncfrompreference="Alph.Prefs.checkUserDataModel();" 
+                        onsynctopreference="return Alph.Prefs.updateDataServiceSettings();">
+                
+                <radio label="&alpheios.prefs.userdata.model.ffprofile;" value="ffprofile"/>    
+                <radio label="&alpheios.prefs.userdata.model.ffprofileplus;" value="ffprofileplus"/>
+                <radio label="&alpheios.prefs.userdata.model.shared;" value="shared"/>
+                <radio label="&alpheios.prefs.userdata.model.custom;" value="custom"/>
+                <label id="alpheios-prefs-userdata-customize-info"
+                             class="alpheios-info"
+                             value="&alpheios.prefs.userdata.model.custom.info;"
+                             collapsed="true"/>
+                <radio label="&alpheios.prefs.userdata.model.disable;" value="disable"/>
+            </radiogroup>
+        </groupbox>
+        <vbox id="alpheios-prefs-userdata-advanced" collapsed="true">
         </vbox>
     </prefpane>
 </prefwindow>

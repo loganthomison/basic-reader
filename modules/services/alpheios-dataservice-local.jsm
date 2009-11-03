@@ -29,13 +29,14 @@ const EXPORTED_SYMBOLS = ['DataServiceLocal'];
 
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 Components.utils.import("resource://alpheios/services/alpheios-dataservice.jsm");
+Components.utils.import("resource://alpheios/alpheios-constants.jsm");
 
 /**
- * Module scoped constant strings
+ * Local Data Service preference setting 
+ * @constant
+ * @private
  */
-const B_PATH = "user.backup.file";
-const R_PATH = "user.restore.file";
-
+const BFILE_PREF = Constants.DSVC + "." + "local.backup.file";
 
 /**
  * @class DataServiceLocal extends DataService to provide an implementation which
@@ -57,51 +58,42 @@ DataServiceLocal.prototype = new DataService();
 DataServiceLocal.s_logger = BrowserUtils.getLogger('Alpheios.DataServiceLocal');
 
 /**
- * Holds the current service state 
- * @see DataService.CONFIG_REQUIRED
- * @see DatService.CONFIGURED
- * @see DataService.RESTORED
+ * Holds the current restored state 
+ * @type boolean
  */
-DataServiceLocal.prototype.d_status = DataService.CONFIG_REQUIRED;
+DataServiceLocal.prototype.d_restored = false;
 
 /**
- * get the current service state
- * @return the current service state
+ * Holds the number of backups to keep 
  * @type int
- * @see DataService.CONFIG_REQUIRED
- * @see DatService.CONFIGURED
- * @see DataService.RESTORED 
  */
-DataServiceLocal.prototype.getStatus = function()
+DataServiceLocal.prototype.d_keepBackups = 0;
+
+/**
+ * get the current restored state
+ * @return true if the data has been restored, otherwise false
+ * @type Boolean
+ */
+DataServiceLocal.prototype.restored = function()
 {    
-    // check configuration
-    if (this.d_status == DataService.CONFIG_REQUIRED)
-    {
-        try
-        {
-            this.configure();
-        }
-        catch(a_e)
-        {
-            DataServiceLocal.s_logger.fatal(a_e);
-            
-        }
-    }        
-    return this.d_status;       
+    return this.d_restored;       
 }
 
 /**
  * Restores the user data directory from a local zip file
+ * @param {Window} a_window the parent window
  * @returns true if restore succeeded false if not
  * @type Boolean
  */
-DataServiceLocal.prototype.restore = function()
+DataServiceLocal.prototype.restore = function(a_window)
 {
     var rc = true;
     try 
-    {
-        BrowserUtils.extractZipData(BrowserUtils.getPref(R_PATH));
-        this.d_status = DataService.RESTORED;
+    { 
+        BrowserUtils.setStatus(a_window,"alpheios-dataservice-status","restore-in-progress");
+        BrowserUtils.extractZipData(BrowserUtils.getLocalFilePref(BFILE_PREF),true);
+        BrowserUtils.clearStatus(a_window,"alpheios-dataservice-status");
+        this.d_restored = true;
     }
     catch(a_e)
     {
@@ -112,19 +104,71 @@ DataServiceLocal.prototype.restore = function()
 }
 
 /**
+ * get a callback function to execute the data restore
+ * @returns restore callback which takes a single argument, the parent window 
+ * @type Function
+ */
+DataServiceLocal.prototype.getRestoreCallback = function()
+{
+    var backupPath= BrowserUtils.getLocalFilePref(BFILE_PREF);   
+    if (backupPath && BrowserUtils.testLocalFile(backupPath,'<'))
+    {
+        return this.restore;
+    }
+    else
+    {
+        return this.configureRestore;
+    }
+}
+
+/**
+ * Get a callback function to execute the data backup
+ * @param {int} a_keep the number of old backups to keep
+ * @returns backup callback which takes a single argument, the parent window 
+ * @type Function
+ */
+DataServiceLocal.prototype.getBackupCallback = function(a_keep)
+{
+
+    this.d_keepBackups = a_keep;
+    
+    var backupPath= BrowserUtils.getLocalFilePref(BFILE_PREF);   
+    if (backupPath && BrowserUtils.testLocalFile(backupPath,'>'))
+    {
+        return this.backup;
+    }
+    else
+    {
+        return this.configureBackup;
+    }
+}
+
+
+/**
  * Backs up the user data directory to a local zip file,
  * keeping the requested number of copies of old backups
+ * @param {Window} a_window the parent window
  * @param {int} a_keep the number of old copies to keep
  * @returns true if backup succeeded false if not
  * @type Boolean
  */
-DataServiceLocal.prototype.backup = function(a_keep)
+DataServiceLocal.prototype.backup = function(a_window)
 {
     var rc = true;
+    var backup_file = BrowserUtils.getLocalFilePref(BFILE_PREF);
     try 
     {
-        // TODO make copy of existing backup if a_keep > 0
-        BrowserUtils.backup(BrowserUtils.getPref(B_PATH));
+        for (var i=this.d_keepBackups-1; i>=0;i--)
+        {
+            var srcCopy = i == 0 ? backup_file : backup_file.replace(/(\.[^\.]+)$/, ".bak" + i + "$1");
+            var backupCopy = backup_file.replace(/(\.[^\.]+)$/, ".bak" + (i+1) + "$1");
+            BrowserUtils.copyLocalFile(srcCopy,BrowserUtils.getLocalFile(backupCopy),true);
+        }
+        // TODO make copy of existing backup if this.d_keepBackups > 0
+        // TODO add message to statusbar or toolbar indicating backup in progress
+        BrowserUtils.setStatus(a_window,"alpheios-dataservice-status","backup-in-progress");
+        BrowserUtils.zipDataDir(BrowserUtils.getLocalFilePref(BFILE_PREF));
+        BrowserUtils.clearStatus(a_window,"alpheios-dataservice-status");
     }
     catch(a_e)
     {
@@ -135,58 +179,71 @@ DataServiceLocal.prototype.backup = function(a_keep)
 }
 
 /**
- * Sets the configured state of the service based upon the current preferences settings
- * @throws an error if there is a missing or invalid setting 
+ * Open UI for configuring restore options and execute restore 
+ * after configured
+ * @param {Window} a_window the parent window 
  */
-DataServiceLocal.prototype.configure = function(a_app_state)
+DataServiceLocal.prototype.configureRestore = function(a_window)
 {
-    // reset config status
-    this.d_status = DataService.CONFIG_REQUIRED;
-    var backupPath= BrowserUtils.getPref(B_PATH);   
-    var restorePath = BrowserUtils.getPref(R_PATH);
-    var errors = [];
-    if (typeof backupPath == "undefined" || typeof restorePath == "undefined") 
-    {
-        errors.push("MISSING_SETTING");       
-    }
-    else 
-    {
-       // make sure the backup path is writeable the restore file is readable
-        if (! BrowserUtils.testLocalFile(backupPath,">"))
+    var self = this;
+    var rc =
+        BrowserUtils.doFilePicker(
+        a_window,
+        null, 
+        'alph-browse-backup-file', 
+        function(a_window,a_event,a_picked,a_path)
         {
-            errors.push("INVALID_BACKUP_PATH");
-        }
-        if (! BrowserUtils.testLocalFile(restorePath,"<"))
-        {
-            errors.push("INVALID_RESTORE_PATH");
-        }
-    }
-    if (errors.length != 0)
-    {
-        throw errors.join(',');
-    }  
-    else
-    {
-        this.d_status = DataService.CONFIGURED;
-    }
-}
+            BrowserUtils.debug("restore file picked:" + a_picked + " path:" + a_path);
+            if (a_picked)
+            {       
+                BrowserUtils.setLocalFilePref(BFILE_PREF,a_path);
+                return this.restore(a_window);
+            }
+            else
+            {
+                return false;
+            }
+        },
+        self,
+        '*.zip',
+        BrowserUtils.getLocalFilePref(BFILE_PREF)||'alpheios-backup.zip');
+    return rc;
+};
 
 /**
- * Backup is enabled for this service type
- * @returns true
- * @type Boolean
+ * Open UI for configuring backup options and execute backup 
+ * after configured
+ * @param {Window} a_window the parent window 
  */
-DataServiceLocal.prototype.backupEnabled = function()
+DataServiceLocal.prototype.configureBackup = function(a_window)
 {
-    return true;
-}
+    var self = this;
+    var rc =
+        BrowserUtils.doDirectoryPicker(
+        a_window,
+        null, 
+        'browse-backup-folder', 
+        function(a_window,a_event,a_picked,a_file)
+        {
+            if (a_picked && a_file)
+            { 
+                a_file.append(Constants.BACKUP_FILE);
+                BrowserUtils.setLocalFilePref(BFILE_PREF,a_file);
+                return this.backup(a_window);
+            }
+            else
+            {
+                return false;
+            }
+        },
+        self);
+    return rc;
+};
 
 /**
- * Restore is enabled for this service type
- * @returns true
- * @type Boolean
+ * Clears any user-defined preferences for the service
  */
-DataServiceLocal.prototype.restoreEnabled = function()
+DataServiceLocal.prototype.clearPrefs = function()
 {
-    return true;
+    BrowserUtils.resetPref(BFILE_PREF);
 }

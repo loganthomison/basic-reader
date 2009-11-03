@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios-prefs.dtd">
+<!-- Alpheios Panel Preferences Overlay -->
+<overlay id="alpheios-local-data-prefs"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <prefpane id="alpheios-prefs-userdata">
+        <preferences id="prefs-userdata">
+            <preference id="pref-backup-local-file" name="extensions.alpheios.user.dataservice.local.backup.file" type="string"/>
+        </preferences>
+        <vbox id="alpheios-prefs-userdata-advanced">
+            <tabbox id="alpheios-prefs-userdata-service-tabbox">
+                <tabs id="alpheios-prefs-userdata-service-tabs">
+                    <tab label="&alpheios.prefs.userdata.service.local;"/>
+                </tabs>
+                <tabpanels id="alpheios-prefs-userdata-service-tabpanels">
+                    <tabpanel flex="1">
+                        <hbox flex="1">
+                            <label value="&alpheios.prefs.backup.local.file;" 
+                                control="backup-file"/>
+                            <textbox id="backup-file" preference="pref-backup-local-file" flex="1"
+                                     onsynctopreference="return Alph.Prefs.setBackupFile();"
+                                     onsyncfrompreference="Alph.Prefs.getBackupFilePath();"/>
+                            <button class="alpheios-browse-button" 
+                                    id="browse-backup-file" 
+                                    label="&alpheios.prefs.file.browse;"
+                                    onclick="Alph.BrowserUtils.doDirectoryPicker(
+                                        window,event,'browse-backup-folder',Alph.Prefs.onDataFilePicked,Alph.Prefs,null)"/>
+                        </hbox>
+                    </tabpanel>
+                </tabpanels>
+            </tabbox>
+        </vbox>
+    </prefpane>
+</overlay>

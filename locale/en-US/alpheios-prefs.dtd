@@ -2,6 +2,8 @@
 <!ENTITY alpheios.prefs.mouse "Mouse Settings">
 <!ENTITY alpheios.prefs.advanced "Advanced">
 <!ENTITY alpheios.prefs.advanced.label "Advanced...">
+<!ENTITY alpheios.prefs.customize.label "Customize...">
+<!ENTITY alpheios.prefs.customize.accesskey "c">
 <!ENTITY alpheios.prefs.features "General">
 <!ENTITY alpheios.prefs.log.level "Console Log Level">
 <!ENTITY alpheios.prefs.log.level.fatal "Fatal">
@@ -58,3 +60,33 @@
 <!ENTITY alpheios.prefs.sites.label "Enabled Sites...">
 <!ENTITY alpheios.prefs.sites "Alpheios-Enabled Sites">
 <!ENTITY sites.accesskey "s">
+<!ENTITY alpheios.prefs.userdata "User Profile">
+<!ENTITY alpheios.prefs.userdata.advanced "Alpheios User Profile - Advanced">
+<!ENTITY alpheios.prefs.userdata.service "Data Storage Service:">
+<!ENTITY alpheios.prefs.userdata.service.none "&lt;none&gt;">
+<!ENTITY alpheios.prefs.backup.options "Backup/Restore Options">
+<!ENTITY alpheios.prefs.backup.enable "Enable Data Backup?">
+<!ENTITY alpheios.prefs.backup.interval "Backup Interval:"> 
+<!ENTITY alpheios.prefs.backup.interval.lookup "After X User Data Additions">
+<!ENTITY alpheios.prefs.backup.interval.disable "Whenever Alpheios is Disabled">
+<!ENTITY alpheios.prefs.backup.interval.appquit "Whenever Firefox Is Closed">
+<!ENTITY alpheios.prefs.backup.interval.request "On Request Only">
+<!ENTITY alpheios.prefs.backup.interval.lookup.num "Backup After How Many User Data Additions?">
+<!ENTITY alpheios.prefs.backup.keep "Number of Backups to Keep:">
+<!ENTITY alpheios.prefs.restore.enable "Enable Data Restore?">
+<!ENTITY alpheios.prefs.restore.interval "Restore Interval:">
+<!ENTITY alpheios.prefs.restore.interval.enable "Whenever Alpheios is Enabled">
+<!ENTITY alpheios.prefs.restore.interval.appstart "Whenever Firefox is Started">
+<!ENTITY alpheios.prefs.restore.interval.request "On Request Only">
+<!ENTITY alpheios.prefs.restore.confirm "Require confirmation before restore?">
+<!ENTITY alpheios.prefs.backup.local.file "Data File Path:">
+<!ENTITY alpheios.prefs.file.browse "Browse...">
+<!ENTITY alpheios.prefs.userdata.service.local "Local Zip File">
+<!ENTITY alpheios.prefs.clear.interval "Clear User Data:">
+<!ENTITY alpheios.prefs.userdata.model "Alpheios User Profile:">    
+<!ENTITY alpheios.prefs.userdata.model.ffprofile "Single User Per Firefox Profile, Non Portable Data">    
+<!ENTITY alpheios.prefs.userdata.model.ffprofileplus "Single User Per Firefox Profile, Portable Data">
+<!ENTITY alpheios.prefs.userdata.model.shared "Multiple Users per Firefox Profile, Portable Data">
+<!ENTITY alpheios.prefs.userdata.model.custom "Custom">
+<!ENTITY alpheios.prefs.userdata.model.custom.info "(Configure Custom User Data Storage Settings Below)">
+<!ENTITY alpheios.prefs.userdata.model.disable "User Features Disabled"> 
