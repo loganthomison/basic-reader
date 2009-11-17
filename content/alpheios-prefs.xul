@@ -143,7 +143,7 @@
     </prefpane>
     <prefpane id="alpheios-prefs-userdata" 
           label="&alpheios.prefs.userdata;" 
-          image="chrome://alpheios/skin/prefs/user_32.png"
+          image="chrome://alpheios/skin/icons/userdata_32.png"
           onpaneload=""
           insertafter="alpheios-prefs-features">
         <preferences id="prefs-userdata">

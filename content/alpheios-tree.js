@@ -87,7 +87,19 @@ Alph.Tree.prototype.show = function()
 
     var svgError = "";
 
-    var treebankUrl = Alph.Site.getTreebankDiagramUrl(bro.contentDocument);
+    var docs = Alph.Main.getBrowserDocs(bro);
+    var treebankUrl = null;
+    for (var i=0; i<docs.length; i++)
+    {
+        treebankUrl = Alph.Site.getTreebankDiagramUrl(docs[i]);
+        if (treebankUrl)
+        {
+            // TODO for now, just take the first treebank url found
+            // but eventually need to support multiple per page and per 
+            // browser window
+            break;
+        }
+    }
 
     var tbrefs;
     var sentence;

@@ -29,6 +29,10 @@ const EXPORTED_SYMBOLS = ['WordList'];
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 Components.utils.import("resource://alpheios/datatypes/DataType.jsm");
 
+//TODO these need to be configurable
+const THRESHOLD_FORM = 5;
+const THRESHOLD_LEMMA = 10;
+
 /**
  * @class WordList
  * @extends DataType 
@@ -51,24 +55,96 @@ WordList.prototype = new DataType();
 WordList.s_fileSpec = '.json';
 
 /**
+ * static constant - known words index
+ * @constant
+ */
+WordList.prototype.KNOWN = 'KNOWN';
+
+/**
+ * static constant - unknown words index
+ * @constant
+ */
+WordList.prototype.UNKNOWN = 'UNKNOWN';
+
+/**
  * get the default data contents
  * @TODO replace this very naive implementation of wordlist type
  */
 WordList.prototype.getDefault = function()
 {
  
-    return { d_forms: [], d_lemmas: [] };
+    var list = { };
+    list[this.UNKNOWN] = { d_forms: {}, d_lemmas: {} };
+    list[this.KNOWN] = { d_forms: {}, d_lemmas: {} };
+    return list;
 }
 
-WordList.prototype.addForm = function(a_window,a_word)
-{
-    this.observeSetter(a_window);
-    this.d_dataObj.d_forms.push(a_word);
-}
 
-WordList.prototype.addLemma = function(a_window,a_lemma)
+/**
+ * Add a new word to the word list
+ * @param {Window} a_window the parent window
+ * @param {String} a_word the word 
+ * @param {Array} a_lemmas list of possible lemmas for the word
+ * @param {String} a_list the sublist to add it to ({@link WordList.KNOWN} or {@link WordList.UNKNOWN})
+ * @return true if the word is added to the list, otherwise false
+ *         (returns false if the word is already on the list)
+ * @type Boolean        
+ */
+WordList.prototype.addWord = function(a_window,a_word,a_lemmas,a_list)
 {
+    var known = this.KNOWN;
+    var unknown = this.UNKNOWN;
+    
     this.observeSetter(a_window);
-    this.d_dataObj.d_lemmas.push(a_lemma);
-}
+    var list = this.d_dataObj[a_list];
+    var added = false;
+    if (! list.d_forms[a_word])
+    {
+        list.d_forms[a_word]= { lookups: 0,
+                                lemmas: {},
+                                contexts: [] 
+                              };
+        added = true;
+    }
+    var lookups = list.d_forms[a_word].lookups++;
+    if (a_list == unknown && lookups >= THRESHOLD_FORM && this.d_dataObj[known].d_forms[a_word])
+    {
+        delete this.d_dataObj[known].d_forms[a_word];
+    }
+    else if (a_list == known && this.d_dataObj[unknown].d_forms[a_word])
+    {
+        delete this.d_dataObj[unknown].d_forms[a_word];
+    }
+    
+    for (var i=0; i<a_lemmas.length; i++)
+    {
+        var a_lemma = a_lemmas[i];
+        var lemma_lookups = list.d_lemmas[a_lemma]++;
+        list.d_forms[a_word].lemmas[a_lemma]++;
+        if (a_list == unknown && lemma_lookups >= THRESHOLD_LEMMA 
+            && this.d_dataObj[known].d_lemmas[a_lemma]) 
+        {
+            delete this.d_dataObj[known].d_lemmas[a_lemma];
+        }
+        else if (a_list == known && this.d_dataObj[unknown].d_lemmas[a_lemma])
+        {
+            delete this.d_dataObj[unknown].d_lemmas[a_lemma];
+        }
+   }        
+   return added;
+};
+
+/**
+ * Check one of the sublists in the WordList Data object for 
+ * the supplied word
+ * @param {String} the sublist id
+ * @param {String} a_word the word to check for
+ * @returns true if the word is in the list, otherwise false
+ * @type Boolean
+ */
+WordList.prototype.hasForm = function(a_list,a_word)
+{
+    var has_form = this.d_dataObj[a_list].d_forms[a_word];
+    return (has_form ? true : false);
+};
 

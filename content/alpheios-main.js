@@ -1310,31 +1310,43 @@ Alph.Main =
         // that case is the browser linked from ...
         var bro = Alph.Main.getCurrentBrowser();
         
+        var docs = Alph.Main.getBrowserDocs(bro);
         var ped_site = 
-            Alph.Site.isPedSite(bro.contentDocument);
+            Alph.Site.isPedSite(docs);
         var mixed_site = false;        
-        var auto_lang = null;
+        var page_langs = null;
         
         var cur_lang = this.getStateObj(bro).getVar("current_language");
-        if (ped_site)
+        if (ped_site.length>0)
         {     
-            auto_lang = ped_site;            
-            this.s_logger.debug("Page language is " + auto_lang);
+            page_langs = ped_site;            
         }
-        else if (mixed_site = Alph.Site.isMixedSite(bro.contentDocument))
+        else 
         {
-            auto_lang = mixed_site;
+            mixed_site = Alph.Site.isMixedSite(docs)
+            if (mixed_site.length >0)
+            {
+                page_langs = mixed_site;
+            }
+            else
+            {
+                page_langs=[Alph.Site.isBasicSite(Alph.BrowserUtils.getSvc('IO').newURI(bro.contentDocument.location,null,null))];
+            }   
         }
-        else
+        var auto_lang = null;
+        for (var i=0; i<page_langs.length; i++)
         {
-            auto_lang=Alph.Site.isBasicSite(Alph.BrowserUtils.getSvc('IO').newURI(bro.contentDocument.location,null,null));
-        }   
-        
-        auto_lang = Alph.Languages.mapLanguage(auto_lang);
-        
-        if (auto_lang && Alph.Languages.hasLang(auto_lang)) 
+            var mapped_lang = Alph.Languages.mapLanguage(page_langs[i]);
+            if (mapped_lang && Alph.Languages.hasLang(mapped_lang)) 
+            {
+                auto_lang = mapped_lang;
+                // TODO stop at first supported language for now but ultimately
+                // need to support multiple langues, per page, and per browser frame/document
+                break;
+            }
+        }
+        if (auto_lang)
         {
-            
             // if we support this language and site automatically setup the extension for it
             // if Alpheios is not enabled, auto-enable it
             if (! this.isEnabled(bro))
@@ -1356,7 +1368,7 @@ Alph.Main =
             this.toggleToolbar(true);
             // if we're not on an enhanced site
             // and make sure the mode is set to READER
-            if (! ped_site)
+            if (ped_site.length == 0)
             {
                 this.setMode(bro,Alph.Constants.LEVELS.READER);
             }
@@ -1402,14 +1414,14 @@ Alph.Main =
             this.toggleToolbar();
         }
         
-        if ((ped_site || mixed_site) && this.isEnabled(bro))
+        if ((ped_site.length >0 || mixed_site.length >0) && this.isEnabled(bro))
         {
             // these functions should only be called after Alpheios has been auto-toggled
             // on because otherwise they get done twice via the send call to resetState
             // from Alph.Main.onTabSelect
 
             // inject the pedagogical site with the alpheios-specific elements
-            Alph.Site.setupPage(bro.contentDocument,
+            Alph.Site.setupPage(docs,
                 Alph.Translation.INTERLINEAR_TARGET_SRC);
             
             // if we're in quiz mode, and the popup is still showing for a
@@ -1450,7 +1462,7 @@ Alph.Main =
         Alph.$("broadcaster.alpheios-pedagogical-notifier").each(
             function()
             {
-                if (! ped_site)
+                if (ped_site.length == 0)
                 {
                     Alph.$(this).attr("disabled",true);
                     if (Alph.$(this).attr("hidden") != null)
@@ -1474,7 +1486,7 @@ Alph.Main =
         Alph.$("broadcaster.alpheios-basic-notifier").each(
             function()
             {
-                if (! ped_site)
+                if (ped_site.length == 0)
                 {
                     Alph.$(this).attr("disabled",false)
                     // only set hidden if the hidden attribute was already set
@@ -1497,9 +1509,9 @@ Alph.Main =
         );
         
         
-        if (ped_site)
+        if (ped_site.length > 0)
         {
-            Alph.Site.updateSiteToolStatus(bro.contentDocument);
+            Alph.Site.updateSiteToolStatus(docs);
         }    
             
           
@@ -1703,7 +1715,7 @@ Alph.Main =
         var new_mode = this.getStateObj(a_bro).getVar("level");
         
         // update the site toolbar
-        Alph.Site.setCurrentMode(a_bro.contentDocument,new_mode);
+        Alph.Site.setCurrentMode(Alph.Main.getBrowserDocs(a_bro),new_mode);
         // make sure the ff toolbar button has the right state
         Alph.$("toolbarbutton[group=AlpheiosLevelGroup]").each(
             function() { this.setAttribute("checked",'false');}
@@ -1790,15 +1802,21 @@ Alph.Main =
                     this.d_handleRefresh = false;
                     Alph.Main.s_logger.debug("Handling refresh for " + this.d_lastUrlBase);
                     var bro = Alph.Main.getCurrentBrowser();
-                    var doc = bro.contentDocument;
-                    Alph.Main.insertMetadata({target: doc});
-                    if ((Alph.Site.isPedSite(doc) || Alph.Site.isMixedSite(doc))
+                    var docs = Alph.Main.getBrowserDocs(bro);
+                    docs.forEach(
+                        function(a_doc)
+                        {
+                            Alph.Main.insertMetadata({target: a_doc});        
+                        }
+                    );
+                    
+                    if ((Alph.Site.isPedSite(docs).length >0 || Alph.Site.isMixedSite(docs).length >0)
                         && Alph.Main.isEnabled(bro))
                     {
                         // update the site functionality and toolbar
-                        Alph.Site.setupPage(doc,Alph.Translation.INTERLINEAR_TARGET_SRC);
+                        Alph.Site.setupPage(docs,Alph.Translation.INTERLINEAR_TARGET_SRC);
                         var mode = Alph.Main.getStateObj(bro).getVar("level");
-                        Alph.Site.setCurrentMode(doc,mode);
+                        Alph.Site.setCurrentMode(docs,mode);
                         // check to see if we need to refresh the state of any panels
                         
                         Alph.$("alpheiosPanel").each(
@@ -1988,7 +2006,32 @@ Alph.Main =
     getString: function(a_name,a_replace)
     {
         return Alph.BrowserUtils.getString(this.d_stringBundle,a_name,a_replace);
-    }    
+    },
+    
+    /**
+     * get the set of HTML documents in the current browser 
+     * @param {Browser} a_bro the current browser
+     * @returns array of Documents (from the main browser window, as well
+     *          as any frames and iframes loaded 
+     * @type Array
+     */
+    getBrowserDocs: function(a_bro)
+    {
+        var docs = [a_bro.contentDocument];
+        Alph.$("iframe",a_bro.contentDocument).each(
+            function()
+            {
+                docs.push(this.contentDocument);
+            }
+        );
+        Alph.$("frame",a_bro.contentDocument).each(
+            function()
+            {
+                docs.push(this.contentDocument);
+            }
+        );
+        return docs;
+    }
 };
 
 Alph.Main.init();

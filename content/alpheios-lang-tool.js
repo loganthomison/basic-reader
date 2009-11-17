@@ -1438,18 +1438,18 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         );
     }
     // add language-specific dictionary link, if any
-    var lemmaCount = 0;
+    var lemmas = [];
     Alph.$(".alph-dict",a_node).each(
         function()
         {
-            if (this.getAttribute("lemma-key") ||
-                this.getAttribute("lemma-id"))
+            var lemma_key = this.getAttribute("lemma-key"); 
+            if ( lemma_key )
             {
-                ++lemmaCount;
+                lemmas.push(lemma_key);
             }
         }
     );
-    if (lemmaCount > 0)
+    if (lemmas.length > 0)
     {
         Alph.$("#alph-word-tools",a_node).append(this.getDictionaryLink());
         // TODO the dictionary handler should be defined in Alph.Dict
@@ -1500,6 +1500,37 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             {
                 Alph.Xlate.showLoadingMessage([tools_node,loading_msg]);
                 lang_tool.handleSpeech(a_e,a_node);
+                return false;
+            }
+        );
+        Alph.$("#alph-word-tools",a_node).append(link);
+    }
+    
+    var wordlist = lang_tool.getWordList();
+    if (wordlist && lemmas.length > 0) 
+    {
+        var normalizedWord = lang_tool.normalizeWord(a_target.getWord()); 
+        wordlist.addWord(window,normalizedWord,lemmas,wordlist.UNKNOWN);
+        var alt_text = Alph.Main.getString('alph-mywords-link');
+        var added_msg = Alph.Main.getString('alph-mywords-added',[normalizedWord,lemmas.join(', ')]);
+        var link = Alph.$(  
+            '<div class="alph-tool-icon alpheios-button alph-mywords-link" ' +
+            'href="#alpheios-mywords" title="' + alt_text + '">' +
+            '<img src="chrome://alpheios/skin/icons/vocablist_16.png" ' +
+            'alt="' + alt_text + '"/>' + 
+            '<div class="alpheios-icon-label">' + alt_text + '</div></div>',a_node
+        );
+        Alph.$(link).click(
+            function(a_e)
+            {
+                if (Alph.BrowserUtils.doConfirm(window,'alpheios-confirm-dialog',added_msg))
+                {
+                    if (wordlist.addWord(window,normalizedWord,lemmas,wordlist.KNOWN))
+                    {
+                        Alph.Site.toggleWordStatus(
+                            lang_tool,Alph.$(a_node).get(0).ownerDocument,normalizedWord);
+                    }
+                }
                 return false;
             }
         );
@@ -1794,4 +1825,25 @@ Alph.LanguageTool.prototype.handleSpeech= function(a_event,a_node)
         success: function(data, textStatus)
         { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument); }
     });
+};
+
+/**
+ * Return a normalized version of a word which can be used to compare the word for equality
+ * @param {String} a_word the source word
+ * @returns the normalized form of the word (default version just returns the same word, 
+ *          override in language-specific subclass)
+ * @type String
+ */
+Alph.LanguageTool.prototype.normalizeWord = function(a_word)
+{
+    return a_word;
+}
+/**
+ * Get the user's wordlist for the language
+ * @returns the wordlist, or null if user features aren't enabled
+ * @type Alph.DataType (WordList implementation)
+ */
+Alph.LanguageTool.prototype.getWordList = function()
+{
+    return (Alph.DataManager.getDataObj('words',this.d_sourceLanguage,true));
 };

@@ -6,6 +6,10 @@
     list-style-image: url("chrome://alpheios/skin/icons/languages_16.png");
 }
 
+#alpheios-userdata-commands {
+    list-style-image: url("chrome://alpheios/skin/icons/userdata_16.png");
+}
+
 #alpheios-help-button {
     list-style-image: url("chrome://alpheios/skin/icons/help_16.png");
 }

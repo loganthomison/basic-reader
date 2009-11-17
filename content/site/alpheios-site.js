@@ -38,19 +38,28 @@ Alph.Site = {
     
     /**
      * Check to see if this site supports the pedagogical functionality
-     * @param {Document} a_doc the content document for the site
- * @returns the language supported by the document if it's a pedagogical site, otherwise null
-     * @type String
+     * @param {Array} a_docs the array of content documents loaded on the site
+     * @returns the Array of languages identified in the html elements of any documents
+     *          flagged as Alpheios pedagogical texts, if any 
+     * @type Array{String}
      */
-    isPedSite: function(a_doc)
+    isPedSite: function(a_docs)
     {       
-        var page_lang = null;
-        if (Alph.$("meta[name=alpheios-pedagogical-text]",a_doc).length > 0)
-        {
-            page_lang = a_doc.documentElement.getAttribute("xml:lang") ||
-                        a_doc.documentElement.getAttribute("lang");
-        }
-        return page_lang;
+        var page_langs = [];
+        // TODO for now only one language per page is supported but so take the first one found
+        // but in the future it would be good to support multiple frames with different languages
+        Alph.$("meta[name=alpheios-pedagogical-text]",a_docs).each(
+            function()
+            {
+                var lang = this.ownerDocument.documentElement.getAttribute("xml:lang") ||
+                           this.ownerDocument.documentElement.getAttribute("lang");
+                if (lang)
+                {
+                    page_langs.push(lang);
+                }
+            }
+        );
+        return page_langs;
     },
     
     /**
@@ -83,20 +92,25 @@ Alph.Site = {
     /**
      * Check to see if the site is one we which has declared some text to be
      * activated for alpheios
-     * @param nsIURI a_url the url object
-     * @returns the language of the alpheios-enabled text (or null if none)
-     * @type String
+     * @param {Array} a_docs the array of content documents loaded on the site
+     * @returns the Array of languages identified in the alpheios-enabled-text elements 
+     *          in those documents, if any
+     * @type Array{String}
      */
-    isMixedSite: function(a_doc)
+    isMixedSite: function(a_docs)
     {
-        var enabled_text = Alph.$('.alpheios-enabled-text',a_doc);
-        var enabled_lang = null;
-        if (enabled_text.length > 0)
-        {
-            // TODO eventually need to support multiple languages per page
-            enabled_lang = Alph.$(enabled_text).attr("xml:lang") || Alph.$(enabled_text).attr("lang");
-        }
-        return enabled_lang;
+        var enabled_langs = [];
+        Alph.$('.alpheios-enabled-text',a_docs).each(
+            function()
+            {
+                var lang = this.getAttribute("xml:lang") || this.getAttribute("lang");
+                if (lang)
+                {
+                    enabled_langs.push(lang);
+                }
+            }
+        );
+        return enabled_langs;
     },
 
     /**
@@ -142,159 +156,191 @@ Alph.Site = {
     /**
      * injects the browser content document with Alpheios pedagogical
      * functionality
-     * @param {Document} a_doc the browser content document
+     * @param {Array} a_docs array of documents loaded in the browser window
+     * @param {String} a_type the browser type (one of Alph.Translation.INTERLINEAR_TARGET_SRC
+     *                        or Alph.Translation.INTERLINEAR_TARGET_TRANS)  
      */
-    setupPage: function(a_doc,a_type)
+    setupPage: function(a_docs,a_type)
     {
         
         // unless interactivity is enabled,
         // add the mouseover handlers for the parallel alignment
         // and the interlinear alignment toggle
-        Alph.$(".alpheios-aligned-word",a_doc).mouseover(  
+        Alph.$(".alpheios-aligned-word",a_docs).mouseover(  
             function(e) { Alph.Site.toggleAlignment(e,this,a_type,true)}
         );
             
-        Alph.$(".alpheios-aligned-word",a_doc).mouseout( 
+        Alph.$(".alpheios-aligned-word",a_docs).mouseout( 
             function(e) { Alph.Site.toggleAlignment(e,this,a_type,false)}
         );
             
         // wrap a div around each target word so that the aligned text can
         // be floated under it
-        if (Alph.$(".alpheios-word-wrap",a_doc).length == 0)
+        if (Alph.$(".alpheios-word-wrap",a_docs).length == 0)
         {
-            Alph.$(".alpheios-aligned-word",a_doc)
+            Alph.$(".alpheios-aligned-word",a_docs)
                 .wrap("<div class='alpheios-word-wrap'></div>");
         }
                 
 
         if (a_type == Alph.Translation.INTERLINEAR_TARGET_SRC)
         {
-            this.addInterlinearToggle(a_doc);
+            this.addInterlinearToggle(a_docs);
         }
         
-        this.enableToolbar(a_doc);
+        this.enableToolbar(a_docs);
         var bro = Alph.Main.getCurrentBrowser();
         var trigger = Alph.Main.getXlateTrigger(bro);
-        this.addTriggerHint(bro,a_doc,trigger,Alph.Main.getLanguageTool(bro));
+        var lang_tool = Alph.Main.getLanguageTool(bro);
         // run site-defined alpheios enabled event handler
-        var callback_elem = Alph.$("#alpheios-enabled-callback",a_doc).get(0);
-        if (callback_elem)
-        {
-            var evt = a_doc.createEvent("Events");
-            evt.initEvent("AlpheiosEnabled", true, false);
-            callback_elem.dispatchEvent(evt);
-        }
-
-        // run site-defined alpheios enabled event handler
-        var callback_elem = Alph.$("#alpheios-enabled-callback",a_doc).get(0);
-        if (callback_elem)
-        {
-            var evt = a_doc.createEvent("Events");
-            evt.initEvent("AlpheiosEnabled", true, false);
-            callback_elem.dispatchEvent(evt);
-        }
+        a_docs.forEach(
+            function(a_doc)
+            {
+                Alph.Site.addTriggerHint(bro,a_doc,trigger,lang_tool);
+                var callback_elem = Alph.$("#alpheios-enabled-callback",a_doc).get(0);
+                if (callback_elem)
+                {
+                    var evt = a_doc.createEvent("Events");
+                    evt.initEvent("AlpheiosEnabled", true, false);
+                    callback_elem.dispatchEvent(evt);
+                }
+            }
+            
+        );
 
     },
     
     /**
      * If the site contains an element with the class 'alpheios-toolbar',
      * adds the toolbar handlers to the child elements
-     * @param {Document} a_doc the browser content document
+     * @param {Array} a_docs array of documents loaded in the browser window
      */
-    enableToolbar: function(a_doc)
+    enableToolbar: function(a_docs)
     {
         
-        var toolbars = Alph.$(".alpheios-toolbar",a_doc);
-        // do nothing if we don't have a toolbar
-        if (toolbars.length == 0)
+        for (var i=0; i<a_docs.length; i++)
         {
-            return;
-        }
-        if (this.getTranslationUrl(a_doc))
-        {
-            Alph.$(".alpheios-toolbar-translation",toolbars).bind(
-                'click',
-                {alpheios_panel_id: 'alph-trans-panel'},
-                this.togglePanelHandler
+            var a_doc = a_docs[i];
+            if (this.getTranslationUrl(a_doc))
+            {
+                Alph.$(".alpheios-toolbar-translation",a_doc).bind(
+                    'click',
+                    {alpheios_panel_id: 'alph-trans-panel'},
+                    this.togglePanelHandler
          
-            );
-        }
-        else
-        {
-            Alph.$(".alpheios-toolbar-translation",toolbars).css("display","none");
-        }
-        if (this.getTreebankDiagramUrl(a_doc))
-        {
-            Alph.$(".alpheios-toolbar-tree",toolbars).bind(
+                );
+            }
+            else
+            {
+                Alph.$(".alpheios-toolbar-translation",a_doc).css("display","none");
+            }
+            if (this.getTreebankDiagramUrl(a_doc))
+            {
+                Alph.$(".alpheios-toolbar-tree",a_doc).bind(
+                    'click',
+                    {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
+                    this.doCommandHandler
+                );
+            }
+            else
+            {
+                Alph.$(".alpheios-toolbar-tree",a_doc).css("display","none");           
+            }
+            Alph.$(".alpheios-toolbar-options",a_doc).bind(
                 'click',
-                {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
+                {alpheios_cmd_id: 'alpheios-options-cmd'},
                 this.doCommandHandler
             );
-        }
-        else
-        {
-            Alph.$(".alpheios-toolbar-tree",toolbars).css("display","none");           
-        }
-        Alph.$(".alpheios-toolbar-options",toolbars).bind(
-            'click',
-            {alpheios_cmd_id: 'alpheios-options-cmd'},
-            this.doCommandHandler
-        );
-        Alph.$(".alpheios-toolbar-about",toolbars).bind(
-            'click',
-            { alpheios_cmd_id: 'alpheios-about-cmd'},
-            this.doCommandHandler
-        );
-        Alph.$(".alpheios-toolbar-feedback",toolbars).bind(
-            'click',
-            { alpheios_cmd_id: 'alpheios-feedback-cmd'},
-            this.doCommandHandler
-        );
-
-        Alph.$(".alpheios-toolbar-level",toolbars).bind(
-            'click',
-            function()
-            {
-                var mode = this.getAttribute('alpheios-value');
-                if (mode)
+            Alph.$(".alpheios-toolbar-about",a_doc).bind(
+                'click',
+                { alpheios_cmd_id: 'alpheios-about-cmd'},
+                this.doCommandHandler
+            );
+            Alph.$(".alpheios-toolbar-feedback",a_doc).bind(
+                'click',
+                { alpheios_cmd_id: 'alpheios-feedback-cmd'},
+                this.doCommandHandler
+            );
+    
+            Alph.$(".alpheios-toolbar-level",a_doc).bind(
+                'click',
+                function()
                 {
-                    Alph.Main.setMode(null,mode);
+                    var mode = this.getAttribute('alpheios-value');
+                    if (mode)
+                    {
+                        Alph.Main.setMode(null,mode);
+                    }
                 }
+            );
+            
+            Alph.$(".alpheios-toolbar-inflect",a_doc).bind(
+                'click',
+                { alpheios_cmd_id: 'alpheios-inflect-cmd' },
+                this.doCommandHandler
+            );
+            Alph.$(".alpheios-toolbar-grammar",a_doc).bind(
+                'click',
+                { alpheios_cmd_id: 'alpheios-grammar-cmd' },
+                this.doCommandHandler
+            );
+            Alph.$(".alpheios-toolbar-wordlist",a_doc).bind(
+                'click',
+                { alpheios_cmd_id: 'alpheios-wordlist-cmd' },
+                this.doCommandHandler
+            );
+            Alph.$(".alpheios-toolbar-help",a_doc).bind(
+                'click',
+                {alpheios_cmd_id: 'alpheios-help-cmd'},
+                this.doCommandHandler
+            );
+            var lang_tool = Alph.Main.getLanguageTool();
+            var wordlist;
+            if (lang_tool)
+            {
+                wordlist = lang_tool.getWordList();
             }
-        );
-        
-        Alph.$(".alpheios-toolbar-inflect",toolbars).bind(
-            'click',
-            { alpheios_cmd_id: 'alpheios-inflect-cmd' },
-            this.doCommandHandler
-        );
-        Alph.$(".alpheios-toolbar-grammar",toolbars).bind(
-            'click',
-            { alpheios_cmd_id: 'alpheios-grammar-cmd' },
-            this.doCommandHandler
-        );
-        Alph.$(".alpheios-toolbar-wordlist",toolbars).bind(
-            'click',
-            { alpheios_cmd_id: 'alpheios-wordlist-cmd' },
-            this.doCommandHandler
-        );
-        Alph.$(".alpheios-toolbar-help",toolbars).bind(
-            'click',
-            {alpheios_cmd_id: 'alpheios-help-cmd'},
-            this.doCommandHandler
-        );
-        
+            if (wordlist && 
+                     (Alph.$(".alpheios-word",a_doc).length > 0 || 
+                      Alph.$(".alpheios-aligned-word",a_doc).length >0)
+                    )
+            {
+                Alph.$(".alpheios-toolbar-scanwords",a_doc).bind(
+                    'click',
+                    function()
+                    {
+                        var loading_msg = Alph.Main.getString("alph-loading-wordlist");
+                        Alph.$(this)
+                            .after('<div id="alpheios-loading-wordlist" class="alpheios-loading">' 
+                                + loading_msg + '</div>');
+            
+                        Alph.Site.scanWords(
+                            lang_tool,
+                            a_doc,
+                            function() {Alph.$("#alpheios-loading-wordlist",a_doc).remove() }
+                        )
+                    }
+                );
+            }
+            else
+            {
+                Alph.$(".alpheios-toolbar-scanwords",a_doc).css("display","none");
+            }
+        }
+               
     },
     
 
     /**
      * set current mode
+     * @param {Array} a_docs the array of Documents loaded in the current browser window
+     * @param {String} a_mode the new Alpheios mode
      */
-    setCurrentMode: function(a_doc,a_mode)
+    setCurrentMode: function(a_docs,a_mode)
     {
         try
         {
-            Alph.$(".alpheios-toolbar-level[alpheios-value=" + a_mode + "]",a_doc).each
+            Alph.$(".alpheios-toolbar-level[alpheios-value=" + a_mode + "]",a_docs).each
             (
                 function()
                 {
@@ -302,12 +348,12 @@ Alph.Site = {
                     Alph.$(this)
                         .siblings(".alpheios-toolbar-level")
                         .removeClass("alpheios-current");
-                    Alph.$("#alpheios-current-level",a_doc).attr("alpheios-value",a_mode);
-                    Alph.$("#alpheios-current-level *:not([alpheios-value="+a_mode+"])",a_doc)
+                    Alph.$("#alpheios-current-level",a_docs).attr("alpheios-value",a_mode);
+                    Alph.$("#alpheios-current-level *:not([alpheios-value="+a_mode+"])",a_docs)
                         .removeClass("alpheios-current");
-                    Alph.$("#alpheios-current-level *[alpheios-value="+a_mode+"]",a_doc)
+                    Alph.$("#alpheios-current-level *[alpheios-value="+a_mode+"]",a_docs)
                         .addClass("alpheios-current");
-                    Alph.$("body",a_doc).attr("alpheios-level",a_mode);
+                    Alph.$("body",a_docs).attr("alpheios-level",a_mode);
                     ;
                     Alph.$("body",(Alph.Main.d_panels['alph-trans-panel'].getCurrentDoc())[0])
                         .attr("alpheios-level",a_mode);
@@ -322,8 +368,11 @@ Alph.Site = {
     
     /**
      * update panel status
+     * @param {Array} a_docs the array of Documents loaded in the browser window
+     * @param {String} a_id the id of the toolbar panel
+     * @param {String} a_status the new panel status
      */
-    setToolbarPanelStatus: function(a_doc,a_panel_id,a_status)
+    setToolbarPanelStatus: function(a_docs,a_panel_id,a_status)
     {
         // for now, only update the toolbar buttons for the translation panel 
         var toolbar_class = 
@@ -337,11 +386,11 @@ Alph.Site = {
         
         if (a_status == Alph.Panel.STATUS_SHOW)
         {
-            Alph.$("."+toolbar_class,a_doc).addClass("alpheios-current");
+            Alph.$("."+toolbar_class,a_docs).addClass("alpheios-current");
         }
         else
         {
-            Alph.$("."+toolbar_class,a_doc).removeClass("alpheios-current");
+            Alph.$("."+toolbar_class,a_docs).removeClass("alpheios-current");
         }
     },
     
@@ -381,46 +430,51 @@ Alph.Site = {
 
     /**
      * adds the interlinear toggle element to the page
-     * @param {Document} a_doc the browser content document
+     * @param {Array} a_doc the array of documents loaded in the browser window
      */
-    addInterlinearToggle: function(a_doc)
-    {
-        
-        // don't add the toggle if we don't have an aligned translation to use
-        if ( ! this.getTranslationUrl(a_doc) ||  
-               Alph.$(".alpheios-aligned-word",a_doc).length == 0)
+    addInterlinearToggle: function(a_docs)
+    {        
+        for (var i=0; i<a_docs.length; i++)
         {
-            return;
-        }
-        
-        // add handlers to interlinear translation controls 
-        // in the source text display, but only do it if this feature
-        // is turned on
-        if ( Alph.BrowserUtils.getPref("features.alpheios-interlinear") )
-        {
+            var a_doc = a_docs[i];
             
-            var my_obj = this;
-
-            Alph.$(".alpheios-interlinear-toggle",a_doc)
-                .bind('click', Alph.Site.handleInterlinearToggle);        
-
-            // update the checked state of the interlinear toggle in the source text
-            // document with the state of the XUL control
-            if (Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == 'true')
+            // don't add the toggle if we don't have an aligned translation to use
+            if ( ! Alph.Site.getTranslationUrl(a_doc) ||  
+                   Alph.$(".alpheios-aligned-word",a_doc).length == 0)
             {
-                Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",true);
-                if (! Alph.Interactive.enabled())
-                {
-                    Alph.Site.handleInterlinearToggle(null,
-                        Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
-                }
-            }   
-            Alph.$("#alpheios-interlinear-parent",a_doc).css("display","block");
+                continue;
+            }
             
-        }
-        else
-        {
-            Alph.$("#alpheios-interlinear-parent",a_doc).css("display","none");
+            // add handlers to interlinear translation controls 
+            // in the source text display, but only do it if this feature
+            // is turned on
+            if ( Alph.BrowserUtils.getPref("features.alpheios-interlinear") )
+            {
+                
+                var my_obj = this;
+    
+                Alph.$(".alpheios-interlinear-toggle",a_doc)
+                    .bind('click', Alph.Site.handleInterlinearToggle);        
+    
+                // update the checked state of the interlinear toggle in the source text
+                // document with the state of the XUL control
+                if (Alph.$("#alpheios-trans-opt-inter-src").attr('checked') == 'true')
+                {
+                    Alph.$(".alpheios-interlinear-toggle",a_doc).attr("checked",true);
+                    if (! Alph.Interactive.enabled())
+                    {
+                        Alph.Site.handleInterlinearToggle(null,
+                            Alph.$(".alpheios-interlinear-toggle",a_doc).get(0));
+                    }
+                }   
+                Alph.$("#alpheios-interlinear-parent",a_doc).css("display","block");
+                
+            }
+            else
+            {
+                Alph.$("#alpheios-interlinear-parent",a_doc).css("display","none");
+            }
+
         }
     },
 
@@ -556,7 +610,7 @@ Alph.Site = {
     populateInterlinear: function(a_words,a_source,a_end_callback)
     {    
         /*
-         * This code is a little convuluted.  We want to issue
+         * This code is a little convoluted.  We want to issue
          * the request to retrieve and insert the interlinear translation
          * in a background thread (launched by setTimeout()) so that the remainder
          * of the javascript processing for the page can finish without waiting
@@ -575,13 +629,14 @@ Alph.Site = {
             this.execute = function()
             {
                 var next_offset = 0;
-        
+                var wordlist = Alph.Main.getLanguageTool().getWordList();
                 Alph.Site.s_logger.debug("Start inserting interlinear.");
                 // add the aligned text to each source word
                 a_words.forEach(
                     function(parent)
                     {
                    
+                        var word_text = Alph.$(parent).text();
                         if (Alph.$(parent).attr("aligned-offset"))
                         {
                             Alph.$(parent).css("padding-left",Alph.$(parent).attr("aligned-offset"));     
@@ -621,7 +676,11 @@ Alph.Site = {
                                        Alph.$(id_copy).removeClass("alpheios-aligned-word");
                                        Alph.$(id_copy).css("top",offset_top); 
                                        Alph.$(id_copy).css("left",offset_left + next_offset);
-                                       offset_left = offset_left + Alph.$(id_copy).width();                           
+                                       offset_left = offset_left + Alph.$(id_copy).width();
+                                       if (wordlist && wordlist.hasForm(wordlist.KNOWN,word_text))
+                                       {
+                                            Alph.$(id_copy).addClass("alpheios-known-word");
+                                       }
                                    }
                                 }
                                 // adjust the offset of the next element
@@ -748,21 +807,23 @@ Alph.Site = {
      */
     observeUIEvent: function(a_bro,a_event_type,a_event_data)
     {
-       //TODO - won't work for frames
-       var doc = a_bro.contentDocument;
-       
+        var docs = Alph.Main.getBrowserDocs(a_bro);
+        
         if (a_event_type == Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER)
         {
-            this.addTriggerHint(
-                a_bro,doc,a_event_data.new_trigger,Alph.Main.getLanguageTool(a_bro));
+            for (var i=0; i<docs.length; i++)
+            {
+                this.addTriggerHint(
+                        a_bro,docs[i],a_event_data.new_trigger,Alph.Main.getLanguageTool(a_bro));
+            }
         }
         // observe change to config setting which enables interlinear
         else if (a_event_type == Alph.Constants.EVENTS.UPDATE_PREF 
                  && a_event_data.name.indexOf('features.alpheios-interlinear') >= 0)
         {
-            this.addInterlinearToggle(doc);             
+            this.addInterlinearToggle(docs);             
         }
-
+        
     },
     
     /**
@@ -844,20 +905,84 @@ Alph.Site = {
     
     /**
      * Update the browser elements which correspond to the site tools
-     * @param {Document} a_doc the current document
+     * @param {Array} a_docs the array of Documents loaded in the browser window
      */
-    updateSiteToolStatus: function(a_doc)
+    updateSiteToolStatus: function(a_docs)
     {
-        if (! this.getTranslationUrl(a_doc))
+        var has_translation = false;
+        var has_treebank = false;;
+        for (var i=0; i<a_docs.length; i++)
         {
-            Alph.$("#alph-trans-status").attr("disabled",true);
-            Alph.$("#alph-trans-status").attr("hidden",true);
+            if (this.getTranslationUrl(a_docs[i]))
+            {
+                has_translation = true;        
+            }
+            if (this.getTreebankDiagramUrl(a_docs[i]))
+            {
+                has_treebank = true;
+            }
+        }
+        // TODO for now the firefox toolbar status assumes that all documents
+        // in the browser window should reflect the same status, but might
+        // not always be the case.
+        Alph.$("#alph-trans-status").attr("disabled",! has_translation);
+        Alph.$("#alph-trans-status").attr("hidden", ! has_translation);
+        Alph.$("#alph-tree-status").attr("disabled",! has_treebank);
+        Alph.$("#alph-tree-status").attr("hidden",! has_treebank);
         
-        }
-        if (! this.getTreebankDiagramUrl(a_doc))
+    },
+    
+    /**
+     * Toggle the alpheios-known-word class on any elements matching the supplied word
+     * which are identified by the alpheios-aligned-word or alpheios-word class
+     * @param {Alph.LanguageTool} a_lang_tool, the appropriate Alpheios language tool 
+     * @param {Document} a_doc the document to check
+     * @param {String} a_word the word to look for in the document
+     */
+    toggleWordStatus: function(a_langTool,a_doc,a_word)
+    {
+        
+        Alph.$(".alpheios-aligned-word,.alpheios-word",a_doc).each(
+            function()
+            {
+                if (a_langTool.normalizeWord(Alph.$(this).text()) == a_word)
+                {
+                    Alph.$(this).toggleClass("alpheios-known-word");
+                    Alph.$(this).nextAll(".alpheios-aligned-trans").toggleClass("alpheios-known-word");
+                }
+            }
+        );
+    },
+    
+    /**
+     * Iterate through elements identified with the alpheios-aligned-word or alpheios-word
+     * class, toggling the alpheios-known-word class on them according to their presence
+     * or absense on the user's wordlist
+     * @param {Alph.LanguageTool} a_langTool the appropriate Alpheios Language Tool
+     * @param {Document} a_doc the document to update
+     * @param {Function} a_callback a function to call upon completion
+     */
+    scanWords: function(a_langTool,a_doc,a_callback)
+    {
+        var wordlist = a_langTool.getWordList();
+        if (wordlist)
         {
-            Alph.$("#alph-tree-status").attr("disabled",true);
-            Alph.$("#alph-tree-status").attr("hidden",true);
+            Alph.$(".alpheios-aligned-word,.alpheios-word",a_doc).each(
+                function()
+                { 
+                    var word = a_langTool.normalizeWord(Alph.$(this).text());
+                    if (wordlist.hasForm(wordlist.KNOWN,word))
+                    {
+                        Alph.$(this).addClass("alpheios-known-word");
+                    }
+                    else
+                    {
+                        Alph.$(this).removeClass("alpheios-known-word");
+                    }
+                
+                }
+            );
         }
+        a_callback();
     }
 };

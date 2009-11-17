@@ -521,7 +521,14 @@ DataManager =
                 obj = this.createDataObj(a_type,a_key)
             }
             // make sure the object is fully loaded before we return it
-            obj.load();
+            if (obj)
+            {   
+                obj.load();
+            }
+            else
+            {
+                this.s_logger.error("Failed to create data object type " + a_type + " key " + a_key);
+            }
         }
         return obj;
     },

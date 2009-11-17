@@ -328,7 +328,7 @@ Alph.Panel.prototype.updateStatus = function(a_status)
         }
     }
     
-    Alph.Site.setToolbarPanelStatus(bro.contentDocument,this.d_panelId,a_status);
+    Alph.Site.setToolbarPanelStatus(Alph.Main.getBrowserDocs(bro),this.d_panelId,a_status);
     
     // if the panel status changed, call observeUIEvent to make sure the 
     // panel contents are up to date

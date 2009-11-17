@@ -53,11 +53,22 @@ Alph.Translation.prototype.show = function()
 {
     var panel_obj = this;
     var bro = Alph.Main.getCurrentBrowser();
-    //TODO - eventually should be able to pick the translation url
-    // up from the user's preferences for the basic reader
+  
     
-    
-    var trans_url = Alph.Site.getTranslationUrl(bro.contentDocument);
+    var docs = Alph.Main.getBrowserDocs(bro);
+    var trans_url;
+    for (var i=0; i<docs.length; i++)
+    {
+        var doc = docs[i];
+        trans_url = Alph.Site.getTranslationUrl(doc);
+        if (trans_url)
+        {
+            // TODO for now just take the first translation url found, but
+            // eventually need to support possibility of multiple translations, per document
+            // and per browser window
+            break;
+        }   
+    } 
     if (trans_url)
     {
         Alph.Main.s_logger.info("loading translation from " + trans_url);
@@ -74,7 +85,7 @@ Alph.Translation.prototype.show = function()
             {
                 if (r.readyState == 4 && r.responseText) 
                 {
-                    Alph.Translation.processTranslation(r.responseText,bro,trans_doc);
+                    Alph.Translation.processTranslation(trans_url,r.responseText,bro,trans_doc);
                 }
                 else 
                 {
@@ -101,7 +112,7 @@ Alph.Translation.prototype.show = function()
                     success: function(data, textStatus) 
                     {
                         
-                        Alph.Translation.processTranslation(data,bro,trans_doc);
+                        Alph.Translation.processTranslation(trans_url,data,bro,trans_doc);
                     } 
                 }   
             );
@@ -127,16 +138,21 @@ Alph.Translation.handleError = function(a_error,a_trans_doc)
 
 /**
  * Populate the pedagogical panel with the translation
+ * @param {String} a_href the source url
+ * @param {String} a_data the contents of the translation document
+ * @param {Browser} a_bro the current browser
+ * @param {Document} a_trans_doc the template document to which the translation gets appended
  */
-Alph.Translation.processTranslation = function(a_data,a_bro,a_trans_doc) {
+Alph.Translation.processTranslation = function(a_href,a_data,a_bro,a_trans_doc) {
     var new_doc = (new DOMParser()).parseFromString(
                             a_data,
                             "application/xhtml+xml");
     Alph.$("head",a_trans_doc).html(Alph.$("head",new_doc).contents())
     Alph.$("body",a_trans_doc).html(Alph.$("body",new_doc).contents());
+    Alph.$("head",a_trans_doc).append('<meta name="DC.source" content="' + a_href + '"></meta>');
 
     // setup the display
-    Alph.Site.setupPage(a_trans_doc,'trans');
+    Alph.Site.setupPage([a_trans_doc],'trans');
                         
     var disable_interlinear = true;
     if ( (Alph.$(".alpheios-aligned-word",a_trans_doc).length > 0) &&
@@ -246,9 +262,20 @@ Alph.Translation.toggleInterlinear = function(a_event)
 Alph.Translation.showInterlinear = function()
 {
     var panel = Alph.$("#alph-trans-panel");
-    var browser_doc = Alph.Main.getCurrentBrowser().contentDocument;
+    var browser_docs = Alph.Main.getBrowserDocs(Alph.Main.getCurrentBrowser());
     var trans_doc =  
             Alph.$("browser",panel).get(0).contentDocument;
+    var trans_href = Alph.$("meta[name=DC.source]",trans_doc).attr("content");
+    var browser_doc = null;
+    // find the browser document which references the currently loaded translation
+    for (var i=0; i<browser_docs.length; i++)
+    {
+        if (Alph.Site.getTranslationUrl(browser_docs[i]) == trans_href)
+        {
+            browser_doc = browser_docs[i];
+            break;
+        }
+    }
     
     Alph.$("#alpheios-trans-opt-inter-trans").
         parent("toolbaritem").
@@ -323,7 +350,7 @@ Alph.Translation.prototype.toggleParallelAlignment = function(a_elem,a_type,a_on
     }
     else
     {
-        parallel_doc = Alph.Main.getCurrentBrowser().contentDocument;
+        parallel_doc = Alph.Main.getBrowserDocs(Alph.Main.getCurrentBrowser());
     }
  
     // the source text element uses the "nrefs" attribute to identify the

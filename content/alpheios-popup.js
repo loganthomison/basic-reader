@@ -96,6 +96,7 @@ Alph.Xlate = {
         if (typeof rp == "undefined" || rp == null ||
             (! rp.data && ! is_svg_text))
         {
+            Alph.Main.s_logger.debug("No data found");
             return;
         }
 
@@ -135,7 +136,7 @@ Alph.Xlate = {
         }
         
         // in a mixed site, ignore everything except explicity enabled text
-        if (Alph.Site.isMixedSite(rp.ownerDocument) && 
+        if (Alph.Site.isMixedSite([rp.ownerDocument]).length > 0 && 
             (! Alph.$(a_e.explicitOriginalTarget).hasClass('alpheios-enabled-text')) &&
                Alph.$(a_e.explicitOriginalTarget).parents('.alpheios-enabled-text').length == 0)
         {
@@ -467,25 +468,7 @@ Alph.Xlate = {
         // TODO - we probably should reposition the popup now that we
         // know it's final size
 
-        /**
-         * TODO this is temporary until the actual wordlist implementation
-         * is figured out.   
-         */
-        var wordlist = Alph.DataManager.getDataObj('words',a_lang_tool.d_sourceLanguage,true);
-        if (wordlist)
-        {
-            wordlist.addForm(window,a_alphtarget.getWord());
-            Alph.$(".alph-dict",alphtext_node).each(
-                function()
-                {
-                    var lemma = this.getAttribute('lemma-key');
-                    if (lemma)
-                    {
-                        wordlist.addLemma(window,lemma);
-                    }
-                }
-            );
-        }
+        
         // disambiguate if treebank is available
         if (disambiguate_id)
         {
@@ -959,7 +942,7 @@ Alph.Xlate = {
             lang_tool.addStyleSheet(topdoc);
             
             // flag the popup if we're on an enhanced text site
-            var enhanced_class = Alph.Site.isPedSite(topdoc) ? ' alpheios-enhanced' : '';
+            var enhanced_class = Alph.Site.isPedSite([topdoc]).length > 0 ? ' alpheios-enhanced' : '';
             
             popup = topdoc.createElementNS("http://www.w3.org/1999/xhtml", "div");
             popup.setAttribute("id", "alph-window");
