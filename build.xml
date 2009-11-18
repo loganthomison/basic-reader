@@ -16,7 +16,7 @@
               value="/Program Files/Apache Group/Apache2/htdocs/alpheios_devbuilds" />
 	<property name="docs.deploy.dir"
 	          value="/test/docs/${app.name}"/>
-	<property name="release.id" value="1.0alpha4" />
+	<property name="release.id" value="1.0alpha5" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
 	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img,espeak"/>
 	
