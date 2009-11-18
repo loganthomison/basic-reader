@@ -1159,7 +1159,7 @@ Alph.Prefs = {
     {
         var menu = Alph.$("#backup-interval").get(0);
         var selectedItem = menu.selectedItem;
-        var hide_lookup_num = (selectedItem.value != Alph.Constants.ONLOOKUP);
+        var hide_lookup_num = (! selectedItem || selectedItem.value != Alph.Constants.ONLOOKUP);
         Alph.$("#backup-lookup-num").get(0).setAttribute("hidden",hide_lookup_num);
     },
         
@@ -1204,11 +1204,11 @@ Alph.Prefs = {
         var path = "";
         try
         {
-            path = Alph.BrowserUtils.getLocalFilePref(pref_name);
+            path = Alph.BrowserUtils.getLocalFilePref(pref_name.replace(/extensions.alpheios./,''));
         }
         catch (a_e)
         {
-            // TODO log error
+            Alph.BrowserUtils.debug("Error retrieving backup file path " + a_e);
         }
         return path;
     },

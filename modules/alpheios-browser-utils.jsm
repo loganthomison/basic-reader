@@ -151,7 +151,7 @@ BrowserUtils = {
             prefSvc.setComplexValue(lookup_name,CI.nsILocalFile,file);
         } catch(a_e)
         {
-            this.s_logger.debug(a_path + " not storable as a valid file path :" + a_e);
+            this.s_logger.debug(a_pathOrFile + " not storable as a valid file path :" + a_e);
         }
     },
 
@@ -618,7 +618,7 @@ BrowserUtils = {
                 // OR if it doesn't exist but parent path is writeable
                 result = 
                     (file.exists() && file.isWritable()) ||
-                    (!file.exists() && file.parent.isWriteable());
+                    (!file.exists() && file.parent.isWritable());
                 break;
             }
             case '<':

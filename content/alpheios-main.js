@@ -868,7 +868,7 @@ Alph.Main =
             else
             {         
                 Alph.Main.d_defaultLanguage = 
-                    Alph.$("#alpheios-lang-popup-tm menuitem:visible").get(0).value;
+                    Alph.$("#alpheios-lang-popup-tm menuitem:visible").get(0).getAttribute("value");
             }
             // successfully setup the Alph.Languages object, so return true 
             languages_set = true;
@@ -1963,6 +1963,7 @@ Alph.Main =
         else if (a_name.match(/user/))
         {
             Alph.DataManager.updateUserCommands(window);
+            Alph.DataManager.resetDataService();
         }
 
         if (typeof a_lang != 'undefined')

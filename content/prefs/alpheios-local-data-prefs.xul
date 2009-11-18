@@ -19,7 +19,7 @@
                                 control="backup-file"/>
                             <textbox id="backup-file" preference="pref-backup-local-file" flex="1"
                                      onsynctopreference="return Alph.Prefs.setBackupFile();"
-                                     onsyncfrompreference="Alph.Prefs.getBackupFilePath();"/>
+                                     onsyncfrompreference="return Alph.Prefs.getBackupFilePath();"/>
                             <button class="alpheios-browse-button" 
                                     id="browse-backup-file" 
                                     label="&alpheios.prefs.file.browse;"

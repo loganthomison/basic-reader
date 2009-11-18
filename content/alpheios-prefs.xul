@@ -6,8 +6,7 @@
 <prefwindow id="alpheios-prefs" title="&alpheios.prefs.preferences;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         buttons="accept,cancel"
-        type="prefwindow"
-        ondialogaccept="Alph.DataManager.resetDataService()">
+        type="prefwindow">
     <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
     <script type="application/x-javascript" src="chrome://alpheios/content/prefs/alpheios-prefs.js" />
 
@@ -149,7 +148,7 @@
         <preferences id="prefs-userdata">
             <preference id="pref-user-model" name="extensions.alpheios.user.model" type="string"/>
         </preferences>
-        <groupbox>
+        <groupbox flex="1">
             <caption label="&alpheios.prefs.userdata.model;"/>
             <radiogroup preference="pref-user-model" 
                         onsyncfrompreference="Alph.Prefs.checkUserDataModel();" 
@@ -166,7 +165,7 @@
                 <radio label="&alpheios.prefs.userdata.model.disable;" value="disable"/>
             </radiogroup>
         </groupbox>
-        <vbox id="alpheios-prefs-userdata-advanced" collapsed="true">
+        <vbox id="alpheios-prefs-userdata-advanced" collapsed="true" flex="1">
         </vbox>
     </prefpane>
 </prefwindow>

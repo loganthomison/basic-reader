@@ -148,14 +148,15 @@ DataServiceLocal.prototype.getBackupCallback = function(a_keep)
  * Backs up the user data directory to a local zip file,
  * keeping the requested number of copies of old backups
  * @param {Window} a_window the parent window
- * @param {int} a_keep the number of old copies to keep
+ * @param {Path} a_path optional file path for the backup 
+ *               (if not suplied, taken from preferences)
  * @returns true if backup succeeded false if not
  * @type Boolean
  */
-DataServiceLocal.prototype.backup = function(a_window)
+DataServiceLocal.prototype.backup = function(a_window,a_path)
 {
     var rc = true;
-    var backup_file = BrowserUtils.getLocalFilePref(BFILE_PREF);
+    var backup_file = a_path || BrowserUtils.getLocalFilePref(BFILE_PREF);
     try 
     {
         for (var i=this.d_keepBackups-1; i>=0;i--)
@@ -164,10 +165,9 @@ DataServiceLocal.prototype.backup = function(a_window)
             var backupCopy = backup_file.replace(/(\.[^\.]+)$/, ".bak" + (i+1) + "$1");
             BrowserUtils.copyLocalFile(srcCopy,BrowserUtils.getLocalFile(backupCopy),true);
         }
-        // TODO make copy of existing backup if this.d_keepBackups > 0
-        // TODO add message to statusbar or toolbar indicating backup in progress
+        
         BrowserUtils.setStatus(a_window,"alpheios-dataservice-status","backup-in-progress");
-        BrowserUtils.zipDataDir(BrowserUtils.getLocalFilePref(BFILE_PREF));
+        BrowserUtils.zipDataDir(backup_file);
         BrowserUtils.clearStatus(a_window,"alpheios-dataservice-status");
     }
     catch(a_e)
@@ -228,8 +228,17 @@ DataServiceLocal.prototype.configureBackup = function(a_window)
             if (a_picked && a_file)
             { 
                 a_file.append(Constants.BACKUP_FILE);
-                BrowserUtils.setLocalFilePref(BFILE_PREF,a_file);
-                return this.backup(a_window);
+                // try creating the backup file at the selected path
+                // before updating the file preference -- on the mac
+                // the attempt to set the file preference will fail
+                // if the file doesn't exist, see 
+                // https://bugzilla.mozilla.org/show_bug.cgi?id=529521
+                var rc = this.backup(a_window,a_file.path);
+                if (rc)
+                {
+                    BrowserUtils.setLocalFilePref(BFILE_PREF,a_file);
+                }
+                return rc;
             }
             else
             {
