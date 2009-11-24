@@ -40,7 +40,7 @@ pref("extensions.alpheios.enable.toolbar",true);
 pref("extensions.alpheios.survey.url","http://www.surveymonkey.com/s.aspx?sm=IG7mAWG026Z4JYB_2f5dsXEw_3d_3d");
 pref("extensions.alpheios.user.model","ffprofile");
 pref("extensions.alpheios.user.save.interval.lookup.num",5);
-pref("extensions.alpheios.user.backup.keep",5);
+pref("extensions.alpheios.user.backup.keep",1);
 pref("extensions.alpheios.user.backup.interval","disable");
 pref("extensions.alpheios.user.backup.interval.lookup.num",10);
 pref("extensions.alpheios.user.restore.interval","enable");

@@ -1026,12 +1026,12 @@ Alph.Prefs = {
                 // local dataservice
                 // restore on request
                 // backup on app disable
-                // keep 5 backups
+                // keep 1 backup
                 // clear only on request
                 dataservice_pref.value = 'local';
                 document.getElementById('pref-restore-interval').value = Alph.Constants.ONREQUEST;
                 document.getElementById('pref-backup-interval').value = Alph.Constants.ONDISABLE;
-                document.getElementById('pref-backup-keep').value = 5;
+                document.getElementById('pref-backup-keep').value = 1;
                 document.getElementById('pref-userdata-clear-interval').value = Alph.Constants.ONREQUEST;
                 document.getElementById('pref-restore-confirm').value = false;
                 break;
@@ -1042,13 +1042,13 @@ Alph.Prefs = {
                 // local dataservice
                 // restore on enable
                 // backup after 10 lookups 
-                // keep 10 backups
+                // keep 1 backup
                 // clear on app disable
                 dataservice_pref.value = 'local';
                 document.getElementById('pref-restore-interval').value = Alph.Constants.ONENABLE;
                 document.getElementById('pref-backup-interval').value = Alph.Constants.ONLOOKUP;
                 document.getElementById('pref-backup-interval-lookup-num').value = 10;
-                document.getElementById('pref-backup-keep').value = 10;
+                document.getElementById('pref-backup-keep').value = 1;
                 document.getElementById('pref-userdata-clear-interval').value =Alph.Constants.ONDISABLE; 
                 document.getElementById('pref-restore-confirm').value = false;
                 break;

@@ -1509,10 +1509,25 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     var wordlist = lang_tool.getWordList();
     if (wordlist && lemmas.length > 0) 
     {
+        var seenLemmas = {};
+        var normalizedLemmas = [];
+        for (var i=0; i<lemmas.length; i++)
+        {
+            // remove special flags and trailing digits from lemmas
+            var lemma = lemmas[i].replace(/^@/,'');
+            lemma = lemma.replace(/\d+$/,'');
+            lemma = lang_tool.normalizeWord(lemma)
+            if (! seenLemmas[lemma])
+            {
+                normalizedLemmas.push(lemma);
+                seenLemmas[lemma] = true;
+            }
+        }
         var normalizedWord = lang_tool.normalizeWord(a_target.getWord()); 
         wordlist.addWord(window,normalizedWord,lemmas,wordlist.UNKNOWN);
         var alt_text = Alph.Main.getString('alph-mywords-link');
-        var added_msg = Alph.Main.getString('alph-mywords-added',[normalizedWord,lemmas.join(', ')]);
+        var added_msg = Alph.Main.getString('alph-mywords-added',
+            [normalizedWord,normalizedLemmas.join(', ')]);
         var link = Alph.$(  
             '<div class="alph-tool-icon alpheios-button alph-mywords-link" ' +
             'href="#alpheios-mywords" title="' + alt_text + '">' +
@@ -1525,7 +1540,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             {
                 if (Alph.BrowserUtils.doConfirm(window,'alpheios-confirm-dialog',added_msg))
                 {
-                    if (wordlist.addWord(window,normalizedWord,lemmas,wordlist.KNOWN))
+                    if (wordlist.addWord(window,normalizedWord,normalizedLemmas,wordlist.KNOWN))
                     {
                         Alph.Site.toggleWordStatus(
                             lang_tool,Alph.$(a_node).get(0).ownerDocument,normalizedWord);
@@ -1838,6 +1853,8 @@ Alph.LanguageTool.prototype.normalizeWord = function(a_word)
 {
     return a_word;
 }
+
+
 /**
  * Get the user's wordlist for the language
  * @returns the wordlist, or null if user features aren't enabled
