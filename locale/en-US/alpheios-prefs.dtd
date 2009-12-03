@@ -1,4 +1,5 @@
 <!ENTITY alpheios.prefs.preferences "Alpheios Preferences">
+<!ENTITY alpheios.prefs.toolbar "Toolbar">
 <!ENTITY alpheios.prefs.mouse "Mouse Settings">
 <!ENTITY alpheios.prefs.advanced "Advanced">
 <!ENTITY alpheios.prefs.advanced.label "Advanced...">
@@ -42,6 +43,7 @@
 <!ENTITY alpheios.prefs.dictionaries "Dictionaries">
 <!ENTITY alpheios.prefs.dictionaries.advanced "Advanced Dictionary Settings">
 <!ENTITY alpheios.prefs.lookup "Word Lookup">
+<!ENTITY alpheios.prefs.toolbar.enable "Enable Alpheios Toolbar">
 <!ENTITY alpheios.prefs.toolbar.lookup "Enable Toolbar Lookup">
 <!ENTITY alpheios.prefs.panels.inline "Inline Panels">
 <!ENTITY alpheios.prefs.panels.default.caption "Panels Open By Default">

@@ -1231,5 +1231,33 @@ Alph.Prefs = {
             // TODO log error    
         }
         return file_path;
+    },
+    
+    /**
+     * onsynctopreference handler for disabling the alpheios toolbar
+     * @returns true if alpheios toolbar can be enabled, false if not
+     */
+    checkAlpheiosToolbar: function()
+    {
+        var cbx = document.getElementById("enabletoolbar");
+        var enable = cbx.checked;
+        // if we're disabling the toolbar, make sure Alpheios isn't enabled anywhere first
+        if (! enable)
+        {
+            var alpheios_enabled = Alph.BrowserUtils.checkBrowsers(
+                function(a_bro)
+                {
+                    return typeof a_bro.alpheios != "undefined" &&                        
+                                  a_bro.alpheios.getVar("enabled");
+                })                           
+            if (alpheios_enabled)
+            {            
+                Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-toolbar-disable");
+                enable = true;
+                cbx.checked = true;
+            }
+        }
+        return enable;
     }
+    
 };

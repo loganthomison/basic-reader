@@ -198,9 +198,9 @@ Alph.Main =
                 .addEventListener("select", Alph.Main.onTabSelect, false);
         gBrowser.mTabContainer
                 .addEventListener("TabClose", function(e) { Alph.Main.onTabClose(e); }, false);
-        
-        Alph.Main.toggleToolbar(); 
+                 
         Alph.Main.d_hasLanguages = Alph.Main.setLanguages();
+        Alph.Main.toggleToolbar();
         // register any new auto-enable sites
         Alph.Site.registerSites();
         Alph.DataManager.updateUserCommands(window);
@@ -346,6 +346,7 @@ Alph.Main =
                 this.onMhttpdStart,
                 this.startMhttpd);   
         }
+        
         Alph.DataManager.handleAppEnable(window);
     },
 
@@ -578,7 +579,7 @@ Alph.Main =
         var cmenu_text = '';
         var tmenu_text = '';
         var menu_lang = '';
-        var status_text = '';
+        var status_text = '';        
         if (! this.isEnabled(this.getCurrentBrowser()))
         {
             cmenu_text = this.getString("alph-inline-enable-cm");
@@ -599,6 +600,7 @@ Alph.Main =
                 "[" +
                 Alph.$("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']").attr("label")
                 + "]";
+
         }
         Alph.$("#alpheios-toggle-cm").attr("label",cmenu_text);
         Alph.$("#alpheios-toggle-tm").attr("label",tmenu_text);
@@ -824,58 +826,32 @@ Alph.Main =
         
         var lang_list = Alph.LanguageToolFactory.getLangList();
         
-        var language_count = lang_list.length;
-
-        // if we have don't have at least one language, show the 'none' item
-        // in the menu and return false to disable the extension
-        if (language_count==0)
+        for (var i=0; i<lang_list.length; i++)
+        {           
+            var a_lang = lang_list[i];
+            Alph.Languages.addLangTool(a_lang,Alph.LanguageToolFactory.createInstance(a_lang,Alph));
+        }             
+        // set the default language from preferences if possible
+        if (lang_list.length > 0)
         {
-            Alph.$("#alpheios-tm-lang-none").attr("hidden","false");
-            Alph.$("#alpheios-mm-lang-none").attr("hidden","false");
-            Alph.$("#alpheios-cm-lang-none").attr("hidden","false"); 
-        }
-        else
-        {
-            for (var i=0; i<lang_list.length; i++)
-            {           
-                var a_lang = lang_list[i];
-                Alph.Languages.addLangTool(a_lang,Alph.LanguageToolFactory.createInstance(a_lang,Alph));
-                
-                // add menu items to the various language menus for this language
-                var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
-                var menuitem = Alph.Util.makeXUL(
-                    'menuitem',
-                    'alpheios-tm-lang-'+a_lang,
-                    ['label','value','type'],
-                    [lang_string,a_lang,'checkbox']
-                );
-                Alph.$("#alpheios-lang-popup-tm").append(menuitem);
-                Alph.$("#alpheios-lang-popup-mm").append(
-                    Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
-                Alph.$("#alpheios-lang-popup-cm").append(
-                    Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
-            }
-         
-            // set the default language from preferences if possible
             var pref_lang = Alph.BrowserUtils.getPref("default_language");
             if (pref_lang != null && pref_lang != '' &&
                 Alph.Languages.hasLang(pref_lang))
             {
                 Alph.Main.d_defaultLanguage = pref_lang;
             }
-            // no preferences so just use the first language in the 
-            // menu as the default
+            // no preferences so just use the first language added as the default
             else
             {         
-                Alph.Main.d_defaultLanguage = 
-                    Alph.$("#alpheios-lang-popup-tm menuitem:visible").get(0).getAttribute("value");
+                Alph.Main.d_defaultLanguage = lang_list[0];
             }
-            // successfully setup the Alph.Languages object, so return true 
+            // successfully setup the Alph.Languages object, so return true
             languages_set = true;
         }
         return languages_set;
     },
     
+   
     /**
      * Set the current language in use by the browser window.
      * If the extension isn't already enabled, redirects to 
@@ -1188,7 +1164,7 @@ Alph.Main =
                     }
                 }
             }
-        );          
+        );                  
     },
     
     /**
@@ -1585,7 +1561,7 @@ Alph.Main =
      */
     isEnabled: function(a_bro)
     {
-        return this.getStateObj(a_bro).getVar("enabled");
+        return Alph.Main.getStateObj(a_bro).getVar("enabled");
     },
     
     /**
@@ -1606,7 +1582,7 @@ Alph.Main =
     
     /**
      * toggle the ff toolbar
-     * @param {Boolean} a_on true if toolbar should be turned on, false if not 
+     * @param {Boolean} a_on true if toolbar should be turned on, false if not
      */
     toggleToolbar: function(a_on)
     {
@@ -1631,9 +1607,46 @@ Alph.Main =
                 Alph.$(toolbar).attr("id",'alpheios-toolbar');
                 Alph.$(toolbar).attr("collapsed",false);
                 Alph.$(toolbar).attr("hidden",false);
-                Alph.$("#navigator-toolbox").append(toolbar);
+                Alph.$("#navigator-toolbox").append(toolbar);      
+                
+                // update the languages menu in the toolbar
+                var lang_list = Alph.LanguageToolFactory.getLangList();
+                var language_count = lang_list.length;
+
+                // if we have don't have at least one language, show the 'none' item
+                // in the menu and return false to disable the extension
+                if (language_count==0)
+                {
+                    Alph.$("#alpheios-tm-lang-none").attr("hidden","false");
+                    Alph.$("#alpheios-mm-lang-none").attr("hidden","false");
+                    Alph.$("#alpheios-cm-lang-none").attr("hidden","false"); 
+                }
+                else
+                {
+                    for (var i=0; i<lang_list.length; i++)
+                    {           
+                        var a_lang = lang_list[i];
+                        if (Alph.Languages.hasLang(a_lang))
+                        {             
+                            // add menu items to the various language menus for this language
+                            var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
+                            var menuitem = Alph.Util.makeXUL(
+                                'menuitem',
+                                'alpheios-tm-lang-'+a_lang,
+                                ['label','value','type'],
+                                [lang_string,a_lang,'checkbox']
+                            );
+                            Alph.$("#alpheios-lang-popup-tm").append(menuitem);
+                            Alph.$("#alpheios-lang-popup-mm").append(
+                                Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
+                            Alph.$("#alpheios-lang-popup-cm").append(
+                            Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
+                        }
+         
+                    }
+                }
                 Alph.Main.enableTbLookup();
-            }
+            }            
         }
         else
         {
@@ -2032,6 +2045,25 @@ Alph.Main =
             }
         );
         return docs;
+    },
+    
+    /**
+     * disable the alpheios toolbar
+     */
+    disableToolbar: function(a_enable)
+    {
+        // first check to make sure alpheios isn't still enabled in 
+        // any browser tab of any open windows
+        var alpheios_enabled = Alph.BrowserUtils.checkBrowsers( Alph.Main.isEnabled );   
+        if (alpheios_enabled)
+        {            
+            Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-toolbar-disable");                
+        }
+        else
+        {
+            Alph.BrowserUtils.setPref("enable.toolbar",false);
+        
+        }
     }
 };
 

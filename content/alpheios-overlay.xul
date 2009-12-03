@@ -122,6 +122,8 @@
         <command id="alpheios-user.clear-cmd"
             oncommand="Alph.DataManager.clearData();"
             observes="alpheios-user.clear-allowed"/>
+        <command id="alpheios-disable-toolbar-cmd"                
+                 oncommand="Alph.Main.disableToolbar();"/>
     </commandset>
 
     <!-- FF context and tools menu overlays disabled for now 
@@ -329,6 +331,11 @@
                 <label id="alpheios-toolbar-status-text"
                        value="&alpheios-tools-status-disabled;"/>
             </toolbaritem>
+            <toolbarbutton 
+                id="alpheios-toolbar-close" 
+                class="alph-close-button"
+                tooltiptext="&alpheios.toolbar.disable;"
+                command="alpheios-disable-toolbar-cmd"/>
         </toolbar>
         <menu id="alpheios-lang-menu-tm" 
               label="&alpheios.lang.menu;"

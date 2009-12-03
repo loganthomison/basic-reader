@@ -44,6 +44,7 @@
 <!ENTITY alpheios-morph-lookup-tooltip "Enter a word or words.">
 <!ENTITY alpheios-toolbar-grippy-tooltip "Alpheios Toolbar">
 <!ENTITY alpheios-toolbar-name "Alpheios Toolbar">
+<!ENTITY alpheios.toolbar.disable "Hide Toolbar">
 <!ENTITY alpheios.panel.detach "Detach">
 <!ENTITY alpheios.panel.close "Close">
 <!ENTITY alpheios.panel.options "Options">

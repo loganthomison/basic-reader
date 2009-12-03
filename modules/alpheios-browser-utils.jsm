@@ -1423,6 +1423,40 @@ BrowserUtils = {
         }
     },
     
+    /**
+     * Iterate through the open browser windows, executing a callback
+     * in the context of each window. 
+     * @param {Function} a_callback callback function. Should accept the browser
+     *                              as a parameter and return a Boolean     *                              
+     * @returns the return value for the callback (true if it returned true in any browser, 
+     *                                          false only if it returned false in all browsers)
+     * @type Boolean
+     */
+    checkBrowsers: function(a_callback)
+    {
+        var wm = this.getSvc('WinMediator');
+        var enumerator = wm.getEnumerator("navigator:browser");
+            
+        var cb_return = false;
+        // iterate through the open browser windows, executing callback in context
+        // of each window        
+        while(enumerator.hasMoreElements()) {  
+            var win = enumerator.getNext();
+            var w_gBrowser = win.gBrowser;
+            var num = w_gBrowser.browsers.length;
+            for (var i = 0; i < num; i++) {
+                var bro = w_gBrowser.getBrowserAtIndex(i);
+                if (a_callback.call(win,bro))
+                {
+                    cb_return = true;                            
+                    break;
+                }
+            }
+        }
+        return cb_return;
+                    
+    }
+    
 
 };
 
