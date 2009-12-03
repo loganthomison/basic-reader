@@ -142,8 +142,6 @@ Alph.LanguageTool = function(a_language,a_properties)
                 // TODO should we throw an error if the startup method returns
                 // false?
             }
-            // TODO - do we want to support eval of javascript code present
-            // as a string in the config?
             else
             {
                 this.s_logger.warn("Startup method " + method_name +
