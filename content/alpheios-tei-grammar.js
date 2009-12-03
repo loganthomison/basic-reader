@@ -36,11 +36,16 @@ Alph.TeiGrammar = {
      * onLoad 
      * load handler for the grammar window
      * @param {String} a_index name of the grammar index file
+     * @param {Object} a_handlerObj object to handle toc/content links
+     *                 if not specified defaults to this object
      */
-    onLoad: function(a_index) {
-        var toc_doc = Alph.$("#alph-grammar-toc").get(0).contentDocument;
+    onLoad: function(a_index,a_handlerObj) {        
         var content_browser = Alph.$("#alph-grammar-content");
         
+        if (! a_handlerObj)
+        {
+            a_handlerObj = Alph.TeiGrammar;
+        }        
         // Add a handler to main grammar content browser window 
         // which adds a click handler to the links in the grammar
         // content document whenever a new document is loaded
@@ -50,7 +55,7 @@ Alph.TeiGrammar = {
                 function() 
                 {
                     Alph.$("a",this.contentDocument)
-                        .click(Alph.TeiGrammar.contentClickHandler);
+                        .click(a_handlerObj.contentClickHandler);
                 },
                 true
                 );
@@ -80,8 +85,21 @@ Alph.TeiGrammar = {
             this.setStartHref(params);            
         }
         
-
+        a_handlerObj.tocInit();
         
+            // if a callback function was passed in in the window
+        // arguments, execute it
+        if (params && typeof params.callback == 'function') {
+            params.callback();
+        }   
+    },
+    
+    /**
+     * initialize the table of contents
+     */
+    tocInit: function()
+    {
+        var toc_doc = Alph.$("#alph-grammar-toc").get(0).contentDocument;
         // hide the header in the toc
         Alph.$("div.stdheader",toc_doc).css("display","none");
             
@@ -90,7 +108,7 @@ Alph.TeiGrammar = {
         Alph.$("a.toc",toc_doc).click(
             function(a_e)
             {
-                return Alph.TeiGrammar.tocClickHandler(a_e,this,params.lang_tool);
+                return Alph.TeiGrammar.tocClickHandler(a_e,this,window.arguments[0].lang_tool);
             }
         );
     
@@ -104,12 +122,7 @@ Alph.TeiGrammar = {
         
         // Add a click handler to the toc widgets
         Alph.$("div.toc-widget",toc_doc).click(Alph.TeiGrammar.tocheadClickHandler);
-
-        // if a callback function was passed in in the window
-        // arguments, execute it
-        if (params && typeof params.callback == 'function') {
-            params.callback();
-        }
+       
     },
     
     /**
@@ -196,7 +209,13 @@ Alph.TeiGrammar = {
         {        
             // if multiple matches found, exact match should be 1st
             var exact_match = data.split(/\n/)[0];
-            var start_href_target = exact_match.split(this.d_indexFile.getSeparator(),2)[1]
+            var start_href_target = exact_match.split(this.d_indexFile.getSeparator(),2)[1];
+            // if the index entry didn't include an anchor, append the requested href to the
+            // url as the anchor
+            if (! start_href_target.match(/#/))
+            {
+                start_href_target = start_href_target + "#" + start_href;
+            }
             Alph.$("#alph-grammar-content").attr("src", 
                   Alph.TeiGrammar.getBaseUrl(a_params.lang_tool) 
                 + start_href_target
