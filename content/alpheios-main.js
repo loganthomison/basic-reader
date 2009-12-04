@@ -1974,9 +1974,9 @@ Alph.Main =
             Alph.BrowserUtils.setLogLevel(a_value);
         }
         else if (a_name.match(/user/))
-        {
-            Alph.DataManager.updateUserCommands(window);
+        {            
             Alph.DataManager.resetDataService();
+            Alph.DataManager.updateUserCommands(window);
         }
 
         if (typeof a_lang != 'undefined')

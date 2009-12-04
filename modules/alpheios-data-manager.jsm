@@ -86,16 +86,8 @@ DataManager =
     init: function(a_force)
     {
      
-        var self = this;
-        var model = BrowserUtils.getPref(Constants.DMODEL);
-        if (! model || model == 'disable')
-        {
-            this.d_disabled = true;
-        }
-        else
-        {
-            this.d_disabled = false;
-        }
+        var self = this;        
+        this.resetDisabledStatus();
         // if we already initalied the data service just return
         if (this.d_dataService && ! a_force)
         {
@@ -174,14 +166,20 @@ DataManager =
     
     /**
      * Disable the data manager
+     * @param {Window} a_window the current window
      * @param {Boolean} a_persist flag to indicate whether diabled status should be persisted to preferences 
      */
-    disable: function(a_persist)
+    disable: function(a_window,a_persist)
     {
         this.d_disabled = true;
         if (a_persist)
         {
             BrowserUtils.setPref(Constants.DMODEL,'disable');
+            // modification to the preference setting will automatically call updateUserCommands
+        }
+        else
+        {
+            this.updateUserCommands(a_window);
         }
     },
 
@@ -216,7 +214,7 @@ DataManager =
         // still no dataservice? disable data manager and return
         if (! this.d_dataService)
         {
-            this.disable(false);
+            this.disable(a_window,false);
             BrowserUtils.doAlert(a_window,"alpheios-warning-dialog","datamanager-disabled");
             return; 
         }
@@ -249,13 +247,14 @@ DataManager =
             // start fresh or disable data manager if restore wasn't successful
             if (! restored && ! declined)
             {
-                if (BrowserUtils.doConfirm(a_window,"alpheios-confirm-dialog","datamanager-confirm-newuser"))
+                if (BrowserUtils.doConfirm(a_window,"alpheios-confirm-dialog","datamanager-confirm-newuser")
+                    && this.clearData(a_window,true))
                 {
-                    this.clearData();
+                    // nothing else to do here
                 }
                 else
                 {
-                    this.disable(false);
+                    this.disable(a_window,false);
                 }
             }
         }
@@ -290,64 +289,121 @@ DataManager =
         
     /**
      * Restores the user data directory from a backup
-     * @param {Window} a_window the current window 
+     * @param {Window} a_window the current window
+     * @param {Boolean} a_quiet true to hide confirm message otherwise false
      * @returns true if data was succesfully restored otherwise false
      * @type Boolean
      */
-    restoreData: function(a_window)
+    restoreData: function(a_window,a_quiet)
     {
+        var restored = true;
         // don't do anything if the data manager is disabled
         if (this.disabled())
         {
-            return true;
+            return restored;
         }
+        
+        var title;
+        var msg;
         var restore_callback = this.d_dataService.getRestoreCallback();
         if (restore_callback.call(this.d_dataService,a_window))
         {
             this.loadData();
-            return true;
+            title = "alph-general-dialog-title";
+            msg = "restore-success"; 
         }
         else
         {
-            return false;
+            restored = false;
+            title = "alpheios-warning-dialog";
+            msg = "restore-failed-nodisable";
         }
+        if (! a_quiet)
+        {
+            BrowserUtils.doAlert(a_window,title,msg);
+        }
+        else
+        {
+            this.s_logger.info(msg);
+        }
+        return restored;
     },
     
      /**
      * Backs up the user data directory   
      * @param {Window} a_window the current window
+     * @param {Boolean} a_quiet true to hide confirm message otherwise false
      * @returns true if data was succesfully backed up otherwise false
      * @type Boolean
      */
-    backupData: function(a_window)
+    backupData: function(a_window,a_quiet)
     {
         // don't do anything if the data manager is disabled
         if (this.disabled())
         {
             return true;
         }
+        var rc = false;
         this.saveData();
         var keep = BrowserUtils.getPref(Constants.BACKUP + "." + Constants.KEEP) || 0;
         var backup_callback = this.d_dataService.getBackupCallback(keep);
-        return backup_callback.call(this.d_dataService,a_window);
+        var msg;
+        var title;
+        if (backup_callback.call(this.d_dataService,a_window))
+        {
+            rc = true;
+            title = "alph-general-dialog-title";
+            msg = "backup-success";
+        }
+        else
+        {
+            title = "alpheios-warning-dialog";
+            msg = "backup-failed";
+        }
+        if (! a_quiet)
+        {
+            BrowserUtils.doAlert(a_window,title,msg);
+        }
+        else
+        {
+            this.s_logger.info(msg);
+        }
+        return rc;
     },
     
     
     /**
      * Clear the current user data
+     * @param {Window} a_window the current window
+     * @param {Boolean} a_quiet true to hide confirm message otherwise false
+     * @returns true if data was succesfully cleared otherwise false
+     * @type Boolean
      */
-    clearData: function()
+    clearData: function(a_window,a_quiet)
     {
+        var title;
+        var msg;
+        var cleared = false;
         // clear any service-specific settings
         try
         {
             this.d_dataService.clearPrefs();
             BrowserUtils.removeDataDir();
+            cleared = true;
+            title = "alph-general-dialog-title";
+            msg = "clear-success";
         }
         catch(a_e)
         {
-            this.s_logger.error("Error clearing user data: " + a_e);            
+            this.s_logger.error("Error clearing user data: " + a_e);
+            title = "alpheios-warning-dialog";
+            msg = "clear-failed";
         }
+        if (! a_quiet)
+        {
+            BrowserUtils.doAlert(a_window,title,msg);
+        }
+        return cleared;
     },
     
     
@@ -454,9 +510,10 @@ DataManager =
             var clear_interval = BrowserUtils.getPref(Constants.CLEAR + "." + Constants.INTERVAL);
             if (clear_interval == Constants.ONDISABLE)
             {
-                this.clearData();
+                this.clearData(a_window,true);
             }
         }
+        this.resetDisabledStatus(a_window);
     },
 
     /**
@@ -481,7 +538,7 @@ DataManager =
             var clear_interval = BrowserUtils.getPref(Constants.CLEAR + "." + Constants.INTERVAL);
             if (clear_interval == Constants.ONAPPQUIT)
             {
-                this.clearData();
+                this.clearData(a_window,true);
             }
         }
     },
@@ -595,8 +652,8 @@ DataManager =
      */
     updateUserCommands: function(a_window)
     {
-        var allowed = 0;
-        if (BrowserUtils.getPref(Constants.DMODEL) != 'disable')
+        var allowed = 0;        
+        if (! this.disabled())
         {
             [Constants.BACKUP,Constants.RESTORE,Constants.CLEAR].forEach(
                 function(a_type)
@@ -604,7 +661,7 @@ DataManager =
                     var elem = a_window.document.getElementById('alpheios-' + a_type + '-allowed');
                     if (elem)
                     {
-                        if (BrowserUtils.getPref(a_type + "." + Constants.INTERVAL) == Constants.ONREQUEST)
+                        if (BrowserUtils.getPref(a_type + "." + Constants.INTERVAL))
                         {
                             allowed++;
                             elem.setAttribute('hidden',false);
@@ -632,6 +689,27 @@ DataManager =
                 all_commands.setAttribute("hidden",true);
                 all_commands.setAttribute("disabled",true);
             }
+        }
+    },
+    
+    /**
+     * resets the disabled status from preferences
+     * @param {Window} a_window
+     */
+    resetDisabledStatus: function(a_window)
+    {
+        var model = BrowserUtils.getPref(Constants.DMODEL);
+        if (! model || model == 'disable')
+        {
+            this.d_disabled = true;
+        }
+        else
+        {
+            this.d_disabled = false;
+        }
+        if (a_window)
+        {
+            this.updateUserCommands(a_window)
         }
     }
 }

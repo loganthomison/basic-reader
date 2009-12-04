@@ -114,13 +114,13 @@
         <command id="alpheios-level-reader-cmd"
             oncommand="Alph.Main.setMode(null,'reader');"/>
         <command id="alpheios-user.backup-cmd"
-            oncommand="Alph.DataManager.backupData(window);"
+            oncommand="Alph.DataManager.backupData(window,false);"
             observes="alpheios-user.backup-allowed"/>
         <command id="alpheios-user.restore-cmd"
-            oncommand="Alph.DataManager.restoreData(window);"
+            oncommand="Alph.DataManager.restoreData(window,false);"
             observes="alpheios-user.restore-allowed"/>
         <command id="alpheios-user.clear-cmd"
-            oncommand="Alph.DataManager.clearData();"
+            oncommand="Alph.DataManager.clearData(window,false);"
             observes="alpheios-user.clear-allowed"/>
         <command id="alpheios-disable-toolbar-cmd"                
                  oncommand="Alph.Main.disableToolbar();"/>
