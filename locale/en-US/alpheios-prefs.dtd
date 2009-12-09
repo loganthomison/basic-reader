@@ -39,6 +39,7 @@
 <!ENTITY alpheios.prefs.panel.dict "Dictionary Panel">
 <!ENTITY alpheios.prefs.panel.trans "Translation Panel">
 <!ENTITY alpheios.prefs.panel.tree "Dependency Tree Panel">
+<!ENTITY alpheios.prefs.panel.vocab "Vocabulary Panel">
 <!ENTITY alpheios.prefs.panel.etym "Etymology/Cognates Panel">
 <!ENTITY alpheios.prefs.dictionaries "Dictionaries">
 <!ENTITY alpheios.prefs.dictionaries.advanced "Advanced Dictionary Settings">

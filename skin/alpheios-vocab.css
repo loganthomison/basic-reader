@@ -1,0 +1,27 @@
+body {
+    background-color: white;
+}
+
+#alpheios-wordlist-header {
+    font-weight: bold;
+    border-bottom: 1px solid black;
+}
+
+#alpheios-wordlist .header {
+    clear: both;
+    font-weight: bold;
+}
+#alpheios-wordlist .entry {
+    clear: both;
+    margin-bottom: .5em;
+}
+
+#alpheios-wordlist div.lemma {
+    float: left;
+    width: 50%;
+}
+
+#alpheios-wordlist div.forms {    
+    margin-left: 50%;
+}
+

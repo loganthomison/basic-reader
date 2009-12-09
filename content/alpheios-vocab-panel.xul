@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://alpheios/locale/alpheios.dtd">
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-vocab.js" />
+
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="alpheios-vocab"
+            class="alpheios-language-notifier alpheios-userdata-notifier"
+            hidden="true"
+            disabled="true"/>
+    </broadcasterset>
+
+    <commandset id="mainCommandSet">
+        <command id="alpheios-vocab-toggle-cmd"
+            oncommand="Alph.Main.d_panels['alph-vocab-panel'].open();"
+            observes="alpheios-vocab"/>
+    </commandset>
+             
+   <!-- overlay the toolbar menu -->
+    <toolbar id="alpheios-toolbar-template">
+        <toolbarbutton
+                id="alpheios-vocab-button"
+                insertafter="alpheios-grammar-button"
+                class="toolbarbutton-icon"
+                label="&alpheios-tools-vocab-label;"
+                tooltiptext="&alpheios-tools-vocab-tooltip;"
+                command="alpheios-vocab-toggle-cmd"/>
+    </toolbar>
+            
+    <!-- overlay the right panel -->
+    <hbox id="alpheios-vocab-box">
+            <alpheiosPanel 
+                flex="1" 
+                id="alph-vocab-panel" 
+                notifier="alpheios-vocab-status"
+                paneltype="Vocab"
+                panelorient="vertical">
+                <toolbaritem id="alpheios-vocab-panel-label">
+                    <label id="alph-vocab-label" 
+                           value="&alpheios-vocab-toolbar-label;"/>
+                </toolbaritem>
+                <browser 
+                    id="alph-vocab-body"
+                    flex="1"
+                    src="chrome://alpheios/content/html/alph-panel.html" />                
+            </alpheiosPanel>
+    </hbox>  
+</overlay>

@@ -72,6 +72,16 @@ Alph.LanguageTool = function(a_language,a_properties)
             {
                 return a_language;
             },
+        LanguageCode:
+            function()
+            {
+                var codes = Alph.BrowserUtils.getPref("languagecode",a_language);
+                if (codes)
+                {
+                    // first code in list is the preferred code
+                    return codes.split(',')[0];
+                }                
+            },
         PopupTrigger:
             function()
             {
@@ -1443,7 +1453,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             var lemma_key = this.getAttribute("lemma-key"); 
             if ( lemma_key )
             {
-                lemmas.push(lemma_key);
+                lemmas.push([lemma_key,this.getAttribute("lemma-lex")]);
             }
         }
     );
@@ -1504,28 +1514,15 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         Alph.$("#alph-word-tools",a_node).append(link);
     }
     
-    var wordlist = lang_tool.getWordList();
-    if (wordlist && lemmas.length > 0) 
+    var wordlist = lang_tool.getWordList();     
+    if (wordlist && 
+        lemmas.length > 0 &&
+        // hide the learned button on the wordlist display
+        Alph.$("#alpheios-wordlist",Alph.$(a_node).get(0).ownerDocument).length == 0)       
     {
-        var seenLemmas = {};
-        var normalizedLemmas = [];
-        for (var i=0; i<lemmas.length; i++)
-        {
-            // remove special flags and trailing digits from lemmas
-            var lemma = lemmas[i].replace(/^@/,'');
-            lemma = lemma.replace(/\d+$/,'');
-            lemma = lang_tool.normalizeWord(lemma)
-            if (! seenLemmas[lemma])
-            {
-                normalizedLemmas.push(lemma);
-                seenLemmas[lemma] = true;
-            }
-        }
-        var normalizedWord = lang_tool.normalizeWord(a_target.getWord()); 
-        wordlist.addWord(window,normalizedWord,lemmas,wordlist.UNKNOWN);
+        var normalizedWord = lang_tool.normalizeWord(a_target.getWord());        
         var alt_text = Alph.Main.getString('alph-mywords-link');
-        var added_msg = Alph.Main.getString('alph-mywords-added',
-            [normalizedWord,normalizedLemmas.join(', ')]);
+        var added_msg = Alph.Main.getString('alph-mywords-added',[normalizedWord]);
         var link = Alph.$(  
             '<div class="alph-tool-icon alpheios-button alph-mywords-link" ' +
             'href="#alpheios-mywords" title="' + alt_text + '">' +
@@ -1538,11 +1535,9 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             {
                 if (Alph.BrowserUtils.doConfirm(window,'alpheios-confirm-dialog',added_msg))
                 {
-                    if (wordlist.addWord(window,normalizedWord,normalizedLemmas,wordlist.KNOWN))
-                    {
-                        Alph.Site.toggleWordStatus(
+                    lang_tool.addToWordList(a_node,true,true);
+                    Alph.Site.toggleWordStatus(
                             lang_tool,Alph.$(a_node).get(0).ownerDocument,normalizedWord);
-                    }
                 }
                 return false;
             }
@@ -1570,8 +1565,11 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
  */
 Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
 {
-    var lang_tool = this;
+    var lang_tool = this;    
     var tools = Alph.$("#alph-word-tools",a_node).clone();
+    // hide the learned button in the quiz for now
+    // TODO word should be automatically identified as learned or not according to user's answer
+    Alph.$('.alph-mywords-link',tools).remove();
     // if the node is from the dependency tree diagram, the call to selectBrowserForDoc
     // will fail, but it should be unnecessary in this case, because the tree won't be available
     // if the browser that originated it isn't selected
@@ -1622,6 +1620,7 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
             return false;
         }
     );
+
     return tools;
 }
 
@@ -1861,4 +1860,61 @@ Alph.LanguageTool.prototype.normalizeWord = function(a_word)
 Alph.LanguageTool.prototype.getWordList = function()
 {
     return (Alph.DataManager.getDataObj('words',this.d_sourceLanguage,true));
+};
+
+/**
+ * Add add a looked up word to the wordlist for the language
+ * @param {Node} a_node the node containing the lookup results
+ * @param {Boolean} a_learned flag to indicate if the user 
+ *                            has learned the word
+ * @param {Boolean} a_userAction flag to indicate if the request was automatic (false)
+ *                               or user-initiated (true)                             
+ */
+Alph.LanguageTool.prototype.addToWordList = function(a_node,a_learned,a_userAction)
+{
+    var self = this;
+    var wordlist = self.getWordList();
+    if (!wordlist)
+    {
+        // don't do anything if we have no wordlist
+        return;
+    }
+        
+    var seenLemmas = new Array();
+    var updated = false;
+    Alph.$(".alph-word .alph-dict",a_node).each(
+        function()
+        {
+            var lemma_key = this.getAttribute("lemma-key"); 
+            if ( lemma_key )
+            {
+                
+                // TODO compose a real CTS urn for the dictionary entry
+                var urn = lemma_key + ':' + this.getAttribute("lemma-lex");                
+                // remove special flags and trailing digits from lemmas
+                var lemma = lemma_key.replace(/^@/,'');
+                lemma = lemma.replace(/\d+$/,'');
+                lemma = self.normalizeWord(lemma);
+                if (! seenLemmas[lemma])
+                {
+                    seenLemmas[lemma] = true;
+                    var normalizedWord =
+                        self.normalizeWord(Alph.$(this).parents(".alph-word").attr("context"));                                            
+                    wordlist.updateFormEntry(
+                        window,
+                        self.getLanguageCode(),
+                        normalizedWord,
+                        lemma,
+                        urn,
+                        a_learned,
+                        a_userAction);
+                    updated = true;
+                }
+            }        
+        }
+    );
+    if (updated)
+    {
+        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.VOCAB_UPDATE, { src_node: Alph.$(a_node).get(0) });        
+    }
 };

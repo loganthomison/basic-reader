@@ -629,7 +629,7 @@ DataManager =
         // add an observer to store changes to the data object every x accesses
         var store_trigger = 
             BrowserUtils.getPref([Constants.SAVE,Constants.INTERVAL,Constants.NUMLOOKUPS].join('.'));
-        a_obj.addSetterObserver(store_trigger,null,null);
+        a_obj.addSetterObserver('store_data',store_trigger,null,null);
         
         
         // check to see if we need to add a backup observer to the object
@@ -642,7 +642,7 @@ DataManager =
             var backup_callback = this.d_dataService.getBackupCallback(keep);
             var lookup_num = 
                 BrowserUtils.getPref([Constants.BACKUP,Constants.INTERVAL,Constants.NUMLOOKUPS].join('.'));
-            a_obj.addSetterObserver(lookup_num,backup_callback,this.d_dataService);
+            a_obj.addSetterObserver('lookup_data',lookup_num,backup_callback,this.d_dataService);
         }
     },
     

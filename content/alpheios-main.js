@@ -582,7 +582,6 @@ Alph.Main =
         var status_text = '';        
         if (! this.isEnabled(this.getCurrentBrowser()))
         {
-            cmenu_text = this.getString("alph-inline-enable-cm");
             tmenu_text = this.getString("alph-inline-enable-tm");
             
             status_text = this.getString("alph-tools-status-disabled");
@@ -592,34 +591,23 @@ Alph.Main =
             
         }
         else
-        {
-            cmenu_text = this.getString("alph-inline-disable-cm");
+        {         
             tmenu_text = this.getString("alph-inline-disable-tm");
             menu_lang = this.getStateObj().getVar("current_language");
             status_text = 
                 "[" +
-                Alph.$("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']").attr("label")
+                Alph.$("#alpheios-lang-popup-mm menuitem[value='"+menu_lang+"']").attr("label")
                 + "]";
 
         }
-        Alph.$("#alpheios-toggle-cm").attr("label",cmenu_text);
-        Alph.$("#alpheios-toggle-tm").attr("label",tmenu_text);
         Alph.$("#alpheios-toggle-mm").attr("label",tmenu_text);
         Alph.$("#alpheios-toolbar-status-text").attr("value",status_text);
         this.setTbHints();
         
         // uncheck the previously checked language
-        Alph.$("#alpheios-lang-popup-tm menuitem[checked='true']")
-            .attr("checked","false");
-        Alph.$("#alpheios-lang-popup-cm menuitem[checked='true']")
-            .attr("checked","false");
         Alph.$("#alpheios-lang-popup-mm menuitem[checked='true']")
             .attr("checked","false");
         // check the current language
-        Alph.$("#alpheios-lang-popup-tm menuitem[value='"+menu_lang+"']")
-            .attr("checked","true");
-        Alph.$("#alpheios-lang-popup-cm menuitem[value='"+menu_lang+"']")
-            .attr("checked","true");
         Alph.$("#alpheios-lang-popup-mm menuitem[value='"+menu_lang+"']")
             .attr("checked","true");
             
@@ -825,7 +813,7 @@ Alph.Main =
         var languages_set = false;
         
         var lang_list = Alph.LanguageToolFactory.getLangList();
-        
+         
         for (var i=0; i<lang_list.length; i++)
         {           
             var a_lang = lang_list[i];
@@ -891,7 +879,15 @@ Alph.Main =
             // from the prior language, if any
             Alph.Xlate.removePopup(bro,old_lang_tool);
             
-            
+            // remove the wordlist observers for the prior language
+            if (old_lang_tool)
+            {
+                var wordlist = old_lang_tool.getWordList();
+                if (wordlist)
+                { 
+                    wordlist.removeSetterObserver('\.' + old_lang_tool.getLanguage() + '$');
+                }
+            }           
             // update the popup trigger if necessary
             this.setXlateTrigger(bro,lang_tool.getPopupTrigger());
              
@@ -1109,7 +1105,12 @@ Alph.Main =
                 var disabled = true;
                 // enable only if Alpheios is enabled
                 // and the language supports the feature
-                if (Alph.Main.isEnabled(bro) && lang_tool.getFeature(id) )
+                // and if also specified as a userdata-notifier then 
+                // data manager must also be enabled
+                if (Alph.Main.isEnabled(bro) && lang_tool.getFeature(id) 
+                    && (!Alph.$(this).hasClass('alpheios-userdata-notifier') ||
+                        ! Alph.DataManager.disabled()
+                        ))
                 {
                     disabled = false;
                 }
@@ -1607,7 +1608,7 @@ Alph.Main =
                 Alph.$(toolbar).attr("id",'alpheios-toolbar');
                 Alph.$(toolbar).attr("collapsed",false);
                 Alph.$(toolbar).attr("hidden",false);
-                Alph.$("#navigator-toolbox").append(toolbar);      
+      
                 
                 // update the languages menu in the toolbar
                 var lang_list = Alph.LanguageToolFactory.getLangList();
@@ -1617,35 +1618,26 @@ Alph.Main =
                 // in the menu and return false to disable the extension
                 if (language_count==0)
                 {
-                    Alph.$("#alpheios-tm-lang-none").attr("hidden","false");
                     Alph.$("#alpheios-mm-lang-none").attr("hidden","false");
-                    Alph.$("#alpheios-cm-lang-none").attr("hidden","false"); 
                 }
                 else
                 {
                     for (var i=0; i<lang_list.length; i++)
                     {           
                         var a_lang = lang_list[i];
-                        if (Alph.Languages.hasLang(a_lang))
-                        {             
-                            // add menu items to the various language menus for this language
-                            var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
-                            var menuitem = Alph.Util.makeXUL(
-                                'menuitem',
-                                'alpheios-tm-lang-'+a_lang,
-                                ['label','value','type'],
-                                [lang_string,a_lang,'checkbox']
-                            );
-                            Alph.$("#alpheios-lang-popup-tm").append(menuitem);
-                            Alph.$("#alpheios-lang-popup-mm").append(
-                                Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
-                            Alph.$("#alpheios-lang-popup-cm").append(
-                            Alph.$(menuitem).clone().attr('id','alpheios-cm-lang-'+a_lang));
-                        }
-         
+                        // add menu items to the various language menus for this language
+                        var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
+                        var menuitem = Alph.Util.makeXUL(
+                            'menuitem',
+                            'alpheios-mm-lang-'+a_lang,
+                            ['label','value','type'],
+                            [lang_string,a_lang,'checkbox']
+                        );
+                        Alph.$("#alpheios-lang-popup-mm",toolbar).append(menuitem);         
                     }
                 }
                 Alph.Main.enableTbLookup();
+                Alph.$("#navigator-toolbox").append(toolbar);
             }            
         }
         else
@@ -2065,6 +2057,7 @@ Alph.Main =
         
         }
     }
+   
 };
 
 Alph.Main.init();

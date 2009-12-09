@@ -29,10 +29,6 @@ const EXPORTED_SYMBOLS = ['WordList'];
 Components.utils.import("resource://alpheios/alpheios-browser-utils.jsm");
 Components.utils.import("resource://alpheios/datatypes/DataType.jsm");
 
-//TODO these need to be configurable
-const THRESHOLD_FORM = 5;
-const THRESHOLD_LEMMA = 10;
-
 /**
  * @class WordList
  * @extends DataType 
@@ -55,96 +51,303 @@ WordList.prototype = new DataType();
 WordList.s_fileSpec = '.json';
 
 /**
- * static constant - known words index
- * @constant
- */
-WordList.prototype.KNOWN = 'KNOWN';
-
-/**
- * static constant - unknown words index
- * @constant
- */
-WordList.prototype.UNKNOWN = 'UNKNOWN';
-
-/**
  * get the default data contents
  * @TODO replace this very naive implementation of wordlist type
  */
 WordList.prototype.getDefault = function()
 {
  
-    var list = { };
-    list[this.UNKNOWN] = { d_forms: {}, d_lemmas: {} };
-    list[this.KNOWN] = { d_forms: {}, d_lemmas: {} };
+    var list = {
+        d_forms: {},
+        d_entries: {},
+    };    
     return list;
 }
 
-
 /**
- * Add a new word to the word list
+ * Update an entry for a lemma in the word list, adding it if it doesn't exist
  * @param {Window} a_window the parent window
- * @param {String} a_word the word 
- * @param {Array} a_lemmas list of possible lemmas for the word
- * @param {String} a_list the sublist to add it to ({@link WordList.KNOWN} or {@link WordList.UNKNOWN})
- * @return true if the word is added to the list, otherwise false
- *         (returns false if the word is already on the list)
- * @type Boolean        
+ * @param {String} a_lang the language code for the lemma
+ * @param {String} a_lemma the lemma 
+ * @param {String} a_ptr the lexicon pointer                     
+ * @param {Boolean} a_learned true if the form is to be flagged as learned otherwise false
+ * @param {Boolean} a_force true to force the learned state to false, otherwise false to 
+ *                          take lookup threshold into account                                                 
+ * @returns the updated Entry
+ * @type Object 
  */
-WordList.prototype.addWord = function(a_window,a_word,a_lemmas,a_list)
-{
-    var known = this.KNOWN;
-    var unknown = this.UNKNOWN;
+WordList.prototype.updateLemmaEntry = function(a_window,a_lang,a_lemma,a_ptr,a_learned,a_force)
+{   
+    var entry = this.getEntry(a_lemma) || this.addEntry(a_lemma,a_lang);
+    // check to see if we already have the lexicon pointer for
+    // this lemma listed in the entry
     
+    if (a_ptr) 
+    {
+        var has_ptr = false;
+        for (var j=0; j< entry.lexicon_ptrs.length; j++)
+        {
+            if (entry.lexicon_ptrs[j] == a_ptr)
+            {
+                has_ptr = true;
+            }
+        }
+        // lexicon pointer isn't in the entry, so add it
+        if (! has_ptr)
+        {
+            entry.lexicon_ptrs.push(a_ptr);
+        }
+    }
+    if (a_learned)
+    {            
+        entry.learned = true;            
+    }        
+    else if (a_force) 
+    {
+        entry.learned = false;
+    }
+                                                      
+    if (a_force)
+    {
+        // notify any observers that the wordlist has changed
+        this.observeSetter(a_window);
+    }
+    return entry;
+}
+/**
+ * Update an entry for a form in the word list, adding it if it doesn't exist
+ * @param {Window} a_window the parent window
+ * @param {String} a_lang the language code for the form
+ * @param {String} a_form the specific form 
+ * @param {String} a_lemma the lemmas for the form
+ * @param {String} a_lexicon_ptr the lexicon pointer for the lemma                     
+ * @param {Boolean} a_learned true if the form is to be flagged as learned otherwise false
+ * @param {Boolean} a_force true to force the learned state to false, otherwise false to 
+ *                          take lookup threshold into account 
+ */
+WordList.prototype.updateFormEntry = function(a_window,a_lang,a_form,a_lemma,a_lexicon_ptr,a_learned,a_force)
+{   
+    var threshold = BrowserUtils.getPref("user.wordlist.lookup.threshold");
+    var list = this.d_dataObj;  
+        
+    // make sure the form and lemma are in the list index
+    this.updateIndexEntry(a_form,a_lemma,a_lang);
+            
+    var entry = this.updateLemmaEntry(a_window,a_lang,a_lemma,a_lexicon_ptr,false,false);
+                            
+    // add the form to the entry if it isn't already there        
+    if (!entry.forms[a_form])
+    {
+        entry.forms[a_form] = {lookups: 0, learned: false};
+    }
+    if (a_learned)
+    {            
+        entry.forms[a_form].learned = true;
+            
+        // the form is learned, so reset the lookup counter
+        entry.forms[a_form].lookups = 0;            
+    }        
+    else {
+        if (! a_force) 
+        {
+            // the request is a lookup so increment the lookup counter
+            entry.forms[a_form].lookups++;
+
+            // make sure the lookup count is over the configured 
+            // threshold before flagging as unlearned
+            if (entry.forms[a_form].lookups > threshold)
+            {
+                entry.forms[a_form].learned = false;
+            }
+        }
+        else
+        {
+            // the request is to remove the word from the list of
+            // known words. don't increment the lookup counter,
+            // but flag is unlearned
+            entry.forms[a_form].learned = false;
+        }
+    }                                       
+             
+    // notify any observers that the wordlist has changed
     this.observeSetter(a_window);
-    var list = this.d_dataObj[a_list];
-    var added = false;
-    if (! list.d_forms[a_word])
-    {
-        list.d_forms[a_word]= { lookups: 0,
-                                lemmas: {},
-                                contexts: [] 
-                              };
-        added = true;
-    }
-    var lookups = list.d_forms[a_word].lookups++;
-    if (a_list == unknown && lookups >= THRESHOLD_FORM && this.d_dataObj[known].d_forms[a_word])
-    {
-        delete this.d_dataObj[known].d_forms[a_word];
-    }
-    else if (a_list == known && this.d_dataObj[unknown].d_forms[a_word])
-    {
-        delete this.d_dataObj[unknown].d_forms[a_word];
-    }
-    
-    for (var i=0; i<a_lemmas.length; i++)
-    {
-        var a_lemma = a_lemmas[i];
-        var lemma_lookups = list.d_lemmas[a_lemma]++;
-        list.d_forms[a_word].lemmas[a_lemma]++;
-        if (a_list == unknown && lemma_lookups >= THRESHOLD_LEMMA 
-            && this.d_dataObj[known].d_lemmas[a_lemma]) 
-        {
-            delete this.d_dataObj[known].d_lemmas[a_lemma];
-        }
-        else if (a_list == known && this.d_dataObj[unknown].d_lemmas[a_lemma])
-        {
-            delete this.d_dataObj[unknown].d_lemmas[a_lemma];
-        }
-   }        
-   return added;
 };
 
 /**
- * Check one of the sublists in the WordList Data object for 
- * the supplied word
- * @param {String} the sublist id
- * @param {String} a_word the word to check for
- * @returns true if the word is in the list, otherwise false
+ * Gthe learned state of a specific form 
+ * @param {String} a_form the form
+ * @param {String} a_lemma the lemma if known, otherwise null
+ * @returns the learned state (true or false) of the supplied form
+ *          if the lemma was not supplied, and the form occurs in multiple lemmas
+ *          then returns false if false for any of the lemmas
  * @type Boolean
  */
-WordList.prototype.hasForm = function(a_list,a_word)
+WordList.prototype.checkForm = function(a_form,a_lemma)
 {
-    var has_form = this.d_dataObj[a_list].d_forms[a_word];
-    return (has_form ? true : false);
+    var learned = false;
+    var entries = [];
+    if (a_lemma) 
+    {
+        var entry = this.getEntry(a_lemma);
+        if (entry)
+        {
+            entries.push(entry);
+        }
+           
+    }
+    else
+    {
+        entries = this.getEntriesForForm(a_form);
+    }
+    for (var i=0; i<entries.length; i++)
+    {
+        if (entries[i].forms[a_form])
+        {
+            if (! entries[i].forms[a_form].learned)
+            {
+                learned = false;
+                // if any entry has the form as unlearned, then 
+                // that overiddes the state of the form in any other entries
+                break;
+            }
+            else 
+            {
+                learned = true;
+                // but continue to check the next entry
+            }
+        }        
+        
+    }
+    BrowserUtils.debug("Checking for " + a_form + ": " + learned);
+    return learned;
 };
 
+/**
+ * Get the wordlist index entries for a form
+ * @param {String} a_form the form
+ * @returns the list of entries
+ * @type Array
+ */
+WordList.prototype.getEntriesForForm = function(a_form)
+{
+  
+    var list = [];
+    var index = this.d_dataObj.d_forms[a_form];
+    for (var key in index)
+    {            
+        var entry = this.getEntry(key);
+        if (entry)
+        {
+            list.push(entry);
+        }    
+    }
+    return list;
+
+}
+
+/**
+ * Add or update an wordlist index entry for a form and lemma
+ * @param {String} a_form the form
+ * @param {String} a_lemma the lemma
+ * @param {String} a_lang the language code 
+ */
+WordList.prototype.updateIndexEntry = function(a_form,a_lemma,a_lang)
+{
+    if (! this.d_dataObj.d_forms[a_form])
+    {
+        this.d_dataObj.d_forms[a_form] = {};
+    }
+    if (! this.d_dataObj.d_forms[a_form][a_lemma])
+    {      
+        this.d_dataObj.d_forms[a_form][a_lemma] = a_lang;
+    }
+}
+
+/**
+ * Get the wordlist entry for a lemma
+ * @param {String} a_lemma the lemma
+ * @returns the wordlist entry
+ * @type Object
+ */
+WordList.prototype.getEntry = function(a_lemma)
+{
+    return this.d_dataObj.d_entries[a_lemma]; 
+}
+
+/**
+ * add a new entry to the wordlist
+ * @param {String} a_lemma the entry key (lemma)
+ * @param {String} a_lang the language code
+ * @returns the new entry object
+ * @type Object
+ */
+WordList.prototype.addEntry = function(a_lemma,a_lang)
+{
+    var entry = 
+    {
+        learned: false,
+        lang: a_lang,
+        lookups: 0,
+        lexicon_ptrs: [],
+        forms: {}                
+    }         
+    this.d_dataObj.d_entries[a_lemma] = entry;
+    return entry;
+}
+
+/**
+ * get the wordlist as a TEI formated XML document  
+ */
+WordList.prototype.asXML = function(a_learned)
+{
+    // return a TEI-formated XML document for the wordlist
+    var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");
+        
+    var template = 
+        '<?xml version="1.0" encoding="UTF-8"?>' +
+        '<TEI xmlns="http://www.tei-c.org/ns/1.0"' +
+        '    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'+
+        '    xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_dictionaries.xsd">' +
+        '<teiHeader><fileDesc>' + 
+        '<titleStmt><title></title></titleStmt>'  + 
+        '<publicationStmt><date></date></publicationStmt>' + 
+        '<sourceDesc><p>Alpheios</p></sourceDesc>' +
+        '</fileDesc></teiHeader>' + 
+        '<text><body></body></text></TEI>';
+    var doc = (new recent_win.DOMParser()).parseFromString(template,"text/xml");
+    var body = doc.getElementsByTagName("body")[0];
+    for (var key in this.d_dataObj.d_entries)
+    {       
+        var entry = this.d_dataObj.d_entries[key];
+        var entryNode = doc.createElementNS("http://www.tei-c.org/ns/1.0","entry");;
+        var lemma = doc.createElementNS("http://www.tei-c.org/ns/1.0","form");
+        lemma.setAttribute("type","lemma");
+        lemma.setAttribute("lang",entry.lang);
+        lemma.appendChild(doc.createTextNode(key));
+        if (entry.learned)
+        {
+            lemma.setAttribute("rend","learned");
+        }
+        entryNode.appendChild(lemma);
+        for (var form in entry.forms)
+        {
+            var formNode = doc.createElementNS("http://www.tei-c.org/ns/1.0","form");
+            formNode.setAttribute("type","inflection");
+            formNode.setAttribute("lang",entry.lang);
+            if (entry.forms[form].learned)
+            {
+                formNode.setAttribute("rend","learned");
+            }
+            formNode.appendChild(doc.createTextNode(form));
+            entryNode.appendChild(formNode);
+        }
+        for (var i=0; i<entry.lexicon_ptrs.length; i++)
+        {            
+            var ptr = doc.createElementNS("http://www.tei-c.org/ns/1.0","ptr");
+            ptr.setAttribute("target",entry.lexicon_ptrs[i]);
+            entryNode.appendChild(ptr);            
+        }
+        body.appendChild(entryNode)
+    }
+    return doc;
+}

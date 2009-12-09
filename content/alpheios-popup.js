@@ -519,6 +519,10 @@ Alph.Xlate = {
         else
         {
             Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
+            if (! Alph.Interactive.enabled())
+            {
+                a_lang_tool.addToWordList(Alph.$("#alph-window #alph-text",a_topdoc),false,false);
+            }
             Alph.Interactive.openQueryDisplay(a_topdoc,a_alphtarget);
         }
 
@@ -884,7 +888,11 @@ Alph.Xlate = {
         }
 
         Alph.$("#alph-window-anchor",a_topdoc).focus();
-        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);            
+        Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_TRANS);
+        if (! Alph.Interactive.enabled())
+        {
+            a_lang_tool.addToWordList(Alph.$("#alph-window #alph-text",a_topdoc),false,false);
+        }
         Alph.Interactive.openQueryDisplay(a_doc_array[0],a_alphtarget);
     },
 

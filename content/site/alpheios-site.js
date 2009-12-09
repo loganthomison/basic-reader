@@ -677,7 +677,7 @@ Alph.Site = {
                                        Alph.$(id_copy).css("top",offset_top); 
                                        Alph.$(id_copy).css("left",offset_left + next_offset);
                                        offset_left = offset_left + Alph.$(id_copy).width();
-                                       if (wordlist && wordlist.hasForm(wordlist.KNOWN,word_text))
+                                       if (wordlist && wordlist.checkForm(word_text))
                                        {
                                             Alph.$(id_copy).addClass("alpheios-known-word");
                                        }
@@ -971,7 +971,7 @@ Alph.Site = {
                 function()
                 { 
                     var word = a_langTool.normalizeWord(Alph.$(this).text());
-                    if (wordlist.hasForm(wordlist.KNOWN,word))
+                    if (wordlist.checkForm(word))
                     {
                         Alph.$(this).addClass("alpheios-known-word");
                     }

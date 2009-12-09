@@ -29,6 +29,8 @@
 <!ENTITY alpheios.menu.restore.tooltip "Restore User Data Now">
 <!ENTITY alpheios.menu.clear "Clear User Data">
 <!ENTITY alpheios.menu.clear.tooltip "Clear User Data Now">
+<!ENTITY alpheios.menu.wordlist "Word List">
+<!ENTITY alpheios.menu.wordlist.tooltip "See My Word List">
 <!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-view-label "View">
 <!ENTITY alpheios-view-tooltip "Alpheios Browser Panels">
@@ -61,4 +63,7 @@
 <!ENTITY alpheios.help.tooltip "Open Alpheios User Guide">
 <!ENTITY alpheios.version.string "Alpha Version">
 <!ENTITY alpheios.menu.userdata "User Data">
-<!ENTITY alpheios.menu.userdata.tooltip "Uer Data Functions"> 
+<!ENTITY alpheios.menu.userdata.tooltip "User Data Functions"> 
+<!ENTITY alpheios-tools-vocab-label "Vocabulary">
+<!ENTITY alpheios-tools-vocab-tooltip "Show/Hide Vocabulary">
+<!ENTITY alpheios-vocab-toolbar-label "Alpheios: Vocabulary">

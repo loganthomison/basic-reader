@@ -43,7 +43,9 @@ Constants = {
             UPDATE_PREF: 500,
             LOAD_DICT_WINDOW: 600,
             LOAD_TREE_WINDOW: 700,
-            UPDATE_XLATE_TRIGGER: 800
+            UPDATE_XLATE_TRIGGER: 800,
+            LOAD_VOCAB_WINDOW: 900,
+            VOCAB_UPDATE: 1000
         },
 
     /**

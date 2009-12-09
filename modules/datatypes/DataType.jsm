@@ -42,7 +42,7 @@ DataType = function(a_file,a_charset)
     this.d_charSet = a_charset;
     this.d_dataObj = null;
     this.d_setCounter = 0;
-    this.d_setObservers = [];
+    this.d_setObservers = new Array();
     this.init();
 };
 
@@ -127,13 +127,30 @@ DataType.prototype.getDefault = function()
 
 /**
  * Add an observer function on x data sets
+ * @param {String} a_name the unique name for the observer
  * @param {int} a_num the number of set accesses after which to execute the callback
- * @param {Function} the a_lookup the callback to execute
+ * @param {Function} the a_callback the callback to execute
  * @param {Object} a_ctx the 'this' object context for the callback
  */
-DataType.prototype.addSetterObserver = function(a_num,a_lookup,a_ctx)
+DataType.prototype.addSetterObserver = function(a_name,a_num,a_callback,a_ctx)
 {
-   this.d_setObservers.push([0,a_num,a_lookup,a_ctx]);
+   this.d_setObservers[a_name]= [0,a_num,a_callback,a_ctx];
+},
+
+/**
+ * Remove an observer function on x data sets
+ * @param {String} a_name the name (regex pattern) for the observer                
+ */
+DataType.prototype.removeSetterObserver = function(a_regex)
+{
+    var pattern = new RegExp(a_regex);
+    for (var name in this.d_setObservers)
+    {
+        if (pattern.exec(name))
+        {
+            delete this.d_setObservers[name];
+        }
+    }            
 },
 
 /**
@@ -142,16 +159,18 @@ DataType.prototype.addSetterObserver = function(a_num,a_lookup,a_ctx)
  */
 DataType.prototype.observeSetter = function(a_window)
 {
-    for (var i=0; i< this.d_setObservers.length; i++)
+    for (var name in this.d_setObservers)
     {
-        var counter = this.d_setObservers[i][0]++;
-        var trigger = this.d_setObservers[i][1];
-        var func = this.d_setObservers[i][2];
-        var ctx = this.d_setObservers[i][3];
+        var obs = this.d_setObservers[name];
+        var counter = ++obs[0];
+        var trigger = obs[1];
+        var func = obs[2];
+        var ctx = obs[3];
         if (counter >= trigger)
         {
+            DataType.s_logger.debug("observing setter " + name + " in " + a_window.location.pathname);
             // reset the counter
-            this.d_setObservers[i][0] = 0;
+            obs[0] = 0;
             try
             {
                 // make sure latest data is saved

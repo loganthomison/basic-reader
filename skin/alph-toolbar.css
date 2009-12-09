@@ -38,6 +38,10 @@
     list-style-image: url("chrome://alpheios/skin/icons/reading_16.png");
 }
 
+#alpheios-vocab-button {
+   list-style-image: url("chrome://alpheios/skin/icons/vocablist_16.png");
+}
+
 .alpheios-logo {
    margin-left: 4px;
 }

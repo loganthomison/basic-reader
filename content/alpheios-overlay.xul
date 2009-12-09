@@ -12,6 +12,7 @@
 <?xul-overlay href="chrome://alpheios/content/alph-morph-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-tree-panel.xul"?>
 <?xul-overlay href="chrome://alpheios/content/alpheios-etym-panel.xul"?>
+<?xul-overlay href="chrome://alpheios/content/alpheios-vocab-panel.xul"?>
 
 
 <overlay id="alpheios" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -40,7 +41,7 @@
         <broadcaster id="alpheios-grammar"
                      class="alpheios-language-notifier"
                      hidden="true"
-                     disabled="true"/>
+                     disabled="true"/>                          
         <broadcaster id="alpheios-pedagogical-status"
                      class="alpheios-pedagogical-notifier"
                      disabled="true"
@@ -192,7 +193,7 @@
         -->
         <toolbar id="alpheios-toolbar-template" 
                  accesskey="" 
-                 class="chromeclass-toolbar" 
+                 class="chromeclass-toolbar"                  
                  collapsed="true" 
                  context="toolbar-context-menu" 
                  customizable="true" 
@@ -215,11 +216,35 @@
                         id="alpheios-toggle-mm" 
                         label="&alpheios.inline.enable.tm;"
                         command="alpheios-toggle-cmd"/>
+                    <menu
+                        id="alpheios-userdata-commands" 
+                        observes="alpheios-userdata-broadcaster"
+                        tooltiptext="&alpheios.menu.userdata.tooltip;"
+                        label="&alpheios.menu.userdata;">
+                        <menupopup>
+                            <menuitem
+                                id="alpheios-user.backup-mm"
+                                label="&alpheios.menu.backup;"
+                                tooltiptext="&alpheios.menu.backup.tooltip;"
+                                command="alpheios-user.backup-cmd"/>
+                            <menuitem
+                                id="alpheios-user.restore-mm"
+                                label="&alpheios.menu.restore;"
+                                tooltiptext="&alpheios.menu.restore.tooltip;"
+                                command="alpheios-user.restore-cmd"/>
+                            <menuitem
+                                id="alpheios-user.clear-mm"
+                                label="&alpheios.menu.clear;"
+                                tooltiptext="&alpheios.menu.clear.tooltip;"
+                                command="alpheios-user.clear-cmd"/>
+                        </menupopup>                 
+                    </menu>                        
                     <menuitem
                         id="alpheios-options-button"
                         label="&alpheios.menu.options;"
                         tooltiptext="&alpheios.menu.options.tooltip;"
                         command="alpheios-options-cmd"/>
+                   
                     <menuitem
                         id="alpheios-about-mm"
                         label="&alpheios.menu.about;"
@@ -236,32 +261,7 @@
                         tooltiptext="&alpheios.menu.site.tooltip;"
                         command="alpheios-site-cmd"/>
                 </menupopup>
-            </toolbarbutton>
-            <toolbarbutton
-                id="alpheios-userdata-commands"
-                class="toolbarbutton-icon"
-                label="&alpheios.menu.userdata;"
-                tooltiptext="&alpheios.menu.userdata.tooltip;"
-                type="menu"
-                observes="alpheios-userdata-broadcaster">
-                <menupopup>
-                    <menuitem
-                        id="alpheios-user.backup-mm"
-                        label="&alpheios.menu.backup;"
-                        tooltiptext="&alpheios.menu.backup.tooltip;"
-                        command="alpheios-user.backup-cmd"/>
-                    <menuitem
-                        id="alpheios-user.restore-mm"
-                        label="&alpheios.menu.restore;"
-                        tooltiptext="&alpheios.menu.restore.tooltip;"
-                        command="alpheios-user.restore-cmd"/>
-                    <menuitem
-                        id="alpheios-user.clear-mm"
-                        label="&alpheios.menu.clear;"
-                        tooltiptext="&alpheios.menu.clear.tooltip;"
-                        command="alpheios-user.clear-cmd"/>
-                </menupopup>
-            </toolbarbutton>               
+            </toolbarbutton>                           
             <toolbarbutton
                 id="alpheios-lang-button"
                 class="toolbarbutton-icon"
@@ -316,17 +316,21 @@
                     onkeypress="Alph.Main.doTbLookup(event);"
                     observes="alpheios-lookup-enabled"
                     tooltiptext="&alpheios-morph-lookup-tooltip;"/>
-            </toolbaritem>
+            </toolbaritem>                        
             <toolbarbutton
-                id="alpheios-help-button"
-                label="&alpheios.help;"
+                id="alpheios-help-button"                
+                label="&alpheios.help;"                
                 tooltiptext="&alpheios.help.tooltip;"
                 command="alpheios-help-cmd"/>
-            <toolbarspring id="alpheios-toolbar-spring"/>
-            <toolbaritem><label id="alpheios-toolbar-hint" value=""/></toolbaritem>
+            <toolbarspring/>                                                    
+            <toolbaritem observes="alpheios-basic-status">
+                <label id="alpheios-toolbar-hint" value=""/>
+            </toolbaritem>                                                        
             <toolbaritem><label id="alpheios-dataservice-status" value=""/></toolbaritem>
             <toolbarspring/>
-            <toolbaritem class="alpheios-alpha-text"><label value="&alpheios.version.string;"/></toolbaritem>
+            <toolbaritem class="alpheios-alpha-text">
+                <label value="&alpheios.version.string;"/>
+            </toolbaritem>
             <toolbaritem id="alpheios-toolbar-status">
                 <label id="alpheios-toolbar-status-text"
                        value="&alpheios-tools-status-disabled;"/>
@@ -359,6 +363,11 @@
             <vbox id="alph-right-panel" 
                   flex="1"
                   persist="width" collapsed="true" class="alph-panel"/>
+            <splitter collapsed="true" 
+                      class="alph-panel-splitter alph-panel-section-splitter"/>
+            <vbox id="alpheios-vocab-box" 
+                  flex="1"
+                  persist="width" collapsed="true" class="alph-panel"/>            
         </vbox>
     </tabbrowser>
 </overlay>
