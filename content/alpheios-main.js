@@ -323,18 +323,71 @@ Alph.Main =
         
         this.getStateObj(a_bro).setVar("enabled",true);
         if (! this.d_hasLanguages)
-        {
-            var err_msg = this.getString("alph-error-nolanguages");
-            alert(err_msg);
+        {            
+            Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-nolanguages");
             this.inlineDisable(a_bro);
             return;
         }
         if (a_lang == null)
-        {
-            // TODO - pick up language from source text
-            a_lang = this.d_defaultLanguage;
+        {      
+            var lang_list = Alph.Languages.getLangList();
+            if (lang_list.length > 1)
+            {            
+                var docs = this.getBrowserDocs(a_bro);
+                for (var i=0; i< docs.length; i++)
+                {
+                    var doc = docs[i];
+                    var doc_lang = 
+                        doc.documentElement.getAttribute("xml:lang") ||
+                        doc.documentElement.getAttribute("lang") ||
+                        Alph.$("body",doc).attr("xml:lang") ||
+                        Alph.$("body",doc).attr("lang");
+                    if(doc_lang)
+                    {
+                        doc_lang = Alph.Languages.mapLanguage(doc_lang);
+                    }
+                    if (doc_lang && Alph.Languages.hasLang(doc_lang))
+                    {
+                        // use the first supported language we find
+                        a_lang = doc_lang;
+                        break;
+                   }
+                }
+                // if we still don't know the language, ask the user to choose
+                if (! a_lang)
+                {                  
+                    var lang_strs = [];
+                    for (var i=0; i<lang_list.length; i++)
+                    {
+                        lang_strs.push(this.getLanguageString(lang_list[i],lang_list[i]+'.string'));             
+                    }
+                    var selected = Alph.BrowserUtils.doSelect(
+                        window,
+                        'alpheios-select-language-title',
+                        'alpheios-select-language-text',
+                        lang_strs                        
+                        );
+                    if (selected >= 0)
+                    {
+                        a_lang = lang_list[selected];
+                    }
+                    else
+                    {
+                        // user didn't select a language, don't enable the tools                 
+                        var err_msg = this.getString();
+                        Alph.BrowserUtils.doAlert(
+                            window,"alpheios-warning-dialog","alph-error-nolanguage-selected");
+                        this.inlineDisable(a_bro);
+                        return;
+                    }
+                }            
+            }
+            else
+            {
+                a_lang = lang_list[0];
+            }
         }
-                
+                        
         // flag select language not to call onTabSelect
         // because it will be called later by the calling toggle method
         this.selectLanguage(a_lang,false);

@@ -1393,6 +1393,30 @@ BrowserUtils = {
     },
     
     /**
+     * display a selection list dialog
+     * @param {Window} a_window the parent window
+     * @param {String} a_title the title for the dialog (string or key into properties)
+     * @param {String} a_text the text contents for the dialog (string or key into properties)
+     * @param {Array} a_select the list of strings for the select list
+     * @returns the index of the selected item or -1 if the user chose cancel
+     * @type int
+     */
+    doSelect: function(a_window,a_title,a_text,a_select)
+    {
+        var prompts = BrowserSvc.getSvc("Prompts");
+        var bundle = a_window.document.getElementById('alpheios-strings');
+        var title = this.getString(bundle,a_title) || a_title;
+        var text = this.getString(bundle,a_text) || a_text;
+        var selected = {};
+        var rc = -1;
+        if (prompts.select(a_window, title, text, a_select.length, a_select, selected))
+        {
+            rc = selected.value;
+        }
+        return rc;
+    },
+    
+    /**
      * add a status message to a browser element
      * @param {Window} a_window the browser window
      * @param {String} a_elem_id the browser element id
