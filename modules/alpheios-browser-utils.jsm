@@ -506,7 +506,13 @@ BrowserUtils = {
      */
     browserForDoc: function(a_window,a_doc)
     {
-        return a_window.gBrowser.getBrowserForDocument(a_doc);
+        
+        var bro = a_window.gBrowser.getBrowserForDocument(a_doc);
+        if (! bro && a_doc.defaultView.frameElement)
+        {
+            bro = a_window.gBrowser.getBrowserForDocument(a_doc.defaultView.frameElement.ownerDocument);
+        }
+        return bro;
     },
     
     /**
@@ -518,7 +524,7 @@ BrowserUtils = {
      */
     selectBrowserForDoc:function(a_window,a_doc)
     {
-        var bro = a_window.gBrowser.getBrowserForDocument(a_doc);
+        var bro = this.browserForDoc(a_window,a_doc);
         var num = a_window.gBrowser.browsers.length;
         var succeeded = false;
         for (var i = 0; i < num; i++) {
