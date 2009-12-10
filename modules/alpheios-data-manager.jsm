@@ -403,6 +403,8 @@ DataManager =
         {
             BrowserUtils.doAlert(a_window,title,msg);
         }
+        // reset the data objects
+        this.loadData()
         return cleared;
     },
     
@@ -426,6 +428,8 @@ DataManager =
                 var typeObj = self.d_dataObjs[a_type];
                 if (typeObj)
                 {
+                    // clear any old objects of this type
+                    typeObj.d_objs = {};
                     var classname = typeObj.d_classname;
                     var match_string = new RegExp('(.+)' + self.d_dataTypes[classname].s_fileSpec + "$");
                     var charset = typeObj.d_charset;
