@@ -845,8 +845,10 @@ Alph.Xlate = {
                     }
 
                 }
-                // remove all the old word elements from the popup
+                // remove all the old word elements from the popup                 
                 Alph.$(".alph-word",popup).remove();
+                // remove any unknown response from the non-disambiguated results
+                Alph.$(".alph-unknown",popup).remove();
                 // iterate through the final word elements, adding them
                 // back into the popup
                 for (var i=0; i<final_word_set.length; i++)
