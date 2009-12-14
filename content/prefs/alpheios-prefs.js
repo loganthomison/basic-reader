@@ -1185,9 +1185,9 @@ Alph.Prefs = {
                 a_file.append(file_default);
             }
             if (control)
-            {
-                var pref_id = control.getAttribute('preference');
-                document.getElementById(pref_id).value = a_file.path;
+            {             
+                var pref_id = control.getAttribute('preference');                
+                document.getElementById(pref_id).value = a_file.path;                
             } 
         }
     },
@@ -1209,13 +1209,13 @@ Alph.Prefs = {
         catch (a_e)
         {
             Alph.BrowserUtils.debug("Error retrieving backup file path " + a_e);
-        }
+        }        
         return path;
     },
     
      /**
      * onsynctopreferences handler for the backup file 
-     * @returns the path to the file as formatted correction for the operating system
+     * @returns the path to the file as formatted correctly for the operating system
      * @type String
      */
     setBackupFile: function()

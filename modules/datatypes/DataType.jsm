@@ -93,8 +93,44 @@ DataType.prototype.store = function()
         var data = this.serialize();
         BrowserUtils.writeLocalFile(this.d_srcFile,data,this.d_charset);
     }
-}
+};
 
+/**
+ * Export as XML
+ * @param {Window} a_window the parent window
+ * @param {Event} a_event the initiating event
+ * @returns true if the export succeeded, otherwise false
+ * @type boolean
+ */
+DataType.prototype.doXMLExport = function(a_window,a_event)
+{     
+    var self = this;
+    var filename = 'alpheios-' 
+        + BrowserUtils.getLocalFileName(this.d_srcFile).replace(/\.[^\.]+$/,'.xml');
+    return (BrowserUtils.doFilePicker(a_window,
+                              a_event,
+                              "alpheios-xml-export-title",
+                              function(a_window,a_event,a_picked,a_path)
+                              {
+                                  if (a_picked)
+                                    {       
+                                        BrowserUtils.writeLocalFile(
+                                            a_path,
+                                            a_window.XML(a_window.XMLSerializer().serializeToString(this.asXML()))
+                                                    .toXMLString(),
+                                            this.d_charSet);
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                              },
+                              self,
+                              'xml',
+                              filename,
+                              true));
+}
 /**
  * unload the data parsed from the filesystem
  */

@@ -78,10 +78,14 @@ Alph.Vocab.prototype.show = function()
     // clear out the prior contents of the panel
     Alph.$("head link",vocabDoc).remove();
     var style_url = Alph.BrowserUtils.getStyleUrl();
+    var xml_alt_text = Alph.Main.getString("alph-vocab-wordlist-xml");
     Alph.$("body",vocabDoc).html(
         '<div id="alpheios-vocab-contents">' +
-        '<div id="alpheios-wordlist-header">' +
-        Alph.Main.getString("alph-vocab-wordlist-header",[lang_tool.getLanguageString()]) +
+        '<div id="alpheios-wordlist-header" class="alpheios-ignore">' +
+        '<div id="wordlist-export-xml" title="' + xml_alt_text + '">' +
+        '<img src="chrome://alpheios/skin/icons/xml.gif" ' +
+            'alt="' + xml_alt_text + '"/></div>' +
+        '<span>' + Alph.Main.getString("alph-vocab-wordlist-header",[lang_tool.getLanguageString()]) + '</span>'+
         '</div>' +
         '<div id="alpheios-wordlist-hints" class="alpheios-hint">' +
         Alph.Main.getString("alph-vocab-wordlist-hints",[lang_tool.getLanguageString()]) +
@@ -94,8 +98,7 @@ Alph.Vocab.prototype.show = function()
         '<link rel="stylesheet" type="text/css" href="' + style_url + '/alpheios-os.css"/>' +
         '<link rel="stylesheet" type="text/css" href="' + style_url + '/alpheios-vocab.css"/>');
           
-    // update language-specific stylesheets and content
-    
+    // update language-specific stylesheets and content    
     lang_tool.addStyleSheet(vocabDoc);
     this.d_wordList = lang_tool.getWordList();
     this.updateWordList(this.d_wordList);
@@ -258,6 +261,14 @@ Alph.Vocab.prototype.updateWordList = function (a_wordlist)
             return true;
         }
     );
+    Alph.$("#wordlist-export-xml",vocabDoc).click(        
+        function(a_event)
+        {                        
+            panel_obj.exportWordList(a_event);
+            return true;
+        }
+    );
+
     this.updatePanelWindow({},'alph-vocab-body');       
 }
 
@@ -306,5 +317,15 @@ Alph.Vocab.prototype.selectWordListItem = function(a_cbx)
         // update the lemma 
         this.d_wordList.updateLemmaEntry(window,lang,Alph.$(item).text(),null,a_cbx.checked,true);
     }    
-}
+};
 
+/**
+ * handler for the xml export button
+ * @param {Event} the button click event
+ */
+Alph.Vocab.prototype.exportWordList = function(a_event)
+{     
+    var panel_obj = this;
+    this.d_wordList.doXMLExport(window,a_event);
+    
+};

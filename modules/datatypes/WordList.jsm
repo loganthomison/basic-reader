@@ -303,14 +303,13 @@ WordList.prototype.asXML = function(a_learned)
     // return a TEI-formated XML document for the wordlist
     var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");
         
-    var template = 
-        '<?xml version="1.0" encoding="UTF-8"?>' +
+    var template =         
         '<TEI xmlns="http://www.tei-c.org/ns/1.0"' +
         '    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'+
         '    xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_dictionaries.xsd">' +
         '<teiHeader><fileDesc>' + 
-        '<titleStmt><title></title></titleStmt>'  + 
-        '<publicationStmt><date></date></publicationStmt>' + 
+        '<titleStmt><title>Alpheios Word List</title></titleStmt>'  + 
+        '<publicationStmt><date>' + (new Date()).toString() + '</date></publicationStmt>' + 
         '<sourceDesc><p>Alpheios</p></sourceDesc>' +
         '</fileDesc></teiHeader>' + 
         '<text><body></body></text></TEI>';
@@ -350,4 +349,4 @@ WordList.prototype.asXML = function(a_learned)
         body.appendChild(entryNode)
     }
     return doc;
-}
+};

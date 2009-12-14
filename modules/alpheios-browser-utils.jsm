@@ -1263,6 +1263,8 @@ BrowserUtils = {
     /**
      * get an nsILocalFile object given a path or a file
      * @param a_pathOrFile (a String path or an nsIFile)
+     * @returns the file object
+     * @type nsILocalFile
      */
     getLocalFile: function(a_pathOrFile)
     {
@@ -1277,6 +1279,18 @@ BrowserUtils = {
             file.initWithPath(a_pathOrFile);
         }
         return file;
+    },
+    
+    /**
+     * the leaf name for a local file object
+     * @param a_pathOrFile (a String path or an nsIFile)
+     * @returns the leaf name for the file
+     * @type String
+     */
+    getLocalFileName: function(a_pathOrFile)
+    {
+        var file = this.getLocalFile(a_pathOrFile);
+        return file.leafName;        
     },
     
     /**
@@ -1314,19 +1328,38 @@ BrowserUtils = {
      *                   callback args are the window, the event, the return code and the file path
      * @param {Object} a_ctx the 'this' object for the callback 
      * @param {String} a_defaultExt the default extension filter string for the dialog e.g. *.zip (optional)
-     * @param {String} a_defaultFile the default file name for the dialog (optional)
+     * @param {String} a_defaultFile the default file path for the dialog (optional)
+     * @param {Boolean} a_save true to display save as dialog
      * @returns the return value from the callback function 
      */
-    doFilePicker: function(a_window,a_event, a_title, a_callback,a_ctx,a_defaultExt,a_defaultFile)
+    doFilePicker: function(a_window,a_event,a_title, a_callback,a_ctx,a_defaultExt,a_defaultFile,a_save)
     {
         var bundle = a_window.document.getElementById('alpheios-strings');
         var title = this.getString(bundle,a_title) || a_title; 
         var fp = CC["@mozilla.org/filepicker;1"].createInstance(CI.nsIFilePicker);
-        fp.init(a_window, title, CI.nsIFilePicker.modeOpen);       
+        fp.init(a_window, title, a_save ? CI.nsIFilePicker.modeSave : CI.nsIFilePicker.modeOpen);
+        var displayDir = null;
         if (a_defaultFile)
         {
             fp.defaultString  = a_defaultFile;
+            try 
+            {
+                var defaultDir = this.getLocalFile(a_defaultFile).parent;
+                if (defaultDir && defaultDir.isDirectory())
+                {
+                    displayDir = defaultDir;
+                }
+            } catch (a_e) {
+                // fall through to default
+            };
         }
+        // default to the desktop if a default file path hasn't been provided
+        if (displayDir == null)
+        {
+            displayDir = BrowserSvc.getSvc('DirSvc').get("Desk", Components.interfaces.nsIFile);
+        }       
+        fp.displayDirectory = displayDir;
+        this.debug(("display dir set to ") + fp.displayDirectory.path);
         if (a_defaultExt)
         {
             fp.appendFilter(a_defaultExt,a_defaultExt);
@@ -1421,7 +1454,7 @@ BrowserUtils = {
         }
         return rc;
     },
-    
+            
     /**
      * add a status message to a browser element
      * @param {Window} a_window the browser window
@@ -1486,8 +1519,7 @@ BrowserUtils = {
         return cb_return;
                     
     }
-    
-
+         
 };
 
 /**

@@ -25,3 +25,7 @@ body {
     margin-left: 50%;
 }
 
+#wordlist-export-xml {
+    float: right;
+    cursor: pointer;    
+}
