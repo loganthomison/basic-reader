@@ -1,5 +1,7 @@
 body {
     background-color: white;
+    font-family: Arial, sans-serif;
+    color: #0E2233;
 }
 
 #alpheios-wordlist-header {
@@ -28,4 +30,17 @@ body {
 #wordlist-export-xml {
     float: right;
     cursor: pointer;    
+}
+
+#alpheios-wordlist .filtered {
+    display: none;    
+}
+
+#alpheios-wordlist-filter input {    
+    margin-left: 1em;
+}
+
+#alpheios-wordlist-filter {
+    margin-bottom: 2em;
+    font-size: smaller;
 }

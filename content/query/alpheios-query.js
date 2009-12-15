@@ -712,6 +712,9 @@ Alph.Quiz =
 
         // get the tools 
         var tools = params.lang_tool.getToolsForQuery(params.source_node);
+        
+        // add the word to the user's list of learned words
+        params.lang_tool.addToWordList(params.source_node,true,true);
  
         $(".alph-query-context",query_doc)
             .after('<div class="alph-query-context">' +

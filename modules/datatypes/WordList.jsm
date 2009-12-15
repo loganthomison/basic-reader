@@ -319,6 +319,7 @@ WordList.prototype.asXML = function(a_learned)
     {       
         var entry = this.d_dataObj.d_entries[key];
         var entryNode = doc.createElementNS("http://www.tei-c.org/ns/1.0","entry");;
+        entryNode.setAttribute("lang",entry.lang);
         var lemma = doc.createElementNS("http://www.tei-c.org/ns/1.0","form");
         lemma.setAttribute("type","lemma");
         lemma.setAttribute("lang",entry.lang);

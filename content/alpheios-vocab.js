@@ -90,6 +90,14 @@ Alph.Vocab.prototype.show = function()
         '<div id="alpheios-wordlist-hints" class="alpheios-hint">' +
         Alph.Main.getString("alph-vocab-wordlist-hints",[lang_tool.getLanguageString()]) +
         '</div>' +
+        '<div id="alpheios-wordlist-filter">' +
+        '<label><input type="radio" name="filter_wordlist" value="all" checked="checked"/>' +
+        Alph.Main.getString("alph-vocab-wordlist-all") + '</label>' +
+        '<label><input type="radio" name="filter_wordlist" value="unlearned"/>' +
+        Alph.Main.getString("alph-vocab-wordlist-unlearned") + '</label>' +
+        '<label><input type="radio" name="filter_wordlist" value="learned"/>' + 
+        Alph.Main.getString("alph-vocab-wordlist-learned") + '</label>' +
+        '</div>' +
         '<div id="alpheios-wordlist-contents"></div>' + 
         '</div>'
     );
@@ -267,11 +275,62 @@ Alph.Vocab.prototype.updateWordList = function (a_wordlist)
             panel_obj.exportWordList(a_event);
             return true;
         }
-    );
-
-    this.updatePanelWindow({},'alph-vocab-body');       
+    );    
+    Alph.$("input[name=filter_wordlist]",vocabDoc).click(Alph.Vocab.handleFilterSelect);
+    this.updatePanelWindow({},'alph-vocab-body');
+    
 }
 
+/**
+ * handler for click on the filter radio buttons 
+ * @param {Event} a_event the radio click event
+ * @returns true
+ * @type Boolean
+ */
+Alph.Vocab.handleFilterSelect = function(a_event) {
+         
+    // 'this' is the input element which was clicked
+    if (this.value == 'all')
+    {
+        Alph.$("#alpheios-wordlist input[type=checkbox]",this.ownerDocument)
+            .parent('div').removeClass("filtered");
+    }
+    else if (this.value == 'learned')
+    {
+        Alph.$("#alpheios-wordlist input[type=checkbox]",this.ownerDocument).each(
+            function()
+            {
+                if (this.checked)
+                {
+                    Alph.$(this).parent('div').removeClass("filtered");
+                }
+                else 
+                {
+                    Alph.$(this).parent('div').addClass("filtered");
+                }
+            }
+            
+        );               
+    }
+    else if (this.value == 'unlearned')
+    {
+        Alph.$("#alpheios-wordlist input[type=checkbox]",this.ownerDocument).each(
+            function()
+            {
+                if (this.checked)
+                {
+                    Alph.$(this).parent('div').addClass("filtered");
+                }
+                else 
+                {
+                    Alph.$(this).parent('div').removeClass("filtered");
+                }
+            }
+        );
+    }
+    return true;
+}
+   
 /**
  * Update a browser in the detached panel window with the current
  * state of that browser the real (attached) panel
