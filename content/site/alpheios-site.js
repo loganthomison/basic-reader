@@ -844,6 +844,48 @@ Alph.Site = {
     },
     
     /**
+     * Get the title of the document
+     * @param {Document} a_doc the document
+     * @returns the title
+     * @type String
+     */
+    getDocumentTitle: function(a_doc)
+    {
+      // return the value of the Dublin Core title metadatum if it exists, otherwise
+      // the contents of the title element in the document head
+ 
+      var title = Alph.$("meta[name=DC.Title]",a_doc).attr("content") ||
+                  Alph.$("head title",a_doc).text();
+      // if it's an alpheios document, string the "Alpheios:" prefix
+      if (title)
+      {
+        title = title.replace(/^Alpheios:\s*/,'');
+      }
+      return title;
+    },
+    
+    /**
+     * Get the vocabulary url for the document, if any
+     * @param {Document} a_doc the document
+     * @returns the url or null if not defined
+     * @type {String}
+     */
+    getVocabularyUrl: function(a_doc)
+    { 
+        var url = Alph.$("meta[name=alpheios-vocabulary-url]",a_doc).attr("content");
+        // if the vocabulary url is defined, but remote features are disabled and
+        // the vocabulary url is remote, then act as if it's not defined
+        if (url && Alph.BrowserUtils.getPref("disable.remote") && 
+            ! Alph.Util.isLocalUrl(url)
+           )
+        {
+           url = null; 
+        }
+        return (typeof url == "undefined" ? null : url);
+    },
+
+    
+    /**
      * Get the treebank url for the document, if any
      * @param {Document} a_doc the document
      * @returns the url or null if not defined

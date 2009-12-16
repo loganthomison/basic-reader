@@ -9,21 +9,21 @@ body {
     border-bottom: 1px solid black;
 }
 
-#alpheios-wordlist .header {
+.header {
     clear: both;
     font-weight: bold;
 }
-#alpheios-wordlist .entry {
+.entry {
     clear: both;
     margin-bottom: .5em;
 }
 
-#alpheios-wordlist div.lemma {
+div.lemma {
     float: left;
     width: 50%;
 }
 
-#alpheios-wordlist div.forms {    
+div.forms {    
     margin-left: 50%;
 }
 
@@ -32,7 +32,7 @@ body {
     cursor: pointer;    
 }
 
-#alpheios-wordlist .filtered {
+.filtered {
     display: none;    
 }
 
@@ -43,4 +43,33 @@ body {
 #alpheios-wordlist-filter {
     margin-bottom: 2em;
     font-size: smaller;
+}
+
+#alpheios-vocablist-contents {
+    display: none;
+}
+
+.alpheios-tab { 
+    border-width: 1px;
+    border-style: solid;  
+    border-color: #9E9C9A #9E9C9A white #9E9C9A;    
+    background-color: #d1d1d9;
+    color: white;
+    padding: .25em .25em 0 .25em;
+    margin-left: .25em; 
+}
+
+.alpheios-tab.current, .alpheios-tab:hover {
+   background-color: white;
+   color: #0E2233;
+   font-weight: bold;
+   border-color: ThreeDShadow ThreeDShadow white ThreeDShadow;
+}
+
+.alpheios-tab a {
+    border: none;  
+}
+
+.caption {
+    font-weight: bold;
 }
