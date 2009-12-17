@@ -694,6 +694,16 @@ DataManager =
                 all_commands.setAttribute("disabled",true);
             }
         }
+        // also update the toolbar
+        try 
+        {
+            a_window.Alph.Main.updateLangUserTools();
+        }
+        catch(a_e)
+        {
+            this.s_logger.warn("Error updating toolbar " + a_e);
+        }
+        
     },
     
     /**

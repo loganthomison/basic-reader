@@ -632,8 +632,9 @@ Alph.Main =
         var cmenu_text = '';
         var tmenu_text = '';
         var menu_lang = '';
-        var status_text = '';        
-        if (! this.isEnabled(this.getCurrentBrowser()))
+        var status_text = '';    
+        var bro = this.getCurrentBrowser();
+        if (! this.isEnabled(bro))
         {
             tmenu_text = this.getString("alph-inline-enable-tm");
             
@@ -644,14 +645,10 @@ Alph.Main =
             
         }
         else
-        {         
+        {                      
             tmenu_text = this.getString("alph-inline-disable-tm");
             menu_lang = this.getStateObj().getVar("current_language");
-            status_text = 
-                "[" +
-                Alph.$("#alpheios-lang-popup-mm menuitem[value='"+menu_lang+"']").attr("label")
-                + "]";
-
+            status_text = '[' + this.getLanguageTool(bro).getLanguageString() + ']';                
         }
         Alph.$("#alpheios-toggle-mm").attr("label",tmenu_text);
         Alph.$("#alpheios-toolbar-status-text").attr("value",status_text);
@@ -1142,8 +1139,7 @@ Alph.Main =
     },
     
     /**
-     * Update the tools (View) menu for the current browser and language
-     * (call by the popupshowing handler for the menu)
+     * Update the toolbar menus and buttons for the current browser and language
      */
     updateToolsMenu: function()
     {
@@ -1157,13 +1153,8 @@ Alph.Main =
                 var id = Alph.$(this).attr("id");
                 var disabled = true;
                 // enable only if Alpheios is enabled
-                // and the language supports the feature
-                // and if also specified as a userdata-notifier then 
-                // data manager must also be enabled
-                if (Alph.Main.isEnabled(bro) && lang_tool.getFeature(id) 
-                    && (!Alph.$(this).hasClass('alpheios-userdata-notifier') ||
-                        ! Alph.DataManager.disabled()
-                        ))
+                // and the language supports the feature                
+                if (Alph.Main.isEnabled(bro) && lang_tool.getFeature(id))
                 {
                     disabled = false;
                 }
@@ -1218,7 +1209,39 @@ Alph.Main =
                     }
                 }
             }
-        );                  
+        );
+        this.updateLangUserTools();
+    },
+    
+    /**
+     * Update toolbar items which are both language and user specific
+     */
+    updateLangUserTools: function()
+    {
+        var bro = this.getCurrentBrowser();
+        var lang_tool = Alph.Main.getLanguageTool(bro);
+    
+        // check the language-specific feature notifiers
+        Alph.$("broadcaster.alpheios-language-notifier.alpheios-userdata-notifier").each(
+            function()
+            {
+                var id = Alph.$(this).attr("id");
+                var disabled = true;
+                // enable only if Alpheios is enabled
+                // and the language supports the feature
+                // and data manager is enabled
+                if (Alph.Main.isEnabled(bro) && lang_tool.getFeature(id) 
+                    && ! Alph.DataManager.disabled())
+                {
+                    disabled = false;
+                }
+                Alph.$(this).attr("disabled",disabled);
+                if (Alph.$(this).attr("hidden") != null)
+                {
+                    Alph.$(this).attr("hidden",disabled);
+                }
+            }
+        );  
     },
     
     /**
