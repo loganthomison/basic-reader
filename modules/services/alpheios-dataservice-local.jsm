@@ -32,11 +32,25 @@ Components.utils.import("resource://alpheios/services/alpheios-dataservice.jsm")
 Components.utils.import("resource://alpheios/alpheios-constants.jsm");
 
 /**
- * Local Data Service preference setting 
+ * Local Data Service backup file preference setting 
  * @constant
  * @private
  */
 const BFILE_PREF = Constants.DSVC + "." + "local.backup.file";
+
+/**
+ * Local Data Service restore file preference setting 
+ * @constant
+ * @private
+ */
+const RFILE_PREF = Constants.DSVC + "." + "local.restore.file";
+
+/**
+ * Local Data Service preference setting - restore from backup 
+ * @constant
+ * @private
+ */
+const BACKUP_TO_RESTORE_PREF = Constants.DSVC + "." + "local.backup_to_restore";
 
 /**
  * @class DataServiceLocal extends DataService to provide an implementation which
@@ -88,10 +102,11 @@ DataServiceLocal.prototype.restored = function()
 DataServiceLocal.prototype.restore = function(a_window)
 {
     var rc = true;
+    var pref = BrowserUtils.getPref(BACKUP_TO_RESTORE_PREF) ? BFILE_PREF : RFILE_PREF;
     try 
     { 
         BrowserUtils.setStatus(a_window,"alpheios-dataservice-status","restore-in-progress");
-        BrowserUtils.extractZipData(BrowserUtils.getLocalFilePref(BFILE_PREF),true);
+        BrowserUtils.extractZipData(BrowserUtils.getLocalFilePref(pref),true);
         BrowserUtils.clearStatus(a_window,"alpheios-dataservice-status");
         this.d_restored = true;
     }
@@ -110,8 +125,16 @@ DataServiceLocal.prototype.restore = function(a_window)
  */
 DataServiceLocal.prototype.getRestoreCallback = function()
 {
-    var backupPath= BrowserUtils.getLocalFilePref(BFILE_PREF);   
-    if (backupPath && BrowserUtils.testLocalFile(backupPath,'<'))
+    var restorePath;
+    if (BrowserUtils.getPref(BACKUP_TO_RESTORE_PREF))
+    {
+        restorePath = BrowserUtils.getLocalFilePref(BFILE_PREF); 
+    }
+    else 
+    {
+        restorePath = BrowserUtils.getLocalFilePref(RFILE_PREF);
+    }        
+    if (restorePath && BrowserUtils.testLocalFile(restorePath,'<'))
     {
         return this.restore;
     }
@@ -186,17 +209,18 @@ DataServiceLocal.prototype.backup = function(a_window,a_path)
 DataServiceLocal.prototype.configureRestore = function(a_window)
 {
     var self = this;
+    var pref = BrowserUtils.getPref(BACKUP_TO_RESTORE_PREF) ? BFILE_PREF : RFILE_PREF;
     var rc =
         BrowserUtils.doFilePicker(
         a_window,
         null, 
-        'alph-browse-backup-file', 
+        'alph-browse-restore-file', 
         function(a_window,a_event,a_picked,a_path)
         {
             BrowserUtils.debug("restore file picked:" + a_picked + " path:" + a_path);
             if (a_picked)
             {       
-                BrowserUtils.setLocalFilePref(BFILE_PREF,a_path);
+                BrowserUtils.setLocalFilePref(pref,a_path);
                 return this.restore(a_window);
             }
             else
@@ -206,7 +230,7 @@ DataServiceLocal.prototype.configureRestore = function(a_window)
         },
         self,
         '*.zip',
-        BrowserUtils.getLocalFilePref(BFILE_PREF)||'alpheios-backup.zip');
+        BrowserUtils.getLocalFilePref(pref)||'alpheios-backup.zip');
     return rc;
 };
 
@@ -255,4 +279,5 @@ DataServiceLocal.prototype.configureBackup = function(a_window)
 DataServiceLocal.prototype.clearPrefs = function()
 {
     BrowserUtils.resetPref(BFILE_PREF);
+    BrowserUtils.resetPref(RFILE_PREF);
 }

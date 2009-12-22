@@ -50,7 +50,7 @@ DataManager =
      * Container for the instantiated user data objects
      * @private
      */
-    d_dataObjs: {},
+    d_dataObjs: { _count: 0 },
     
     /**
      * Container for the factory methods for each data service type
@@ -405,6 +405,7 @@ DataManager =
         }
         // reset the data objects
         this.loadData()
+        this.updateUserCommands(a_window);
         return cleared;
     },
     
@@ -627,9 +628,9 @@ DataManager =
         if (this.disabled())
         {
             return;
-        }
+        }        
         this.d_dataObjs[a_type].d_objs[a_key] = a_obj;
-        
+        this.d_dataObjs._count++;
         // add an observer to store changes to the data object every x accesses
         var store_trigger = 
             BrowserUtils.getPref([Constants.SAVE,Constants.INTERVAL,Constants.NUMLOOKUPS].join('.'));
@@ -659,7 +660,7 @@ DataManager =
         var allowed = 0;        
         if (! this.disabled())
         {
-            [Constants.BACKUP,Constants.RESTORE,Constants.CLEAR].forEach(
+            [Constants.BACKUP,Constants.RESTORE].forEach(
                 function(a_type)
                 {
                     var elem = a_window.document.getElementById('alpheios-' + a_type + '-allowed');
@@ -679,6 +680,19 @@ DataManager =
                     }
                 }
             ); 
+            // offer clear only if there is any data to clear
+            var clear = a_window.document.getElementById('alpheios-' + Constants.CLEAR + '-allowed');            
+            if (this.hasData())
+            {
+                allowed++; 
+                clear.setAttribute('hidden',false);
+                clear.setAttribute('disabled',false);   
+            }
+            else
+            {
+                clear.setAttribute('hidden',true);
+                clear.setAttribute('disabled',true);
+            }
         }
         var all_commands = a_window.document.getElementById('alpheios-userdata-broadcaster');
         if (all_commands)
@@ -725,6 +739,16 @@ DataManager =
         {
             this.updateUserCommands(a_window)
         }
+    },
+    
+    /**
+     * Check to see if any user data is available
+     * @returns true or false
+     * @type Boolean
+     */
+    hasData: function()
+    {
+        return (this.d_dataObjs._count > 0);
     }
 }
 DataManager.init();

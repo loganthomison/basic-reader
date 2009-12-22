@@ -88,8 +88,7 @@
             <radiogroup preference="pref-user-model" 
                         onsyncfrompreference="Alph.Prefs.checkUserDataModel();" 
                         onsynctopreference="return Alph.Prefs.updateDataServiceSettings();">
-                
-                <radio label="&alpheios.prefs.userdata.model.ffprofile;" value="ffprofile"/>    
+                                    
                 <radio label="&alpheios.prefs.userdata.model.ffprofileplus;" value="ffprofileplus"/>
                 <radio label="&alpheios.prefs.userdata.model.shared;" value="shared"/>
                 <radio label="&alpheios.prefs.userdata.model.custom;" value="custom"/>

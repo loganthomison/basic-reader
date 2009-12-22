@@ -82,14 +82,16 @@
 <!ENTITY alpheios.prefs.restore.interval.appstart "Whenever Firefox is Started">
 <!ENTITY alpheios.prefs.restore.interval.request "On Request Only">
 <!ENTITY alpheios.prefs.restore.confirm "Require confirmation before restore?">
-<!ENTITY alpheios.prefs.backup.local.file "Data File Path:">
+<!ENTITY alpheios.prefs.backup.local.file "Backup File Path:">
+<!ENTITY alpheios.prefs.restore.local.file "Restore File Path:">
 <!ENTITY alpheios.prefs.file.browse "Browse...">
 <!ENTITY alpheios.prefs.userdata.service.local "Local Zip File">
 <!ENTITY alpheios.prefs.clear.interval "Clear User Data:">
 <!ENTITY alpheios.prefs.userdata.model "Alpheios User Profile:">    
-<!ENTITY alpheios.prefs.userdata.model.ffprofile "Single User Per Firefox Profile, Non Portable Data">    
-<!ENTITY alpheios.prefs.userdata.model.ffprofileplus "Single User Per Firefox Profile, Portable Data">
-<!ENTITY alpheios.prefs.userdata.model.shared "Multiple Users per Firefox Profile, Portable Data">
+<!ENTITY alpheios.prefs.userdata.model.ffprofile "Single User Per Firefox Profile (No backup or restore)">    
+<!ENTITY alpheios.prefs.userdata.model.ffprofileplus "Single User Per Firefox Profile">
+<!ENTITY alpheios.prefs.userdata.model.shared "Multiple Users per Firefox Profile">
 <!ENTITY alpheios.prefs.userdata.model.custom "Custom">
 <!ENTITY alpheios.prefs.userdata.model.custom.info "(Configure Custom User Data Storage Settings Below)">
-<!ENTITY alpheios.prefs.userdata.model.disable "User Features Disabled"> 
+<!ENTITY alpheios.prefs.userdata.model.disable "User Features Disabled">
+<!ENTITY alpheios.prefs.backup.to.restore "Backup and Restore to/from same file?"> 

@@ -1068,7 +1068,7 @@ BrowserUtils = {
      */
     removeDataDir: function(a_sub)
     {
-        var prof_dir = this.getDataDir(a_sub)
+        var prof_dir = this.getDataDir(a_sub);        
         if( prof_dir.exists() ) 
         {   
            prof_dir.remove(true);

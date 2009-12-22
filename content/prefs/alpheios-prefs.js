@@ -1024,16 +1024,16 @@ Alph.Prefs = {
             {
                 // single user per ff profile, backup/restore to zip
                 // local dataservice
-                // restore on request
-                // backup on app disable
+                // backup,restore and clear on request
+                // backup and restore separate files
                 // keep 1 backup
-                // clear only on request
                 dataservice_pref.value = 'local';
                 document.getElementById('pref-restore-interval').value = Alph.Constants.ONREQUEST;
-                document.getElementById('pref-backup-interval').value = Alph.Constants.ONDISABLE;
+                document.getElementById('pref-backup-interval').value = Alph.Constants.ONREQUEST;
                 document.getElementById('pref-backup-keep').value = 1;
                 document.getElementById('pref-userdata-clear-interval').value = Alph.Constants.ONREQUEST;
                 document.getElementById('pref-restore-confirm').value = false;
+                document.getElementById('pref-backup-to-restore').value = false;
                 break;
             }
             case 'shared':
@@ -1043,6 +1043,7 @@ Alph.Prefs = {
                 // restore on enable
                 // backup after 10 lookups 
                 // keep 1 backup
+                // backup and restore same file
                 // clear on app disable
                 dataservice_pref.value = 'local';
                 document.getElementById('pref-restore-interval').value = Alph.Constants.ONENABLE;
@@ -1051,6 +1052,7 @@ Alph.Prefs = {
                 document.getElementById('pref-backup-keep').value = 1;
                 document.getElementById('pref-userdata-clear-interval').value =Alph.Constants.ONDISABLE; 
                 document.getElementById('pref-restore-confirm').value = false;
+                document.getElementById('pref-backup-to-restore').value = true;
                 break;
             }
             case 'disable':
@@ -1181,25 +1183,32 @@ Alph.Prefs = {
             {
                 var control_id = match[1];
                 control = Alph.$("#"+control_id).get(0);
-                var file_default = Alph.Constants.BACKUP_FILE;
-                a_file.append(file_default);
+                // if called from directoryPicker rather than filePicker,
+                // a_file will be a file object rather than the string path
+                if (typeof a_file != 'string')
+                {
+                    var file_default = Alph.Constants.BACKUP_FILE;
+                    a_file.append(file_default);
+                    a_file = a_file.path;
+                }
             }
             if (control)
             {             
                 var pref_id = control.getAttribute('preference');                
-                document.getElementById(pref_id).value = a_file.path;                
+                document.getElementById(pref_id).value = a_file;                
             } 
         }
     },
     
     /**
-     * onsyncfrompreferences handler for the backup file 
+     * onsyncfrompreferences handler for a file path
+     * @param {String} a_controlId the id of the the xul control element  
      * @returns the path to the file as formatted correction for the operating system
      * @type String
      */
-    getBackupFilePath: function()
+    getFilePath: function(a_controlId)
     {
-        var pref = Alph.$("#backup-file").get(0).getAttribute('preference');
+        var pref = Alph.$("#"+a_controlId).get(0).getAttribute('preference');
         var pref_name = document.getElementById(pref).name;
         var path = "";
         try
@@ -1214,13 +1223,14 @@ Alph.Prefs = {
     },
     
      /**
-     * onsynctopreferences handler for the backup file 
+     * onsynctopreferences handler for the backup file
+     * @param {String} a_controlId the id of the the xul control element 
      * @returns the path to the file as formatted correctly for the operating system
      * @type String
      */
-    setBackupFile: function()
+    setBackupFile: function(a_controlId)
     {
-        var str_path = Alph.$("#backup-file").get(0).value;
+        var str_path = Alph.$("#" + a_controlId).get(0).value;
         var file_path = "";
         try
         {
@@ -1258,6 +1268,22 @@ Alph.Prefs = {
             }
         }
         return enable;
+    },
+    /**
+     * onsyncto/from preference handler for control checkbox for restore file for
+     * local dataservice - toggles the disabled status for the restore file path
+     * @param {Boolean} a_fromPref true take the value from preference otherwise observe
+     *                             the checked status
+     * @returns the preference value (i.e. true or false)
+     * @type boolean
+     */
+    toggleRestoreFile: function(a_fromPref)
+    {
+        var pref = document.getElementById('pref-backup-to-restore').value;
+        var checked = document.getElementById('backup-to-restore').checked;        
+        var enabled = a_fromPref ? pref : checked;                     
+        document.getElementById('restore-file-prefs').setAttribute("collapsed",enabled);        
+        return enabled;
     }
     
 };

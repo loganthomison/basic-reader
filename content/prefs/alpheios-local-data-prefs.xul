@@ -6,6 +6,8 @@
     <prefpane id="alpheios-prefs-userdata">
         <preferences id="prefs-userdata">
             <preference id="pref-backup-local-file" name="extensions.alpheios.user.dataservice.local.backup.file" type="string"/>
+            <preference id="pref-restore-local-file" name="extensions.alpheios.user.dataservice.local.restore.file" type="string"/>
+            <preference id="pref-backup-to-restore" name="extensions.alpheios.user.dataservice.local.backup_to_restore" type="bool"/>
         </preferences>
         <vbox id="alpheios-prefs-userdata-advanced">
             <tabbox id="alpheios-prefs-userdata-service-tabbox">
@@ -13,18 +15,41 @@
                     <tab label="&alpheios.prefs.userdata.service.local;"/>
                 </tabs>
                 <tabpanels id="alpheios-prefs-userdata-service-tabpanels">
-                    <tabpanel flex="1">
+                    <tabpanel flex="1" orient="vertical">
                         <hbox flex="1">
                             <label value="&alpheios.prefs.backup.local.file;" 
                                 control="backup-file"/>
                             <textbox id="backup-file" preference="pref-backup-local-file" flex="1"
-                                     onsynctopreference="return Alph.Prefs.setBackupFile();"
-                                     onsyncfrompreference="return Alph.Prefs.getBackupFilePath();"/>
+                                     onsynctopreference="return Alph.Prefs.setFile('backup-file');"
+                                     onsyncfrompreference="return Alph.Prefs.getFilePath('backup-file');"/>
                             <button class="alpheios-browse-button" 
                                     id="browse-backup-file" 
                                     label="&alpheios.prefs.file.browse;"
                                     onclick="Alph.BrowserUtils.doDirectoryPicker(
                                         window,event,'browse-backup-folder',Alph.Prefs.onDataFilePicked,Alph.Prefs,null)"/>
+                        </hbox>
+                        <hbox flex="1">
+                            <label value="&alpheios.prefs.backup.to.restore;" control="backup-to-restore"/> 
+                            <checkbox id="backup-to-restore" preference="pref-backup-to-restore"
+                                      onsyncfrompreference="return Alph.Prefs.toggleRestoreFile(true);"
+                                      oncommand="return Alph.Prefs.toggleRestoreFile(false);"/>                            
+                        </hbox>
+                        <hbox flex="1" id="restore-file-prefs">    
+                            <label value="&alpheios.prefs.restore.local.file;" 
+                                control="restore-file"/>                   
+                            <textbox id="restore-file" preference="pref-restore-local-file" flex="1"
+                                onsynctopreference="return Alph.Prefs.setFile('restore-file');"
+                                onsyncfrompreference="return Alph.Prefs.getFilePath('restore-file');"/>
+                            <button class="alpheios-browse-button" 
+                                    id="browse-restore-file" 
+                                    label="&alpheios.prefs.file.browse;"                                    
+                                    onclick="Alph.BrowserUtils.doFilePicker(
+                                        window,event,
+                                        'alph-browse-restore-file',
+                                        Alph.Prefs.onDataFilePicked,
+                                        Alph.Prefs,
+                                        '*.zip',
+                                        'alpheios-backup.zip',false);"/>                                                   
                         </hbox>
                     </tabpanel>
                 </tabpanels>
