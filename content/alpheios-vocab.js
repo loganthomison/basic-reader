@@ -165,7 +165,9 @@ Alph.Vocab.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     }  
     else if (a_event_type == Alph.Constants.EVENTS.VOCAB_UPDATE 
                 && panel_state.status == Alph.Panel.STATUS_SHOW
-                && Alph.$("#alpheios-wordlist",a_event_data.src_node.ownerDocument).length == 0)
+                && (! a_event_data.src_node || 
+                    Alph.$("#alpheios-wordlist",a_event_data.src_node.ownerDocument).length == 0)
+            )
     {        
         this.updateWordList(this.d_wordList); 
     }
@@ -230,6 +232,10 @@ Alph.Vocab.prototype.updateWordList = function (a_wordlist)
         '<img src="chrome://alpheios/skin/icons/xml.gif" ' +
         'alt="' + xml_alt_text + '"/></div>',vocabDoc);               
         Alph.$("#alpheios-wordlist-contents",vocabDoc).html(wordlistElem).prepend(xml_link);
+        Alph.$("#alpheios-wordlist-filter",vocabDoc).before(Alph.Vocab.getFilter(vocabDoc)).remove();
+        Alph.Vocab.handleFilterSelect
+                      .call(Alph.$("input[name=filter_wordlist]:checked",vocabDoc).get(0),null);
+        
     }    
     catch (e)
     {
@@ -250,6 +256,13 @@ Alph.Vocab.prototype.updateWordList = function (a_wordlist)
  */
 Alph.Vocab.handleFilterSelect = function(a_event) {
          
+
+    if (a_event != null)
+    {
+        // update the preference setting if called from a click event
+        Alph.BrowserUtils.setPref(Alph.Constants.VOCAB_FILTER,this.value);
+    }
+    
     // 'this' is the input element which was clicked
     if (this.value == 'all')
     {
@@ -312,7 +325,7 @@ Alph.Vocab.prototype.updatePanelWindow = function(a_panel_state,a_browser_id,a_b
         {
             var pw_doc = pw_bro.contentDocument;
             Alph.$("head",pw_doc).html(Alph.$("head",vocabDoc).children().clone());
-            Alph.$("body",pw_doc).html(Alph.$("body",vocabDoc).children().clone(true));                            
+            Alph.$("body",pw_doc).html(Alph.$("body",vocabDoc).children().clone(true));          
         }
     }
 };
@@ -338,7 +351,7 @@ Alph.Vocab.selectWordListItem = function(a_event)
     {
         // update the lemma 
         panel_obj.d_wordList.updateLemmaEntry(window,lang,Alph.$(item).text(),null,this.checked,true);
-    }    
+    }   
 };
 
 /**
@@ -361,31 +374,24 @@ Alph.Vocab.exportWordList = function(a_event)
 Alph.Vocab.prototype.initDocument = function(a_bro,a_doc,a_lang_tool)
 {   
     Alph.$("head link",a_doc).remove();
-    var style_url = Alph.BrowserUtils.getStyleUrl();
+    var style_url = Alph.BrowserUtils.getStyleUrl();       
     Alph.$("body",a_doc).html(
         '<div id="alpheios-vocab-contents" lang="' + a_lang_tool.getLanguage() + '">' +
         '<div id="alpheios-wordlist-header" class="alpheios-ignore">' +        
-        '<span class="alpheios-tab current">' + 
+        '<span class="alpheios-tab current" id="wordlist-tab">' + 
         '<a href="#alpheios-wordlist-contents">' + 
             Alph.Main.getString("alph-vocab-wordlist-header",[a_lang_tool.getLanguageString()]) +
         '</a>' +         
         '</span>'+
-        '</div>' +
+        '</div>' +        
         '<div id="alpheios-wordlist-hints" class="alpheios-hint alpheios-ignore">' +
         Alph.Main.getString("alph-vocab-wordlist-hints",[a_lang_tool.getLanguageString()]) +
-        '</div>' +
-        '<div id="alpheios-wordlist-filter">' +
-        '<label><input type="radio" name="filter_wordlist" value="all" checked="checked"/>' +
-        Alph.Main.getString("alph-vocab-wordlist-all") + '</label>' +
-        '<label><input type="radio" name="filter_wordlist" value="unlearned"/>' +
-        Alph.Main.getString("alph-vocab-wordlist-unlearned") + '</label>' +
-        '<label><input type="radio" name="filter_wordlist" value="learned"/>' + 
-        Alph.Main.getString("alph-vocab-wordlist-learned") + '</label>' +
-        '</div>' +
+        '</div>' + 
+        '<div id="alpheios-wordlist-filter"></div>' +
         '<div id="alpheios-wordlist-contents"></div>' +
         '<div id="alpheios-vocablist-contents"><div id="alpheios-vocablist"></div></div>' +
         '</div>'
-    );
+    );        
     var docs = Alph.Main.getBrowserDocs(a_bro);
     var vocabUrl = null;
     var docTitle = "";
@@ -404,7 +410,7 @@ Alph.Vocab.prototype.initDocument = function(a_bro,a_doc,a_lang_tool)
     if (vocabUrl)    
     {        
         Alph.$("#alpheios-wordlist-header",a_doc).append(
-            '<span class="alpheios-tab" id="vocablist-header">' +
+            '<span class="alpheios-tab" id="vocablist-tab">' +
             '<a href="#alpheios-vocablist-contents">' + 
             Alph.Main.getString("alph-vocablist-header",[docTitle])
             + '</a></span>');
@@ -458,21 +464,11 @@ Alph.Vocab.prototype.addHandlers = function(a_doc)
         'click',Alph.Vocab.exportWordList);
     Alph.$("#wordlist-export-xml",a_doc).bind(        
         'click',panel_obj,Alph.Vocab.exportWordList);
-    Alph.$("input[name=filter_wordlist]",a_doc).unbind(
-        'click',Alph.Vocab.handleFilterSelect);
-    Alph.$("input[name=filter_wordlist]",a_doc).bind(
-        'click',panel_obj,Alph.Vocab.handleFilterSelect);
     Alph.$("#alpheios-vocablist-pofsselect",a_doc).unbind(
         'change', Alph.Vocab.handleVocabSelect);
     Alph.$("#alpheios-vocablist-pofsselect",a_doc).bind(
         'change',panel_obj,Alph.Vocab.handleVocabSelect);
-    Alph.$("#vocablist-header",a_doc).unbind(
-        'click',Alph.Vocab.handleVocabSelect);
-    Alph.$("#vocablist-header",a_doc).bind(
-        'click',panel_obj,Alph.Vocab.handleVocabSelect);
-
 };
-
 
 /**
  * Select handler for the vocabulary list
@@ -482,12 +478,6 @@ Alph.Vocab.handleVocabSelect = function(a_event)
 {
     var panelObj = a_event.data;
     var doc = this.ownerDocument;
-    // if called from tab select, only execute if the contents are empty
-    if (this.id == 'vocablist-header' && Alph.$("#alpheios-vocablist",doc).children(".entry").length > 0)
-    {
-        return;
-    }
-    
     Alph.$("#alpheios-vocablist",doc).html(
         '<div class="loading">' + Alph.Main.getString('alph-loading-misc') + '</div>');
     var pofs = Alph.$("#alpheios-vocablist-pofsselect",doc).get(0).value;        
@@ -539,11 +529,27 @@ Alph.Vocab.prototype.updateVocabList = function(a_xml,a_doc)
         {
             Alph.$("#alpheios-vocablist input[type=checkbox]",a_doc).each(
                 function()
-                {                    
-                    var word = lang_tool.normalizeWord(Alph.$(this).next('span').text());                    
-                    Alph.$(this).attr("checked",self.d_wordList.checkForm(word));
+                {       
+                    var learned = false;
+                    // if it's a lemma, check the lemma only
+                    if (Alph.$(this).parent(".lemma").length == 1)
+                    {
+                        var lemma= lang_tool.normalizeWord(Alph.$(this).next('span').text());
+                        learned = self.d_wordList.checkLemma(lemma);
+                    }
+                    // otherwise check for the form under the correct lemma
+                    else
+                    {
+                        var lemma = lang_tool.normalizeWord( 
+                            Alph.$(this).parents(".entry").children(".lemma").text());
+                        var form = lang_tool.normalizeWord(Alph.$(this).next('span').text());
+                        learned = self.d_wordList.checkForm(form,lemma);
+                    }
+                    Alph.$(this).attr("checked",learned);                    
                 }
-            )    
+            )
+            Alph.Vocab.handleFilterSelect
+                      .call(Alph.$("input[name=filter_wordlist]:checked",a_doc).get(0),null);
         }
         
     
@@ -577,5 +583,47 @@ Alph.Vocab.selectTab = function(a_event)
     Alph.$(this).addClass("current");
     var target_id = Alph.$("a",this).attr("href");
     Alph.$(target_id,this.ownerDocument).css("display","block");
+
+    // for vocab tab, update vocabulary panel contents if it's empty
+    if (this.id == 'vocablist-tab'
+        && Alph.$("#alpheios-vocablist",this.ownerDocument).children(".entry").length == 0)
+    {
+        Alph.Vocab.handleVocabSelect.call(this,a_event);
+    }
+    // for wordlist tab, refresh contents with latest word list
+    else if (this.id == 'wordlist-tab')
+    {
+        panelObj.updateWordList(panelObj.d_wordList);
+    }
     return false;
+}
+
+/**
+ * get the filter controls
+ * @param {Document} a_doc the parent document
+ * @returns the alpheios-wordlist-filter html
+ * @type String
+ */
+Alph.Vocab.getFilter = function(a_doc)
+{
+    var def_filter = Alph.BrowserUtils.getPref(Alph.Constants.VOCAB_FILTER);
+    var filter_html = '<div id="alpheios-wordlist-filter">';
+    ['all','unlearned','learned'].forEach(
+        function(a_filter)
+        {
+            var checked = '';
+            if (def_filter == a_filter)
+            {
+                checked = 'checked="checked"';
+            }
+            filter_html = filter_html +
+                '<label><input type="radio" name="filter_wordlist" value="' + a_filter + '"' +
+                checked + '/>' +
+            Alph.Main.getString("alph-vocab-wordlist-" + a_filter) + '</label>';
+        }
+    );
+    filter_html = filter_html + '</div>';
+    var filter_node = Alph.$(filter_html,a_doc);
+    Alph.$("input[name=filter_wordlist]",filter_node).click(Alph.Vocab.handleFilterSelect);    
+    return filter_node;                      
 }

@@ -84,5 +84,6 @@ Constants = {
      ONAPPQUIT : "appquit",
      ONREQUEST : "request",
      DMODEL:  "user.model",
-     BACKUP_FILE: 'alpheios-backup.zip'
+     BACKUP_FILE: 'alpheios-backup.zip',
+     VOCAB_FILTER: 'interface.vocab.filter'
 };

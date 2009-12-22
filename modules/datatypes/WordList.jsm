@@ -174,7 +174,7 @@ WordList.prototype.updateFormEntry = function(a_window,a_lang,a_form,a_lemma,a_l
 };
 
 /**
- * Gthe learned state of a specific form 
+ * Get the learned state of a specific form 
  * @param {String} a_form the form
  * @param {String} a_lemma the lemma if known, otherwise null
  * @returns the learned state (true or false) of the supplied form
@@ -220,6 +220,18 @@ WordList.prototype.checkForm = function(a_form,a_lemma)
     }
     BrowserUtils.debug("Checking for " + a_form + ": " + learned);
     return learned;
+};
+
+/**
+ * Get the learned state of a specific lemma 
+ * @param {String} a_lemma the lemma 
+ * @returns the learned state (true or false) of the supplied lemma        
+ * @type Boolean
+ */
+WordList.prototype.checkLemma = function(a_lemma)
+{ 
+    var entry = this.getEntry(a_lemma);
+    return (entry && entry.learned);    
 };
 
 /**

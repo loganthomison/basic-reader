@@ -65,3 +65,4 @@ pref("extensions.alpheios.user.dataservice.local.backup.file","");
 pref("extensions.alpheios.user.dataservice.local.restore.file","");
 pref("extensions.alpheios.user.dataservice.local.backup_to_restore",false);
 pref("extensions.alpheios.user.wordlist.lookup.threshold",3);
+pref("extensions.alpheios.interface.vocab.filter",'all');
