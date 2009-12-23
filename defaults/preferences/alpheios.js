@@ -50,7 +50,7 @@ pref("extensions.alpheios.user.backup.interval.lookup.num",10);
 pref("extensions.alpheios.user.restore.interval","enable");
 pref("extensions.alpheios.user.restore.confirm",false);
 pref("extensions.alpheios.user.clear.interval","request");
-pref("extensions.alpheios.user.dataservice","none");
+pref("extensions.alpheios.user.dataservice","local");
 pref("extensions.alpheios.user.datatypes","words");
 pref("extensions.alpheios.user.datatype.words.class","WordList");
 pref("extensions.alpheios.user.datatype.words.resource","resource://alpheios/datatypes/WordList.jsm");
