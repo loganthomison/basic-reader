@@ -15,6 +15,7 @@
     
     <hbox flex="100">
         <browser id="alpheios-diagram-content"
+                 class="alpheios-trigger-proxied"
                  type="content-primary"
                  src="chrome://alpheios/content/html/alph-panel.html"
                  flex="10"

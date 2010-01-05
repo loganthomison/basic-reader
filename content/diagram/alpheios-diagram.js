@@ -41,11 +41,6 @@ Alph.Diagram.load = function()
     
                         
     var browser = document.getElementById("alpheios-diagram-content");
-    var trigger;
-    if (params.lang_tool)
-    {
-        trigger = params.lang_tool.getPopupTrigger();
-    }
     browser.setAttribute('src',params.url);
     // resize the window to fit the tree
     browser.addEventListener(
@@ -75,18 +70,19 @@ Alph.Diagram.load = function()
             );
                                   
             // add the trigger hint
+            var trigger = params.lang_tool.getPopupTrigger();
             if (trigger)
             {
                 var parent_browser = 
-                    Alph.BrowserUtils.browserForDoc(window.opener,params.src_node.ownerDocument);
+                    Alph.BrowserUtils.browserForDoc(window.opener,params.src_doc);
                 window.opener.Alph.Site
                         .addTriggerHint(parent_browser,this.contentDocument,trigger,params.lang_tool);
             }
 
         },true);
-    if (trigger)
+    if (params.proxied_event && params.proxied_handler)
     {
-        browser.addEventListener(trigger, Alph.Diagram.handleTriggerEvent, false);    
+        Alph.Util.addProxiedEvent(window,browser,params.proxied_event);    
     }
     
                 
@@ -97,28 +93,3 @@ Alph.Diagram.load = function()
     }
 
 }
-
-/**
- * handler for the xlate trigger -- pass to the Alph.Main handler for the parent
- * browser window
- * @param {Event} a_event the trigger event
- */
-Alph.Diagram.handleTriggerEvent = function(a_e)
-{
-    var params = typeof window.arguments != "undefined" ? 
-                    window.arguments[0] : {};
-    if (params.src_node)
-    {
-        // select the browser which opened the window before executing the handler
-        if (Alph.BrowserUtils.selectBrowserForDoc(window.opener,params.src_node.ownerDocument))
-        {
-            window.opener.Alph.Main.doXlateText(a_e);
-        }
-        else
-        {
-            alert("Unable to locate source browser");
-    
-        }
-    }
-}
-

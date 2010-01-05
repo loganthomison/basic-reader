@@ -621,6 +621,7 @@ Alph.Main =
         // forward the event to Alph.Xlate.doMouseMoveOverText
         Alph.Xlate.doMouseMoveOverText(a_event);
     },
+            
 
     /**
      * Toggle the text of the browser menu items for extension to 
@@ -1021,11 +1022,37 @@ Alph.Main =
         a_bro.addEventListener(a_trigger, this.doXlateText, false);
         this.getStateObj(a_bro).setVar("xlate_trigger",a_trigger);
         this.setTbHints();
+        // update the trigger in any secondary windows opened by this browser
+        var windows = Alph.Main.getStateObj(a_bro).getVar("windows");
+        for (var win in windows)
+        {
+            try {
+                if (typeof windows[win] != "undefined" 
+                    && windows[win] != null 
+                    && ! windows[win].closed)
+                {                    
+                    var window_bro = Alph.$("browser.alpheios-trigger-proxied",windows[win].document).get(0);
+                    if (window_bro)
+                    {
+                        Alph.Main.s_logger.debug("updating trigger in window " + win);
+                        Alph.Util.removeProxiedEvent(windows[win],window_bro,old_trigger)
+                        Alph.Util.addProxiedEvent(windows[win],window_bro,a_trigger);    
+                        Alph.Site.addTriggerHint(a_bro,
+                                                 window_bro.contentDocument,
+                                                 a_trigger,Alph.Main.getLanguageTool(a_bro));
+                    }
+                }
+            } catch(a_e)
+            {
+                Alph.Main.s_logger.error("Error updating window " + win + " : " + a_e);                           
+            }               
+        }
         this.broadcastUiEvent(Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER,
             {new_trigger: a_trigger,
              old_trigger: old_trigger
             }
         );
+        
     },
     
     /**
@@ -2025,7 +2052,7 @@ Alph.Main =
                 if (Alph.Main.isEnabled(bro) && 
                     a_name.indexOf(Alph.Main.getStateObj(bro).getVar("current_language")) == 0)
                 {
-                    Alph.Main.setXlateTrigger(bro,a_value);
+                    Alph.Main.setXlateTrigger(bro,a_value);                   
                 }
             }
         }            
@@ -2132,6 +2159,16 @@ Alph.Main =
             Alph.BrowserUtils.setPref("enable.toolbar",false);
         
         }
+    },
+    
+    /**
+     * open new diagram edit window
+     * @param {Event} a_event the initiating event
+     */
+    enterDiagram: function(a_event)
+    {
+        var url = Alph.BrowserUtils.getPref("interface.diagram.enter.url");
+        Alph.Xlate.openSecondaryWindow('alpheios-diagram-enter-window',url);
     }
    
 };

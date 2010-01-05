@@ -815,7 +815,9 @@ Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_para
                       function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) }
                       : function() {},
             lang_tool: thisObj,
-            src_node: a_node
+            src_doc: a_node.ownerDocument,
+            proxied_event: thisObj.getPopupTrigger(),
+            proxied_handler: Alph.Main.doXlateText
         },
         a_params || {}
     );
@@ -1660,16 +1662,14 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
     // hide the learned button in the quiz for now
     // TODO word should be automatically identified as learned or not according to user's answer
     Alph.$('.alph-mywords-link',tools).remove();
-    // if the node is from the dependency tree diagram, the call to selectBrowserForDoc
-    // will fail, but it should be unnecessary in this case, because the tree won't be available
-    // if the browser that originated it isn't selected
     var from_tree = Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length > 0;
     Alph.$('.alph-diagram-link',tools).click(
         function(a_e)
         {
             if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument))
             {
-                Alph.$("#alpheios-tree-open-cmd").get(0).doCommand(a_e);
+                // just pass the diagram click back to the originating node to handle
+                Alph.$(".alph-diagram-link",a_node).click();
             }
             else
             {
@@ -1678,18 +1678,22 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
             return false;
         }
     );
-    
+    // if the node is from the dependency tree diagram, the call to selectBrowserForDoc
+    // will fail, in which case we should just try to pass the click back to the originating node     
     Alph.$('.alph-inflect-link',tools).click(
         function(a_e)
         {
-            if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument) || from_tree)
+            if ( Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument))
             {
                 var loading_msg = Alph.Main.getString("alph-loading-inflect");
                 Alph.Xlate.showLoadingMessage([tools,loading_msg]);
                 lang_tool.handleInflections(a_e,a_node);
             }
-            else
+            else if (from_tree)
             {
+                Alph.$(".alph-inflect-link",a_node).click();
+            }
+            else {
                 alert("Unable to locate source browser");
             }
             return false;
@@ -1698,10 +1702,14 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
     Alph.$('.alph-dict-link',tools).click(
         function(a_event)
         {
-            if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument) || from_tree)
+            if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument))
             {
                 Alph.Main.broadcastUiEvent(
                     Alph.Constants.EVENTS.SHOW_DICT);
+            }
+            else if (from_tree)
+            {
+                Alph.$(".alph-dict-link",a_node).click();
             }
             else
             {

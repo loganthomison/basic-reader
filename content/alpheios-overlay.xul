@@ -94,6 +94,10 @@
             id="alpheios-grammar-cmd" 
             oncommand="Alph.Main.executeLangCommand(event);" 
             observes="alpheios-grammar"/>
+        <command
+            id="alpheios-diagram-enter-cmd" 
+            oncommand="Alph.Main.enterDiagram(event);" 
+            observes=""/>                        
         <command id="alpheios-options-cmd" 
             oncommand="Alph.BrowserUtils.openDialog(
                 window,

@@ -277,5 +277,64 @@ Alph.Util = {
             height = max_height;
         }
         a_window.resizeTo(width,height);
-    }    
+    },
+    
+    /**
+     * Method to add an event to a browser in a secondary window which can be called from either the window
+     * itself or the parent opener window.  
+     * The event will be proxied by the generic Alph.Util.proxyEventHandler method
+     * which first selects the browser which opened the window before issuing the event
+     * Requires that the window has the Alph.Util namespace loaded.
+     * @see Alph.Util.removeProxiedEvent
+     * @see Alph.Util.proxyEventHandler
+     * @param {Window} a_window the window
+     * @param {Browser} a_bro the browser to which the event is to be added
+     * @param {String} a_event the event name  
+     */
+    addProxiedEvent: function(a_window,a_bro,a_event)
+    {
+        a_bro.addEventListener(a_event, a_window.Alph.Util.proxyEventHandler, false);
+    },
+
+    /**
+     * Method to remove a proxied event from a browser in a secondary window which can be called from either
+     * the window itself or the parent opener window.  
+     * Requires that the window has the Alph.Util namespace loaded
+     * @see Alph.Util.addProxiedEvent
+     * @see Alph.Util.proxyEventHandler
+     * @param {Window} a_window the window
+     * @param {Browser} a_bro the browser to which the event is to be added
+     * @param {String} a_event the event name  
+     */
+
+    removeProxiedEvent: function(a_window,a_bro,a_event)
+    {
+        a_bro.removeEventListener(a_event, a_window.Alph.Util.proxyEventHandler, false);
+    },
+    
+    /**
+     * Proxy event handler for a secondary window. 
+     * Can used to handle events which may needed to be added or removed from the window
+     * by both the window itself and by the parent opener window, and which rely on the browser tab
+     * which opened the tab being current in the parent opener window before being executed.
+     * Requires that the secondary window arguments contain an object which has the following properties:
+     *     {Document} src_doc: the document which initiated the opening of the secondary window
+     *     {Function} proxied_handler: event handling function to be executed 
+     * @param {Event} a_event the event being handled 
+     */
+    proxyEventHandler: function(a_event)
+    {        
+        var params = typeof window.arguments != "undefined" ? 
+                        window.arguments[0] : {};
+        if (params.src_doc  &&
+            params.proxied_handler &&
+            Alph.BrowserUtils.selectBrowserForDoc(window.opener,params.src_doc))
+        {
+            params.proxied_handler(a_event);
+        }
+        else
+        {
+            Alph.BrowserUtils.debug("Unable to handle proxied event " + a_event);
+        }                
+    }
 };
