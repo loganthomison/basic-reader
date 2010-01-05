@@ -1269,6 +1269,12 @@ Alph.Main =
                 }
             }
         );  
+        var docs = this.getBrowserDocs(bro);
+        if ((Alph.Site.isPedSite(docs).length >0|| Alph.Site.isMixedSite(docs).length >0) &&
+            Alph.Main.isEnabled(bro))
+        {
+            Alph.Site.updateUserToolbar(docs);
+        }
     },
     
     /**

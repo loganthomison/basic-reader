@@ -221,6 +221,7 @@ Alph.Site = {
         for (var i=0; i<a_docs.length; i++)
         {
             var a_doc = a_docs[i];
+            
             if (this.getTranslationUrl(a_doc))
             {
                 Alph.$(".alpheios-toolbar-translation",a_doc).bind(
@@ -233,19 +234,8 @@ Alph.Site = {
             else
             {
                 Alph.$(".alpheios-toolbar-translation",a_doc).css("display","none");
-            }
-            if (this.getTreebankDiagramUrl(a_doc))
-            {
-                Alph.$(".alpheios-toolbar-diagram-enter",a_doc).bind(
-                    'click',
-                    {alpheios_cmd_id: 'alpheios-diagram-enter-cmd'},
-                    this.doCommandHandler
-                );
-            }
-            else
-            {
-                Alph.$(".alpheios-toolbar-tree",a_doc).css("display","none");           
-            }
+            }            
+            
             Alph.$(".alpheios-toolbar-options",a_doc).bind(
                 'click',
                 {alpheios_cmd_id: 'alpheios-options-cmd'},
@@ -328,6 +318,63 @@ Alph.Site = {
             }
         }
                
+    },
+    
+    /**
+     * Update user-variable items on the toolbar
+     * @param {Array} a_docs array of documents loaded in the browser window
+     */
+    updateUserToolbar: function(a_docs)
+    {
+        for (var i=0; i<a_docs.length; i++)
+        {
+            var a_doc = a_docs[i];
+
+            var diagram = Alph.$(".alpheios-toolbar-user-diagram",a_doc);
+            if (document.getElementById('alpheios-user-diagram-cmd').getAttribute('disabled') == 'false')
+            {                
+                diagram.unbind(
+                    'click',this.doCommandHandler);
+        
+                diagram.bind(
+                        'click',
+                        {alpheios_cmd_id: 'alpheios-user-diagram-cmd'},
+                        this.doCommandHandler
+                );    
+                diagram.removeClass("disabled");
+            }
+            else
+            {
+                diagram.addClass("disabled");
+            }
+            var vocab = Alph.$(".alpheios-toolbar-vocab",a_doc);
+            if (document.getElementById('alpheios-vocab-toggle-cmd').getAttribute('disabled') == 'false')
+            {
+                vocab.unbind(
+                    'click',this.doCommandHandler);       
+                vocab.bind(
+                        'click',
+                        {alpheios_cmd_id: 'alpheios-vocab-toggle-cmd'},
+                        this.doCommandHandler
+                );    
+                vocab.removeClass("disabled");
+            }
+            else
+            {
+                vocab.addClass("disabled");
+            }
+                         
+            var user_cmds = Alph.$(".alpheios-toolbar-usertools li",a_doc).length;
+            var disabled_user_cmds = Alph.$(".alpheios-toolbar-usertools li.disabled",a_doc).length;
+            if (disabled_user_cmds == user_cmds)
+            {
+                Alph.$(".alpheios-toolbar-usertools",a_doc).addClass("disabled");
+            }
+            else
+            {
+                Alph.$(".alpheios-toolbar-usertools",a_doc).removeClass("disabled");
+            }
+        }
     },
     
 
@@ -1013,8 +1060,7 @@ Alph.Site = {
         Alph.$("#alph-trans-status").attr("disabled",! has_translation);
         Alph.$("#alph-trans-status").attr("hidden", ! has_translation);
         Alph.$("#alph-tree-status").attr("disabled",! has_treebank);
-        Alph.$("#alph-tree-status").attr("hidden",! has_treebank);
-        
+        Alph.$("#alph-tree-status").attr("hidden",! has_treebank);               
     },
     
     /**

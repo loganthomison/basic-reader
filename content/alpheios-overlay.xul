@@ -75,6 +75,10 @@
         <broadcaster id ="alpheios-userdata-broadcaster"
                      hidden="true"
                      disabled="true"/>
+        <broadcaster id="alpheios-user-diagram"
+            class="alpheios-language-notifier alpheios-userdata-notifier"
+            hidden="true"
+            disabled="true"/>
     </broadcasterset>
         
 	<commandset id="mainCommandSet">
@@ -95,9 +99,9 @@
             oncommand="Alph.Main.executeLangCommand(event);" 
             observes="alpheios-grammar"/>
         <command
-            id="alpheios-diagram-enter-cmd" 
-            oncommand="Alph.Main.enterDiagram(event);" 
-            observes=""/>                        
+            id="alpheios-user-diagram-cmd" 
+            oncommand="Alph.Main.enterDiagram(event);"
+            observes="alpheios-user-diagram"/>                        
         <command id="alpheios-options-cmd" 
             oncommand="Alph.BrowserUtils.openDialog(
                 window,
