@@ -236,9 +236,9 @@ Alph.Site = {
             }
             if (this.getTreebankDiagramUrl(a_doc))
             {
-                Alph.$(".alpheios-toolbar-tree",a_doc).bind(
+                Alph.$(".alpheios-toolbar-diagram-enter",a_doc).bind(
                     'click',
-                    {alpheios_cmd_id: 'alpheios-tree-open-cmd'},
+                    {alpheios_cmd_id: 'alpheios-diagram-enter-cmd'},
                     this.doCommandHandler
                 );
             }
@@ -865,6 +865,50 @@ Alph.Site = {
     },
     
     /**
+     * Get the value of the content attribute of the specified metadata element,
+     * excluding the version prefix, if any
+     * @param {String} a_name metadata name
+     * @param {Document} a_doc the document
+     * @return the value of the content attribute, excluding the version prefix, or null if not defined
+     * @type String
+     */
+    getMetadataContent: function(a_name,a_doc)
+    {
+        var content = Alph.$("meta[name=" + a_name + "]",a_doc).attr("content");
+        if (content && content.match(/^version=([\d\.]+);/))
+        {
+            content=content.replace(/^version=([\d\.]+);/,'');
+        }
+        return content;
+    },
+    
+    /** 
+     * Get the version of a particular document metadata
+     * @param {String} metadata name
+     * @return version # if present, otherwise 0
+     * @type int    
+     */
+    getMetadataVersion: function(a_name,a_doc)
+    {
+        var version = 0;
+        try
+        {
+            var has_version = 
+                Alph.$("meta[name=" + a_name + "]",a_doc).attr("content").match(/^version=([\d\.]+);/);         
+            if (has_version)
+            {        
+                version = parseFloat(has_version[1]);                
+            }        
+        }
+        catch (a_e)
+        {
+            this.s_logger.debug("Unable to retrieve version for " + a_name + " in " + a_doc.title + ":" + a_e);
+        }
+        return version;
+    },
+
+
+    /**
      * Get the vocabulary url for the document, if any
      * @param {Document} a_doc the document
      * @returns the url or null if not defined
@@ -872,7 +916,7 @@ Alph.Site = {
      */
     getVocabularyUrl: function(a_doc)
     { 
-        var url = Alph.$("meta[name=alpheios-vocabulary-url]",a_doc).attr("content");
+        var url = this.getMetadataContent('alpheios-vocabulary-url',a_doc);        
         // if the vocabulary url is defined, but remote features are disabled and
         // the vocabulary url is remote, then act as if it's not defined
         if (url && Alph.BrowserUtils.getPref("disable.remote") && 
@@ -893,7 +937,7 @@ Alph.Site = {
      */
     getTreebankUrl: function(a_doc)
     { 
-        var treebank_url = Alph.$("meta[name=alpheios-treebank-url]",a_doc).attr("content");
+        var treebank_url = this.getMetadataContent('alpheios-treebank-url',a_doc);
         // if the treebank url is defined, but remote features are disabled and
         // the treebank url is remote, then act as if it's not defined
         if (treebank_url && Alph.BrowserUtils.getPref("disable.remote") && 
@@ -913,8 +957,7 @@ Alph.Site = {
      */
     getTreebankDiagramUrl: function(a_doc)
     { 
-        var url = Alph.$("meta[name=alpheios-treebank-diagram-url]",a_doc)
-                      .attr("content");
+        var url = this.getMetadataContent('alpheios-treebank-diagram-url',a_doc);
         // if the url is defined, but remote features are disabled and
         // the url is remote, then act as if it's not defined
         if (url && Alph.BrowserUtils.getPref("disable.remote") && 

@@ -265,8 +265,7 @@ Alph.Xlate = {
         var treebank_ref = Alph.$(rp).attr("tbrefs") ||
                            Alph.$(rp).parents().attr("tbrefs") ||
                            Alph.$(rp).attr("tbref") ||
-                           Alph.$(rp).parents().attr("tbref");
-
+                           Alph.$(rp).parents().attr("tbref");                           
         // if we're in the dependency tree diagram, the treebank reference will
         // be in the id attribute of the parent tree-node element
         if (! treebank_ref && is_svg_text)
@@ -275,6 +274,7 @@ Alph.Xlate = {
         }
         if (treebank_ref)
         {
+            alphtarget.setTreebankRef(treebank_ref);
             var treebank_url = Alph.Site.getTreebankUrl(doc);
             var treebank_wds = treebank_ref.split(' ');
 

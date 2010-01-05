@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+ 
+<!DOCTYPE window SYSTEM "chrome://alpheios/locale/alpheios.dtd"
+[<!ENTITY % treeDTD SYSTEM "chrome://alpheios/locale/alpheios-tree.dtd" >
+%treeDTD;
+]>
+
+<window id="alpheios-diagram-window" title="&alpheios-tree-toolbar-label;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        windowtype="alph-window"
+        onload="Alph.Diagram.load()">
+    <script type="application/x-javascript" src="chrome://alpheios/content/alpheios-utils.js" />
+    <script type="application/x-javascript" src="chrome://alpheios/content/diagram/alpheios-diagram.js" />
+    
+    <hbox flex="100">
+        <browser id="alpheios-diagram-content"
+                 type="content-primary"
+                 src="chrome://alpheios/content/html/alph-panel.html"
+                 flex="10"
+                 width="90%"/>
+    </hbox>   
+</window>

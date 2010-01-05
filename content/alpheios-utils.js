@@ -249,6 +249,33 @@ Alph.Util = {
             a_url.match(/^http:\/\/(localhost|127\.0\.0\.1)/) || 
             Alph.BrowserUtils.isBrowserUrl(a_url));
     },
-    
-    
+
+    /**
+     * resize the window to the specified width and height
+     * @parma {Window} a_window the window to resize
+     * @param {int} a_width the desired width
+     * @param {int} a_height the desired height
+     */
+    resizeWindow: function(a_window,a_width,a_height)
+    {
+        // add a little bit to the width and height to account for title bar and leave a
+        // little room on the side
+        var width = a_width + 25; 
+        var height = a_height + 40;
+            
+        // make sure we don't resize the window to dimensions larger than the user's screen,
+        // leaving a little room around the edges
+        var max_width = a_window.screen.availWidth - 10;
+        var max_height = a_window.screen.availHeight - 10;
+        
+        if (width > max_width )
+        {
+            width = max_width;
+        }
+        if (height > max_height)
+        {
+            height = max_height;
+        }
+        a_window.resizeTo(width,height);
+    }    
 };

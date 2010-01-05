@@ -27,6 +27,8 @@
 /**
  * @class Tree (Diagram) Panel implementation 
  * @augments Alph.Panel
+ * @obsolete superceded by the Diagram chome window (which is not implemented as 
+ *           a panel) 
  * @param {alpheiosPanel} a_panel DOM object bound to the alpheiosPanel tag
  */
 Alph.Tree = function(a_panel)

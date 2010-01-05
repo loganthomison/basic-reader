@@ -790,6 +790,75 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
     );
 };
 
+/**
+ * Default Diagram window - assumes treebank diagram url points at a fully
+ * functional external treebank editor and which specifies any required parameters
+ * with placeholders for the dynamically selected SENTENCE and WORD.
+ * @param {Event} a_event the event which triggered the request
+ * @param {String} a_title the window title
+ * @param {Node} a_node the DOM node to show a loading message next to (optional)
+ * @param {Object} a_params parameters object to pass to the window (optional)
+ */
+Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_params)
+{
+    var thisObj = this;
+    if (! a_title)
+    {
+        a_title = 'alph-diagram-window';
+    }
+    
+    var features = {};
+
+    var params = Alph.$.extend(
+        {
+            callback: a_node ? 
+                      function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) }
+                      : function() {},
+            lang_tool: thisObj,
+            src_node: a_node
+        },
+        a_params || {}
+    );
+            
+
+    var loading_node = Alph.$("#alph-word-tools",a_node).get(0);    
+    var treebankUrl = Alph.Site.getTreebankDiagramUrl(a_node.ownerDocument);
+    var tbrefs = a_params.tbrefs;
+    var sentence;
+    var word;
+    if (treebankUrl && tbrefs)
+    {
+        try
+        {
+            var parts = tbrefs[0].split(/-/);
+            sentence = parts[0];
+            word = parts[1];
+        }
+        catch(a_e)
+        {
+            Alph.Main.s_logger.error("Error identifying sentence and id: " + a_e);                   
+        }
+    }
+    if (sentence)
+    {
+        treebankUrl = treebankUrl.replace(/SENTENCE/, sentence);
+        treebankUrl = treebankUrl.replace(/WORD/, word);
+        params.url = treebankUrl;  
+        // open or replace the diagram window
+        Alph.Xlate.openSecondaryWindow(
+            a_title,
+            Alph.BrowserUtils.getContentUrl() + "/diagram/alpheios-diagram.xul",            
+            features,
+            params,
+            Alph.Xlate.showLoadingMessage,
+                [loading_node||{}, Alph.Main.getString("alph-loading-misc")]                
+        );
+    }
+    else
+    {
+        Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-tree-notree");
+    }
+};
 
 /**
  * Handler which can be used to show context-specific inflection tables
@@ -1426,7 +1495,8 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     }
     // add diagram link, if appropriate (only add if we have a treebank reference
     // and we're not already on the tree
-    if (a_target.getTreebankQuery() &&
+    if (a_target.getTreebankRef() &&
+        Alph.Site.getTreebankDiagramUrl(Alph.$(a_node).get(0).ownerDocument) &&
         Alph.$("#dependency-tree",Alph.$(a_node).get(0).ownerDocument).length == 0)
     {
         var diagram_alt_text = Alph.Main.getString('alph-diagram-link');
@@ -1437,13 +1507,33 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             ' alt="' + diagram_alt_text + '" />' + 
             '<div class="alpheios-icon-label">' + diagram_alt_text + '</div></div>',a_node)
             .appendTo(tools_node);
-        Alph.$('#alph-word-tools .alph-diagram-link',a_node).click(
-            function(a_e)
+        var diagram_func;
+        var diagram_cmd = lang_tool.getCmd('alpheios-diagram-cmd');
+        // for version > 0 of treebank metadatum, use treebank diagramming command
+        // defined per language (defaults to external treebank editor)
+        if (diagram_cmd && 
+            Alph.Site.getMetadataVersion("alpheios-treebank-diagram-url",
+                Alph.$(a_node).get(0).ownerDocument) > 0)
+        {   
+            diagram_func = function(a_e)
             {
+                Alph.Xlate.showLoadingMessage([tools_node,Alph.Main.getString("alph-loading-misc")]);
+                lang_tool[diagram_cmd](a_e,null,Alph.$(a_node).get(0),{tbrefs:a_target.getTreebankRef()});
+                return false;
+            }
+        }
+        else
+        {
+            // early alpha versions used the internal tree panel implementation
+            // TODO remove this once all enhanced texts have been updated to version > 0 of the
+            // treebank metadatum
+            diagram_func = function(a_e)
+            {                 
                 Alph.$("#alpheios-tree-open-cmd").get(0).doCommand(a_e);
                 return false;
             }
-        );
+        }
+        Alph.$('#alph-word-tools .alph-diagram-link',a_node).click(diagram_func);
     }
     // add language-specific dictionary link, if any
     var lemmas = [];

@@ -123,6 +123,14 @@ Alph.SourceSelection.prototype.d_contextPos = 0;
 Alph.SourceSelection.prototype.d_rangeParent;
 
 /**
+ * treebankRef for the selection
+ * @private
+ * @type String
+ */
+Alph.SourceSelection.prototype.d_treebankRef = null;
+
+
+/**
  * treebankQueryUrl for the selection
  * @private
  * @type String
@@ -190,6 +198,16 @@ Alph.SourceSelection.prototype.getContextPos = function()
 Alph.SourceSelection.prototype.getRangeParent = function(a_parent)
 {
     return this.d_rangeParent;
+};
+
+/**
+ * get the treebankRef for the selection
+ * @returns the treebank reference
+ * @type String
+ */
+Alph.SourceSelection.prototype.getTreebankRef = function()
+{
+    return this.d_treebankRef;
 };
 
 /**
@@ -266,6 +284,15 @@ Alph.SourceSelection.prototype.setRangeParent = function(a_parent)
 Alph.SourceSelection.prototype.setTreebankQuery = function(a_url)
 {
     this.d_treebankQuery = a_url;
+};
+
+/**
+ * set the treebank reference for the selection
+ * @param {String} a_ref the treebank reference 
+ */
+Alph.SourceSelection.prototype.setTreebankRef = function(a_ref)
+{
+    this.d_treebankRef = a_ref;
 };
 
 /**
