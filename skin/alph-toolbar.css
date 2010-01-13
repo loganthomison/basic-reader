@@ -42,6 +42,10 @@
    list-style-image: url("chrome://alpheios/skin/icons/vocablist_16.png");
 }
 
+#alpheios-tools-button {
+  list-style-image: url("chrome://alpheios/skin/icons/tools_16.png");
+}
+
 .alpheios-logo {
    margin-left: 4px;
 }

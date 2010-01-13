@@ -318,19 +318,19 @@ Alph.Util = {
      * by both the window itself and by the parent opener window, and which rely on the browser tab
      * which opened the tab being current in the parent opener window before being executed.
      * Requires that the secondary window arguments contain an object which has the following properties:
-     *     {Document} src_doc: the document which initiated the opening of the secondary window
-     *     {Function} proxied_handler: event handling function to be executed 
+     *     {Document} e_srcDoc: the document which initiated the opening of the secondary window
+     *     {Function} e_proxiedHandler: event handling function to be executed 
      * @param {Event} a_event the event being handled 
      */
     proxyEventHandler: function(a_event)
     {        
         var params = typeof window.arguments != "undefined" ? 
                         window.arguments[0] : {};
-        if (params.src_doc  &&
-            params.proxied_handler &&
-            Alph.BrowserUtils.selectBrowserForDoc(window.opener,params.src_doc))
+        if (params.e_srcDoc  &&
+            params.e_proxiedHandler &&
+            Alph.BrowserUtils.selectBrowserForDoc(window.opener,params.e_srcDoc))
         {
-            params.proxied_handler(a_event);
+            params.e_proxiedHandler(a_event);
         }
         else
         {

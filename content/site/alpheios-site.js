@@ -317,6 +317,7 @@ Alph.Site = {
                 Alph.$(".alpheios-toolbar-scanwords",a_doc).css("display","none");
             }
         }
+        this.updateUserToolbar(a_docs);
                
     },
     

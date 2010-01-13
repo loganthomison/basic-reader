@@ -35,15 +35,16 @@ Components.utils.import("resource://alpheios/ext/JSON.js");
  * @constructor
  * @param {String} a_file the local file name
  * @param {String} a_charset the charset for the file (defaults to UTF-8)
+ * @param {Object} a_args optional type specific constructor argumetns
  */
-DataType = function(a_file,a_charset)
+DataType = function(a_file,a_charset,a_args)
 {  
     this.d_srcFile = a_file;
     this.d_charSet = a_charset;
     this.d_dataObj = null;
     this.d_setCounter = 0;
     this.d_setObservers = new Array();
-    this.init();
+    this.init(a_args);
 };
 
 /**
@@ -55,8 +56,9 @@ DataType.s_logger = BrowserUtils.getLogger('Alpheios.DataType');
 /**
  * init method can be overridden in the derived classes
  * to perform type-specific initialization
+ * @param {Object} a_args initialization arguments
  */
-DataType.prototype.init = function()
+DataType.prototype.init = function(a_args)
 {
     // default does nothing
 }

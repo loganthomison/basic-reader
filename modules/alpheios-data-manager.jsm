@@ -564,10 +564,11 @@ DataManager =
      * @param {String} a_type the data type
      * @param {String} a_key the key for the specific object
      * @param {Boolean} a_create flag to request object creation if it doesn't exist
+     * @param {Object} a_args optional create arguments
      * @returns the requested data object
      * @type DataType 
      */
-    getDataObj: function(a_type,a_key,a_create)
+    getDataObj: function(a_type,a_key,a_create,a_args)
     {
         // don't do anything if the data manager is disabled
         if (this.disabled())
@@ -580,7 +581,7 @@ DataManager =
             obj = this.d_dataObjs[a_type].d_objs[a_key];
             if (! obj && a_create)
             {
-                obj = this.createDataObj(a_type,a_key)
+                obj = this.createDataObj(a_type,a_key,a_args);
             }
             // make sure the object is fully loaded before we return it
             if (obj)
@@ -599,10 +600,11 @@ DataManager =
      * create a new datatype object
      * @param {String} a_type the datatype
      * @param {String} a_key the key to the data object
+     * @param {Object} a_args optional create arugments
      * @returns the new data object
      * @type DataType
      */
-    createDataObj: function(a_type,a_key)
+    createDataObj: function(a_type,a_key,a_args)
     {
         var typeObj = this.d_dataObjs[a_type];
         var dataObj = null;
@@ -610,7 +612,7 @@ DataManager =
         filepath.append(a_key + this.d_dataTypes[typeObj.d_classname].s_fileSpec);
         if (typeObj)
         {
-            dataObj = new this.d_dataTypes[typeObj.d_classname](filepath.path,typeObj.d_charset);
+            dataObj = new this.d_dataTypes[typeObj.d_classname](filepath.path,typeObj.d_charset,a_args);
             this.addDataObj(a_type,a_key,dataObj);
         }
         return dataObj;

@@ -790,10 +790,11 @@ BrowserUtils = {
      * @param {String} a_url the chrome url
      * @param {String} a_title the dialgo title
      * @param {Object} a_features dialog features
+     * @param {Object} a_extra additional dialog args
      * @return the dialog object
      * @type Window
      */
-    openDialog: function(a_window,a_url,a_title,a_features)
+    openDialog: function(a_window,a_url,a_title,a_features,a_extra)
     {
          // default features
         var features =
@@ -824,7 +825,8 @@ BrowserUtils = {
         return a_window.openDialog(
                     a_url, 
                     a_title, 
-                    feature_list);   
+                    feature_list,
+                    a_extra);   
     },
     
     /**

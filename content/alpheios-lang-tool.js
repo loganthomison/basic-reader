@@ -801,7 +801,7 @@ Alph.LanguageTool.prototype.openGrammar = function(a_event,a_node,a_target,a_par
  */
 Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_params)
 {
-    var thisObj = this;
+    var thisObj = this;   
     if (! a_title)
     {
         a_title = 'alph-diagram-window';
@@ -809,47 +809,58 @@ Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_para
     
     var features = {};
 
+    var window_url = Alph.BrowserUtils.getContentUrl() + "/diagram/alpheios-diagram.xul";
     var params = Alph.$.extend(
         {
-            callback: a_node ? 
+            e_callback: a_node ? 
                       function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) }
                       : function() {},
-            lang_tool: thisObj,
-            src_doc: a_node.ownerDocument,
-            proxied_event: thisObj.getPopupTrigger(),
-            proxied_handler: Alph.Main.doXlateText
+            e_langTool: thisObj,
+            e_srcDoc: a_node ? a_node.ownerDocument : null,
+            e_proxiedEvent: thisObj.getPopupTrigger(),
+            e_proxiedHandler: Alph.Main.doXlateText,
+            e_dataManager : Alph.DataManager,
+            e_metadata: { 'alpheios-getSentenceURL': window_url,
+                        'alpheios-putSentenceURL': window_url }            
         },
         a_params || {}
     );
             
 
     var loading_node = Alph.$("#alph-word-tools",a_node).get(0);    
-    var treebankUrl = Alph.Site.getTreebankDiagramUrl(a_node.ownerDocument);
-    var tbrefs = a_params.tbrefs;
-    var sentence;
-    var word;
-    if (treebankUrl && tbrefs)
+    if (a_node && ! params.e_url)
     {
-        try
+        var treebankUrl = Alph.Site.getTreebankDiagramUrl(a_node.ownerDocument);
+        var tbrefs = a_params.tbrefs;
+        var sentence;
+        var word;
+        if (treebankUrl && tbrefs)
         {
-            var parts = tbrefs[0].split(/-/);
-            sentence = parts[0];
-            word = parts[1];
+            try
+            {
+                var parts = tbrefs[0].split(/-/);
+                sentence = parts[0];
+                word = parts[1];
+            }
+            catch(a_e)
+            {
+                Alph.Main.s_logger.error("Error identifying sentence and id: " + a_e);                   
+            }
         }
-        catch(a_e)
+        if (sentence)
         {
-            Alph.Main.s_logger.error("Error identifying sentence and id: " + a_e);                   
+            treebankUrl = treebankUrl.replace(/SENTENCE/, sentence);
+            treebankUrl = treebankUrl.replace(/WORD/, word);
+            params.e_url = treebankUrl;
         }
     }
-    if (sentence)
+    
+    if (params.e_url)
     {
-        treebankUrl = treebankUrl.replace(/SENTENCE/, sentence);
-        treebankUrl = treebankUrl.replace(/WORD/, word);
-        params.url = treebankUrl;  
         // open or replace the diagram window
         Alph.Xlate.openSecondaryWindow(
             a_title,
-            Alph.BrowserUtils.getContentUrl() + "/diagram/alpheios-diagram.xul",            
+            window_url,            
             features,
             params,
             Alph.Xlate.showLoadingMessage,
@@ -858,6 +869,7 @@ Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_para
     }
     else
     {
+        this.s_logger.warn("No tree url");
         Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-tree-notree");
     }
 };

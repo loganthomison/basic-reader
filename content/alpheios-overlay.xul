@@ -100,7 +100,7 @@
             observes="alpheios-grammar"/>
         <command
             id="alpheios-user-diagram-cmd" 
-            oncommand="Alph.Main.enterDiagram(event);"
+            oncommand="Alph.Main.userDiagram(event);"
             observes="alpheios-user-diagram"/>                        
         <command id="alpheios-options-cmd" 
             oncommand="Alph.BrowserUtils.openDialog(
@@ -318,6 +318,21 @@
                 label="&alpheios-tools-grammar-label;"
                 command="alpheios-grammar-cmd"
                 tooltiptext="&alpheios-tools-grammar-tooltip;"/>
+            <toolbarbutton
+                id="alpheios-tools-button"
+                class="toolbarbutton-icon"
+                label="&alpheios-tools-label;"
+                tooltiptext="&alpheios-tools-tooltip;"
+                type="menu"
+                observes="alpheios-userdata-broadcaster">
+                <menupopup id="alpheios-tools-menu">
+                    <menuitem
+                        id="alpheios-user-diagram-mm"
+                        label="&alpheios.menu.user.diagram;"
+                        tooltiptext="&alpheios.menu.user.diagram.tooltip;"
+                        command="alpheios-user-diagram-cmd"/>
+                </menupopup>
+            </toolbarbutton>                
             <toolbaritem id="alpheios-lookup-text-tbitem" observes="alpheios-learner-disabled">
                 <textbox id="alpheios-lookup-text"
                     command="alpheios-lookup-cmd"

@@ -2171,10 +2171,17 @@ Alph.Main =
      * open new diagram edit window
      * @param {Event} a_event the initiating event
      */
-    enterDiagram: function(a_event)
+    userDiagram: function(a_event)
     {
-        var url = Alph.BrowserUtils.getPref("interface.diagram.enter.url");
-        Alph.Xlate.openSecondaryWindow('alpheios-diagram-enter-window',url);
+        Alph.BrowserUtils.openDialog(
+                        window,
+                        Alph.BrowserUtils.getContentUrl() + '/dialogs/user-diagram.xul', 
+                        'alpheios-user-diagram-dialog',
+                        null,
+                        { e_langTool: Alph.Main.getLanguageTool(),
+                          e_dataManager: Alph.DataManager}
+                        );
+                        
     }
    
 };

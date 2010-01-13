@@ -31,6 +31,8 @@
 <!ENTITY alpheios.menu.clear.tooltip "Clear User Data Now">
 <!ENTITY alpheios.menu.wordlist "Word List">
 <!ENTITY alpheios.menu.wordlist.tooltip "See My Word List">
+<!ENTITY alpheios.menu.user.diagram "My Diagrams">
+<!ENTITY alpheios.menu.user.diagram.tooltip "Add and Edit Sentence Diagrams">
 <!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-view-label "View">
 <!ENTITY alpheios-view-tooltip "Alpheios Browser Panels">
@@ -67,3 +69,20 @@
 <!ENTITY alpheios-tools-vocab-label "Vocabulary">
 <!ENTITY alpheios-tools-vocab-tooltip "Show/Hide Vocabulary">
 <!ENTITY alpheios-vocab-toolbar-label "Alpheios: Vocabulary">
+<!ENTITY alpheios.diagram.user "Alpheios: User Diagram">
+<!ENTITY alpheios.diagram.input "Input text:">
+<!ENTITY alpheios.diagram.lang "Language:">
+<!ENTITY alpheios.diagram.lang.grc "Greek">
+<!ENTITY alpheios.diagram.lang.la "Latin">
+<!ENTITY alpheios.diagram.lang.ar "Arabic">
+<!ENTITY alpheios.diagram.lang.got "Gothic">
+<!ENTITY alpheios.diagram.lang.chu "Old Church Slavonic">
+<!ENTITY alpheios.diagram.lang.en "English">
+<!ENTITY alpheios.diagram.fmt "Format:">
+<!ENTITY alpheios.diagram.fmt.aldt "Ancient Language Dependency Treebank">
+<!ENTITY alpheios.diagram.fmt.catib "Columbia Arabic Treebank">
+<!ENTITY alpheios.diagram.fmt.proiel "PROIEL">
+<!ENTITY alpheios.diagram.add "Add">
+<!ENTITY alpheios.diagram.edit "Edit">
+<!ENTITY alpheios.diagram.select "Or select a previously saved sentence to edit:">
+<!ENTITY alpheios.diagram.sequential "Show words sequentially:">

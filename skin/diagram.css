@@ -1,0 +1,14 @@
+browser {
+    background-color: white;
+}
+
+#error {
+    color: red;
+    min-height: 1em;
+    font-weight: bold;
+    font-size: larger;
+}
+
+spacer {
+    min-height: 1em;
+}
