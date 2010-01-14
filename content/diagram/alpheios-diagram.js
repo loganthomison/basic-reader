@@ -43,9 +43,12 @@ Alph.Diagram.load = function()
     var browser = document.getElementById("alpheios-diagram-content");    
     browser.setAttribute('src',params.e_url);
     // resize the window to fit the tree
+    
+    // install progress listener to list for the page to be done loading
+    // DOMContentLoaded fires before all the javascript and svg is loaded
     browser.addProgressListener(Alph.Diagram.s_loadListener,
-            Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);        
-            
+            Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+    
     browser.addEventListener(
         "DOMContentLoaded",
         function() 
@@ -73,10 +76,46 @@ Alph.Diagram.load = function()
                 false
             );
             
+            this.contentDocument.addEventListener(
+                'AlpheiosTreeLoaded',
+                function()
+                {                    
+                    var doc = this;
+                    // add tooltips
+                    Alph.$("text[title]",this).hover(
+                        function(a_event)
+                        {        
+                                                    
+                            var title = this.getAttribute("title");
+                            var id = "tooltip_" + Alph.$(this).parents("g").attr("id");
+                            var offset = Alph.$(this).offset();            
+                            var top = a_event.pageY + 10;
+                            var left = a_event.pageX + 20;
+                            if (title)
+                            {
+                                var span = 
+                                    Alph.$(
+                                        '<span class="alph-tooltip" id="' + id + '">' + title + '</span>'
+                                    ,doc);                                
+                                Alph.$('body',doc).prepend(span);
+                                Alph.$("#" + id, doc).css("top",top + "px");
+                                Alph.$("#" + id, doc).css("left",left + "px");
+                            }
+                       },
+                       function()
+                       {
+                           var id = "tooltip_" + Alph.$(this).parents("g").attr("id");
+                           Alph.$("#" + id, doc).remove();
+                       }
+                    );      
+                },
+                false
+            );
+            
             // hide the exit submit button
             // TODO this should really bring the user back to the list of sentences
            Alph.$("form[name=sent-navigation-exit] button[type=submit]",this.contentDocument).remove();
-           
+                                    
             // add the trigger hint
             var trigger = params.e_langTool.getPopupTrigger();
             if (trigger && params.e_srcDoc)
@@ -300,7 +339,8 @@ Alph.Diagram.openDiagram = function(a_doc,a_id,a_lang,a_seq)
         null,
         'alph-diagram-edit-window',
         null,
-        {'e_url': url});   
+        {'e_url': url,
+          'e_viewer': false});   
 }
 
 /**
@@ -390,12 +430,11 @@ Alph.Diagram.s_loadListener =
            if ((aFlag & Components.interfaces.nsIWebProgressListener.STATE_STOP) && 
                 (aFlag & Components.interfaces.nsIWebProgressListener.STATE_IS_DOCUMENT))
            {
-                if (aWebProgress.DOMWindow.AlphEdit)
+                if (aWebProgress.DOMWindow.AlphEdit && ! window.arguments[0].e_viewer)
                 {                       
                     aWebProgress.DOMWindow.AlphEdit.getContents = Alph.Diagram.getUserDiagram;
                     aWebProgress.DOMWindow.AlphEdit.putContents = Alph.Diagram.putUserDiagram;                                            
-                }
-               
+                }                                                     
            }
            return 0;
         },

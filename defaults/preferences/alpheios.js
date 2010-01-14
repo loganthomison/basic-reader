@@ -47,9 +47,9 @@ pref("extensions.alpheios.survey.url","http://www.surveymonkey.com/s.aspx?sm=IG7
 pref("extensions.alpheios.user.model","ffprofileplus");
 pref("extensions.alpheios.user.save.interval.lookup.num",5);
 pref("extensions.alpheios.user.backup.keep",1);
-pref("extensions.alpheios.user.backup.interval","disable");
+pref("extensions.alpheios.user.backup.interval","request");
 pref("extensions.alpheios.user.backup.interval.lookup.num",10);
-pref("extensions.alpheios.user.restore.interval","enable");
+pref("extensions.alpheios.user.restore.interval","request");
 pref("extensions.alpheios.user.restore.confirm",false);
 pref("extensions.alpheios.user.clear.interval","request");
 pref("extensions.alpheios.user.dataservice","local");

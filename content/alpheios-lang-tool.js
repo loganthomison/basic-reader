@@ -820,6 +820,7 @@ Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_para
             e_proxiedEvent: thisObj.getPopupTrigger(),
             e_proxiedHandler: Alph.Main.doXlateText,
             e_dataManager : Alph.DataManager,
+            e_viewer: true,
             e_metadata: { 'alpheios-getSentenceURL': window_url,
                         'alpheios-putSentenceURL': window_url }            
         },
