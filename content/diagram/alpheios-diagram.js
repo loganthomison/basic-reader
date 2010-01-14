@@ -53,35 +53,35 @@ Alph.Diagram.load = function()
         "DOMContentLoaded",
         function() 
         {          
-            // listen for the AlpheiosTreeResized event
-            // and resize the window accordingly
-            // would be better to use SVGResize but it's not yet supported for
-            // embedded SVG
-            this.contentDocument.addEventListener(
-                'AlpheiosTreeResized',
-                function()
-                {                   
-                    try
-                    {
-                         // update the title of the window to the title of the tree document
-                        document.documentElement.setAttribute('title',this.title);
-                        var tree = this.getElementById("dependency-tree");
-                        var w = parseInt(tree.getAttribute("width"));
-                        var h = parseInt(tree.getAttribute("height"));
-                        Alph.Util.resizeWindow(window,w,h);
-                        
-                    }
-                    catch (a_e) { Alph.Diagram.s_logger.warn(a_e)}
-                },
-                false
-            );
-            
+            // listen for the tree diagram to be fully loaded            
             this.contentDocument.addEventListener(
                 'AlpheiosTreeLoaded',
                 function()
-                {                    
+                {
+                    // update the title of the window to the title of the tree document
+                    document.documentElement.setAttribute('title',this.title);
+                    
                     var doc = this;
-                    // add tooltips
+                    
+                    // resize the window
+                    var width = 0;
+                    var height = 0;
+                    try 
+                    {
+                        width = parseFloat(Alph.$("#dependency-tree",doc).get(0).getAttribute("width"));   
+                        height = parseFloat(Alph.$("#dependency-tree",doc).get(0).getAttribute("height"));
+                    }
+                    catch (a_e)
+                    {
+                        Alph.Util.debug("error parsing diagram size");   
+                    }
+                                
+                    // take the greater of the tree dimensions or the document dimensions
+                    width = doc.width > width ? doc.width : width;  
+                    height = doc.height > height ? doc.height : height;
+                    Alph.Util.resizeWindow(window,width,height);
+                        
+                    // add tooltips                                        
                     Alph.$("text[title]",this).hover(
                         function(a_event)
                         {        
@@ -388,7 +388,7 @@ Alph.Diagram.putUserDiagram = function(a_xml, a_url, a_doc, a_sentid)
     var dm = window.arguments[0].e_dataManager;   
     try
     {
-        var xml_string = XMLSerializer().serializeToString(a_xml);
+        var xml_string = XMLSerializer().serializeToString(a_xml);        
         dm.getDataObj('diagrams',a_doc,false).putSentence(window, xml_string,a_sentid);
         Alph.BrowserUtils.doAlert(window,'alph-general-dialog-title','alpheios-diagram-saved');
     }

@@ -56,16 +56,26 @@ XmlDataType.prototype.load = function()
         var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");        
         
         var parsed;
+        var raw;
         try
         {
+            raw = BrowserUtils.readLocalFile(this.d_srcFile);
             parsed = (new recent_win.DOMParser())
-                .parseFromString(BrowserUtils.readLocalFile(this.d_srcFile),"text/xml");
+                .parseFromString(raw,"text/xml");
         }
         catch(a_e)
         {
             BrowserUtils.debug("Unable to parse file at " + this.d_srcFile + ":" + a_e);
         }
-        this.d_dataObj = parsed || this.getDefault();
+        if (parsed)
+        {
+            this.d_dataObj = parsed;
+            this.d_raw = raw;
+        } else 
+        {
+            this.d_dataObj = this.getDefault();            
+            this.d_raw = this.serialize();
+        }
     }
 };
 
@@ -74,10 +84,20 @@ XmlDataType.prototype.load = function()
  */
 XmlDataType.prototype.serialize = function()
 {
-     var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");        
-     return recent_win.XML(
+     var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");
+     var serialized = "";
+     try {
+        serialized = recent_win.XML(
             recent_win.XMLSerializer().serializeToString(this.d_dataObj)
-        ).toXMLString();     
+        ).toXMLString();
+     }
+     catch(a_e)
+     {
+         BrowserUtils.debug("Unable to serialize file: " + a_e);
+         // use the last stored state
+         serialized = this.d_raw;
+     }
+     return serialized;
 };
 
 /**

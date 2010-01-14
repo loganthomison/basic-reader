@@ -69,9 +69,9 @@ TreeDiagram.s_fileSpec = '.xml';
 TreeDiagram.prototype.getDefault = function()
 {   
     var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");        
-    var template =         
-       '<?xml version="1.0" encoding="UTF-8"?>' +
-       '<treebank xmlns:treebank="' + NAMESPACE + '"' +
+    var template =                
+       '<treebank ' + 
+       //'  xmlns="' + NAMESPACE + '"' +
        '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
        '  xsi:schemaLocation="' + SCHEMA + '"' +
        '  version="1.5"' +
@@ -81,11 +81,19 @@ TreeDiagram.prototype.getDefault = function()
     return doc;
 };
 
+/**
+ * set the format of the diagram
+ * @param {String} a_format
+ */
 TreeDiagram.prototype.setFormat = function(a_format)
 {
     this.d_format = a_format;   
 };
 
+/**
+ * set the language for the diagram
+ * @param {String} a_lang the language
+ */
 TreeDiagram.prototype.setLang = function(a_lang)
 {
     this.d_lang = a_lang;        
@@ -102,6 +110,7 @@ TreeDiagram.prototype.addSentence = function(a_window,a_words)
     var id = this.d_dataObj.getElementsByTagName('sentence').length + 1;
     var document_id = BrowserUtils.getLocalFileName(this.d_srcFile).replace(/\.[^\.]+$/,'');
     var sentence = this.d_dataObj.createElement("sentence");
+    //sentence.setAttribute("xmlns",NAMESPACE);
     sentence.setAttribute("id",id);
     sentence.setAttribute("document_id",document_id);
     sentence.setAttribute("subdoc","");
@@ -116,6 +125,8 @@ TreeDiagram.prototype.addSentence = function(a_window,a_words)
         sentence.appendChild(word);
     }
     this.d_dataObj.documentElement.appendChild(sentence);
+    // update the raw string
+    this.d_raw = this.serialize();
     this.observeSetter(a_window);
     return sentence;        
 };
@@ -175,16 +186,20 @@ TreeDiagram.prototype.putSentence = function(a_window,a_sentence,a_id)
     var sent_node = a_window.DOMParser()
                             .parseFromString(a_sentence,"text/xml");                          
     var sentence  = this._getSentenceElem(a_id);
-    var old_children = sentence.childNodes;
-    for (var i=0; i<old_children.length; i++)
+    var words = sentence.getElementsByTagName('word');    
+    while (words.length > 0)
     {
-        sentence.removeChild(old_children[i]);
+        sentence.removeChild(words[0]);
     }
-    var new_children = sent_node.documentElement.childNodes;
-    for (var i=0; i<new_children.length; i++)
-    {
-        sentence.appendChild(new_children[i])
-    }        
+    
+    var new_words = sent_node.documentElement.getElementsByTagName('word'); 
+    for (var j=0; j<new_words.length; j++)
+    {        
+        var node = this.d_dataObj.importNode(new_words[j],true);
+        sentence.appendChild(node);        
+    }            
+    // update the raw string
+    this.d_raw = this.serialize();
     this.observeSetter(a_window);
 };
 
@@ -200,13 +215,13 @@ TreeDiagram.prototype.getSentenceList = function(a_window)
     var sentences = this.d_dataObj.documentElement.getElementsByTagName("sentence");    
     for (var i=0; i<sentences.length; i++)
     {                
-        var children = sentences[i].childNodes;
+        var children = sentences[i].getElementsByTagName('word');
         var raw = new Array(children.length);
-        for (var j=0; j< children.length; j++)    
+        for (var j=0; j<children.length; j++)    
         {
-           var form = children[j].getAttribute('form');
-           var id = children[j].getAttribute('id');
-           raw[id] = form || ""           
+            var form = children[j].getAttribute('form');
+            var id = children[j].getAttribute('id');
+            raw[id] = form || ""           
         }
         
         list.push(

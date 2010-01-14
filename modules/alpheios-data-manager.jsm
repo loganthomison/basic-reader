@@ -682,9 +682,9 @@ DataManager =
                     }
                 }
             ); 
-            // offer clear only if there is any data to clear
             var clear = a_window.document.getElementById('alpheios-' + Constants.CLEAR + '-allowed');            
-            if (this.hasData())
+            // @TODO make clear option contingent on whether there is any data 
+            if (true)
             {
                 allowed++; 
                 clear.setAttribute('hidden',false);
