@@ -74,4 +74,4 @@ pref("extensions.alpheios.interface.diagram.lang",'greek');
 pref("extensions.alpheios.interface.diagram.fmt",'aldt');
 pref("extensions.alpheios.interface.diagram.fmt.ar",'catib');
 pref("extensions.alpheios.diagram.url",
-    'http://localhost:8080/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE');
+    'http://repos.alpheios.net:8080/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE');
