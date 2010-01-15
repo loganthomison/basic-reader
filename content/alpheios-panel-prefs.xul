@@ -29,9 +29,6 @@
             <preference id="pref-panel-trans-inline"
                         name="extensions.alpheios.panels.inline.alph-trans-panel"
                         type="bool"/>
-            <preference id="pref-panel-tree-inline"
-                        name="extensions.alpheios.panels.inline.alph-tree-panel"
-                        type="bool"/>
             <preference id="pref-panel-vocab-inline"
                         name="extensions.alpheios.panels.inline.alph-vocab-panel"
                         type="bool"/>
@@ -52,12 +49,6 @@
                         type="int"/>
             <preference id="pref-panel-trans-basic" 
                         name="extensions.alpheios.panels.alph-trans-panel.basic" 
-                        type="int"/>
-            <preference id="pref-panel-tree-ped" 
-                        name="extensions.alpheios.panels.alph-tree-panel.pedagogical" 
-                        type="int"/>
-            <preference id="pref-panel-tree-basic" 
-                        name="extensions.alpheios.panels.alph-tree-panel.basic" 
                         type="int"/>
             <preference id="pref-panel-vocab-ped" 
                         name="extensions.alpheios.panels.alph-vocab-panel.pedagogical" 
@@ -115,13 +106,6 @@
                                             preference="pref-panel-trans-inline"
                                             preference-editable="false"
                                             disabled="true"/>
-                                    </row>
-                                    <row>
-                                        <label value="&alpheios.prefs.panel.tree;"/>
-                                        <checkbox 
-                                            id="tree-inline" 
-                                            preference="pref-panel-tree-inline"
-                                            preference-editable="true"/>
                                     </row>
                                     <row>
                                         <label value="&alpheios.prefs.panel.vocab;"/>
@@ -189,15 +173,6 @@
                                         <checkbox 
                                             id="trans-ped" 
                                             preference="pref-panel-trans-ped"
-                                            onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
-                                            preference-editable="true"/>
-                                    </row>
-                                    <row>
-                                        <label value="&alpheios.prefs.panel.tree;"/>
-                                        <spacer/><!-- tree is never available to basic -->
-                                        <checkbox 
-                                            id="tree-ped" 
-                                            preference="pref-panel-tree-ped"
                                             onsynctopreference="return Alph.Prefs.updatePanelPref(this);"
                                             preference-editable="true"/>
                                     </row>

@@ -90,7 +90,6 @@
                         onsynctopreference="return Alph.Prefs.updateDataServiceSettings();">
                                     
                 <radio label="&alpheios.prefs.userdata.model.ffprofileplus;" value="ffprofileplus"/>
-                <radio label="&alpheios.prefs.userdata.model.shared;" value="shared"/>
                 <radio label="&alpheios.prefs.userdata.model.custom;" value="custom"/>
                 <label id="alpheios-prefs-userdata-customize-info"
                              class="alpheios-info"

@@ -52,7 +52,7 @@ Alph.Diagram.load = function()
     browser.addEventListener(
         "DOMContentLoaded",
         function() 
-        {          
+        {            
             // listen for the tree diagram to be fully loaded            
             this.contentDocument.addEventListener(
                 'AlpheiosTreeLoaded',
@@ -108,6 +108,7 @@ Alph.Diagram.load = function()
                            Alph.$("#" + id, doc).remove();
                        }
                     );      
+
                 },
                 false
             );
@@ -250,33 +251,48 @@ Alph.Diagram.listUserDiagrams = function()
  * @type Boolean
  */
 Alph.Diagram.addUserDiagram = function()
-{  
-   var sentence = document.getElementById("new_sentence").value;
-   var rc = false;
-   if (sentence)
-   {   var lang = document.getElementById("lang_select").value;
-       var fmt = document.getElementById("fmt_select").value;
-       var tb = this.getDiagramData(fmt,lang);
-       var seq = document.getElementById("sequential").checked ? 'yes' : 'no';
+{
+    var lang = document.getElementById("lang_select").value;
+    var fmt = document.getElementById("fmt_select").value;
+    var sentence = document.getElementById("new_sentence").value;
+    var lang_tool = window.arguments[0].e_langTool;
+    var punc;
+    // if the curreng language tool is for this language, use it to identify the punctuation
+    if (lang_tool && lang_tool.supportsLanguage(lang))
+    {
+        punc = lang_tool.getPunctuation('g');
+    }
+    else
+    {
+        punc = ".,;:!?'\"(){}\\[\\]<>\/\\\u00A0\u2010\u2011\u2012\u2013\u2014\u2015\u2018\u2019\u201C\u201D\u0387";              
+    }
+    // insert spaces before puncuation
+    sentence = sentence.replace(new RegExp("([" + punc + "])","g")," $1 "); 
+    var rc = false;
+    if (sentence)
+    {   
+        
+        var tb = this.getDiagramData(fmt,lang);
+        var seq = document.getElementById("sequential").checked ? 'yes' : 'no';
        
-       // check if language tool matches selected language and if so, use to separate words, otherwise
-       // just separate by space ?
-       var sentence = tb.addSentence(window,sentence.split(/\s+/));       
-       try
-       {
+        // check if language tool matches selected language and if so, use to separate words, otherwise
+        // just separate by space ?
+        var sentence = tb.addSentence(window,sentence.split(/\s+/));       
+        try
+        {
             this.openDiagram(this.getDocName(fmt,lang),sentence.getAttribute('id'),lang,seq);
             rc = true;
-       }
-       catch(a_e)
-       {
+        }
+        catch(a_e)
+        {
             document.getElementById("error").value = a_e;            
-       }
-   } else {
+        }
+    } else {
         document.getElementById("error").value = 
             Alph.BrowserUtils.getString(document.getElementById("alpheios-strings"),
                                    'alpheios-diagram-error-noinput');                                           
-   }   
-   return rc;                 
+    }   
+    return rc;                 
 };
 
 /**
@@ -335,11 +351,21 @@ Alph.Diagram.openDiagram = function(a_doc,a_id,a_lang,a_seq)
    url = url.replace(/SENTENCE/g,a_id);
    url = url.replace(/LANG/,a_lang);
    url = url.replace(/SEQUENTIAL/,a_seq);
-   return window.arguments[0].e_langTool.openDiagram(
+   var lang_tool = window.arguments[0].e_langTool;
+   var srcDoc = null;
+   // if the current Alpheios language is the language we're diagramming, 
+   // set the source document to the main browser document so that we can
+   // enable the popup, etc.
+   if (lang_tool.supportsLanguage(a_lang) && window.arguments[0].e_srcBrowser)
+   {
+        srcDoc =  window.arguments[0].e_srcBrowser.contentDocument;
+   }
+   lang_tool.openDiagram(
         null,
         'alph-diagram-edit-window',
         null,
         {'e_url': url,
+          'e_srcDoc': srcDoc,
           'e_viewer': false});   
 }
 

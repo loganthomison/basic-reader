@@ -471,6 +471,37 @@ Alph.Vocab.prototype.addHandlers = function(a_doc)
 };
 
 /**
+ * Click handler for vocab list navigation
+ * @param {Event} a_event the click event (the panel object is available at a_event.data)
+ */
+Alph.Vocab.handleNavigation = function(a_event)
+{
+    var panelObj = a_event.data;
+    var doc = this.ownerDocument;
+    Alph.$("#alpheios-vocablist",doc).html(
+        '<div class="loading">' + Alph.Main.getString('alph-loading-misc') + '</div>');
+    var url = this.getAttribute("href");    
+    Alph.$.ajax(
+        {
+            type: "GET",
+            url: url,
+            dataType: 'xml', 
+            error: function(a_req,a_status,a_e)
+            {
+                Alph.$("body",doc).prepend('<div id="alph-vocab-error">' + a_e + '</div>');                            
+
+            },
+            success: function(a_xml, a_status) 
+            {
+                panelObj.updateVocabList(a_xml,doc);                        
+            } 
+        }   
+    ); 
+    return false;
+}
+
+   
+/**
  * Select handler for the vocabulary list
  * @param {Event} a_event the click event (the panel object is available at a_event.data)
  */
@@ -523,6 +554,9 @@ Alph.Vocab.prototype.updateVocabList = function(a_xml,a_doc)
         Alph.$("#alpheios-vocablist",a_doc).html(Alph.$(vocabElem).contents());
         Alph.$("#alpheios-vocablist input[type=checkbox]",a_doc).bind(
             'click',this,Alph.Vocab.selectWordListItem);
+         Alph.$(".navigation a",a_doc).bind(
+            'click',self,Alph.Vocab.handleNavigation);
+
         var lang = Alph.$("#alpheios-vocab-contents",a_doc).attr("lang");
         var lang_tool = Alph.Languages.getLangTool(lang);
         if (lang_tool)

@@ -73,3 +73,13 @@ div.forms {
 .caption {
     font-weight: bold;
 }
+
+.navigation {
+    float: right;
+}
+.navigation a {
+    padding: 0 .5em;
+    color: #3E8D9C;
+    font-weight: bold;
+    text-decoration: none;
+}

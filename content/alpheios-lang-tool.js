@@ -495,10 +495,7 @@ function(a_ro, a_rngstr)
     // clean string:
     //   convert punctuation to spaces
     a_rngstr =
-      a_rngstr.replace(
-        /[.,;:!?'\"(){}\[\]<>\/\\\u00A0\u2010\u2011\u2012\u2013\u2014\u2015\u2018\u2019\u201C\u201D\u0387\n\r]/g,
-        " ");
-
+      a_rngstr.replace(new RegExp("[" + this.getPunctuation() + "]","g")," ");        
     this.s_logger.debug("In doSpaceSeparatedWordSelection for " + a_rngstr);
 
     // If the user selected whitespace in the margins of a range
@@ -600,7 +597,7 @@ function(a_ro, a_rngstr)
 
     // clean string:
     //   convert punctuation to spaces
-    a_rngstr = a_rngstr.replace(/[.,;:!?'\"(){}\[\]<>\/\\\xA0\n\r]/g, " ");
+    a_rngstr.replace(new RegExp("[" + this.getPunctuation() + "]","g")," ");
 
     // If the user selected whitespace in the margins of a range
     // just return.
@@ -2029,3 +2026,12 @@ Alph.LanguageTool.prototype.addToWordList = function(a_node,a_learned,a_userActi
         Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.VOCAB_UPDATE, { src_node: Alph.$(a_node).get(0) });        
     }
 };
+
+/**
+ * Get a list of valid puncutation for this language
+ * @returns {String} a string containing valid puncutation symbols
+ */
+Alph.LanguageTool.prototype.getPunctuation = function()
+{
+    return ".,;:!?'\"(){}\\[\\]<>\/\\\u00A0\u2010\u2011\u2012\u2013\u2014\u2015\u2018\u2019\u201C\u201D\u0387\n\r";        
+}

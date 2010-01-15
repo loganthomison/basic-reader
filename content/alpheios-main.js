@@ -2179,6 +2179,7 @@ Alph.Main =
                         'alpheios-user-diagram-dialog',
                         null,
                         { e_langTool: Alph.Main.getLanguageTool(),
+                          e_srcBrowser: Alph.Main.getCurrentBrowser(), 
                           e_dataManager: Alph.DataManager}
                         );
                         
