@@ -158,20 +158,11 @@ Alph.Diagram.loadUserDiagramDlg = function()
             function(a_i)
             {
                 var lang_val = this.getAttribute('value');
+                
                 if (lang_tool && lang_tool.supportsLanguage(lang_val))
                 {
                     Alph.$("#lang_select").get(0).selectedIndex = a_i;
-                    
-                    var lang_fmt = Alph.BrowserUtils.getPref("interface.diagram.fmt." + lang_val);
-                    if (lang_fmt)
-                    {
-                        var fmt_elem = Alph.$("#fmt_select radio[value=" + lang_fmt + "]").get(0);
-                        if (fmt_elem)
-                        {
-                            Alph.$("#fmt_select").get(0).selectItem(fmt_elem);
-                        }
-                        
-                    }
+                    Alph.Diagram.updateForLanguage(lang_val);
                 }            
             }
         );
@@ -180,10 +171,77 @@ Alph.Diagram.loadUserDiagramDlg = function()
     this.listUserDiagrams();
 
     // repopulate upon language or format change
-    Alph.$("radio").click(function(){   Alph.Diagram.listUserDiagrams()});
-    
+    Alph.$("#fmt_select radio").click(function(){Alph.Diagram.listUserDiagrams()});
+    Alph.$("#lang_select radio").click(
+        function()
+        {
+            Alph.Diagram.updateForLanguage(this.getAttribute('value'));
+            Alph.Diagram.listUserDiagrams();
+        }
+    );    
+    Alph.$("#dir_select").click(
+        function()
+        {
+            var dir = this.value;
+            Alph.$("textbox").each(
+                function()
+                {
+                    this.setAttribute("dir",dir);
+                }
+            );
+            return true;
+        }
+    )
+     
     // submit edit upon double click in list box
     Alph.$("#user-diagram-list").dblclick(Alph.Diagram.editUserDiagram);
+};
+
+/**
+ * Update the dialog for a language selection
+ * (updates the default format and direction selections)
+ * @param {String} a_lang the selected language
+ */
+Alph.Diagram.updateForLanguage = function(a_lang)
+{
+    var lang_fmt = Alph.BrowserUtils.getPref("interface.diagram.fmt." + a_lang) ||
+        Alph.BrowserUtils.getPref("interface.diagram.fmt" );
+    if (lang_fmt)
+    {
+        var fmt_elem = Alph.$("#fmt_select radio[value=" + lang_fmt + "]").get(0);
+        if (fmt_elem)
+        {
+            Alph.$("#fmt_select").get(0).selectedItem = fmt_elem;
+        }                        
+    }
+    var lang_tool = window.arguments[0].e_langTool;
+    var lang_dir; 
+    if (lang_tool && lang_tool.supportsLanguage(a_lang))
+    {
+        lang_dir = lang_tool.getDirection();
+    }
+    else
+    {
+        lang_dir =
+            Alph.BrowserUtils.getPref("interface.diagram.dir." + a_lang) ||
+            Alph.BrowserUtils.getPref("interface.diagram.dir");
+    }
+    if (lang_dir)
+    {
+        var dir_elem = Alph.$("#dir_select radio[value=" + lang_dir + "]").get(0);
+        if (dir_elem)
+        {
+            Alph.$("#dir_select").get(0).selectedItem = dir_elem;
+            Alph.$("textbox").each(
+                function()
+                {
+                    this.setAttribute("dir",lang_dir);
+                }
+            );
+        }
+    }
+    return true;
+         
 };
 
 /**
@@ -229,7 +287,7 @@ Alph.Diagram.listUserDiagrams = function()
     var listbox = document.getElementById('user-diagram-list'); 
     while (listbox.hasChildNodes())
             listbox.removeChild(listbox.firstChild);
-    var data = this.getDiagramData(fmt,lang);                    
+                        
     var sentences = data.getSentenceList(window);
     for (var i=0; i<sentences.length; i++)
     {
@@ -351,6 +409,7 @@ Alph.Diagram.openDiagram = function(a_doc,a_id,a_lang,a_seq)
    url = url.replace(/SENTENCE/g,a_id);
    url = url.replace(/LANG/,a_lang);
    url = url.replace(/SEQUENTIAL/,a_seq);
+   url = url.replace(/DIRECTION/,document.getElementById("dir_select").value);
    var lang_tool = window.arguments[0].e_langTool;
    var srcDoc = null;
    // if the current Alpheios language is the language we're diagramming, 

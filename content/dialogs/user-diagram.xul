@@ -43,10 +43,17 @@
       <radiogroup id="lang_select" orient="horizontal">
         <radio value="grc" label="&alpheios.diagram.lang.grc;"/>
         <radio value="la" label="&alpheios.diagram.lang.la;"/>
-        <radio value="ar" label="&alpheios.diagram.lang.ar;"/>
+        <radio value="ara" label="&alpheios.diagram.lang.ar;"/>
         <radio value="got" label="&alpheios.diagram.lang.got;"/>
         <radio value="chu" label="&alpheios.diagram.lang.chu;"/>
         <radio value="en" label="&alpheios.diagram.lang.en;"/>
+      </radiogroup>
+   </groupbox>
+   <groupbox>
+      <caption label="&alpheios.diagram.direction;"/>
+      <radiogroup id="dir_select" orient="horizontal">
+        <radio value="ltr" label="&alpheios.diagram.direction.ltr;" checked="true"/>
+        <radio value="rtl" label="&alpheios.diagram.direction.rtl;"/>
       </radiogroup>
    </groupbox>
    <hbox>

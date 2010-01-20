@@ -39,6 +39,7 @@ pref("extensions.alpheios.panels.alph-vocab-panel.pedagogical",0);
 pref("extensions.alpheios.methods.dictionary.full.default",'defaultDictionaryLookup');
 pref("extensions.alpheios.methods.dictionary.full.default.timeout",5000);
 pref("extensions.alpheios.partsofspeech","noun,adjective,verb,adverb,pronoun,article,preposition,conjunction,verb_participle");
+pref("extensions.alpheios.textdirection","ltr");
 pref("extensions.alpheios.smallicons",false);
 pref("extensions.alpheios.disable.remote",false);
 pref("extensions.alpheios.url.speech.timeout",5000);
@@ -72,6 +73,8 @@ pref("extensions.alpheios.user.wordlist.lookup.threshold",3);
 pref("extensions.alpheios.interface.vocab.filter",'all');
 pref("extensions.alpheios.interface.diagram.lang",'greek');
 pref("extensions.alpheios.interface.diagram.fmt",'aldt');
-pref("extensions.alpheios.interface.diagram.fmt.ar",'catib');
+pref("extensions.alpheios.interface.diagram.fmt.ara",'catib');
+pref("extensions.alpheios.interface.diagram.dir",'ltr');
+pref("extensions.alpheios.interface.diagram.dir.ara",'rtl');
 pref("extensions.alpheios.diagram.url",
-    'http://repos.alpheios.net:8080/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE');
+    'http://repos.alpheios.net:8080/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE&direction=DIRECTION');

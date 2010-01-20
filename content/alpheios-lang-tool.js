@@ -122,7 +122,13 @@ Alph.LanguageTool = function(a_language,a_properties)
                     return [];
                 }
 
+            },
+        Direction:
+            function()
+            {
+                return Alph.BrowserUtils.getPref("textdirection",a_language);                
             }
+            
     };
 
     this.setAccessors(default_properties);

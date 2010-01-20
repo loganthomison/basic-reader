@@ -86,3 +86,6 @@
 <!ENTITY alpheios.diagram.edit "Edit">
 <!ENTITY alpheios.diagram.select "Or select a previously saved sentence to edit:">
 <!ENTITY alpheios.diagram.sequential "Show words sequentially:">
+<!ENTITY alpheios.diagram.direction "Text Direction">
+<!ENTITY alpheios.diagram.direction.ltr "Left to Right">
+<!ENTITY alpheios.diagram.direction.rtl "Right to Left">
