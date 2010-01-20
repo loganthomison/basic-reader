@@ -84,7 +84,14 @@ Alph.Prefs = {
         var prefs = Alph.$("#alpheios-prefs-svc-advanced preferences").get(0);
         var strings = document.getElementById("alpheios-prefs-strings");
         
-        var languages = Alph.LanguageToolFactory.getLangList();        
+        var languages = Alph.LanguageToolFactory.getLangList();
+        if (languages.length == 0)
+        {
+            Alph.$("#alpheios-prefs-svc-advanced").html(
+                Alph.Util.makeXUL('description',null,["value"],[strings.getString('nolanguages')])
+            );
+        }
+
         // iterate through the languages adding service preferences 
         for (var i =0; i<languages.length; i++)
         {
@@ -372,6 +379,12 @@ Alph.Prefs = {
         
         var languages = Alph.LanguageToolFactory.getLangList();
         
+        if (languages.length == 0)
+        {
+            Alph.$("#alpheios-prefs-dictionaries").html(
+                Alph.Util.makeXUL('description',null,["value"],[strings.getString('nolanguages')])
+            );
+        }
         // iterate through the languages adding dictionary preferences for those which
         // have dictionaries defined
         for (var i =0; i<languages.length; i++)
