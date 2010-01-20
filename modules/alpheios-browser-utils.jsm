@@ -1520,8 +1520,27 @@ BrowserUtils = {
         }
         return cb_return;
                     
+    },
+    
+    /**
+     * Check to see if the browser is in offline mode
+     * @returns true if the browser is offline, false if not
+     * @type Boolean
+     */
+    isOffline: function()
+    {
+        var offline = false;
+        try
+        {
+            offline = BrowserSvc.getSvc('GPrefs').getBoolPref("browser.offline");
+        }
+        catch(a_e)
+        {
+            this.s_logger.debug("Error checking offline status: " + a_e);
+        }
+        return offline; 
     }
-         
+                 
 };
 
 /**
@@ -1545,7 +1564,8 @@ BrowserSvc = {
         InputStream: ["@mozilla.org/scriptableinputstream;1",'nsIScriptableInputStream'],
         WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"],
         DirSvc: ["@mozilla.org/file/directory_service;1","nsIProperties"],
-        Prompts: ["@mozilla.org/embedcomp/prompt-service;1","nsIPromptService"]
+        Prompts: ["@mozilla.org/embedcomp/prompt-service;1","nsIPromptService"],
+        GPrefs: ["@mozilla.org/preferences-service;1","nsIPrefBranch2"]                                     
     },
      
     /**

@@ -48,7 +48,14 @@ PkgMgr =
      * @static
      */
     TYPE_UNINSTALL: 'I',
-    
+
+    /**
+     * constant for grouping sessionstore-windows-restored observers
+     * @type String 
+     * @static
+     */
+    TYPE_RESTORE: 'R',
+
     /**
      * data object to hold per-package observer functions (grouped by type)
      * @type Object
@@ -112,6 +119,18 @@ PkgMgr =
                 }
             }
         }
+        else if (a_topic == "sessionstore-windows-restored")
+        {   
+            for (var pkg in this.d_obs[this.TYPE_RESTORE])
+            {
+                // execute any registered session restore observer callbacks
+                if (typeof this.d_obs[this.TYPE_RESTORE][pkg] == 'function')
+                {
+                    this.d_obs[this.TYPE_RESTORE][pkg]();
+                }
+            }
+            
+        }
     },
     
     /**
@@ -165,6 +184,7 @@ PkgMgr =
             getService(Components.interfaces.nsIObserverService);
         observerService.addObserver(this, "em-action-requested", false); 
         observerService.addObserver(this, "quit-application-granted", false);
+        observerService.addObserver(this,"sessionstore-windows-restored",false);
     },
 
     /**
@@ -178,5 +198,6 @@ PkgMgr =
 
         observerService.removeObserver(this,"em-action-requested");
         observerService.removeObserver(this,"quit-application-granted");
+        observerService.removeObserver(this,"sessionstore-windows-restored");
     }
 }

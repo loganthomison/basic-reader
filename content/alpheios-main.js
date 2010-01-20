@@ -159,6 +159,16 @@ Alph.Main =
              }
             ]
         );
+        // Add a session restore observer to display the firstrun page upon install/update
+        Alph.PkgMgr.registerObserver(
+            Alph.PkgMgr.TYPE_RESTORE,
+            [{id: Alph.Main.d_extensionGUID, 
+              callback: Alph.Main.showUpdateHelp,
+              ctx: Alph.Main,
+              params: [window]
+             }
+            ]
+        );
         Alph.PkgMgr.start();
         window.addEventListener("unload", function(e) { Alph.Main.onUnLoad(e); },false);
         gBrowser
@@ -203,8 +213,7 @@ Alph.Main =
         Alph.Main.toggleToolbar();
         // register any new auto-enable sites
         Alph.Site.registerSites();
-        Alph.DataManager.updateUserCommands(window);
-        Alph.Main.showUpdateHelp();
+        Alph.DataManager.updateUserCommands(window);        
     },
      
 
@@ -322,12 +331,22 @@ Alph.Main =
     {        
         
         this.getStateObj(a_bro).setVar("enabled",true);
-        if (! this.d_hasLanguages)
+        if (! this.hasLanguages())
         {            
             Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-nolanguages");
             this.inlineDisable(a_bro);
             return;
         }
+        // when Firefox is in offline mode, it seems to disable the ajax functionality so that
+        // the tools don't work properly. detect this condition and tell the user how to fix it.
+        if (Alph.BrowserUtils.isOffline())
+        {
+            Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-offline");
+            this.inlineDisable(a_bro);
+            return;
+           
+        }
+               
         if (a_lang == null)
         {      
             var lang_list = Alph.Languages.getLangList();
@@ -2183,6 +2202,30 @@ Alph.Main =
                           e_dataManager: Alph.DataManager}
                         );
                         
+    },
+    
+    /**
+     * Get the the hasLanguages flag to see if any languages are installed
+     * @returns true if at least one language is installed, otherwise false
+     */
+    hasLanguages: function()
+    {
+        return this.d_hasLanguages;
+    },
+    
+    /**
+     * Prompt the user to install a language extension if none are installed
+     */
+    promptForLanguage: function()
+    {
+        if (! this.hasLanguages())
+        {            
+            if (Alph.BrowserUtils.doConfirm(window,"alpheios-warning-dialog","alph-error-getlanguages"))
+            {
+                Alph.Util.openAlpheiosLink(window,'install');
+            }
+            return;
+        }
     }
    
 };

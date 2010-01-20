@@ -58,6 +58,7 @@ Alph.Util = {
     {
         main: 'http://alpheios.net',
         help:  'http://alpheios.net/content/release-notes',
+        install: 'http://alpheios.net/content/installation',
         support: 'mailto:support@alpheios.net',
         content: 'http://alpheios.net/content/',
     },

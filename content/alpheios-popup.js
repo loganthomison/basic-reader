@@ -124,6 +124,25 @@ Alph.Xlate = {
             this.clearSelection();
             return;
         }
+        
+        // check to see if the site has defined an override to our word
+        // selection algorithm based upon element class names (See Bug 377)
+        var wordClasses = Alph.Site.getWordClasses(rp.ownerDocument);
+        for (var i=0; i<wordClasses.length; i++)
+        {
+            var wordClass = wordClasses[i];
+            if (wordClass && ! Alph.$(rp).hasClass(wordClass))
+            {
+                var parent = Alph.$(rp).parents("."+wordClass).get(0);
+                if (parent)
+                {
+                    rp = parent;
+                    ro = 0;
+                    break;
+                }                
+                                
+            }
+        }
 
         // disable the translate function if and the mouse is over an
         // element in a section of the page we've been told to ignore
@@ -254,8 +273,19 @@ Alph.Xlate = {
             // Add the range back to the document highlighted as the selected range
             var doc = rp.ownerDocument;
             var r = doc.createRange();
-            r.setStart(rp, alphtarget.getWordStart());
-            r.setEnd(rp, alphtarget.getWordEnd());
+            try
+            {
+                r.setStart(rp, alphtarget.getWordStart());
+                r.setEnd(rp, alphtarget.getWordEnd());
+            } catch(a_e)
+            {
+                // when we've overriden the range selection for the page to reference
+                // an element with children, (i.e. as for bug 377), the length of the word
+                // exceeds the boundaries of the parent node, which apparently only include
+                // the direct text of that node, and not the children nodes. 
+                // in this case, we can just select the entire parent node 
+                r.selectNode(rp);
+            }
             var sel = doc.defaultView.getSelection();
             sel.removeAllRanges();
             sel.addRange(r);

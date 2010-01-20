@@ -1116,5 +1116,22 @@ Alph.Site = {
             );
         }
         a_callback();
+    },
+    
+    /**
+     * Get the list of classnames which identify the word tokens in this document (if defined)
+     * @param {Document} a_doc the current document
+     * @return the list of classnames
+     * @type Array
+     */
+    getWordClasses: function(a_doc)
+    {
+        var classList = [];
+        var wordClasses = this.getMetadataContent('alpheios-word-classes',a_doc);
+        if (wordClasses)
+        {
+            classList = wordClasses.split(/,/);
+        }
+        return classList;
     }
 };

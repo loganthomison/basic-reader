@@ -279,7 +279,8 @@
                 tooltiptext="&alpheios.menu.lang.tooltip;"
                 type="menu">
                 <menupopup 
-                    id="alpheios-lang-popup-mm">
+                    id="alpheios-lang-popup-mm"
+                    onpopupshowing="Alph.Main.promptForLanguage();">
                     <menuitem id="alpheios-mm-lang-none"
                           label="&alpheios.lang.none;"
                           hidden="true"
