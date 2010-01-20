@@ -441,7 +441,7 @@ DataManager =
                             try 
                             {
                                 var key = a_file_info[0].match(match_string)[1];
-                                var dataObj = new self.d_dataTypes[classname](a_file_info[1],charset);
+                                var dataObj = new self.d_dataTypes[classname](a_file_info[1],charset,{});
                                 self.addDataObj(a_type,key,dataObj)
                             }
                             catch(a_e)

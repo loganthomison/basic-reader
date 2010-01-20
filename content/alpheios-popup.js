@@ -398,7 +398,7 @@ Alph.Xlate = {
         );
 
         var alphtext_node =
-            window.content.document.importNode(
+            a_topdoc.importNode(
                                         wordHTML.getElementById("alph-text"),
                                         true);
         var disambiguate_id = null;
