@@ -71,7 +71,7 @@ TreeDiagram.prototype.getDefault = function()
     var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");        
     var template =                
        '<treebank ' + 
-       //'  xmlns="' + NAMESPACE + '"' +
+       '  xmlns="' + NAMESPACE + '"' +
        '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
        '  xsi:schemaLocation="' + SCHEMA + '"' +
        '  version="1.5"' +

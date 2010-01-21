@@ -842,7 +842,9 @@ Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_para
         {
             try
             {
-                var parts = tbrefs[0].split(/-/);
+                // just use the first reference as the focus if there are multiple
+                var allrefs = tbrefs.split(' ');
+                var parts = allrefs[0].split(/-/);
                 sentence = parts[0];
                 word = parts[1];
             }
