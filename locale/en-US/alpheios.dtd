@@ -63,7 +63,7 @@
 <!ENTITY alpheios.panel.trans.opt.inter.trans "Show Interlinear Text">
 <!ENTITY alpheios.help "Help">
 <!ENTITY alpheios.help.tooltip "Open Alpheios User Guide">
-<!ENTITY alpheios.version.string "Alpha Version">
+<!ENTITY alpheios.version.string "Beta Version">
 <!ENTITY alpheios.menu.userdata "User Data">
 <!ENTITY alpheios.menu.userdata.tooltip "User Data Functions"> 
 <!ENTITY alpheios-tools-vocab-label "Vocabulary">
