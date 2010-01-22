@@ -313,7 +313,15 @@ Alph.Main =
             this.inlineDisable(a_bro);
         }
         else {
-            this.enable(a_bro,a_lang);
+            if (Alph.BrowserUtils.isOffline())
+            {
+                Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-offline");
+                return;
+            }
+            else
+            {
+                this.enable(a_bro,a_lang);
+            }
         }
         this.getStateObj().setVar("toggled_by",Alph.State.SYS_ACTION);
         this.onTabSelect();
