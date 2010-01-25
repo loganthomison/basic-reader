@@ -337,12 +337,6 @@ Alph.Main =
             this.inlineDisable(a_bro);
             return;
         }
-        // when Firefox is in offline mode, it seems to disable the ajax functionality so that
-        // the tools don't work properly. detect this condition and warn the user.
-        if (Alph.BrowserUtils.isOffline())
-        {            
-            Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-offline");
-        }
                
         if (a_lang == null)
         {      
@@ -735,8 +729,19 @@ Alph.Main =
     alertMhttpdFailure: function(a_req,a_text,a_error)
     {
         Alph.Main.s_logger.fatal("Unable to verify daemon start: " + a_error || a_text);
-        var err_msg = Alph.Main.getString("alph-error-mhttpd-failure");
-        alert(err_msg);
+        var err_msg;
+        // when Firefox is in offline mode, it seems to disable the ajax functionality so that
+        // the tools don't work properly. Detect this condition and give the user more specific
+        // instructions.
+        if (Alph.BrowserUtils.isOffline())
+        {            
+            err_msg = "alph-error-offline";
+        }
+        else
+        {
+            err_msg = "alph-error-mhttpd-failure";
+        }
+        Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog",err_msg);
     },
 
     /**
