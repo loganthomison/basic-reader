@@ -313,15 +313,7 @@ Alph.Main =
             this.inlineDisable(a_bro);
         }
         else {
-            if (Alph.BrowserUtils.isOffline())
-            {
-                Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-offline");
-                return;
-            }
-            else
-            {
-                this.enable(a_bro,a_lang);
-            }
+            this.enable(a_bro,a_lang);
         }
         this.getStateObj().setVar("toggled_by",Alph.State.SYS_ACTION);
         this.onTabSelect();
@@ -346,13 +338,10 @@ Alph.Main =
             return;
         }
         // when Firefox is in offline mode, it seems to disable the ajax functionality so that
-        // the tools don't work properly. detect this condition and tell the user how to fix it.
+        // the tools don't work properly. detect this condition and warn the user.
         if (Alph.BrowserUtils.isOffline())
-        {
+        {            
             Alph.BrowserUtils.doAlert(window,"alpheios-warning-dialog","alph-error-offline");
-            this.inlineDisable(a_bro);
-            return;
-           
         }
                
         if (a_lang == null)
