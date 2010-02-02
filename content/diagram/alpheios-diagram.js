@@ -442,16 +442,16 @@ Alph.Diagram.removeUserDiagram = function()
  * get a user defined sentence from the stored diagram
  * data objects
  * @param {String} a_url not used
- * @param {String} a_doc the diagram document name
- * @param {String} a_id the sentence id
+ * @param {Object} a_params array of parameters
  * @returns the sentence xml (as a string)
  */
-Alph.Diagram.getUserDiagram = function(a_url, a_doc, a_sentid)
+Alph.Diagram.getUserDiagram = function(a_url, a_params)
 {    
     var dm = window.arguments[0].e_dataManager;    
     try
     {
-        var sentence_string = dm.getDataObj('diagrams',a_doc,false).getSentence(window, a_sentid);        
+        var sentence_string = dm.getDataObj('diagrams',a_params["doc"],false)
+                                .getSentence(window, a_params["s"]);
         return sentence_string; 
     }
     catch(a_e)
