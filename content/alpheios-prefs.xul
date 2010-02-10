@@ -23,8 +23,7 @@
           label="&alpheios.prefs.features;" 
           image="chrome://alpheios/skin/icons/alpheios_32.ico"
           onpaneload="Alph.Prefs.initFeaturePrefs();">
-        <preferences>
-            <preference id="pref-enabletoolbar" name="extensions.alpheios.enable.toolbar" type="bool"/>
+        <preferences>            
             <preference id="pref-tblookup" name="extensions.alpheios.toolbar.lookup" type="bool"/>
             <preference id="pref-smallicons" name="extensions.alpheios.smallicons" type="bool"/>
             <preference id="pref-interlinear" 
@@ -38,14 +37,6 @@
                 <tab label="&alpheios.prefs.interlinear;"/>
             </tabs>
             <tabpanels>
-                <tabpanel id="alpheios-prefs-toolbar">
-                    <vbox flex="1">
-                        <checkbox id="enabletoolbar"
-                            label="&alpheios.prefs.toolbar.enable;"
-                            preference="pref-enabletoolbar"
-                            onsynctopreference="return Alph.Prefs.checkAlpheiosToolbar();"/>                                                    
-                    </vbox>
-                </tabpanel>
                 <tabpanel id="alpheios-prefs-lookup">
                     <vbox id="alpheios-prefs-lookup-set" flex="1">
                         <groupbox id="alpheios-mouse-group">

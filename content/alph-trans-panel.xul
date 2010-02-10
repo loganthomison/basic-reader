@@ -47,7 +47,7 @@
     </popupset>
     
     <!-- overlay the toolbar menu -->
-    <toolbar id="alpheios-toolbar-template">
+    <toolbar id="alpheios-toolbar">
         <toolbarbutton
             id="alpheios-trans-button"
             insertafter="alpheios-lang-button"
@@ -75,6 +75,7 @@
                 id="alph-trans-panel-primary"
                 flex="1"
                 type="content" 
+                disablehistory="true"
                 src="chrome://alpheios/content/html/alph-panel.html"/>            
             <toolbarbutton id="alpheios-trans-opt-inter-src" 
                           label="&alpheios.panel.trans.opt.inter.src;"  

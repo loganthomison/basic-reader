@@ -27,6 +27,6 @@
     <hbox id="alph-query-box-outer" 
           flex="100" persist="height" collapsed="false">
         <browser id="alph-query-frame" 
-                src="chrome://alpheios/content/html/alph-panel.html" flex="1"/>
+                 disablehistory="true" src="chrome://alpheios/content/html/alph-panel.html" flex="1"/>
     </hbox>
 </window>

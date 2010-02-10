@@ -42,6 +42,7 @@
                 </toolbaritem>
                 <browser 
                     id="alph-vocab-body"
+                    disablehistory="true"
                     flex="1"
                     src="chrome://alpheios/content/html/alph-panel.html" />                
             </alpheiosPanel>

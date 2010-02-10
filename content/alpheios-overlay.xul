@@ -173,40 +173,16 @@
     
     
       
-    
 
-    <vbox id="appcontent">
-        <splitter id="alph-bottom-panel-splitter" collapsed="true" 
-                  class="alph-panel-splitter alph-panel-section-splitter"/>     
-        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">    
-            <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
-                <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
-                      collapsed="true"/>
-            </hbox>
-            <splitter collapsed="true" 
-                      class="alph-panel-splitter alph-panel-section-splitter"/>
-            <hbox id="alph-lex-tools" class="alph-panel-section" collapsed="true"
-                  flex="1" persist="height">
-                <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-morph-box" class="alph-panel" flex="1" 
-                      persist="height" collapsed="true"/>
-                <splitter class="alph-panel-splitter" collapsed="true"/>
-                <hbox id="alph-dict-box" class="alph-panel" flex="1" 
-                      collapsed="true" persist="height"/>
-            </hbox>
-        </vbox>
-        <!-- moving the toolbar and the language menu out of the main overlay
-             for now 
-        -->
-        <toolbar id="alpheios-toolbar-template" 
+    <toolbox id="navigator-toolbox">
+                <toolbar id="alpheios-toolbar" 
                  accesskey="" 
                  class="chromeclass-toolbar"                  
-                 collapsed="true" 
+                 collapsed="false" 
                  context="toolbar-context-menu" 
                  customizable="true" 
                  grippytooltiptext="&alpheios-toolbar-grippy-tooltip;" 
-                 hidden="true" 
+                 hidden="false" 
                  iconsize="small" 
                  inherits="collapsed,hidden" 
                  mode="full" 
@@ -365,6 +341,32 @@
                 tooltiptext="&alpheios.toolbar.disable;"
                 command="alpheios-disable-toolbar-cmd"/>
         </toolbar>
+    </toolbox>    
+
+    <vbox id="appcontent">
+        <splitter id="alph-bottom-panel-splitter" collapsed="true" 
+                  class="alph-panel-splitter alph-panel-section-splitter"/>     
+        <vbox id="alph-bottom-panel" persist="height" collapsed="true" class="alph-panel-section">    
+            <hbox id="alph-tree-tools" class="alph-panel-section" flex="1" persist="height">
+                <splitter class="alph-panel-splitter" collapsed="true"/>
+                <hbox id="alph-tree-box" class="alph-panel" flex="1" persist="height" 
+                      collapsed="true"/>
+            </hbox>
+            <splitter collapsed="true" 
+                      class="alph-panel-splitter alph-panel-section-splitter"/>
+            <hbox id="alph-lex-tools" class="alph-panel-section" collapsed="true"
+                  flex="1" persist="height">
+                <splitter class="alph-panel-splitter" collapsed="true"/>
+                <hbox id="alph-morph-box" class="alph-panel" flex="1" 
+                      persist="height" collapsed="true"/>
+                <splitter class="alph-panel-splitter" collapsed="true"/>
+                <hbox id="alph-dict-box" class="alph-panel" flex="1" 
+                      collapsed="true" persist="height"/>
+            </hbox>
+        </vbox>
+        <!-- moving the toolbar and the language menu out of the main overlay
+             for now 
+        -->
         <menu id="alpheios-lang-menu-tm" 
               label="&alpheios.lang.menu;"
               insertafter="alpheios-toggle-tm"

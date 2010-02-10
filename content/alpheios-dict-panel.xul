@@ -48,6 +48,7 @@
                 </toolbaritem>
                 <browser 
                     id="alph-dict-body"
+                    disablehistory="true"
                     flex="1"
                     src="chrome://alpheios/content/html/alph-panel.html" 
                     class="alph-lexicon-output"/>                

@@ -19,6 +19,7 @@
     </stringbundleset>
     <hbox flex="100">
         <browser id="alpheios-diagram-content"
+                 disablehistory="true"
                  class="alpheios-trigger-proxied"
                  src="chrome://alpheios/content/html/alph-panel.html"
                  flex="100"

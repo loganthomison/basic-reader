@@ -49,6 +49,7 @@
                     </toolbaritem>
                     <browser
                         id="alph-etym-body"
+                        disablehistory="true"
                         flex="1"
                         type="content"
                         class="alph-lexicon-output"

@@ -210,7 +210,8 @@ Alph.Main =
                 .addEventListener("TabClose", function(e) { Alph.Main.onTabClose(e); }, false);
                  
         Alph.Main.d_hasLanguages = Alph.Main.setLanguages();
-        Alph.Main.toggleToolbar();
+        Alph.Main.enableTbLookup();
+
         // register any new auto-enable sites
         Alph.Site.registerSites();
         Alph.DataManager.updateUserCommands(window);        
@@ -581,8 +582,8 @@ Alph.Main =
         // as happens when the browser is issuing the onTabClose event for multiple tabs
         // in a window when the when the window is closed.
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
-        var rand_num = Math.floor(Math.random()* 100000000)
-        kill_url = detach_url + "?_r=" + rand_num;
+        var rand_num = Math.floor(Math.random()* 100000000);
+        kill_url = kill_url + "?_r=" + rand_num;
         Alph.Main.s_logger.info("kill daemon at " + detach_url);
         
         Alph.$.ajax(
@@ -908,6 +909,33 @@ Alph.Main =
             // successfully setup the Alph.Languages object, so return true
             languages_set = true;
         }
+        
+        // update the languages menu in the toolbar
+        var language_count = lang_list.length;
+
+        // if we have don't have at least one language, show the 'none' item
+        // in the menu and return false to disable the extension
+        if (language_count==0)
+        {
+            Alph.$("#alpheios-mm-lang-none").attr("hidden","false");
+        }
+        else
+        {
+            for (var i=0; i<lang_list.length; i++)
+            {           
+                var a_lang = lang_list[i];
+                // add menu items to the various language menus for this language
+                var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
+                var menuitem = Alph.Util.makeXUL(
+                    'menuitem',
+                    'alpheios-mm-lang-'+a_lang,
+                    ['label','value','type'],
+                    [lang_string,a_lang,'checkbox']
+                );
+                Alph.$("#alpheios-toolbar #alpheios-lang-popup-mm").append(menuitem);         
+            }
+        }
+
         return languages_set;
     },
     
@@ -1470,9 +1498,6 @@ Alph.Main =
                 // selectLanguage calls onTabSelect which will re-call resetState
                 return;  
             }
-            // enable the ff toolbar 
-            // TODO - we may only want to enable this for basic sites
-            this.toggleToolbar(true);
             // if we're not on an enhanced site
             // and make sure the mode is set to READER
             if (ped_site.length == 0)
@@ -1492,8 +1517,6 @@ Alph.Main =
         else if (this.isEnabled(bro) && ! this.toggledByUser(bro))
         {
             this.autoToggle(bro);
-            // reset the toolbar status
-            this.toggleToolbar();
             // show the leaving site popup, unless we're returning to the alpheios site
             try
             {
@@ -1514,11 +1537,6 @@ Alph.Main =
             // if we're on a basic site, and the extension is enabled,
             // the set the mode to READER
             this.setMode(bro,Alph.Constants.LEVELS.READER);
-        }
-        else
-        {
-            //reset the toolbar status
-            this.toggleToolbar();
         }
         
         if ((ped_site.length >0 || mixed_site.length >0) && this.isEnabled(bro))
@@ -1710,72 +1728,7 @@ Alph.Main =
         return by_user;
          
     },
-    
-    /**
-     * toggle the ff toolbar
-     * @param {Boolean} a_on true if toolbar should be turned on, false if not
-     */
-    toggleToolbar: function(a_on)
-    {
-        if (typeof a_on == "undefined")
-        {
-            a_on = false;
-            try {
-                a_on = Alph.BrowserUtils.getPref("enable.toolbar");
-            }
-            catch(a_e)
-            {
-                // the toolbar defaults to off
-                a_on = false;
-            }
-        }
-        if (a_on)
-        {
-            //only add the toolbar if it's not already there
-            if (Alph.$('#alpheios-toolbar').length == 0)
-            {
-                var toolbar = Alph.$("#alpheios-toolbar-template").clone();
-                Alph.$(toolbar).attr("id",'alpheios-toolbar');
-                Alph.$(toolbar).attr("collapsed",false);
-                Alph.$(toolbar).attr("hidden",false);
-      
-                
-                // update the languages menu in the toolbar
-                var lang_list = Alph.LanguageToolFactory.getLangList();
-                var language_count = lang_list.length;
-
-                // if we have don't have at least one language, show the 'none' item
-                // in the menu and return false to disable the extension
-                if (language_count==0)
-                {
-                    Alph.$("#alpheios-mm-lang-none").attr("hidden","false");
-                }
-                else
-                {
-                    for (var i=0; i<lang_list.length; i++)
-                    {           
-                        var a_lang = lang_list[i];
-                        // add menu items to the various language menus for this language
-                        var lang_string = this.getLanguageString(a_lang,a_lang+'.string');
-                        var menuitem = Alph.Util.makeXUL(
-                            'menuitem',
-                            'alpheios-mm-lang-'+a_lang,
-                            ['label','value','type'],
-                            [lang_string,a_lang,'checkbox']
-                        );
-                        Alph.$("#alpheios-lang-popup-mm",toolbar).append(menuitem);         
-                    }
-                }
-                Alph.Main.enableTbLookup();
-                Alph.$("#navigator-toolbox").append(toolbar);
-            }            
-        }
-        else
-        {
-            Alph.$("#navigator-toolbox #alpheios-toolbar").remove();
-        }
-    },
-   
+           
     /**
      * enable or disable the toolbar lookup box per the preference
      */
@@ -1986,8 +1939,21 @@ Alph.Main =
            // This fires when the location bar changes; i.e load event is confirmed
            // or when the user switches tabs. If you use myListener for more than one tab/window,
            // use aProgress.DOMWindow to obtain the tab/window which triggered the change.
-           var new_url_base= aURI.spec.match(/([^#]+)[#]?/)[1]
-           if (new_url_base == this.d_lastUrlBase)
+           var new_url_base= "";
+           try 
+           {
+            new_url_base = aURI.spec.match(/([^#]+)[#]?/)[1]
+           }
+           catch(a_e)
+           {
+                // for new tabs, the uri is null
+                // just quietly catch
+           }           
+           if (new_url_base == "")
+           {
+                this.d_handleLoad = false;
+           }
+           else if (new_url_base == this.d_lastUrlBase)
            {
             this.d_handleRefresh = true;
            }
@@ -2083,10 +2049,6 @@ Alph.Main =
                 }
             }
         }            
-        else if (a_name.match(/enable.toolbar$/))
-        {
-            Alph.Main.toggleToolbar(a_value);
-        }
         else if (a_name.match(/toolbar.lookup$/))
         {
             Alph.Main.enableTbLookup();
@@ -2183,7 +2145,7 @@ Alph.Main =
         }
         else
         {
-            Alph.BrowserUtils.setPref("enable.toolbar",false);
+            Alph.$("#alpheios-toolbar").attr("collapsed",true);
         
         }
     },

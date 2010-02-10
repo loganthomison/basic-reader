@@ -23,6 +23,6 @@
     <script type="application/x-javascript" src="chrome://alpheios/content/jquery.tablehover.pack.js" />
 
     <vbox flex="1">
-        <browser id="alph-infl-browser" type="content-primary" src="chrome://alpheios/content/infl/infl-loading.html" flex="1"/>
+        <browser id="alph-infl-browser" disablehistory="true" type="content-primary" src="chrome://alpheios/content/infl/infl-loading.html" flex="1"/>
     </vbox>   
 </window>
