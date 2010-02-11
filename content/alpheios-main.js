@@ -584,7 +584,7 @@ Alph.Main =
         // Using POST would also prevent caching but mhttpd doesn't support POSTS
         var rand_num = Math.floor(Math.random()* 100000000);
         kill_url = kill_url + "?_r=" + rand_num;
-        Alph.Main.s_logger.info("kill daemon at " + detach_url);
+        Alph.Main.s_logger.info("kill daemon at " + kill_url);
         
         Alph.$.ajax(
             {
