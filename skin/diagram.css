@@ -12,3 +12,12 @@ browser {
 spacer {
     min-height: 1em;
 }
+
+#seq-label {
+    margin-left: 0px;
+    padding: 0px;
+}
+
+#sequential {
+    padding-right: 0px;
+}

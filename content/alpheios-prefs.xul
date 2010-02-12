@@ -26,6 +26,7 @@
         <preferences>            
             <preference id="pref-tblookup" name="extensions.alpheios.toolbar.lookup" type="bool"/>
             <preference id="pref-smallicons" name="extensions.alpheios.smallicons" type="bool"/>
+            <preference id="pref-speech" name="extensions.alpheios.features.alpheios-speech" type="bool"/>
             <preference id="pref-interlinear" 
                         name="extensions.alpheios.features.alpheios-interlinear" 
                         type="bool"/>
@@ -45,10 +46,12 @@
                         <checkbox id="tblookup" 
                               label="&alpheios.prefs.toolbar.lookup;" 
                               preference="pref-tblookup"/>
+                         <checkbox id="speech" 
+                                  label="&alpheios.prefs.speech;" 
+                                  preference="pref-speech"/>
                         <checkbox id="smallicons" 
                                   label="&alpheios.prefs.smallicons;" 
                                   preference="pref-smallicons"/>
-
                         <hbox>
                         <button id="alpheios-prefs-svc-button"
                             label="&alpheios.prefs.advanced.label;"

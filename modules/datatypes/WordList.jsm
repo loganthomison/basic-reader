@@ -314,11 +314,13 @@ WordList.prototype.asXML = function(a_learned)
 {
     // return a TEI-formated XML document for the wordlist
     var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");
-        
-    var template =         
+    
+    // note that the xml processing instruction is missing because it causes 
+    // XML().toXMLString() to fail with xml is a reserved word
+    var template =               
         '<TEI xmlns="http://www.tei-c.org/ns/1.0"' +
         '    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'+
-        '    xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_dictionaries.xsd">' +
+        '    xsi:schemaLocation="http://www.tei-c.org/ns/1.0 http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_dictionaries.xsd">' +        
         '<teiHeader><fileDesc>' + 
         '<titleStmt><title>Alpheios Word List</title></titleStmt>'  + 
         '<publicationStmt><date>' + (new Date()).toString() + '</date></publicationStmt>' + 
@@ -331,10 +333,10 @@ WordList.prototype.asXML = function(a_learned)
     {       
         var entry = this.d_dataObj.d_entries[key];
         var entryNode = doc.createElementNS("http://www.tei-c.org/ns/1.0","entry");;
-        entryNode.setAttribute("lang",entry.lang);
+        entryNode.setAttribute("xml:lang",entry.lang);
         var lemma = doc.createElementNS("http://www.tei-c.org/ns/1.0","form");
         lemma.setAttribute("type","lemma");
-        lemma.setAttribute("lang",entry.lang);
+        lemma.setAttribute("xml:lang",entry.lang);
         lemma.appendChild(doc.createTextNode(key));
         if (entry.learned)
         {
@@ -345,7 +347,7 @@ WordList.prototype.asXML = function(a_learned)
         {
             var formNode = doc.createElementNS("http://www.tei-c.org/ns/1.0","form");
             formNode.setAttribute("type","inflection");
-            formNode.setAttribute("lang",entry.lang);
+            formNode.setAttribute("xml:lang",entry.lang);
             if (entry.forms[form].learned)
             {
                 formNode.setAttribute("rend","learned");

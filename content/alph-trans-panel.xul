@@ -50,7 +50,7 @@
     <toolbar id="alpheios-toolbar">
         <toolbarbutton
             id="alpheios-trans-button"
-            insertafter="alpheios-lang-button"
+            insertbefore="alpheios-inflection-button"
             type="checkbox"
             label="&alpheios-tools-trans-label;"
             command="alpheios-trans-toggle-cmd"

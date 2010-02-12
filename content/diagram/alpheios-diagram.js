@@ -364,7 +364,8 @@ Alph.Diagram.editUserDiagram = function()
     {
         var lang = document.getElementById("lang_select").value;
         var fmt = document.getElementById("fmt_select").value;
-        var seq = document.getElementById("sequential").checked ? 'yes' : 'no';        
+        // sequential mode doesn't work for previously-edited diagrams
+        var seq = 'no';        
         var doc = Alph.Diagram.getDocName(fmt,lang);
         var id = selected.value;
         try

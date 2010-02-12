@@ -57,7 +57,7 @@ Alph.Util = {
     ALPHEIOS_URLS:
     {
         main: 'http://alpheios.net',
-        help:  'http://alpheios.net/content/release-notes',
+        help:  'http://alpheios.net/content/user-guide',
         install: 'http://alpheios.net/content/installation',
         support: 'mailto:support@alpheios.net',
         content: 'http://alpheios.net/content/',

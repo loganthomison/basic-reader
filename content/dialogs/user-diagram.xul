@@ -28,6 +28,10 @@
     <description id="error" value=" "/>            
    <label control="new_sentence" value="&alpheios.diagram.input;"/>
     <textbox id="new_sentence"/>
+    <hbox>
+        <checkbox id="sequential" label="&alpheios.diagram.sequential;"/>                
+   </hbox>
+   <separator class="groove"/>
     <label value="&alpheios.diagram.select;"/>
     <listbox id="user-diagram-list" flex="1" rows="5"/>
     <groupbox>
@@ -55,10 +59,6 @@
         <radio value="ltr" label="&alpheios.diagram.direction.ltr;" checked="true"/>
         <radio value="rtl" label="&alpheios.diagram.direction.rtl;"/>
       </radiogroup>
-   </groupbox>
-   <hbox>
-    <label control="sequential" value="&alpheios.diagram.sequential;"/>
-    <checkbox id="sequential"/>
-   </hbox>
+   </groupbox>   
     <spacer/>  
 </dialog>

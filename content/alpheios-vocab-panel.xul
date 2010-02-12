@@ -22,7 +22,8 @@
    <!-- overlay the toolbar menu -->
    <menupopup id="alpheios-tools-menu">
         <menuitem
-                id="alpheios-vocab-mm"                
+                id="alpheios-vocab-mm"
+                insertafter="alpheios-user-diagram-mm"
                 label="&alpheios-tools-vocab-label;"
                 tooltiptext="&alpheios-tools-vocab-tooltip;"
                 command="alpheios-vocab-toggle-cmd"/>

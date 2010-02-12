@@ -16,6 +16,7 @@ body {
 .entry {
     clear: both;
     margin-bottom: .5em;
+    border-top: 1px dotted #9e9c9a;
 }
 
 div.lemma {

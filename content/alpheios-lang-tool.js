@@ -1602,7 +1602,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         );
     }
     
-    if (this.getFeature('alpheios-speech'))
+    if (this.getFeature('alpheios-speech') && Alph.BrowserUtils.getPref("url.speech",this.d_sourceLanguage))
     {
         var alt_text = Alph.Main.getString('alph-speech-link');
         var loading_msg = Alph.Main.getString("alph-loading-speech");

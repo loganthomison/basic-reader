@@ -2143,11 +2143,7 @@ Alph.Main =
         {            
             Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-toolbar-disable");                
         }
-        else
-        {
-            Alph.$("#alpheios-toolbar").attr("collapsed",true);
-        
-        }
+        Alph.$("#alpheios-toolbar").attr("collapsed",true);             
     },
     
     /**

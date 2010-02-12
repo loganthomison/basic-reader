@@ -16,6 +16,7 @@ pref("extensions.alpheios.features.alpheios-grammar",false);
 pref("extensions.alpheios.features.alpheios-vocab",true);
 pref("extensions.alpheios.features.alpheios-user-diagram",true);
 pref("extensions.alpheios.features.alpheios-interlinear",false);
+pref("extensions.alpheios.features.alpheios-speech",true);
 pref("extensions.alpheios.cmds.alpheios-inflect-cmd","handleInflections");
 pref("extensions.alpheios.cmds.alpheios-morph-inflect-cmd","handleInflectionsForMorphWindow");
 pref("extensions.alpheios.cmds.alpheios-grammar-cmd","openGrammar");

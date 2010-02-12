@@ -199,46 +199,7 @@
                     <menuitem
                         id="alpheios-toggle-mm" 
                         label="&alpheios.inline.enable.tm;"
-                        command="alpheios-toggle-cmd"/>
-                    <menu
-                        id="alpheios-userdata-commands" 
-                        observes="alpheios-userdata-broadcaster"
-                        tooltiptext="&alpheios.menu.userdata.tooltip;"
-                        label="&alpheios.menu.userdata;">
-                        <menupopup>
-                            <menuitem
-                                id="alpheios-user.backup-mm"
-                                label="&alpheios.menu.backup;"
-                                tooltiptext="&alpheios.menu.backup.tooltip;"
-                                command="alpheios-user.backup-cmd"/>
-                            <menuitem
-                                id="alpheios-user.restore-mm"
-                                label="&alpheios.menu.restore;"
-                                tooltiptext="&alpheios.menu.restore.tooltip;"
-                                command="alpheios-user.restore-cmd"/>
-                            <menuitem
-                                id="alpheios-user.clear-mm"
-                                label="&alpheios.menu.clear;"
-                                tooltiptext="&alpheios.menu.clear.tooltip;"
-                                command="alpheios-user.clear-cmd"/>
-                        </menupopup>                 
-                    </menu>                        
-                    <menuitem
-                        id="alpheios-options-button"
-                        label="&alpheios.menu.options;"
-                        tooltiptext="&alpheios.menu.options.tooltip;"
-                        command="alpheios-options-cmd"/>
-                   
-                    <menuitem
-                        id="alpheios-about-mm"
-                        label="&alpheios.menu.about;"
-                        tooltiptext="&alpheios.menu.about.tooltip;"
-                        command="alpheios-about-cmd"/>
-                    <menuitem
-                        id="alpheios-feedback-mm"
-                        label="&alpheios.menu.feedback;"
-                        tooltiptext="&alpheios.menu.feedback.tooltip;"
-                        command="alpheios-feedback-cmd"/>
+                        command="alpheios-toggle-cmd"/>                       
                     <menuitem
                         id="alpheios-site-mm"
                         label="&alpheios.menu.site;"
@@ -265,6 +226,15 @@
                 </menupopup>
             </toolbarbutton>
             <toolbarbutton
+                id="alpheios-level-button-learner"
+                type="radio"
+                group="AlpheiosLevelGroup"
+                class="toolbarbutton-icon"
+                label="&alpheios.menu.level.learner;"
+                command="alpheios-level-learner-cmd"
+                tooltiptext="&alpheios.menu.level.learner.tooltip;"
+                observes="alpheios-pedagogical-status"/>
+            <toolbarbutton
                 id="alpheios-level-button-reader"
                 type="radio"
                 group="AlpheiosLevelGroup"
@@ -274,15 +244,6 @@
                 tooltiptext="&alpheios.menu.level.reader.tooltip;"
                 observes="alpheios-pedagogical-status"
                 checked="true"/>
-            <toolbarbutton
-                id="alpheios-level-button-learner"
-                type="radio"
-                group="AlpheiosLevelGroup"
-                class="toolbarbutton-icon"
-                label="&alpheios.menu.level.learner;"
-                command="alpheios-level-learner-cmd"
-                tooltiptext="&alpheios.menu.level.learner.tooltip;"
-                observes="alpheios-pedagogical-status"/>
             <toolbarbutton
                 id="alpheios-inflection-button"
                 class="toolbarbutton-icon"
@@ -308,6 +269,21 @@
                         label="&alpheios.menu.user.diagram;"
                         tooltiptext="&alpheios.menu.user.diagram.tooltip;"
                         command="alpheios-user-diagram-cmd"/>
+                    <menuitem
+                        id="alpheios-user.backup-mm"
+                        label="&alpheios.menu.backup;"
+                        tooltiptext="&alpheios.menu.backup.tooltip;"
+                        command="alpheios-user.backup-cmd"/>
+                    <menuitem
+                        id="alpheios-user.restore-mm"
+                        label="&alpheios.menu.restore;"
+                        tooltiptext="&alpheios.menu.restore.tooltip;"
+                        command="alpheios-user.restore-cmd"/>
+                    <menuitem
+                        id="alpheios-user.clear-mm"
+                        label="&alpheios.menu.clear;"
+                        tooltiptext="&alpheios.menu.clear.tooltip;"
+                        command="alpheios-user.clear-cmd"/>
                 </menupopup>
             </toolbarbutton>                
             <toolbaritem id="alpheios-lookup-text-tbitem" observes="alpheios-learner-disabled">
@@ -319,9 +295,31 @@
             </toolbaritem>                        
             <toolbarbutton
                 id="alpheios-help-button"                
-                label="&alpheios.help;"                
-                tooltiptext="&alpheios.help.tooltip;"
-                command="alpheios-help-cmd"/>
+                label="&alpheios.help;"
+                type="menu">
+              <menupopup id="alpheios-help-menu">
+                <menuitem
+                        id="alpheios-userguide-button"
+                        label="&alpheios.help.menuitem;"
+                        tooltiptext="&alpheios.help.tooltip;"
+                        command="alpheios-help-cmd"/>                                   
+                <menuitem
+                        id="alpheios-options-button"
+                        label="&alpheios.menu.options;"
+                        tooltiptext="&alpheios.menu.options.tooltip;"
+                        command="alpheios-options-cmd"/>
+                    <menuitem
+                        id="alpheios-feedback-mm"
+                        label="&alpheios.menu.feedback;"
+                        tooltiptext="&alpheios.menu.feedback.tooltip;"
+                        command="alpheios-feedback-cmd"/>                   
+                    <menuitem
+                        id="alpheios-about-mm"
+                        label="&alpheios.menu.about;"
+                        tooltiptext="&alpheios.menu.about.tooltip;"
+                        command="alpheios-about-cmd"/>            
+              </menupopup>
+            </toolbarbutton>
             <toolbarspring/>                                                    
             <toolbaritem observes="alpheios-basic-status">
                 <label id="alpheios-toolbar-hint" value=""/>
