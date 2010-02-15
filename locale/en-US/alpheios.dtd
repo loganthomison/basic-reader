@@ -15,7 +15,7 @@
 <!ENTITY alpheios.menu.feedback.tooltip "Email Feedback on Alpheios">
 <!ENTITY alpheios.menu.about "About">
 <!ENTITY alpheios.menu.about.tooltip "About Alpheios">
-<!ENTITY alpheios.menu.site "Alpheios Site">
+<!ENTITY alpheios.menu.site "Alpheios Home">
 <!ENTITY alpheios.menu.site.tooltip "Open the alpheios.net site">
 <!ENTITY alpheios.menu.lang "Language">
 <!ENTITY alpheios.menu.lang.tooltip "Select Language for Alpheios">
