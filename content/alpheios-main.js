@@ -2136,13 +2136,7 @@ Alph.Main =
      */
     disableToolbar: function(a_enable)
     {
-        // first check to make sure alpheios isn't still enabled in 
-        // any browser tab of any open windows
-        var alpheios_enabled = Alph.BrowserUtils.checkBrowsers( Alph.Main.isEnabled );   
-        if (alpheios_enabled)
-        {            
-            Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-toolbar-disable");                
-        }
+        Alph.BrowserUtils.doAlert(window,"alph-general-dialog-title","alph-error-toolbar-disable");                        
         Alph.$("#alpheios-toolbar").attr("collapsed",true);             
     },
     
