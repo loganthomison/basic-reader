@@ -34,8 +34,8 @@ body {
     overflow: scroll;
 }
 
-.alph-infl-select {
-    width: auto;
+fieldset.alph-infl-select {  
+    margin-right: 10px;
 }
 
 .alph-query-header {
@@ -45,6 +45,7 @@ body {
 .alph-query-infl {
     /**float: left;**/
     clear: both;
+    width: 100%;
 }
 
 .answer {

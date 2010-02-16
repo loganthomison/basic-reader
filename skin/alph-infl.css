@@ -105,9 +105,13 @@ th.always-visible {
   display:table-cell;
 }
 
+tr#headerrow1 th {
+    font-size: 100%;
+}
 
 tr#headerrow1 th:first-child {
     /*visibility: hidden; */ 
+    font-size: 90%;
 }
 
 
@@ -155,7 +159,7 @@ tr.group1row td {
 tr.group1row th {
     border-left: 1px solid #0E2233;
     border-right: none;
-    text-align: left;
+    text-align: left;    
 }
 
 tr.data-row td.emptycell {
@@ -208,6 +212,22 @@ a.footnote:after {
     border: 1px outset #B8B7B5 !important;
     white-space: normal;
     background-color: white;
+}
+
+.alph-tooltip {
+    display: inline;
+    position: absolute;
+    color: #0E2233;
+    padding: 2px;
+    font-size: small !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    border: 1px outset #B8B7B5 !important;
+    white-space: normal;
+    background-color: #5BC8DC !important;
+}
+.has-tooltip {
+    cursor: pointer;
 }
 
 td.highlight-ending {

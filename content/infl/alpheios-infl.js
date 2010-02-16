@@ -705,6 +705,23 @@ Alph.Infl = {
         {
             $(a_elem).text(newtext);        
         }  
+        // if there's a fuller version of the text, use it as a tooltop
+        var fulltext = Alph.BrowserUtils.getString(a_props,"full."+text);
+        if (fulltext)
+        {
+            $(a_elem).addClass("has-tooltip");
+            $(a_elem).hover(
+                function()
+                {                    
+                    Alph.$(this).after(
+                        '<span class="alph-tooltip">' + fulltext + '</span>');
+                },
+                function()
+                {
+                    Alph.$(this).next('.alph-tooltip').remove();
+                }
+            );
+        }
     },
     
     /**
