@@ -1088,6 +1088,7 @@ Alph.Infl = {
         $('.tochead',a_node).click(function() {
             $(this).toggleClass("openmenu")
             $(this).children().toggle();
+            Alph.Infl.resizeWindow(this.contentDocument);
             return false;
         }).children().hide();
     },
