@@ -330,7 +330,7 @@ th.reloading {
  * Index classes
  */
 .tocitem {
-    list-style: url(list-item.gif);
+    list-style: none;
 }
 
 .tochead {
