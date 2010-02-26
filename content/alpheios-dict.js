@@ -168,6 +168,9 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
         (panel_state.status == Alph.Panel.STATUS_HIDE))
     {
         Alph.Main.s_logger.debug("Opening dictionary window");
+        // capture the event data so that it be picked up the next time through
+        // for the actual lookup
+        panel_state.last_data = a_event_data;
         this.open();
         return;
     }
@@ -177,20 +180,21 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     // with one tab/browser per dictionary for multiple dictionaries
     var bro_id = 'alph-dict-body';
     var dict_bro = Alph.$("browser#" + bro_id,this.d_panelElem).get(0);
-    var doc = dict_bro.contentDocument;
+    var dict_doc = dict_bro.contentDocument;
 
     
     // if the popup is being closed, clear the contents and state of the panel
     if (a_event_type == Alph.Constants.EVENTS.REMOVE_POPUP)
     {
-        Alph.$(".loading",doc).remove();
-        Alph.$(".alph-dict-block",doc).remove();
+        Alph.$(".loading",dict_doc).remove();
+        Alph.$(".alph-dict-block",dict_doc).remove();
         panel_state.last_request = null;
+        panel_state.last_data = null;
          // update the panel state with the new contents of the panel
         panel_state.contents[bro_id] =
-            Alph.$("#alph-window",doc).clone();
+            Alph.$("#alph-window",dict_doc).clone();
         panel_state.css[bro_id] =
-            Alph.$("link[rel=stylesheet]",doc).clone();
+            Alph.$("link[rel=stylesheet]",dict_doc).clone();            
         this.updatePanelWindow(panel_state,bro_id);
         return;
     }
@@ -211,8 +215,17 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     {
         return;
     }
+        
+    var word_data = a_event_data || panel_state.last_data || {};
+    // if we can't locate the source of the dictionary request, return without doing anything
+    if (! word_data.src_node)
+    {
+        return;
+        
+    }
+    var doc_browser = Alph.Xlate.getBrowser(word_data.src_node);
     
-    var language_tool = Alph.Main.getLanguageTool(a_bro);
+    var language_tool = Alph.Main.getLanguageTool(doc_browser);
     // we should always have a language_tool here, but
     // if not just do nothing and return quietly
     if (typeof language_tool == "undefined")
@@ -222,18 +235,15 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
 
     // get a callback to the current dictionary
     var dictionary_callback = language_tool.getDictionaryCallback();
-
     
-    // if the dictionary browser has the class "alph-lexicon-output"
-    // the alph-window element in its content document will be updated
-    // with the output of the morphology lookup for the currently selected
-    // word by Alph.Xlate.showTranslation
-    var alph_window = Alph.$("#alph-window",doc).get(0);
+    var src_doc = word_data.src_node.ownerDocument; 
+    
+    var alph_window = Alph.$("#alph-window",src_doc).get(0);
 
     // remove any prior dictionary entries or loading messages
     // from the lexicon display
-    Alph.$(".loading",doc).remove();
-    Alph.$(".alph-dict-block",doc).remove();
+    Alph.$(".loading",dict_doc).remove();
+    Alph.$(".alph-dict-block",dict_doc).remove();
 
 
     // pull the new lemmas out of the alph-window lexicon element
@@ -269,7 +279,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
             // remove the dictionary name from the state
             if (panel_state.dicts[bro_id] != null)
             {
-                language_tool.removeStyleSheet(doc,
+                language_tool.removeStyleSheet(dict_doc,
                     'alpheios-dict-' + panel_state.dicts[bro_id]);
                 panel_state.dicts[bro_id] = null;
             }
@@ -286,7 +296,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
             var lemma_list = Alph.$.map(lemmas,function(a){return a[1]}).join(', ');
             var request_id = (new Date()).getTime()
                 + encodeURIComponent(lemma_list)
-            Alph.$(alph_window).append(
+            Alph.$("#alph-window",dict_doc).append(
                     '<div id="alph-dict-loading" class="loading" ' +
                         'alph-request-id="' + request_id + '">'
                     + Alph.Main.getString("alph-searching-dictionary",[lemma_list])
@@ -308,7 +318,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
                     function(a_data,a_dict_name)
                     {
                         panel_obj.displayDictionary(
-                            language_tool,a_bro,doc,a_data,lemmas,a_dict_name,request);
+                            language_tool,a_bro,dict_doc,a_data,lemmas,a_dict_name,request);
                     },
                     function(a_error,a_dict_name)
                     {
@@ -316,7 +326,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
                                       a_error +
                                       '</div>';
                         panel_obj.displayDictionary(
-                            language_tool,a_bro,doc,err_str,lemmas,a_dict_name,request);
+                            language_tool,a_bro,dict_doc,err_str,lemmas,a_dict_name,request);
                     },
                     function ()
                     {
@@ -334,15 +344,15 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
                                       a_e +
                               '</div>';
                 panel_obj.displayDictionary(
-                     language_tool,a_bro,doc,err_str,lemmas,'',request);
+                     language_tool,a_bro,dict_doc,err_str,lemmas,'',request);
             }
         }
     }
     // update the panel state with the new contents of the panel
     panel_state.contents[bro_id] =
-        Alph.$("#alph-window",doc).clone();
+        Alph.$("#alph-window",dict_doc).clone();
     panel_state.css[bro_id] =
-        Alph.$("link[rel=stylesheet]",doc).clone();
+        Alph.$("link[rel=stylesheet]",dict_doc).clone();
 
     this.updatePanelWindow(panel_state,bro_id);
 };

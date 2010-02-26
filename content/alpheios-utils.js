@@ -330,12 +330,38 @@ Alph.Util = {
         if (params.e_srcDoc  &&
             params.e_proxiedHandler &&
             Alph.BrowserUtils.selectBrowserForDoc(window.opener,params.e_srcDoc))
-        {
+        {            
             params.e_proxiedHandler(a_event);
         }
         else
         {
             Alph.BrowserUtils.debug("Unable to handle proxied event " + a_event);
         }                
+    },
+    
+    /**
+     * Autodetect the language for a document
+     * @param {Document} a_doc the document
+     * @return the language key into the Alph.Languages object for the document's language
+     *         or null if the language either isn't found or isn't supported
+     * @type String
+     */
+    getLanguageForDoc: function(a_doc)
+    {
+        var lang_key = null;
+        var doc_lang = 
+            a_doc.documentElement.getAttribute("xml:lang") ||
+            a_doc.documentElement.getAttribute("lang") ||
+            Alph.$("body",a_doc).attr("xml:lang") ||
+            Alph.$("body",a_doc).attr("lang");
+        if(doc_lang)
+        {
+            doc_lang = Alph.Languages.mapLanguage(doc_lang);
+        }
+        if (doc_lang && Alph.Languages.hasLang(doc_lang))
+        {
+            lang_key = doc_lang;                    
+        }
+        return lang_key;
     }
 };

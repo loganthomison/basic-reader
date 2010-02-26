@@ -147,10 +147,20 @@ Alph.Translation.processTranslation = function(a_href,a_data,a_bro,a_trans_doc) 
     var new_doc = (new DOMParser()).parseFromString(
                             a_data,
                             "application/xhtml+xml");
-    Alph.$("head",a_trans_doc).html(Alph.$("head",new_doc).contents())
-    Alph.$("body",a_trans_doc).html(Alph.$("body",new_doc).contents());
-    Alph.$("head",a_trans_doc).append('<meta name="DC.source" content="' + a_href + '"></meta>');
-
+    var doclang = new_doc.documentElement.getAttribute("xml:lang") ||
+                  new_doc.documentElement.getAttribute("xml:lang");                    
+    var title = Alph.$("title",new_doc).text();
+    Alph.$("head",a_trans_doc)
+        .html('<title>' + title + '</title>\n<meta name="DC.source" content="' + a_href + '"></meta>');
+    Alph.$("head",a_trans_doc).append(Alph.$("meta",new_doc).clone());
+    Alph.$("head",a_trans_doc).append(Alph.$("link",new_doc).clone());
+    Alph.$("body",a_trans_doc).after(Alph.$("body",new_doc).clone()).remove();
+    if (doclang && ! Alph.$("body",a_trans_doc).attr("lang"))
+    {
+        Alph.$("body",a_trans_doc).attr("lang",doclang);
+    }
+           
+    Alph.Translation.updateAlpheiosState(a_trans_doc);
     // setup the display
     Alph.Site.setupPage([a_trans_doc],'trans');
                         
@@ -162,8 +172,72 @@ Alph.Translation.processTranslation = function(a_href,a_data,a_bro,a_trans_doc) 
         
     }
     Alph.Translation.setInterlinearToggle(disable_interlinear);                       
-},
+};
 
+/**
+ * updates the Translation Panel browser's alpheios state object
+ * @param {Document} a_doc the currently loaded documnet
+ */
+Alph.Translation.updateAlpheiosState = function(a_doc) 
+{
+    var panel_browser = Alph.$("#alph-trans-panel browser").get(0);
+    var state_obj = Alph.Main.getStateObj(panel_browser)
+    var lang_key = Alph.Util.getLanguageForDoc(a_doc);
+    if (lang_key)
+    {                
+        state_obj.setVar("current_language",lang_key)
+        state_obj.setVar("enabled",true);
+        var lang_tool = Alph.Languages.getLangTool(lang_key);
+        var trigger = lang_tool.getPopupTrigger();        
+        Alph.Main.setXlateTrigger(panel_browser,trigger,false);        
+    }
+    else
+    {
+        Alph.Main.removeXlateTrigger(panel_browser);
+        state_obj.setVar("current_language",null)
+        state_obj.setVar("enabled",false);
+    }
+}
+
+/**
+ * If the supplied document is in the translation panel, return its parent
+ * browser 
+ * @param {Document} a_doc the document
+ * @return the browser or null if it's not in the translation panel
+ * @type Browser
+ */
+Alph.Translation.getBrowser = function(a_doc)
+{
+    var browser = null;
+    if (a_doc.defaultView.name == "alph-trans-panel-primary")
+    {
+        browser = Alph.$("#alph-trans-panel browser#alph-trans-panel-primary").get(0);     
+    }
+    return browser;    
+};
+
+/**
+ * Respond to a change in mode (i.e. quiz or reading)
+ * @param {String} a_mode the new mode
+ */
+Alph.Translation.setCurrentMode = function(a_mode)
+{
+    var browser = Alph.$("#alph-trans-panel browser#alph-trans-panel-primary").get(0);
+    if (Alph.Main.isEnabled(browser))
+    {
+        // show the trigger hint in reading mode
+        if (a_mode == Alph.Constants.LEVELS.READER)
+        {
+            Alph.$(".alpheios-trigger-hint",browser.contentDocument).css("visibility","visible");    
+        }
+        // otherwise hide the trigger hint
+        else
+        {
+            Alph.$(".alpheios-trigger-hint",browser.contentDocument).css("visibility","hidden");
+        }        
+    }
+    // nothing to do if the tools aren't enabled
+}
 
 /**
  * Translation panel specific implementation of 

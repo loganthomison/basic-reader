@@ -807,7 +807,15 @@ Alph.LanguageTool.prototype.openDiagram = function(a_event,a_title,a_node,a_para
     var thisObj = this;   
     if (! a_title)
     {
-        a_title = 'alph-diagram-window';
+        // translation panel and source document diagrams should open in separate windows
+        if (Alph.Translation.getBrowser(Alph.$(a_node).get(0).ownerDocument))
+        {
+            a_title = 'alph-trans-diagram-window';   
+        } 
+        else
+        {
+            a_title = 'alph-diagram-window';
+        }
     }
     
     var features = {};
@@ -938,7 +946,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
         /**
          * @ignore
          */
-        params.callback = function() { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument) };
+        params.callback = function() { Alph.Xlate.hideLoadingMessage(Alph.$(a_node).get(0).ownerDocument) };
         loading_node = Alph.$("#alph-word-tools",a_node).get(0);
     }
     else
@@ -1536,7 +1544,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
                 Alph.$(a_node).get(0).ownerDocument) > 0)
         {   
             diagram_func = function(a_e)
-            {
+            {                
                 Alph.Xlate.showLoadingMessage([tools_node,Alph.Main.getString("alph-loading-misc")]);
                 lang_tool[diagram_cmd](a_e,null,Alph.$(a_node).get(0),{tbrefs:a_target.getTreebankRef()});
                 return false;
@@ -1575,7 +1583,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         Alph.$('#alph-word-tools .alph-dict-link',a_node).click(
             function(a_event)
             {
-                Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_DICT);
+                Alph.Main.broadcastUiEvent(Alph.Constants.EVENTS.SHOW_DICT,{src_node: Alph.$(a_node).get(0)});
             }
         );
     }
@@ -1591,11 +1599,11 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             'alt="' + inflect_alt_text + '"/>' + 
             '<div class="alpheios-icon-label">' + inflect_alt_text + '</div></div>'
         );
-        var loading_msg = Alph.Main.getString("alph-loading-inflect");
+
         Alph.$('#alph-word-tools .alph-inflect-link',a_node).click(
             function(a_e)
             {
-                Alph.Xlate.showLoadingMessage([tools_node,loading_msg]);
+                Alph.Xlate.showLoadingMessage([tools_node,Alph.Main.getString("alph-loading-inflect")]);
                 lang_tool.handleInflections(a_e,a_node);
                 return false;
             }
@@ -1604,8 +1612,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     
     if (this.getFeature('alpheios-speech') && Alph.BrowserUtils.getPref("url.speech",this.d_sourceLanguage))
     {
-        var alt_text = Alph.Main.getString('alph-speech-link');
-        var loading_msg = Alph.Main.getString("alph-loading-speech");
+        var alt_text = Alph.Main.getString('alph-speech-link');        
         var link = Alph.$(
             '<div class="alph-tool-icon alpheios-button alph-speech-link" ' +
             'href="#alpheios-speech" title="' + alt_text + '">' +
@@ -1613,10 +1620,10 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
             'alt="' + alt_text + '"/>' + 
             '<div class="alpheios-icon-label">' + alt_text + '</div></div>',a_node
         );
-        Alph.$(link).click(
+        link.click(
             function(a_e)
             {
-                Alph.Xlate.showLoadingMessage([tools_node,loading_msg]);
+                Alph.Xlate.showLoadingMessage([tools_node,Alph.Main.getString("alph-loading-speech")]);
                 lang_tool.handleSpeech(a_e,a_node);
                 return false;
             }
@@ -1702,9 +1709,8 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
         function(a_e)
         {
             if ( Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument))
-            {
-                var loading_msg = Alph.Main.getString("alph-loading-inflect");
-                Alph.Xlate.showLoadingMessage([tools,loading_msg]);
+            {                
+                Alph.Xlate.showLoadingMessage([tools,Alph.Main.getString("alph-loading-inflect")]);
                 lang_tool.handleInflections(a_e,a_node);
             }
             else if (from_tree)
@@ -1720,10 +1726,10 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
     Alph.$('.alph-dict-link',tools).click(
         function(a_event)
         {
-            if (Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument))
+            if (Alph.BrowserUtils.selectBrowserForDoc(window,Alph.$(a_node).get(0).ownerDocument))
             {
                 Alph.Main.broadcastUiEvent(
-                    Alph.Constants.EVENTS.SHOW_DICT);
+                    Alph.Constants.EVENTS.SHOW_DICT,{src_node: Alph.$(a_node).get(0)});
             }
             else if (from_tree)
             {
@@ -1735,8 +1741,25 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
             }
             return false;
         }
+    );    
+    Alph.$(".alph-speech-link",tools).click(
+        function(a_e)
+        {
+            if ( Alph.BrowserUtils.selectBrowserForDoc(window,Alph.$(a_node).get(0).ownerDocument))
+            {                
+                Alph.Xlate.showLoadingMessage([tools,Alph.Main.getString("alph-loading-speech")]);
+                lang_tool.handleSpeech(a_e,a_node);
+            }
+            else if (from_tree)
+            {
+                Alph.$(".alph-speech-link",a_node).click();
+            }
+            else {
+                alert("Unable to locate source browser");
+            }
+            return false;
+        }
     );
-
     return tools;
 }
 
@@ -1948,10 +1971,10 @@ Alph.LanguageTool.prototype.handleSpeech= function(a_event,a_node)
         timeout: Alph.BrowserUtils.getPref("url.speech.timeout",lang_obj.d_sourceLanguage),
         error: function(req,textStatus,errorThrown)
         {
-            Alph.Xlate.hideLoadingMessage(a_node.ownerDocument);
+            Alph.Xlate.hideLoadingMessage(Alph.$(a_node).get(0).ownerDocument);
         },
         success: function(data, textStatus)
-        { Alph.Xlate.hideLoadingMessage(a_node.ownerDocument); }
+        { Alph.Xlate.hideLoadingMessage(Alph.$(a_node).get(0).ownerDocument); }
     });
 };
 

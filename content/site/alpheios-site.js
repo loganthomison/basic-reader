@@ -188,14 +188,14 @@ Alph.Site = {
             this.addInterlinearToggle(a_docs);
         }
         
-        this.enableToolbar(a_docs);
-        var bro = Alph.Main.getCurrentBrowser();
-        var trigger = Alph.Main.getXlateTrigger(bro);
-        var lang_tool = Alph.Main.getLanguageTool(bro);
+        this.enableToolbar(a_docs);        
         // run site-defined alpheios enabled event handler
         a_docs.forEach(
             function(a_doc)
             {
+                var bro = Alph.Xlate.getBrowser(a_doc);
+                var trigger = Alph.Main.getXlateTrigger(bro);
+                var lang_tool = Alph.Main.getLanguageTool(bro);
                 Alph.Site.addTriggerHint(bro,a_doc,trigger,lang_tool);
                 var callback_elem = Alph.$("#alpheios-enabled-callback",a_doc).get(0);
                 if (callback_elem)

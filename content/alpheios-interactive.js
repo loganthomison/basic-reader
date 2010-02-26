@@ -203,6 +203,12 @@ Alph.Interactive = {
         // event handler so 'this' is the element that was clicked on or selected
         var selection = this;
         
+        // don't do anything if we're not in query  mode
+        if (! Alph.Interactive.enabled())
+        {
+            return;
+        }
+        
         // make each word in the alignment only selectable once
         Alph.$(selection).unbind('click',Alph.Interactive.checkAlignedSelect);
         

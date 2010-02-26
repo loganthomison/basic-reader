@@ -38,8 +38,21 @@ Alph.Diagram.load = function()
 {
     var params = typeof window.arguments != "undefined" ? 
                     window.arguments[0] : {};
-    
-                        
+    var parent_browser;
+    // if the source document was in the translation panel, identification of its parent
+    // browser should fail. more work is needed to get the popup working in the diagram
+    // when the source document is in the translation panel, so application of the trigger
+    // event should be dependent upon parent_browser being defined
+    if (params.e_srcDoc)
+    {
+        try 
+        {
+            parent_browser = Alph.BrowserUtils.browserForDoc(window.opener,params.e_srcDoc);
+        } catch(a_e)
+        {
+            Alph.Util.warn("error identifying source browser for diagram:" + a_e );
+        }        
+    }                        
     var browser = document.getElementById("alpheios-diagram-content");    
     browser.setAttribute('src',params.e_url);
     // resize the window to fit the tree
@@ -119,15 +132,13 @@ Alph.Diagram.load = function()
                                     
             // add the trigger hint
             var trigger = params.e_langTool.getPopupTrigger();
-            if (trigger && params.e_srcDoc)
-            {
-                var parent_browser = 
-                    Alph.BrowserUtils.browserForDoc(window.opener,params.e_srcDoc);
+            if (trigger && parent_browser)
+            {                
                 window.opener.Alph.Site
-                        .addTriggerHint(parent_browser,this.contentDocument,trigger,params.e_langTool);
+                    .addTriggerHint(parent_browser,this.contentDocument,trigger,params.e_langTool);               
             }
         },true);
-    if (params.e_proxiedEvent && params.e_proxiedHandler && params.e_srcDoc)
+    if (params.e_proxiedEvent && params.e_proxiedHandler && parent_browser)
     {
         Alph.Util.addProxiedEvent(window,browser,params.e_proxiedEvent);    
     }

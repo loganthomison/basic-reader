@@ -324,6 +324,11 @@ div.alph-morph {
     height: 32px;    
     margin-top: 2px;
 }
+.alpheios-icon-label {
+   font-size: 10px;
+   font-family:  Arial, sans-serif !important;
+}
+
 .smallicons .alph-tool-icon {
     width: 18px;
     height: 18px;

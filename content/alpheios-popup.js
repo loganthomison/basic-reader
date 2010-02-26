@@ -92,6 +92,12 @@ Alph.Xlate = {
             rp.firstChild &&
             rp.firstChild.nodeType == 3
         );
+        // disable the popup in the translation panel in quiz mode
+        if (Alph.Interactive.enabled() && Alph.Translation.getBrowser(rp.ownerDocument))
+        {
+            return;
+        }
+        
         // if no data, nothing to do
         if (typeof rp == "undefined" || rp == null ||
             (! rp.data && ! is_svg_text))
@@ -229,8 +235,9 @@ Alph.Xlate = {
 
             this.clearSelection();
             return;
-        }
-        var alphtarget = Alph.Main.getLanguageTool().findSelection(ro,rngstr);
+        }        
+        var browser = Alph.Xlate.getBrowser(rp);
+        var alphtarget = Alph.Main.getLanguageTool(browser).findSelection(ro,rngstr);
 
         // if we couldn't identify the target word, return without doing anything
         if (! alphtarget.getWord())
@@ -249,7 +256,7 @@ Alph.Xlate = {
         // unless we're in query  mode and the popup isn't showing,
         // in which case selecting the same word
         // again should act like a reset
-        var alph_state = Alph.Main.getStateObj();
+        var alph_state = Alph.Main.getStateObj(browser);
         var lastSelection = alph_state.getVar("lastSelection");
         if (alphtarget.equals(lastSelection) )
         {
@@ -314,8 +321,7 @@ Alph.Xlate = {
             if (!treebank_url && is_svg_text )
             {
                 treebank_url =
-                    Alph.Site.getTreebankUrl(
-                        Alph.Main.getCurrentBrowser().contentDocument);
+                    Alph.Site.getTreebankUrl(browser.contentDocument);
             }
             if (treebank_url)
             {
@@ -944,9 +950,10 @@ Alph.Xlate = {
         var a_y = a_e.screenY;
         var pageX = a_e.pageX;
         var pageY = a_e.pageY;
-        var lang_tool = Alph.Main.getLanguageTool();
+        var browser = Alph.Xlate.getBrowser(a_elem);
+        var lang_tool = Alph.Main.getLanguageTool(browser);
         const topdoc = a_elem.ownerDocument;
-        var alph_state = Alph.Main.getStateObj();
+        var alph_state = Alph.Main.getStateObj(browser);
         var popup;
         // check the alpheios state object for the prior element
         if (alph_state.getVar("lastElem"))
@@ -957,7 +964,7 @@ Alph.Xlate = {
         // the current one, remove it from the prior document
         if (popup && (topdoc != alph_state.getVar("lastElem").ownerDocument))
         {
-            this.removePopup(Alph.Main.getCurrentBrowser());
+            this.removePopup(browser);
             popup = null;
         }
 
@@ -1003,7 +1010,7 @@ Alph.Xlate = {
             Alph.$(".alph-close-button",topdoc).bind("click",
                 function()
                 {
-                    Alph.Xlate.hidePopup()
+                    Alph.Xlate.hidePopup(this.ownerDocument);
                 }
             );
 
@@ -1705,6 +1712,32 @@ Alph.Xlate = {
             }
             popup_elem.style.left = new_left + 'px'; 
         }
+    },
+    
+    /**
+     * get the owner browser for the request
+     * @param {Element} a_node the selected page element or document
+     * @return the owner browser
+     * @type Browser
+     */
+    getBrowser: function(a_node)
+    {
+        /// try to identify the current browser from the owner document of the selected element
+        var doc = a_node.ownerDocument ? a_node.ownerDocument : a_node;
+        var browser;
+        try {
+            browser = Alph.BrowserUtils.browserForDoc(window,doc);
+        } catch(a_e)
+        {         
+            Alph.Main.s_logger.warn("Error identifying browser for document: " + a_e);
+        }
+        if (! browser)
+        {
+            // if unable to do that, check to see if it's in the translation panel
+            // if not, fall back to default behavior of getting the current browser in the window
+            browser = Alph.Translation.getBrowser(doc) || Alph.Main.getCurrentBrowser();
+        }
+        return browser;
     }
 
 };

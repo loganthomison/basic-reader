@@ -346,21 +346,11 @@ Alph.Main =
             {            
                 var docs = this.getBrowserDocs(a_bro);
                 for (var i=0; i< docs.length; i++)
-                {
-                    var doc = docs[i];
-                    var doc_lang = 
-                        doc.documentElement.getAttribute("xml:lang") ||
-                        doc.documentElement.getAttribute("lang") ||
-                        Alph.$("body",doc).attr("xml:lang") ||
-                        Alph.$("body",doc).attr("lang");
-                    if(doc_lang)
-                    {
-                        doc_lang = Alph.Languages.mapLanguage(doc_lang);
-                    }
-                    if (doc_lang && Alph.Languages.hasLang(doc_lang))
-                    {
+                {                    
+                    var lang_key = Alph.Util.getLanguageForDoc(docs[i]);
+                    if (lang_key){
                         // use the first supported language we find
-                        a_lang = doc_lang;
+                        a_lang = lang_key;
                         break;
                    }
                 }
@@ -1056,9 +1046,15 @@ Alph.Main =
      * from one trigger to another
      * @param a_bro the subject browser
      * @param {String} a_trigger the trigger event name
+     * @param {Boolean} a_broadcast flag to indicate whether or not to broadcast the event
      */
-    setXlateTrigger: function(a_bro, a_trigger)
+    setXlateTrigger: function(a_bro, a_trigger,a_broadcast)
     {
+        // broadcast the event by default if not instructed otherwise
+        if (typeof a_broadcast == "undefined")
+        {
+            a_broadcast = true;
+        }
         // trigger is hard-coded to dble-click in quiz mode
         if (a_trigger == 'mousemove' && this.getStateObj(a_bro).getVar("level") == Alph.Constants.LEVELS.LEARNER)
         {
@@ -1070,7 +1066,10 @@ Alph.Main =
         
         a_bro.addEventListener(a_trigger, this.doXlateText, false);
         this.getStateObj(a_bro).setVar("xlate_trigger",a_trigger);
-        this.setTbHints();
+        if (a_broadcast)
+        {
+            this.setTbHints();
+        }
         // update the trigger in any secondary windows opened by this browser
         var windows = Alph.Main.getStateObj(a_bro).getVar("windows");
         for (var win in windows)
@@ -1096,12 +1095,14 @@ Alph.Main =
                 Alph.Main.s_logger.error("Error updating window " + win + " : " + a_e);                           
             }               
         }
-        this.broadcastUiEvent(Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER,
-            {new_trigger: a_trigger,
-             old_trigger: old_trigger
-            }
-        );
-        
+        if (a_broadcast)
+        {
+            this.broadcastUiEvent(Alph.Constants.EVENTS.UPDATE_XLATE_TRIGGER,
+                {new_trigger: a_trigger,
+                 old_trigger: old_trigger
+                }
+            );
+        }        
     },
     
     /**
@@ -1804,6 +1805,7 @@ Alph.Main =
         
         // update the site toolbar
         Alph.Site.setCurrentMode(Alph.Main.getBrowserDocs(a_bro),new_mode);
+        Alph.Translation.setCurrentMode(new_mode);
         // make sure the ff toolbar button has the right state
         Alph.$("toolbarbutton[group=AlpheiosLevelGroup]").each(
             function() { this.setAttribute("checked",'false');}
