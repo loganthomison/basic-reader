@@ -32,8 +32,7 @@
                         type="bool"/>
         </preferences>
         <tabbox>
-            <tabs id="alpheios-prefs-feature-tabs">
-                <tab label="&alpheios.prefs.toolbar;"/>
+            <tabs id="alpheios-prefs-feature-tabs">                
                 <tab label="&alpheios.prefs.lookup;"/>
                 <tab label="&alpheios.prefs.interlinear;"/>
             </tabs>
