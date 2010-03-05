@@ -196,7 +196,10 @@ Alph.Site = {
                 var bro = Alph.Xlate.getBrowser(a_doc);
                 var trigger = Alph.Main.getXlateTrigger(bro);
                 var lang_tool = Alph.Main.getLanguageTool(bro);
-                Alph.Site.addTriggerHint(bro,a_doc,trigger,lang_tool);
+                if (lang_tool)
+                {
+                    Alph.Site.addTriggerHint(bro,a_doc,trigger,lang_tool);
+                }                    
                 var callback_elem = Alph.$("#alpheios-enabled-callback",a_doc).get(0);
                 if (callback_elem)
                 {
@@ -284,7 +287,8 @@ Alph.Site = {
                 {alpheios_cmd_id: 'alpheios-help-cmd'},
                 this.doCommandHandler
             );
-            var lang_tool = Alph.Main.getLanguageTool();
+            var bro = Alph.Xlate.getBrowser(a_doc);
+            var lang_tool = Alph.Main.getLanguageTool(bro);
             var wordlist;
             if (lang_tool)
             {
@@ -677,7 +681,8 @@ Alph.Site = {
             this.execute = function()
             {
                 var next_offset = 0;
-                var wordlist = Alph.Main.getLanguageTool().getWordList();
+                var bro = Alph.Xlate.getBrowser(a_source);
+                var wordlist = Alph.Main.getLanguageTool(bro).getWordList();
                 Alph.Site.s_logger.debug("Start inserting interlinear.");
                 // add the aligned text to each source word
                 a_words.forEach(
@@ -720,8 +725,9 @@ Alph.Site = {
                                        }
                                        var id_copy = Alph.$(Alph.$(elem)[0]).clone().appendTo(parent);
                                        Alph.$(id_copy).attr("id", "il-" + my_ids[i]);
-                                       Alph.$(id_copy).addClass("alpheios-aligned-trans").css("display","inline");
+                                       Alph.$(id_copy).addClass("alpheios-aligned-trans").css("display","inline");                                       
                                        Alph.$(id_copy).removeClass("alpheios-aligned-word");
+                                       Alph.$(id_copy).addClass("alpheios-ignore");
                                        Alph.$(id_copy).css("top",offset_top); 
                                        Alph.$(id_copy).css("left",offset_left + next_offset);
                                        offset_left = offset_left + Alph.$(id_copy).width();

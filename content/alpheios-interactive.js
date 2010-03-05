@@ -62,8 +62,10 @@ Alph.Interactive = {
     /**
       * Opens a new window with the query display 
       * @param {Document} a_topdoc the contentDocument which contains the popup
+      * @param {Alph.SourceSelection} a_target the target selection
+      * @param {Alph.LanguageTool} a_langTool the language tool
       */
-     openQueryDisplay: function(a_topdoc,a_target)
+     openQueryDisplay: function(a_topdoc,a_target,a_langTool)
      {
         var popup = a_topdoc.getElementById('alph-window');
         if (! this.enabled())
@@ -73,9 +75,8 @@ Alph.Interactive = {
             return;
         }
         
-        var browser = Alph.BrowserUtils.browserForDoc(window,a_topdoc) || Alph.Main.getCurrentBrowser();
-        var lang_tool = Alph.Main.getLanguageTool(browser);
-        var pofs_list = lang_tool.getPofs();
+        var browser = Alph.BrowserUtils.browserForDoc(window,a_topdoc) || Alph.Main.getCurrentBrowser();              
+        var pofs_list = a_langTool.getPofs();
         var valid_pofs = Alph.$('#alph-text .alph-pofs',popup).attr('context');
         var has_pofs = false;
         for (var p_i = 0; p_i < pofs_list.length; p_i++)
@@ -108,7 +109,7 @@ Alph.Interactive = {
         }
         var params =
         {
-            lang_tool: lang_tool,
+            lang_tool: a_langTool,
             main_str: Alph.Main.d_stringBundle,
             source_node: Alph.$("#alph-text",popup).get(0),
             source_align: source_align || [],
@@ -124,7 +125,7 @@ Alph.Interactive = {
             if (source_align.length > 0)
             {
                 var selected_word = Alph.$(".alph-word",popup).attr("context");
-                var src_lang = lang_tool.d_sourceLanguage; 
+                var src_lang = a_langTool.d_sourceLanguage; 
                 Alph.$(popup).addClass("alpheios-inline-query");
                 Alph.$("#alph-text",popup).append(
                     '<div id="alph-inline-query-instruct">' +

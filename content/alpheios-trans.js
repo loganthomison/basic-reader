@@ -209,10 +209,13 @@ Alph.Translation.updateAlpheiosState = function(a_doc)
 Alph.Translation.getBrowser = function(a_doc)
 {
     var browser = null;
-    if (a_doc.defaultView.name == "alph-trans-panel-primary")
+    try 
     {
-        browser = Alph.$("#alph-trans-panel browser#alph-trans-panel-primary").get(0);     
-    }
+        if (a_doc.defaultView.name == "alph-trans-panel-primary")
+        {
+            browser = Alph.$("#alph-trans-panel browser#alph-trans-panel-primary").get(0);     
+        }
+    } catch(a_e) {}
     return browser;    
 };
 

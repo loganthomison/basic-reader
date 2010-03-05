@@ -579,8 +579,7 @@ function(a_ro, a_rngstr)
         context_str =
             pre_wordlist.join(" ") + " " + post_wordlist.join(" ");
         context_pos = pre_wordlist.length - 1;
-    }
-
+    }    
     result.setWord(word);
     result.setWordStart(nonWS + wordStart);
     result.setWordEnd(nonWS + wordEnd);

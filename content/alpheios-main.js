@@ -357,22 +357,8 @@ Alph.Main =
                 // if we still don't know the language, ask the user to choose
                 if (! a_lang)
                 {                  
-                    var lang_strs = [];
-                    for (var i=0; i<lang_list.length; i++)
-                    {
-                        lang_strs.push(this.getLanguageString(lang_list[i],lang_list[i]+'.string'));             
-                    }
-                    var selected = Alph.BrowserUtils.doSelect(
-                        window,
-                        'alpheios-select-language-title',
-                        'alpheios-select-language-text',
-                        lang_strs                        
-                        );
-                    if (selected >= 0)
-                    {
-                        a_lang = lang_list[selected];
-                    }
-                    else
+                    a_lang = Alph.Main.doLangSelect();
+                    if (! a_lang)                                        
                     {
                         // user didn't select a language, don't enable the tools                 
                         var err_msg = this.getString();
@@ -929,6 +915,31 @@ Alph.Main =
         return languages_set;
     },
     
+    /**
+     * Display Language Selection popup
+     * @return the key of the language selected or null on cancel or escape
+     */
+    doLangSelect: function()
+    {
+        var lang_list = Alph.Languages.getLangList();
+        var lang_strs = [];
+        for (var i=0; i<lang_list.length; i++)
+        {
+            lang_strs.push(this.getLanguageString(lang_list[i],lang_list[i]+'.string'));             
+        }
+        var lang_key = null;
+        var selected = Alph.BrowserUtils.doSelect(
+               window,
+               'alpheios-select-language-title',
+               'alpheios-select-language-text',
+               lang_strs                        
+               );
+        if (selected >= 0)
+        {
+           lang_key = lang_list[selected];
+        }
+        return lang_key;
+    },
    
     /**
      * Set the current language in use by the browser window.
@@ -950,20 +961,25 @@ Alph.Main =
         {   
             return this.alphInlineToggle(bro,a_lang);
         }
+        // prompt the user if the language key wasn't supplied
+        if (! a_lang)
+        {
+            a_lang = Alph.Main.doLangSelect();    
+        }        
         if (! Alph.Languages.hasLang(a_lang))
         {
             //TODO handle error more fully?
-            alert("Alpheios language " + a_lang + "is not available");
+            alert("Alpheios language " + a_lang + " is not available");
         }
         else
         {
-            var old_lang_tool = this.getLanguageTool();
+            var old_lang_tool = this.getLanguageTool(bro);
             
             // set the new language but hold onto a copy of the old language
             // tool for use in clearing out the browser
             this.getStateObj(bro).setVar("current_language",a_lang);
             
-            var lang_tool = this.getLanguageTool();
+            var lang_tool = this.getLanguageTool(bro);
             
             // remove the popoup and stylesheets 
             // from the prior language, if any
@@ -996,23 +1012,40 @@ Alph.Main =
     /**
      * Get the Alph.LanguageTool instance for the current language.
      * @param {Browser} a_bro the browser from which to retrieve the language tool
-     *                        (if not supplied, the current browser is used) 
+     *                        (if not supplied, the current browser is used)
+     * @param {Element} a_elem the target element 
+     *                         (optional, if not supplied, the language for the
+     *                         document is assumed)                         
      * @return the Alph.LanguageTool instance for the current language
      *         or undefined if the language isn't set or the extension 
      *         isn't enabled
      * @type Alph.LanguageTool
      */
-    getLanguageTool: function(a_bro)
+    getLanguageTool: function(a_bro,a_elem)
     {
-        if (typeof a_bro == "undefined")
+        if (typeof a_bro == "undefined" || a_bro == null)
         {
             a_bro = this.getCurrentBrowser();
         }
-        var lang_tool;
+        var lang_tool;        
         if (this.isEnabled(a_bro))
         {
-            lang_tool = 
-                Alph.Languages.getLangTool(this.getStateObj(a_bro).getVar("current_language"));
+            var lang_key;  
+            // if we have a specific element, try to get the language
+            // tool for the element
+            if (a_elem)
+            {
+                lang_key = Alph.Util.getLanguageForElement(a_elem);               
+            }
+            // fallback to the language for the browser
+            if (!lang_key)
+            {
+                lang_key = this.getStateObj(a_bro).getVar("current_language");
+            }
+            if (lang_key)
+            {
+                lang_tool = Alph.Languages.getLangTool(lang_key);
+            }
         }
         return lang_tool;
     },
@@ -1160,7 +1193,7 @@ Alph.Main =
         {
             return;
         }
-        var lang_tool = this.getLanguageTool();
+        var lang_tool = this.getLanguageTool(bro);
         var target= new Alph.SourceSelection();
         target.setWord(word);
         target.setWordStart(0);
@@ -1220,8 +1253,9 @@ Alph.Main =
      */
     updateToolsMenu: function()
     {
-        var lang_tool = Alph.Main.getLanguageTool();
+        
         var bro = this.getCurrentBrowser();
+        var lang_tool = Alph.Main.getLanguageTool(bro);
         
         // check the language-specific feature notifiers
         Alph.$("broadcaster.alpheios-language-notifier").each(

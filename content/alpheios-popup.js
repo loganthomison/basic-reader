@@ -237,7 +237,7 @@ Alph.Xlate = {
             return;
         }        
         var browser = Alph.Xlate.getBrowser(rp);
-        var alphtarget = Alph.Main.getLanguageTool(browser).findSelection(ro,rngstr);
+        var alphtarget = Alph.Main.getLanguageTool(browser,a_e.explicitOriginalTarget).findSelection(ro,rngstr);
 
         // if we couldn't identify the target word, return without doing anything
         if (! alphtarget.getWord())
@@ -559,7 +559,7 @@ Alph.Xlate = {
             {
                 a_lang_tool.addToWordList(Alph.$("#alph-window #alph-text",a_topdoc),false,false);
             }
-            Alph.Interactive.openQueryDisplay(a_topdoc,a_alphtarget);
+            Alph.Interactive.openQueryDisplay(a_topdoc,a_alphtarget,a_lang_tool);
         }
 
     },
@@ -931,7 +931,7 @@ Alph.Xlate = {
         {
             a_lang_tool.addToWordList(Alph.$("#alph-window #alph-text",a_topdoc),false,false);
         }
-        Alph.Interactive.openQueryDisplay(a_doc_array[0],a_alphtarget);
+        Alph.Interactive.openQueryDisplay(a_doc_array[0],a_alphtarget,a_lang_tool);
     },
 
     /**
@@ -951,7 +951,7 @@ Alph.Xlate = {
         var pageX = a_e.pageX;
         var pageY = a_e.pageY;
         var browser = Alph.Xlate.getBrowser(a_elem);
-        var lang_tool = Alph.Main.getLanguageTool(browser);
+        var lang_tool = Alph.Main.getLanguageTool(browser,a_elem);
         const topdoc = a_elem.ownerDocument;
         var alph_state = Alph.Main.getStateObj(browser);
         var popup;

@@ -190,14 +190,15 @@
                  toolbarname="&alpheios-toolbar-name;"
                  align="center">
             <toolbarbutton
-                id="alpheios-mainmenu-button"
+                id="alpheios-mainmenu-button"                 
                 class="toolbarbutton-icon"
-                label="&alpheios.menu;"
+                label="&alpheios.menu;"                
                 type="menu">
                 <menupopup
                     id="alpheios-main-menu">
                     <menuitem
-                        id="alpheios-toggle-mm" 
+                        id="alpheios-toggle-mm"
+                        accesskey="a"
                         label="&alpheios.inline.enable.tm;"
                         command="alpheios-toggle-cmd"/>                       
                     <menuitem
@@ -212,6 +213,7 @@
                 class="toolbarbutton-icon"
                 label="&alpheios.menu.lang;"
                 insertafter="alpheios-toggle-mm"
+                accesskey="l"
                 command="alpheios-lang-cmd"
                 tooltiptext="&alpheios.menu.lang.tooltip;"
                 type="menu">

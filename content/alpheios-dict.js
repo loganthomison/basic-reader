@@ -225,7 +225,20 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     }
     var doc_browser = Alph.Xlate.getBrowser(word_data.src_node);
     
-    var language_tool = Alph.Main.getLanguageTool(doc_browser);
+    var language_tool;
+    // try to get the language from the source node, and if not, fall 
+    // back to the document's browser language
+    var lang_key = Alph.$(word_data.src_node).attr("alph-lang");
+    Alph.Main.s_logger.debug("Dictionary lookup for language " + lang_key);
+    if (lang_key)
+    {
+        language_tool = Alph.Languages.getLangTool(lang_key); 
+    }
+    else
+    {
+        language_tool = Alph.Main.getLanguageTool(doc_browser);
+    }
+    
     // we should always have a language_tool here, but
     // if not just do nothing and return quietly
     if (typeof language_tool == "undefined")
