@@ -966,10 +966,9 @@ Alph.Main =
         {
             a_lang = Alph.Main.doLangSelect();    
         }        
-        if (! Alph.Languages.hasLang(a_lang))
+        if ((! a_lang) || (! Alph.Languages.hasLang(a_lang)))
         {
-            //TODO handle error more fully?
-            alert("Alpheios language " + a_lang + " is not available");
+            return;            
         }
         else
         {
