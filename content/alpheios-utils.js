@@ -364,7 +364,7 @@ Alph.Util = {
         }
         return lang_key;
     },
-    
+        
     /**
      * Autodetect the language for an element
      * @param {Element} a_elem the document
@@ -375,11 +375,20 @@ Alph.Util = {
     getLanguageForElement: function(a_elem)
     {
         var lang_key = null;
-        var elem_lang = 
-            Alph.$(a_elem).attr("xml:lang") ||
-            Alph.$(a_elem).attr("lang") ||
-            Alph.$(a_elem).parents().attr("xml:lang") ||
-            Alph.$(a_elem).parents().attr("lang");
+        var elem_lang = null;
+        var checkSet = Alph.$(a_elem).add(Alph.$(a_elem).parents());
+        // iterate through the set of the element and its parents
+        // taking the value of the first lang or xml:lang attribute found
+        // order of parents added in checkSet is closest-first
+        for (var i=0; i<checkSet.length; i++)
+        {    
+            var elem = checkSet.eq(i)
+            elem_lang = elem.attr("lang") || elem.attr("xml:lang");
+            if (elem_lang)
+            {
+                break;
+            }
+        }                       
         if(elem_lang)
         {
             elem_lang = Alph.Languages.mapLanguage(elem_lang);
@@ -390,4 +399,5 @@ Alph.Util = {
         }
         return lang_key;
     }
+    
 };
