@@ -3,7 +3,7 @@
  *
  * @version $Id$
  *
- * Copyright 2008-2009 Cantus Foundation
+ * Copyright 2008-2010 Cantus Foundation
  * http://alpheios.net
  *
  * This file is part of Alpheios.
@@ -35,6 +35,8 @@
 Alph.LanguageTool = function(a_language,a_properties)
 {
     this.d_sourceLanguage = a_language;
+    this.d_idsFile = Array();
+    this.d_defsFile = Array();
 
     /**
      * logger for the language
@@ -179,6 +181,61 @@ Alph.LanguageTool.prototype.loadConverter = function()
 {
     this.d_converter = new Alph.Convert();  
 };
+
+/**
+ * load lemma id lookup files
+ * @returns true if successful, otherwise false
+ * @type boolean
+ */
+Alph.LanguageTool.prototype.loadLexIds = function()
+{
+    this.d_idsFile = Array();
+    this.d_fullLexCode = Alph.BrowserUtils.getPref("dictionaries.full",
+                                      this.d_sourceLanguage).split(',');
+    var contentUrl = Alph.BrowserUtils.getContentUrl(this.d_sourceLanguage);
+    var langCode = this.getLanguageCode();
+    var langString = this.getLanguageString();
+
+    for (var i = 0; i < this.d_fullLexCode.length; ++i)
+    {
+        var lexCode = this.d_fullLexCode[i];
+        var fileName = contentUrl +
+                       '/dictionaries/' +
+                       lexCode +
+                       '/' +
+                       langCode +
+                       '-' +
+                       lexCode +
+                       "-ids.dat";
+        try
+        {
+            this.d_idsFile[i] = new Alph.Datafile(fileName, "UTF-8");
+            this.s_logger.info(
+                "Loaded " +
+                langString +
+                " ids for " +
+                this.d_fullLexCode[i] +
+                "[" +
+                this.d_idsFile[i].getData().length +
+                " bytes]");
+        }
+        catch (ex)
+        {
+            // the ids file might not exist, in particular for remote,
+            // non-alpheios-provided dictionaries
+            // so just quietly log the error in this case
+            // later code must take a null ids file into account
+            this.s_logger.error("error loading " +
+                                langString +
+                                " ids from " +
+                                fileName +
+                                ": " +
+                                ex);
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * Initializes lexicon search parameters
@@ -579,7 +636,8 @@ function(a_ro, a_rngstr)
         context_str =
             pre_wordlist.join(" ") + " " + post_wordlist.join(" ");
         context_pos = pre_wordlist.length - 1;
-    }    
+    }
+
     result.setWord(word);
     result.setWordStart(nonWS + wordStart);
     result.setWordEnd(nonWS + wordEnd);
@@ -1543,7 +1601,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
                 Alph.$(a_node).get(0).ownerDocument) > 0)
         {   
             diagram_func = function(a_e)
-            {                
+            {
                 Alph.Xlate.showLoadingMessage([tools_node,Alph.Main.getString("alph-loading-misc")]);
                 lang_tool[diagram_cmd](a_e,null,Alph.$(a_node).get(0),{tbrefs:a_target.getTreebankRef()});
                 return false;
@@ -1611,7 +1669,7 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
     
     if (this.getFeature('alpheios-speech') && Alph.BrowserUtils.getPref("url.speech",this.d_sourceLanguage))
     {
-        var alt_text = Alph.Main.getString('alph-speech-link');        
+        var alt_text = Alph.Main.getString('alph-speech-link');
         var link = Alph.$(
             '<div class="alph-tool-icon alpheios-button alph-speech-link" ' +
             'href="#alpheios-speech" title="' + alt_text + '">' +
@@ -1708,7 +1766,7 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
         function(a_e)
         {
             if ( Alph.BrowserUtils.selectBrowserForDoc(window,a_node.ownerDocument))
-            {                
+            {
                 Alph.Xlate.showLoadingMessage([tools,Alph.Main.getString("alph-loading-inflect")]);
                 lang_tool.handleInflections(a_e,a_node);
             }
@@ -1740,7 +1798,7 @@ Alph.LanguageTool.prototype.getToolsForQuery = function(a_node)
             }
             return false;
         }
-    );    
+    );
     Alph.$(".alph-speech-link",tools).click(
         function(a_e)
         {
