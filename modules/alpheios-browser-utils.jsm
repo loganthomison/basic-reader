@@ -323,10 +323,11 @@ BrowserUtils = {
         
         // gather the list of possible paths to use under
         // the platform directory of the base path 
-        // ... at a minimum the OS much match
         var available_paths = [];
         try 
         {
+            
+            available_paths.push(base_file_dir);
             if (base_file_dir.isDirectory() )
             {
                 var file_iter = base_file_dir.directoryEntries;
@@ -367,15 +368,20 @@ BrowserUtils = {
             preferred_path_order.push(os + "_" + arch); // without compiler
             preferred_path_order.push(os); // OS only
         }
+        // also allow for the possibility that it's in the root platform directory
+        // if the files aren't platform-specific
+        preferred_path_order.push("."); 
         var file;
         var i=0;
         while (typeof file == "undefined" && 
                i < preferred_path_order.length)
         {       
-            var preferred_path;
+            var preferred_path = base_file_dir.clone();
             // add the base_path on to the preferred path
-            (preferred_path = 
-                base_file_dir.clone()).append(preferred_path_order[i])
+            if (preferred_path_order[i] != ".") 
+            {
+                preferred_path.append(preferred_path_order[i]);
+            }                
             for (var j=0; j< available_paths.length; j++)
             {
                 // check for full match on the requested path, 
