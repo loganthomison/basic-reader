@@ -6,7 +6,7 @@
  *
  * @version $Id$
  * 
- * Copyright 2008 Cantus Foundation
+ * Copyright 2008-2010 Cantus Foundation
  * http://alpheios.net
  * 
  * This file is part of Alpheios.
@@ -309,11 +309,16 @@ BrowserUtils = {
         base_file_dir.append(a_base_path);
         base_file_dir.append("platform");
                 
+        // if extension supplied, use it
+        if (a_file_info.length > 2)
+        {
+            a_filename += '.' + a_file_info[2];
+        }
         // if we're looking for an executable, append .exe for the 
         // WINNT OS
-        if (a_is_exe && os == 'WINNT')
+        else if (a_is_exe && os == 'WINNT')
         {
-            a_filename = a_filename + '.exe';
+            a_filename += '.exe';
         }
         
         // gather the list of possible paths to use under
