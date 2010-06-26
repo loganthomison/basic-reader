@@ -1404,13 +1404,23 @@ Alph.LanguageTool.prototype.defaultDictionaryLookup =
             }
             if (a_lemma[0] && lang_obj.d_lexiconSearch[code]["id"])
             {
-                url += "&" +
-                       lang_obj.d_lexiconSearch[code]["id"] +
-                       "=" +
-                       encodeURIComponent(a_lemma[0]);
+                // Note: Not correct for lexicons not supporting
+                // multiple values.
+
+                // for each id
+                var ids = a_lemma[0].split(',');
+                for (var i = 0; i < ids.length; i++)
+                {
+                    // add search for id
+                    url += "&" +
+                           lang_obj.d_lexiconSearch[code]["id"] +
+                           "=" +
+                           encodeURIComponent(ids[i]);
+                }
             }
             else if (a_lemma[1] && lang_obj.d_lexiconSearch[code]["lemma"])
             {
+                // add search for lemma
                 url += "&" +
                        lang_obj.d_lexiconSearch[code]["lemma"] +
                        "=" +
