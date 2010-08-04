@@ -192,6 +192,7 @@ Datafile.prototype =
         if (start == -1)
             return null;
 
+        a_key += this.d_separator; 
         const tlen = a_key.length;
         var end = start;
 
@@ -208,8 +209,8 @@ Datafile.prototype =
             // make sure to look at the entire string up to the 
             // separator in case the key is found as the beginning
             // of the word on the next line 
-            var test = this.d_data.substr(end, tlen + 1);
-            if (a_key + this.d_separator != test)
+            var test = this.d_data.substr(end, tlen);
+            if (a_key != test)
                 break;
         }
 
