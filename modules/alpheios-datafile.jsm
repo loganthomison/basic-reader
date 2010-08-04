@@ -205,8 +205,11 @@ Datafile.prototype =
 
             // if next line has different key then done,
             // else include this line in output
-            var test = this.d_data.substr(end, tlen);
-            if (a_key != test)
+            // make sure to look at the entire string up to the 
+            // separator in case the key is found as the beginning
+            // of the word on the next line 
+            var test = this.d_data.substr(end, tlen + 1);
+            if (a_key + this.d_separator != test)
                 break;
         }
 
