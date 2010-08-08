@@ -199,6 +199,15 @@ Alph.Xlate = {
                     testchar == 160)
                     break;
             }
+            // if we're on a tree diagram and the selected text element has a form attribute
+            // use that for the lookup instead of the text from the svg, which doesn't obey text
+            // direction properly (See Mozilla bug 311545 https://bugzilla.mozilla.org/show_bug.cgi?id=311545)
+            var form = Alph.$(rp).attr("form");
+            if (form)
+            {
+                Alph.Main.s_logger.debug("Overriding text selection from " + rngstr + " to " + form);
+                rngstr = form;
+            }
         }
         else
         {
@@ -245,7 +254,8 @@ Alph.Xlate = {
             this.clearSelection();
             return;
         }
-
+        
+        
         // add the range parent object to the target
         // so that the user's selection can be highlighted
         // again differently after translation, if necessary
