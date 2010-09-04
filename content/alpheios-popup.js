@@ -134,6 +134,7 @@ Alph.Xlate = {
         // check to see if the site has defined an override to our word
         // selection algorithm based upon element class names (See Bug 377)
         var wordClasses = Alph.Site.getWordClasses(rp.ownerDocument);
+        var wordClassOverride = false;
         for (var i=0; i<wordClasses.length; i++)
         {
             var wordClass = wordClasses[i];
@@ -144,6 +145,7 @@ Alph.Xlate = {
                 {
                     rp = parent;
                     ro = 0;
+                    wordClassOverride = true;
                     break;
                 }                
                                 
@@ -213,6 +215,15 @@ Alph.Xlate = {
         {
             rngstr = range.toString();
         }
+        /*
+         * if a site-defined word selection override was used, check to see 
+         * if we're instructed to preserve whitespace within the marked up element 
+         */
+        if (wordClassOverride && (Alph.$(rp).attr("alpheios-preserve-whitespace") != 'true'))        
+        {
+            rngstr = rngstr.replace(/\s+/g,'');
+        }
+
         /* detachs the range from the parent document so that DOM no longer tracks it */
         range.detach();
 
@@ -246,6 +257,7 @@ Alph.Xlate = {
             return;
         }        
         var browser = Alph.Xlate.getBrowser(rp);
+        
         var alphtarget = Alph.Main.getLanguageTool(browser,a_e.explicitOriginalTarget).findSelection(ro,rngstr);
 
         // if we couldn't identify the target word, return without doing anything
