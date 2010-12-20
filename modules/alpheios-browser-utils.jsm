@@ -51,6 +51,9 @@ const APPEND = 0x10;
 const TRUNCATE = 0x20;
 
 CU.import("resource://alpheios/ext/log4moz.js");
+try {
+CU.import("resource://gre/modules/AddonManager.jsm");
+} catch (a_e) {}
 
 /**
  * @class Alpheios Browser-Specific Utility functions
@@ -66,6 +69,11 @@ BrowserUtils = {
      * @private
      */
     d_extensionBasePaths: {},
+    
+    /**
+     * Holds the list of installed Alpheios Pakcages
+     */
+    d_alph_pkgs: [],
     
     /**
      * main logger for the BrowserUtils object
@@ -465,6 +473,21 @@ BrowserUtils = {
         return this.d_extensionBasePaths[a_ext_pkg].clone();
     },
     
+    initAlpheiosPackages: function(a_list)
+    {
+        var pkgs = [];
+        a_list.forEach(
+                function(a_item)
+                {                    
+                    if (a_item.name.match(/Alpheios/))
+                    {
+                        pkgs.push(a_item);
+                    }
+                }
+            ); 
+        this.d_alph_pkgs = pkgs;            
+    },
+    
     /**
      * Get the id and version for any installed extensions which include
      * 'Alpheios' in their name
@@ -473,27 +496,30 @@ BrowserUtils = {
      */
     getAlpheiosPackages: function()
     {
-        var alph_pkgs = [];
-        try
-        {
-            var ext_list = BrowserSvc.getSvc('ExtMgr').getItemList(
-                CI.nsIUpdateItem.TYPE_EXTENSION,{},{});
-                        
-            ext_list.forEach(
-                function(a_item)
+        if (this.d_alph_pkgs.length == 0)
+        {                          
+            // FF 4
+            try {
+                AddonManager.getAllAddons(this.initAlpheiosPackages);              
+            }
+            catch (a_e)
+            {
+                this.s_logger.error("Unable to retrieve installed extensions from AddOnManager:" + a_e);
+                // not FF4? trying old ExtMgr
+                try
                 {
-                    if (a_item.name.match(/Alpheios/))
-                    {
-                        alph_pkgs.push(a_item);
-                    }
+                    var ext_list = BrowserSvc.getSvc('ExtMgr').getItemList(
+                        CI.nsIUpdateItem.TYPE_EXTENSION,{},{});                                                
+                    this.initAlpheiosPackages(ext_list);                                        
                 }
-            );
-        }
-        catch(a_e)
-        {
-            this.s_logger.error("Error retrieving installed extensions:" + a_e);
-        }
-        return alph_pkgs;
+                
+                catch(a_e)
+                {
+                    this.s_logger.error("Error retrieving installed extensions:" + a_e);
+                }
+            }
+        }        
+        return this.d_alph_pkgs;
     },
 
     /**

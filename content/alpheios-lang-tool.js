@@ -421,8 +421,10 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
 {
     var lexicon_method =
         Alph.BrowserUtils.getPref("methods.lexicon",this.d_sourceLanguage);
+    
     if (lexicon_method == 'webservice')
-    {
+    {        
+        
         /**
          * @ignore
          */
@@ -437,7 +439,7 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
                                   encodeURIComponent(a_alphtarget.getWord()));
                 // TODO add support for the context in the lexicon url
 
-            // send asynchronous request to the lexicon service
+    
             Alph.$.ajax(
                 {
                     type: "GET",
@@ -450,9 +452,10 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
                     },
                     success: function(data, textStatus)
                         { a_onsuccess(data); }
-                }
+                   }
             );
         }
+        
     }
     else if (typeof this[lexicon_method] == 'function')
     {
@@ -992,7 +995,7 @@ Alph.LanguageTool.prototype.handleInflections = function(a_event,a_node,a_otherp
     {
         width:"300",
         height:"620",
-        screen: Alph.BrowserUtils.getPref("shift.window.loc"),
+        screen: Alph.BrowserUtils.getPref("shift.window.loc")
     }
     // add a callback to hide the loading message
     var loading_msg = Alph.Main.getString("alph-loading-inflect");
@@ -1095,7 +1098,7 @@ Alph.LanguageTool.prototype.addStyleSheet = function(a_doc,a_name)
     if (Alph.$("link[href='"+ css_url + "']",a_doc).length == 0)
     {
         this.s_logger.debug("adding stylesheet: " + css_url);
-        var css = document.createElementNS(
+        var css = a_doc.createElementNS(
             "http://www.w3.org/1999/xhtml","link");
         css.setAttribute("rel", "stylesheet");
         css.setAttribute("type", "text/css");
@@ -1842,13 +1845,21 @@ Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
     var form = Alph.Main.getString("alph-morph-form");
     var stem = Alph.Main.getString("alph-morph-stem");
     var suffix = Alph.Main.getString("alph-morph-suffix");
+    var prefix = Alph.Main.getString("alph-morph-prefix");
     var icon_url = Alph.BrowserUtils.getStyleUrl() + '/icons/';
     Alph.$(".alph-term",a_node).each(
         function()
         {
             var suff_elem = Alph.$('.alph-suff',this);
+            var pref_elem = Alph.$('.alph-pref',this);
             var message = (suff_elem.length == 0 || suff_elem.text() == '')
                 ?  form : stem + "+" + suffix;
+            if (pref_elem.length != 0 || pref_elem.text() != '')
+            {
+                message = prefix + "+" + message;
+            }
+            
+            
             var help_node = Alph.$('<span class="alph-form-end"/>',a_node);
             help_node.append(Alph.$('<span class="alph-help-link"><img src="' + icon_url + 'information-16.png" alt="Info" /></span>',
                 a_node).hover(
@@ -1894,7 +1905,7 @@ Alph.LanguageTool.prototype.addInflHelp = function(a_node, a_target)
                             }
                             // only display attributes for which we have explicitly
                             // defined strings, and which we haven't already added
-                            if (Alph.$(this).prevAll(".alph-"+title[1]).length == 0)
+                            if (name && Alph.$(this).prevAll(".alph-"+title[1]).length == 0)
                             {
                                 atts.push(name);
                             }

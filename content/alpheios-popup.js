@@ -1003,9 +1003,8 @@ Alph.Xlate = {
             css.setAttribute("class", "alpheios-css");
             Alph.$("head",topdoc).append(css);
             var css_os = Alph.$(css).clone()
-                .attr("href", style_url + "/alpheios-os.css");
+                .attr("href", style_url + "/alpheios-os.css");         
             Alph.$("head",topdoc).append(css_os);
-
 
             // add any language-specific stylesheet
             lang_tool.addStyleSheet(topdoc);
@@ -1023,9 +1022,9 @@ Alph.Xlate = {
              */
             //popup.addEventListener("mousemove", this.cancelMouseMove, false);
             //popup.addEventListener("dblclick", this.cancelDoubleClick, false);
-
+            
             Alph.$("body",topdoc).append(popup);
-
+            
 
             // add a close link
             Alph.$(popup).append('<div class="alph-title-bar"><div class="alph-close-button">&#160;</div></div>')
