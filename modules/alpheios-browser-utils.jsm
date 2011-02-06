@@ -71,10 +71,10 @@ BrowserUtils = {
     d_extensionBasePaths: {},
     
     /**
-     * Holds the list of installed Alpheios Pakcages
+     * Holds the list of installed Alpheios Packages
      */
     d_alph_pkgs: [],
-    
+        
     /**
      * main logger for the BrowserUtils object
      * @type Log4Moz.Logger
@@ -478,14 +478,14 @@ BrowserUtils = {
         var pkgs = [];
         a_list.forEach(
                 function(a_item)
-                {                    
+                {                 
                     if (a_item.name.match(/Alpheios/))
                     {
                         pkgs.push(a_item);
                     }
                 }
             ); 
-        this.d_alph_pkgs = pkgs;            
+        BrowserUtils.d_alph_pkgs = pkgs;            
     },
     
     /**
@@ -497,10 +497,15 @@ BrowserUtils = {
     getAlpheiosPackages: function()
     {
         if (this.d_alph_pkgs.length == 0)
-        {                          
+        {             
             // FF 4
             try {
-                AddonManager.getAllAddons(this.initAlpheiosPackages);              
+                AddonManager.getAllAddons(
+                    function(a_list)
+                    {
+                        BrowserUtils.initAlpheiosPackages(a_list);
+                    }
+                );              
             }
             catch (a_e)
             {
@@ -1576,7 +1581,33 @@ BrowserUtils = {
             this.s_logger.debug("Error checking offline status: " + a_e);
         }
         return offline; 
+    },
+    
+    /**
+     * Start a local process
+     * @param a_exe nsiLocalFile to be executed
+     * @param a_args array of args to pass to the process
+     */
+    startProcess: function(a_exe,a_args)
+    {
+        
+        var process = BrowserSvc.getSvc('Process');        
+        process.init(a_exe);
+        /** 
+         * in FF4, the run command behaves oddly and blocks unexpectedly
+         * so use the newer runW command
+         */
+        try {
+            process.runw(false,a_args, args.length);
+        }
+        catch (a_e)
+        {
+            // if we don't have runwAsync, use the old run command
+            process.run(false,a_args,a_args.length);
+        }
+        return process;
     }
+    
                  
 };
 
@@ -1602,7 +1633,9 @@ BrowserSvc = {
         WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"],
         DirSvc: ["@mozilla.org/file/directory_service;1","nsIProperties"],
         Prompts: ["@mozilla.org/embedcomp/prompt-service;1","nsIPromptService"],
-        GPrefs: ["@mozilla.org/preferences-service;1","nsIPrefBranch2"]                                     
+        GPrefs: ["@mozilla.org/preferences-service;1","nsIPrefBranch2"],
+        Process: ["@mozilla.org/process/util;1","nsIProcess"]                                     
+
     },
      
     /**

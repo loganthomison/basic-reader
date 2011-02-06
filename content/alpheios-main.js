@@ -125,6 +125,9 @@ Alph.Main =
      */
     onLoad: function()
     {
+		// make sure the list of installed packages
+		// is initialized as early as possible
+        Alph.BrowserUtils.getAlpheiosPackages();
         Alph.Main.d_stringBundle = Alph.$("#alpheios-strings").get(0);
         // Register an uninstaller to clear all alpheios preferences
         // when the Basic Libraries package is uninstalled. This includes
@@ -784,19 +787,15 @@ Alph.Main =
             foStream.write(line, line.length);
         }
         foStream.close();
-
-        var process =
-            cc["@mozilla.org/process/util;1"]
-                .createInstance(ci.nsIProcess);
-        process.init(daemon);
         var args = ['mhttpd.conf'];
-        process.run(false, args, args.length);
+        Alph.BrowserUtils.startProcess(daemon,args);
+        
         setTimeout(
             function() {
                 Alph.Main.getLocalDaemonPid(
                     Alph.Main.onMhttpdStart,
                     Alph.Main.alertMhttpdFailure)
-            },Alph.Main.d_daemonCheckDelay);
+            },Alph.Main.d_daemonCheckDelay);       
     },
     
     /**
