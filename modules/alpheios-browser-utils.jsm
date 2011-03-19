@@ -1591,14 +1591,16 @@ BrowserUtils = {
     startProcess: function(a_exe,a_args)
     {
         
-        var process = BrowserSvc.getSvc('Process');        
+        var process =
+            CC["@mozilla.org/process/util;1"].createInstance(CI.nsIProcess);
+                
         process.init(a_exe);
         /** 
          * in FF4, the run command behaves oddly and blocks unexpectedly
          * so use the newer runW command
          */
         try {
-            process.runw(false,a_args, args.length);
+            process.runw(false,a_args, args.length);            
         }
         catch (a_e)
         {
@@ -1633,9 +1635,7 @@ BrowserSvc = {
         WinMediator: ["@mozilla.org/appshell/window-mediator;1", "nsIWindowMediator"],
         DirSvc: ["@mozilla.org/file/directory_service;1","nsIProperties"],
         Prompts: ["@mozilla.org/embedcomp/prompt-service;1","nsIPromptService"],
-        GPrefs: ["@mozilla.org/preferences-service;1","nsIPrefBranch2"],
-        Process: ["@mozilla.org/process/util;1","nsIProcess"]                                     
-
+        GPrefs: ["@mozilla.org/preferences-service;1","nsIPrefBranch2"]                                            
     },
      
     /**

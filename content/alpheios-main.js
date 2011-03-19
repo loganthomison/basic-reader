@@ -154,7 +154,7 @@ Alph.Main =
             ]);
         // Add an observer handler user data requirements on app quit
         Alph.PkgMgr.registerObserver(
-            Alph.PkgMgr.TYPE_QUIT,
+            Alph.PkgMgr.TYPE_LASTWINDOW,
             [{id: Alph.Main.d_extensionGUID, 
               callback: Alph.DataManager.handleAppQuit,
               ctx: Alph.DataManager,
@@ -162,6 +162,7 @@ Alph.Main =
              }
             ]
         );
+        
         // Add a session restore observer to display the firstrun page upon install/update
         Alph.PkgMgr.registerObserver(
             Alph.PkgMgr.TYPE_RESTORE,
@@ -170,8 +171,20 @@ Alph.Main =
               ctx: Alph.Main,
               params: [window]
              }
-            ]
+            ]            
         );
+        
+        // FF4 register listener to display release notes
+        Alph.PkgMgr.registerObserver(
+            Alph.PkgMgr.TYPE_INSTALL,
+            [{id: Alph.Main.d_extensionGUID, 
+              callback: function() { Alph.Util.openAlpheiosLink(window,'release-notes') },
+              ctx: Alph.Main,
+              params: [window]
+             }
+            ]            
+        );
+                
         Alph.PkgMgr.start();
         window.addEventListener("unload", function(e) { Alph.Main.onUnLoad(e); },false);
         gBrowser
@@ -389,7 +402,7 @@ Alph.Main =
                 this.onMhttpdStart,
                 this.startMhttpd);   
         }
-        
+               
         Alph.DataManager.handleAppEnable(window);
     },
 
