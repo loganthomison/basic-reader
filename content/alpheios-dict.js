@@ -99,7 +99,7 @@ Alph.Dict.prototype.resetContents = function(a_panel_state,a_old_state)
             // if this browser's state hasn't been initialized yet
             if (typeof a_panel_state.contents[id] == "undefined")
             {
-                a_panel_state.contents[id] = Alph.$(doc_state.contents).clone();
+                a_panel_state.contents[id] = Alph.$(doc_state.contents).clone(true);
                 a_panel_state.css[id] = Alph.$(doc_state.css).clone();
                 a_panel_state.dicts[id] = doc_state.dict;
 
@@ -192,7 +192,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
         panel_state.last_data = null;
          // update the panel state with the new contents of the panel
         panel_state.contents[bro_id] =
-            Alph.$("#alph-window",dict_doc).clone();
+            Alph.$("#alph-window",dict_doc).clone(true);
         panel_state.css[bro_id] =
             Alph.$("link[rel=stylesheet]",dict_doc).clone();            
         this.updatePanelWindow(panel_state,bro_id);
@@ -363,7 +363,7 @@ Alph.Dict.prototype.observeUIEvent = function(a_bro,a_event_type,a_event_data)
     }
     // update the panel state with the new contents of the panel
     panel_state.contents[bro_id] =
-        Alph.$("#alph-window",dict_doc).clone();
+        Alph.$("#alph-window",dict_doc).clone(true);
     panel_state.css[bro_id] =
         Alph.$("link[rel=stylesheet]",dict_doc).clone();
 
@@ -397,7 +397,6 @@ Alph.Dict.prototype.displayDictionary = function(
     var bro_id = 'alph-dict-body';
 
     var panel_state = this.getBrowserState(a_bro);
-
     // make sure we didn't switch tabs while waiting for the response
     if (! a_request.interrupted)
     {
@@ -416,11 +415,46 @@ Alph.Dict.prototype.displayDictionary = function(
         // add the correct dictionary stylesheet if we haven't already
         a_lang_tool.addStyleSheet(a_doc,'alpheios-dict-' + a_dict_name);
 
+        var browse_link = "";
+        var browse_url  = a_lang_tool.getDictionaryBrowseUrl(a_dict_name);
+        if (browse_url)
+        {
+        	var browse_text = Alph.Main.getString("alpheios-dictionary-browse-link");
+        	browse_link = '<div class="alph-dict-browse alpheios-link"><a href="' + browse_url + '" alt="' + browse_text 
+        		+ '">' + browse_text + '</a></div>';        	
+        }
         // add an alph-dict-block around the response
-        a_html = '<div class="alph-dict-block">' + a_html + '</div>';
+        a_html = '<div class="alph-dict-block">' + browse_link + a_html + '</div>';
+       
 
         Alph.$(alph_window).append(a_html);
-
+        
+        // add root browse links
+        if (browse_url)
+        {        	
+        	Alph.$(".entry",alph_window).each(
+        			function() {
+        				var root = this.getAttribute('root');
+        				Alph.Main.s_logger.debug("Root entry" + root);
+        				if (root)
+        				{
+        					var root_url =  a_lang_tool.getDictionaryBrowseUrl(a_dict_name,root);
+        					// only add the root link if it differs from the main browse url
+        					Alph.Main.s_logger.debug("Root link " + root_url);
+        					if (root_url != browse_url)
+        					{
+        						var root_text = Alph.Main.getString("alpheios-dictionary-browse-root-link",[root]);
+        						var root_link = '<div class="alph-dict-browse alpheios-link">' + 
+        							'<a href="' + root_url + '" alt="' + root_text
+            	        		+ '">' + root_text + '</a></div>';
+        						Alph.$(this).prepend(root_link);
+        					}
+        					
+        				}
+        			}
+        	);
+        }
+        
         // the class default-dict-display shows just the short definition elements
         // from the morphology ouput
         // the class full-dict-display hides the short definition elements and
@@ -428,10 +462,17 @@ Alph.Dict.prototype.displayDictionary = function(
         Alph.$(alph_window).removeClass("default-dict-display");
         Alph.$(alph_window).addClass("full-dict-display");
 
+        Alph.$(".alph-dict-browse",alph_window).click(
+        		function() {
+        			
+        			Alph.$(this).addClass("loading");
+        		}
+        		
+        );
         // update the panel state with the new contents of the panel
 
         panel_state.contents[bro_id] =
-            Alph.$("#alph-window",a_doc).clone();
+            Alph.$("#alph-window",a_doc).clone(true);
         panel_state.css[bro_id] =
             Alph.$("link[rel=stylesheet]",a_doc).clone();
         panel_state.dicts[bro_id] = a_dict_name;
@@ -524,7 +565,7 @@ Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
     }
     Alph.$("#alph-panel-body-template",a_doc).html("");
     Alph.$("#alph-window",a_doc).remove();
-    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone());
+    Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone(true));
     Alph.$("link[rel=stylesheet]",a_doc).remove();
     Alph.$("head",a_doc).append(Alph.$(a_doc_state.css).clone());
     return a_doc_state;

@@ -1248,23 +1248,45 @@ Alph.LanguageTool.prototype.hasDictionary = function()
 
 /**
  * Get the browse url of the current dictionary
+ * @param {String} a_dict the requested dictionary (use default if null)
+ * @param {String} a_root the root term 
  * @returns the browse url of the dictionary or null if none defined
  * @type String
  */
-Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function()
+Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function(a_dict,a_root)
 {
     var browse_url = null;
-    /**
-     * Not yet implemented
-     * var default_dict = this.getDictionary();
-     * if (default_dict)
-     * {
-     *   browse_url =
-     *       Alph.BrowserUtils.getPref(
-     *           "dictionary.full." + default_dict + ".browse.url",
-     *           this.d_sourceLanguage);
-     *}
-    **/
+    var dict = a_dict;
+    if (dict == null)
+    {
+    	dict = this.getDictionary();
+    }    
+    if (dict != null)
+    {
+    	browse_url =
+            Alph.BrowserUtils.getPref(
+                "dictionary.full." + dict + ".browse.url",
+                this.d_sourceLanguage);    	
+    	if (a_root != null)
+    	{
+    		var root_param = Alph.BrowserUtils.getPref(
+                    "dictionary.full." + dict + ".browse.root_param",
+                    this.d_sourceLanguage);
+    		if (root_param != null)
+    		{      	                
+    			var cvt = 
+    				Alph.BrowserUtils.getPref("dictionary.full." + dict + ".browse.convert_method", this.d_sourceLanguage);    			
+    			if (cvt != null
+    				        && typeof this.d_converter[cvt] == 'function')                
+                {
+                    a_root = this.d_converter[cvt](a_root);
+    			}
+    			root_param = root_param.replace(/\<ROOT\>/, encodeURIComponent(a_root));
+    			browse_url = browse_url + root_param; 
+    		}
+    	}
+    	 
+    }    
     return browse_url;
 }
 
@@ -1370,7 +1392,7 @@ Alph.LanguageTool.prototype.defaultDictionaryLookup =
                 // if conversion method specified, apply it
                 var cvt = lang_obj.d_lexiconSearch[a_lemma[3]]["convert"];
                 if (cvt)
-                    a_lemma[1] = Alph.convert[cvt](a_lemma[1]);
+                    a_lemma[1] = Alph.Convert[cvt](a_lemma[1]);
             }
 
             // remember last lemma with a lexicon
