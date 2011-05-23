@@ -415,46 +415,51 @@ Alph.Dict.prototype.displayDictionary = function(
         // add the correct dictionary stylesheet if we haven't already
         a_lang_tool.addStyleSheet(a_doc,'alpheios-dict-' + a_dict_name);
 
-        var browse_link = "";
-        var browse_url  = a_lang_tool.getDictionaryBrowseUrl(a_dict_name);
-        if (browse_url)
-        {
-        	var browse_text = Alph.Main.getString("alpheios-dictionary-browse-link");
-        	browse_link = '<div class="alph-dict-browse alpheios-link"><a href="' + browse_url + '" alt="' + browse_text 
-        		+ '">' + browse_text + '</a></div>';        	
-        }
         // add an alph-dict-block around the response
-        a_html = '<div class="alph-dict-block">' + browse_link + a_html + '</div>';
+        a_html = '<div class="alph-dict-block">' + a_html + '</div>';
        
 
         Alph.$(alph_window).append(a_html);
-        
-        // add root browse links
-        if (browse_url)
-        {        	
-        	Alph.$(".entry",alph_window).each(
-        			function() {
-        				var root = this.getAttribute('root');
-        				Alph.Main.s_logger.debug("Root entry" + root);
-        				if (root)
-        				{
-        					var root_url =  a_lang_tool.getDictionaryBrowseUrl(a_dict_name,root);
-        					// only add the root link if it differs from the main browse url
-        					Alph.Main.s_logger.debug("Root link " + root_url);
-        					if (root_url != browse_url)
-        					{
-        						var root_text = Alph.Main.getString("alpheios-dictionary-browse-root-link",[root]);
-        						var root_link = '<div class="alph-dict-browse alpheios-link">' + 
-        							'<a href="' + root_url + '" alt="' + root_text
-            	        		+ '">' + root_text + '</a></div>';
-        						Alph.$(this).prepend(root_link);
-        					}
-        					
-        				}
-        			}
-        	);
+        var browse_links = [];
+                
+        Alph.$(".entry",alph_window).each(
+        	function() {
+        		var browse_url  = a_lang_tool.getDictionaryBrowseUrl(a_dict_name,this,false);
+                if (browse_url)
+                {
+                	var browse_text = Alph.Main.getString("alpheios-dictionary-browse-link");
+                	var browse_link = '<div class="alph-dict-browse alpheios-link"><a href="' + browse_url + '" alt="' + browse_text 
+                		+ '">' + browse_text + '</a></div>';
+                	browse_links.push(browse_link)
+                	var root = this.getAttribute('root');
+    				//Alph.Main.s_logger.debug("Root entry" + root);
+    				if (root)
+    				{
+    					var root_url =  a_lang_tool.getDictionaryBrowseUrl(a_dict_name,this,true);
+    					// only add the root link if it differs from the main browse url
+    					//Alph.Main.s_logger.debug("Root link " + root_url);
+    					if (root_url != browse_url)
+    					{
+    						var root_text = Alph.Main.getString("alpheios-dictionary-browse-root-link",[root]);
+    						var root_link = '<div class="alph-dict-browse alpheios-link">' + 
+    							'<a href="' + root_url + '" alt="' + root_text
+        	        		+ '">' + root_text + '</a></div>';
+    						Alph.$(this).prepend(root_link);
+    					}
+    					
+    				}
+    
+                }
+    		}
+        );
+        if (browse_links.length > 0)
+        {
+        	// just include the first browse link for the dictionary itself
+        	// for now, although we probably should list all unique entries
+        	Alph.$(".alph-dict-block",alph_window).prepend(browse_links[0]);
         }
         
+               
         // the class default-dict-display shows just the short definition elements
         // from the morphology ouput
         // the class full-dict-display hides the short definition elements and
@@ -563,8 +568,7 @@ Alph.Dict.prototype.initDocument = function(a_doc,a_doc_state)
         a_doc_state.dict = null;
 
     }
-    Alph.$("#alph-panel-body-template",a_doc).html("");
-    Alph.$("#alph-window",a_doc).remove();
+    Alph.$("body",a_doc).html("");
     Alph.$("body",a_doc).append(Alph.$(a_doc_state.contents).clone(true));
     Alph.$("link[rel=stylesheet]",a_doc).remove();
     Alph.$("head",a_doc).append(Alph.$(a_doc_state.css).clone());

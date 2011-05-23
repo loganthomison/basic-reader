@@ -1249,11 +1249,12 @@ Alph.LanguageTool.prototype.hasDictionary = function()
 /**
  * Get the browse url of the current dictionary
  * @param {String} a_dict the requested dictionary (use default if null)
- * @param {String} a_root the root term 
+ * @param {Node} a_entry the dictionary entry node 
+ * @param {Boolean} a_browseRoot flag to browse to a specific root entry
  * @returns the browse url of the dictionary or null if none defined
  * @type String
  */
-Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function(a_dict,a_root)
+Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function(a_dict,a_entry,a_browseRoot)
 {
     var browse_url = null;
     var dict = a_dict;
@@ -1263,25 +1264,38 @@ Alph.LanguageTool.prototype.getDictionaryBrowseUrl = function(a_dict,a_root)
     }    
     if (dict != null)
     {
-    	browse_url =
-            Alph.BrowserUtils.getPref(
-                "dictionary.full." + dict + ".browse.url",
-                this.d_sourceLanguage);    	
-    	if (a_root != null)
-    	{
+		var body_key = Alph.$(a_entry).attr("body-key");
+		var key_url =Alph.BrowserUtils.getPref(
+                "dictionary.full." + dict + ".browse.url." + body_key,
+                this.d_sourceLanguage);
+		if (body_key && key_url)
+		{
+			browse_url = key_url;
+		}
+		else
+		{
+			browse_url =
+	            Alph.BrowserUtils.getPref(
+	                "dictionary.full." + dict + ".browse.url",
+	                this.d_sourceLanguage);	
+		}    	    	
+    	if (a_browseRoot && Alph.$(a_entry).attr("root"))
+    	{    		    		
     		var root_param = Alph.BrowserUtils.getPref(
                     "dictionary.full." + dict + ".browse.root_param",
                     this.d_sourceLanguage);
     		if (root_param != null)
     		{      	                
     			var cvt = 
-    				Alph.BrowserUtils.getPref("dictionary.full." + dict + ".browse.convert_method", this.d_sourceLanguage);    			
+    				Alph.BrowserUtils.getPref("dictionary.full." + dict
+    						+ ".browse.convert_method", this.d_sourceLanguage);
+    			var root_term = Alph.$(a_entry).attr("root");
     			if (cvt != null
     				        && typeof this.d_converter[cvt] == 'function')                
                 {
-                    a_root = this.d_converter[cvt](a_root);
+                    root_term = this.d_converter[cvt](root_term);
     			}
-    			root_param = root_param.replace(/\<ROOT\>/, encodeURIComponent(a_root));
+    			root_param = root_param.replace(/\<ROOT\>/, encodeURIComponent(root_term));
     			browse_url = browse_url + root_param; 
     		}
     	}
