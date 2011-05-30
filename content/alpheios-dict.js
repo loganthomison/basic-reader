@@ -456,7 +456,9 @@ Alph.Dict.prototype.displayDictionary = function(
         {
         	// just include the first browse link for the dictionary itself
         	// for now, although we probably should list all unique entries
-        	Alph.$(".alph-dict-block",alph_window).prepend(browse_links[0]);
+        	Alph.$("#alph-dict-browse",alph_window).remove();
+        	Alph.$(".alph-dict-block",alph_window).prepend(
+        			'<div id="alph-dict-browse">' + browse_links[0] + '</div>');
         }
         
                
