@@ -1567,7 +1567,8 @@ Alph.Main =
             try
             {
                 var new_host = bro.contentDocument.location.host;
-                if (! new_host.match(/alpheios\.(net|org)/))
+                if (Alph.BrowserUtils.getPref("user.notify.disable")
+                		&& ! new_host.match(/alpheios\.(net|org)/))
                 {
                     Alph.BrowserUtils.openDialog(
                         window,

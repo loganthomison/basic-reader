@@ -77,4 +77,5 @@ pref("extensions.alpheios.interface.diagram.fmt.ara",'catib');
 pref("extensions.alpheios.interface.diagram.dir",'ltr');
 pref("extensions.alpheios.interface.diagram.dir.ara",'rtl');
 pref("extensions.alpheios.diagram.url",
-    'http://repos.alpheios.net:8080/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE&direction=DIRECTION');
+    'http://repos1.alpheios.net/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE&direction=DIRECTION');
+pref("extensions.alpheios.user.notifydisable",false);
