@@ -432,12 +432,17 @@ Alph.LanguageTool.prototype.setLexiconLookup = function()
         {
             this.s_logger.info("Query word: " + a_alphtarget.getWord());
 
-            var url =
-                Alph.BrowserUtils.getPref("url.lexicon",this.d_sourceLanguage) +
-                Alph.BrowserUtils.getPref("url.lexicon.request",this.d_sourceLanguage);
-                url = url.replace(/\<WORD\>/,
+            var url = Alph.BrowserUtils.getPref("url.lexicon",this.d_sourceLanguage);
+            // override local daemon per main prefs
+            if (Alph.Util.isLocalUrl(url) && Alph.BrowserUtils.getPref("morphservice.remote"))
+            {
+		   url = Alph.BrowserUtils.getPref("morphservice.remote.url");
+             
+            }
+            url = url + Alph.BrowserUtils.getPref("url.lexicon.request",this.d_sourceLanguage);
+            url = url.replace(/\<WORD\>/,
                                   encodeURIComponent(a_alphtarget.getWord()));
-                // TODO add support for the context in the lexicon url
+            // TODO add support for the context in the lexicon url
 
     
             Alph.$.ajax(

@@ -4,6 +4,8 @@ pref("extensions.alpheios.toolbar.lookup",true);
 pref("extensions.alpheios.default_language","");
 pref("extensions.alpheios.mhttpd.host",'localhost');
 pref("extensions.alpheios.mhttpd.port",8200); 
+pref("extensions.alpheios.morphservice.remote",true);
+pref("extensions.alpheios.morphservice.remote.url","http://alpheios.net/perl");
 pref("extensions.alpheios.popuptrigger",'dblclick');
 pref("extensions.alpheios.keys.toggle",'a');
 pref("extensions.alpheios.keymodifiers.toggle",'alt');

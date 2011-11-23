@@ -452,13 +452,18 @@ Alph.Main =
      * Checks to see whether the local mhttpd daemon should be
      * enabled for the extension. Checks for installation of individual
      * Alpheios language extensions which are configured to use mhttpd.
+     * Is overridden by switch for remote service.
      * @private
      * @return true if any language extension configured to use mhttpd is found
-     *         otherwise false
+     *         and remote service has not been enabled otherwise false
      * @type Boolean
      */
     useLocalDaemon: function()
     {
+        // if remote service has been enabled, return false
+        if (Alph.BrowserUtils.getPref("morphservice.remote")) {
+            return false;
+        }
         // if any one of our languages use the local daemon
         // return true
         var lang_list = Alph.Languages.getLangList();

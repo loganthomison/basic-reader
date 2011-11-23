@@ -61,6 +61,8 @@
 <!ENTITY alpheios.prefs.speech "Enable Listen Icon in Popup">
 <!ENTITY alpheios.prefs.mhttpd.host "Local mhttpd hostname:">
 <!ENTITY alpheios.prefs.mhttpd.port "Local mhttpd port:">
+<!ENTITY alpheios.prefs.morphservice.remote "Use Remote Morphology Service:">
+<!ENTITY alpheios.prefs.morphservice.remote.url "Remote Morphology Service Url:">
 <!ENTITY alpheios.prefs.sites.label "Enabled Sites...">
 <!ENTITY alpheios.prefs.sites "Alpheios-Enabled Sites">
 <!ENTITY sites.accesskey "s">

@@ -112,6 +112,12 @@
             <preference id="pref-mhttpd-port"
                         name="extensions.alpheios.mhttpd.port"
                         type="int"/> 
+            <preference id="pref-morphservice-remote"
+                        name="extensions.alpheios.morphservice.remote"
+                        type="bool"/>
+			<preference id="pref-morphservice-remote-url"
+                        name="extensions.alpheios.morphservice.remote.url"
+                        type="string"/> 
         </preferences>
         <vbox id="alpheios-prefs-adv-set" flex="1">
             <groupbox>
@@ -156,7 +162,13 @@
                         control="mhttpd-port"/>
                 <textbox id="mhttpd-port" 
                          preference="pref-mhttpd-port"/>      
-      
+         		<label control="morphservice-remote" 
+					value="&alpheios.prefs.morphservice.remote;"/>
+				<checkbox id="morphservice-remote" preference="pref-morphservice-remote"/>
+				<label value="&alpheios.prefs.morphservice.remote.url;" 
+                        control="morphservice-remote-url"/>
+                <textbox id="morphservice-remote-url" class="url"
+                         preference="pref-morphservice-remote-url"/>
             </groupbox>                
                 
             <hbox>
