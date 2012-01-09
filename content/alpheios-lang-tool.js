@@ -1721,7 +1721,11 @@ Alph.LanguageTool.prototype.addWordTools = function(a_node, a_target)
         );
     }
     
-    if (this.getFeature('alpheios-speech') && Alph.BrowserUtils.getPref("url.speech",this.d_sourceLanguage))
+    if (this.getFeature('alpheios-speech') 
+        && Alph.BrowserUtils.getPref("url.speech",this.d_sourceLanguage)
+        // Currently speech function piggy backs on morphservice.remote setting because
+        // espeak is called through mhttpd and must be enabled only if mhttpd is
+        && !(Alph.BrowserUtils.getPref("morphservice.remote")))
     {
         var alt_text = Alph.Main.getString('alph-speech-link');
         var link = Alph.$(
