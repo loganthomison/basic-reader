@@ -1,0 +1,5 @@
+/* default version of Georgia on mac is missing glyphs for some extended
+ * chars and interferes with their correct display */
+*:lang(greek),*[lang=greek],*:lang(grc),*[lang=grc],.card {
+      font-family: "New Athena Unicode", Gentium, "Palatino Linotype", "Lucida Grande", Galilee, "Arial Unicode MS", sans-serif;
+}

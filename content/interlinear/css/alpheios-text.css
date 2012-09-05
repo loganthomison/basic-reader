@@ -1,0 +1,575 @@
+/*
+ * Stylesheet for Alpheios Texts
+ * Copyright 2008 Cantus Foundation
+ * http://alpheios.net
+ * 
+ * This file is part of Alpheios.
+ * 
+ * Alpheios is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alpheios is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+
+/**
+ * General TEI Elements
+ */ 
+body {
+    font-family: Arial,sans-serif;
+}
+
+*:lang(greek),*[lang=greek],*:lang(grc),*[lang=grc],.card,.Poem {
+      font-family: Georgia, "New Athena Unicode", Gentium, "Palatino Linotype", "Lucida Grande", Galilee, "Arial Unicode MS", sans-serif;
+}
+
+.card, .Poem {
+    font-size: 130%;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    display: table; /* hack to center variable width div */
+}
+
+div#header {
+    
+    vertical-align: 40px;
+    float: left;
+    width: 100%;
+    border-bottom: 2px solid black;
+}
+#alpheios-current-level {
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+
+#alpheios-current-level[alpheios-value="learner"] {
+	background: url('../img/learning_16.png') no-repeat 0 2px;
+}
+
+#alpheios-current-level[alpheios-value="reader"] {
+	background: url('../img/reading_16.png') no-repeat 0 2px;
+}
+
+#alpheios-current-level span {
+	padding-left: 20px;
+	color: #0E2233;
+	font-weight: bold;
+	padding-right: 1em;
+	display: none;
+}
+
+#alpheios-current-level span.alpheios-current {
+	display: block;
+}
+
+div#header div#header_text {
+    margin-left: 1em;
+    display: block;
+    float: left;
+}
+
+div#header h1 {
+    font-size: 110%;
+    margin: 2px auto;
+    float: left;
+    display: block;
+    margin-top: 10px;
+    line-height: 1em;
+}
+
+div#header h4 {
+    float: left;
+    font-size: medium;
+    margin-top: 2px;
+    clear: both;
+}
+
+.title {
+    font-style: italic;
+}
+
+.stdfooter {
+    text-align: left;
+}
+
+.stdfooter hr {
+    display: none;
+}
+
+.rights_info, address {
+    background-color: white !important;
+    font-size: small;
+    text-align: left;
+}
+
+.citelabel {
+    display: none;
+}
+
+.linenum {
+    float: right;
+    vertical-align: top;
+    margin-right: 1em;
+    font-size: 100%;
+    padding-top: .5em;
+}
+
+.para {
+    margin-top: 1em;
+}
+
+.milestone.line {
+    margin-top: 1em;
+}
+
+.milestone.card {
+    display: none;
+}
+
+.upLink {
+    display: none;
+}
+
+.l {
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: .5em;
+}
+
+/**
+ * Styles for Perseus-Sourced texts 
+ */
+.perseus-funder,.perseus-publication {
+    font-size: small;
+    text-align: left;
+    font-family: Arial,sans-serif;
+}
+.perseus-funder span, .perseus-publication span {
+    padding-left: .25em;
+}
+
+/**
+ * Alpheios Only Text elements
+ */
+a {
+	color: #3E8D9C;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #5BC8DC;
+	text-decoration: underline;
+}
+
+.alpheios-next-prev {
+    text-align: right;
+    margin-right: .5em;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 100%;
+    clear: both;
+}
+
+.alpheios-next-prev p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.alpheios-next-prev img {
+    border: none;
+}
+
+.alpheios-next-prev a {
+    padding-left: .25em;
+    padding-right: .25em;
+}
+
+.hide-prev {
+    visibility: hidden;
+}
+
+#alpheios-interlinear-parent {
+    position: relative;
+    font-size: small;
+    text-align: right;
+    margin: .5em; 
+    display: none;
+}
+
+body[alpheios-level=learner] #alpheios-interlinear-parent {
+     display: none !important;
+}
+
+#alph-page-header a {
+    vertical-align: middle;
+    padding-left: .5em !important;
+    padding-right: .5em !important;
+    font-style: italic;
+    text-decoration: none;
+}
+
+.alpheios-logo {
+    font-size: 120%;
+}
+
+#alph-page-header img {
+    border: none;
+    padding-right: 1em;
+    margin-top: .25em;
+    vertical-align: bottom;
+}
+
+.alpheios-toolbar {
+    font-size: 12px;
+    clear: both;
+    margin-top: .5em;
+    margin-bottom: .5em;
+    margin-left: .5em;
+    margin-right: .5em;
+    padding: 2px;
+    height: 36px;
+}
+
+#alph-toolbar {
+    overflow: visible;
+    clip: auto;
+    min-width: 700px;
+}
+
+#alph-toolbar-main {
+    float: left;
+}
+
+#alph-citation-links img{
+    border: none;
+    margin-left: 1em;
+    vertical-align: bottom;
+}
+
+#citation {
+    clear: both;
+    font-size: 90%;
+    border-top: 1px dotted black;
+    margin-left: .5em;
+    margin-right: .5em;
+    font-family: Arial,sans-serif;
+
+}
+
+#alph-text-links {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    clear: both;
+}
+
+
+/**
+ * Alpheios Application Interaction 
+ * Elements and Classes
+ */
+.alpheios-highlight-parallel {
+    background-color: #FFEE77;
+}
+
+
+body[alpheios-level=learner] .alpheios-highlight-parallel {
+    background-color: transparent;
+}
+
+.alpheios-highlight-source {
+    background-color: #FFEE77;
+}
+
+.alpheios-highlight-source[nrefs=""] {
+    background-color: transparent;
+    border: 2px solid #FFEE77;
+}
+
+.alpheios-aligned-word {
+    cursor: pointer;
+    position: relative;
+}
+
+.alpheios-aligned-trans {
+    color: blue;
+    font-size: 80%;
+    position: absolute;
+    padding-right: .25em;
+}
+
+body[alpheios-level=learner] .alpheios-aligned-trans {
+     visibility: hidden !important;
+}
+ 
+.alpheios-word-wrap {
+    display: inline;
+    position: relative;
+    line-height: 200%;
+}
+
+.alpheios-inline-query-select {
+    cursor: pointer;
+}
+
+#alpheios-loading-interlinear {
+    position: absolute;
+    bottom: 0;
+    right: -1em;
+    z-index: 100;
+    text-align: right;
+    padding-left: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    background-image: url(loading.gif);
+    background-repeat: no-repeat;
+    background-color: #72CEDF;
+    cursor: progress;
+    white-space: nowrap;
+}
+
+#alpheios-install-links {
+    display: none;
+}
+
+#alpheios-install-links li {
+    list-style: none;
+    margin: 1em;
+}
+
+#alpheios-install-links li a:not(.alpheios-site-link){
+        background: #E49A0D;
+        color: white !important;
+        font-weight: bold !important;
+        font-size: 12pt;
+        cursor: pointer;
+        vertical-align: bottom;
+        padding: 4px;
+}
+
+#alpheios-install-links li a:not(.alpheios-site-link):hover{
+      color: white !important;
+      text-decoration: none !important;
+      border: 1px solid #5BC8DC !important;
+}
+
+#alpheios-install-links span.alpheios-install-plus {
+      color: #F6D918 !important;
+      font-size: 14pt;
+}
+
+.alpheios-toolbar,#alph-toolbar-main,#alph-toolbar-tools {
+	background-color: #4e6476;
+	height: 36px;
+}
+
+.alpheios-toolbar li {
+	margin-top: 2px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 28px;
+
+}
+
+.alpheios-toolbar li ul li{
+	padding-left: .5em;
+	padding-right: .5em;
+}
+
+.alpheios-toolbar-translation {
+	background: transparent url(../img/translation_static.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-translation.alpheios-current {
+	border-width: 1px;
+        border-style: inset;
+	background: #7E8897 url(../img/translation_static.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-translation:hover {
+	background: #7E8897 url(../img/translation_active.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-tree {
+	background: transparent url(../img/diagram_static.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-tree:hover {
+	background: #7E8897 url(../img/diagram_active.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-usertools {
+	background: transparent url(../img/tools_static.png) no-repeat !important;
+}
+
+.alpheios-toolbar-usertools:hover {
+	background: #7E8897 url(../img/tools_active.png) no-repeat !important;
+}
+
+.alpheios-toolbar li.alpheios-toolbar-level-label {
+	padding-left: 0;
+	border: none;
+	margin: 0 0;
+}
+
+.sf-menu li.alpheios-toolbar-level-label, .sf-menu li.alpheios-toolbar-level-label a:hover {
+	background: #4e6476 !important;
+	cursor: default;
+}
+
+.sf-menu li.alpheios-toolbar-level {
+	border: none;
+	margin: 0 0;
+}
+
+.sf-menu li.alpheios-toolbar-level a {
+	padding: 1px 0 0 0;
+	background: transparent;
+}
+
+.alpheios-toolbar-level.learner img {
+         border: 0;
+	 width: 2px; 	 
+	 height: 23px;
+}
+
+.sf-menu li.alpheios-toolbar-inflect a {
+	padding-top: .25em;
+	padding-bottom: .25em;
+}
+
+li.alpheios-toolbar-inflect {
+/**        line-height: 0.65; */
+}
+
+.alpheios-toolbar-level.learner {
+	background: transparent url(../img/learning_off.gif) no-repeat 0px 3px!important;
+	padding-right: 0px;
+	padding-left: 25px;
+	line-height: 23px;
+	cursor: pointer;
+}
+
+.alpheios-toolbar-level.learner:hover, .alpheios-toolbar-level.learner.alpheios-current {
+	background: transparent url(../img/learning_on.gif) 0px 3px no-repeat !important;
+	padding-right: 0px;
+	padding-left: 25px;
+	line-height: 23px;
+	cursor: pointer;
+}
+
+.alpheios-toolbar-level.reader {
+	background: transparent url(../img/reading_off.gif) 0px 3px no-repeat !important;
+	padding-left: 0px;
+	padding-right: 25px;
+	line-height: 23px;
+	cursor: pointer;
+}
+
+.alpheios-toolbar-level.reader:hover, .alpheios-toolbar-level.reader.alpheios-current {
+	background: transparent url(../img/reading_on.gif) 0px 3px no-repeat !important;
+	padding-left: 0px;
+	padding-right: 25px;
+	line-height: 23px;
+	cursor: pointer;
+}
+
+.alpheios-toolbar-inflect {
+	background: transparent url(../img/inflection_static.gif) no-repeat 0 -2px !important;
+}
+
+.alpheios-toolbar-inflect:hover {
+	background: #7E8897 url(../img/inflection_active.gif) no-repeat 0 -2px !important;
+}
+
+.alpheios-toolbar-grammar {
+	background: transparent url(../img/grammar_static.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-grammar:hover {
+	background: #7E8897 url(../img/grammar_active.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-options {
+	background: url(../img/options_static.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-options:hover {
+	background: #7E8897 url(../img/options_active.gif) no-repeat !important;
+}
+
+.alpheios-toolbar-help-menu {
+	background: url(../img/help_static.gif) no-repeat 0 -2px !important;
+}
+
+.alpheios-toolbar-help-menu:hover {
+	background: #7E8897 url(../img/help_active.gif) no-repeat 0 -2px !important;
+}
+
+#alph-citation-icon {
+	padding-bottom: 2px;
+	padding-left: 2px;
+
+}
+
+.alpheios-trigger-hint {
+	margin-right: 1em;
+	float: right;
+	max-width: 50%;
+
+}
+
+.alpheios-hint {
+    color: #4E6476;
+    font-style: italic;
+    margin-bottom: 1em;
+    padding-left: 18px;
+    background: url(chrome://alpheios/skin/icons/information-16-g.png) 0 0 no-repeat;
+}
+
+.alpheios-version-text {
+	font-size: 28px;
+	float: right;
+	margin: 10px 10px 0px 10px;
+	display: none;
+}
+
+.alpheios-version-text a {
+	font-style: normal !important;
+}
+
+.alpheios-tooltip {
+    font-size: small !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    background-color: #5BC8DC !important;
+    border: 1px solid #B8B7B5 !important;
+    position: absolute;
+    top: 20px;
+    left: 16px;
+    z-index: 1000;
+    font-family:  Arial, sans-serif;
+    line-height: 1em;
+    padding: 0px;
+}
+
+.error {
+    color: #e55;
+    font-weight: bold;
+    background: url(../img/error.png) 0 0 no-repeat;
+    padding: 2px 0 0 22px;
+}
+
+li.disabled {
+    display: none !important;
+}
