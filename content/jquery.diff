@@ -1,0 +1,6 @@
+1660,1662c1660
+< 			var name = (r[i].className instanceof SVGAnimatedString) ?
+< 						r[i].className.baseVal : r[i].className;
+< 			var pass = (" " + name + " ").indexOf( m ) >= 0;
+---
+> 			var pass = (" " + r[i].className + " ").indexOf( m ) >= 0;
