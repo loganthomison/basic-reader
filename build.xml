@@ -18,7 +18,7 @@
 	          value="/test/docs/${app.name}"/>
 	<property name="release.id" value="1.0beta2" />
 	<property name="svnant.lib.dir" value="/svnant-1.0.0"/>
-	<property name="extras" value="mhttpd,xsl,xsl_chrome,align_css,align_img,espeak"/>
+	<property name="extras" value="mhttpd,xsl,xsl_chrome,espeak"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 	
