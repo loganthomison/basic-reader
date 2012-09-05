@@ -87,9 +87,7 @@ XmlDataType.prototype.serialize = function()
      var recent_win = BrowserUtils.getMostRecentWindow("navigator:browser");
      var serialized = "";
      try {
-        serialized = recent_win.XML(
-            recent_win.XMLSerializer().serializeToString(this.d_dataObj)
-        ).toXMLString();
+        serialized = recent_win.XMLSerializer().serializeToString(this.d_dataObj);
      }
      catch(a_e)
      {

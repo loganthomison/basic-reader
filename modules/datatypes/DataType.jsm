@@ -118,8 +118,7 @@ DataType.prototype.doXMLExport = function(a_window,a_event)
                                     {       
                                         BrowserUtils.writeLocalFile(
                                             a_path,
-                                            a_window.XML(a_window.XMLSerializer().serializeToString(this.asXML()))
-                                                    .toXMLString(),
+                                            a_window.XMLSerializer().serializeToString(this.asXML()),
                                             this.d_charSet);
                                         return true;
                                     }
