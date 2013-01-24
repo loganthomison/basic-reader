@@ -33,6 +33,8 @@
 <!ENTITY alpheios.menu.wordlist.tooltip "See My Word List">
 <!ENTITY alpheios.menu.user.diagram "Diagram Sentence">
 <!ENTITY alpheios.menu.user.diagram.tooltip "Sentence Diagrams Tool">
+<!ENTITY alpheios.menu.user.align "Align Translation">
+<!ENTITY alpheios.menu.user.align.tooltip "Translation Alignment Tool">
 <!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-view-label "View">
 <!ENTITY alpheios-view-tooltip "Alpheios Browser Panels">

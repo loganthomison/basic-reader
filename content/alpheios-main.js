@@ -2212,6 +2212,22 @@ Alph.Main =
     },
     
     /**
+     * open new alignment edit window
+     * @param {Event} a_event the initiating event
+     */
+    userAlign: function(a_event)
+    {
+        Alph.BrowserUtils.openDialog(
+                        window,
+                        Alph.BrowserUtils.getPref("user.align.url"),
+                        'alpheios-user-align-dialog',
+                        null,
+                        {}
+                        );
+                        
+    },
+    
+    /**
      * Get the the hasLanguages flag to see if any languages are installed
      * @returns true if at least one language is installed, otherwise false
      */

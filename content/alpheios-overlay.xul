@@ -79,6 +79,10 @@
             class="alpheios-language-notifier alpheios-userdata-notifier"
             hidden="true"
             disabled="true"/>
+        <broadcaster id="alpheios-user-align"
+            class="alpheios-language-notifier alpheios-userdata-notifier"
+            hidden="true"
+            disabled="true"/>
     </broadcasterset>
         
 	<commandset id="mainCommandSet">
@@ -101,7 +105,11 @@
         <command
             id="alpheios-user-diagram-cmd" 
             oncommand="Alph.Main.userDiagram(event);"
-            observes="alpheios-user-diagram"/>                        
+            observes="alpheios-user-diagram"/>       
+        <command
+            id="alpheios-user-align-cmd" 
+            oncommand="Alph.Main.userAlign(event);"
+            observes="alpheios-user-align"/>                        
         <command id="alpheios-options-cmd" 
             oncommand="Alph.BrowserUtils.openDialog(
                 window,
@@ -271,6 +279,11 @@
                         label="&alpheios.menu.user.diagram;"
                         tooltiptext="&alpheios.menu.user.diagram.tooltip;"
                         command="alpheios-user-diagram-cmd"/>
+					<menuitem
+                        id="alpheios-user-align-mm"
+                        label="&alpheios.menu.user.align;"
+                        tooltiptext="&alpheios.menu.user.align.tooltip;"
+                        command="alpheios-user-align-cmd"/>
                     <menuitem
                         id="alpheios-user.backup-mm"
                         label="&alpheios.menu.backup;"

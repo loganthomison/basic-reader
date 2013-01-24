@@ -17,6 +17,7 @@ pref("extensions.alpheios.features.alpheios-inflect",false);
 pref("extensions.alpheios.features.alpheios-grammar",false);
 pref("extensions.alpheios.features.alpheios-vocab",true);
 pref("extensions.alpheios.features.alpheios-user-diagram",true);
+pref("extensions.alpheios.features.alpheios-user-align",true);
 pref("extensions.alpheios.features.alpheios-interlinear",false);
 pref("extensions.alpheios.features.alpheios-speech",true);
 pref("extensions.alpheios.cmds.alpheios-inflect-cmd","handleInflections");
@@ -82,4 +83,6 @@ pref("extensions.alpheios.diagram.url",
     'http://repos1.alpheios.net/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE&direction=DIRECTION');
 pref("extensions.alpheios.user.diagram.url",
     'http://repos1.alpheios.net/exist/rest/db/app/treebank-entertext.xhtml');
+pref("extensions.alpheios.user.align.url",
+	'http://repos1.alpheios.net/exist/rest/db/app/align-entersentence.xhtml');
 pref("extensions.alpheios.user.notifydisable",false);
