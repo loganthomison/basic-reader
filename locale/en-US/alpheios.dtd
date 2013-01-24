@@ -31,8 +31,8 @@
 <!ENTITY alpheios.menu.clear.tooltip "Clear Data Now">
 <!ENTITY alpheios.menu.wordlist "Word List">
 <!ENTITY alpheios.menu.wordlist.tooltip "See My Word List">
-<!ENTITY alpheios.menu.user.diagram "My Diagrams">
-<!ENTITY alpheios.menu.user.diagram.tooltip "Add and Edit Sentence Diagrams">
+<!ENTITY alpheios.menu.user.diagram "Diagram Sentence">
+<!ENTITY alpheios.menu.user.diagram.tooltip "Sentence Diagrams Tool">
 <!ENTITY alpheios-tools-status-disabled "[Off]">
 <!ENTITY alpheios-view-label "View">
 <!ENTITY alpheios-view-tooltip "Alpheios Browser Panels">

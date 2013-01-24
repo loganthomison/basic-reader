@@ -320,7 +320,7 @@ Alph.Util = {
      * which opened the tab being current in the parent opener window before being executed.
      * Requires that the secondary window arguments contain an object which has the following properties:
      *     {Document} e_srcDoc: the document which initiated the opening of the secondary window
-     *     {Function} e_proxiedHandler: event handling function to be executed 
+     *     e_proxiedHandler: event handling function to be executed 
      * @param {Event} a_event the event being handled 
      */
     proxyEventHandler: function(a_event)

@@ -80,4 +80,6 @@ pref("extensions.alpheios.interface.diagram.dir",'ltr');
 pref("extensions.alpheios.interface.diagram.dir.ara",'rtl');
 pref("extensions.alpheios.diagram.url",
     'http://repos1.alpheios.net/exist/rest/db/app/treebank-editsentence.xhtml?doc=DOC&s=SENTENCE&lang=LANG&sequential=SEQUENTIAL&sentenceNavigation=no&subdoc=SENTENCE&direction=DIRECTION');
+pref("extensions.alpheios.user.diagram.url",
+    'http://repos1.alpheios.net/exist/rest/db/app/treebank-entertext.xhtml');
 pref("extensions.alpheios.user.notifydisable",false);

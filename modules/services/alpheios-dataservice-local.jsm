@@ -121,7 +121,7 @@ DataServiceLocal.prototype.restore = function(a_window)
 /**
  * get a callback function to execute the data restore
  * @returns restore callback which takes a single argument, the parent window 
- * @type Function
+ * @type 
  */
 DataServiceLocal.prototype.getRestoreCallback = function()
 {
@@ -148,7 +148,7 @@ DataServiceLocal.prototype.getRestoreCallback = function()
  * Get a callback function to execute the data backup
  * @param {int} a_keep the number of old backups to keep
  * @returns backup callback which takes a single argument, the parent window 
- * @type Function
+ * @type 
  */
 DataServiceLocal.prototype.getBackupCallback = function(a_keep)
 {

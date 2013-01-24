@@ -980,7 +980,12 @@ Alph.Xlate = {
         // check the alpheios state object for the prior element
         if (alph_state.getVar("lastElem"))
         {
-            popup = Alph.$("#alph-window",alph_state.getVar("lastElem").ownerDocument).get(0);
+        	try {
+        		popup = Alph.$("#alph-window",alph_state.getVar("lastElem").ownerDocument).get(0);
+        	} catch(e){
+                Alph.Main.s_logger.error("Error getting lastElem: " + e);
+        	}
+        	
         }
         // if the popup window exists, and it's in a different document than
         // the current one, remove it from the prior document

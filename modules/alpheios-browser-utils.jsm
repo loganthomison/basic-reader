@@ -1191,7 +1191,7 @@ BrowserUtils = {
      * Recursively examin a file or directory, performing callback it and each subdirectory and its files
      * @param {nsIFile} a_fileOrDir nsIFile of type NORMAL_FILE_TYP or DIRECTORY_TYPE
      * @param {String} a_parentPath the unix-style parent path for the file 
-     * @param {Function} a_callback callback to execute on each file 
+     * @param a_callback callback to execute on each file 
      *                             (takes the current file and path as arguments) 
      */
     recurseFile: function(a_fileOrDir, a_parentPath, a_callback)
@@ -1342,7 +1342,7 @@ BrowserUtils = {
      * @param {Window} a_window the parent window
      * @param {Event} a_event the initiating event
      * @param {String} a_title the title for the dialog (string or key into properties)
-     * @param {Function} a_callback callback function called upon folder select or cancel
+     * @param a_callback callback function called upon folder select or cancel
      *                   callback args are the window, the event, the return code and the file 
      * @param {Object} a_ctx the 'this' object for the callback 
      * @param {String} a_defaultDir the default directory for the dialog (optional)
@@ -1368,7 +1368,7 @@ BrowserUtils = {
      * @param {Window} a_window the parent window
      * @param {Event} a_event the initiating event
      * @param {String} a_title the title for the dialog (string or key into properties)
-     * @param {Function} a_callback callback function called upon file select or cancel
+     * @param a_callback callback function called upon file select or cancel
      *                   callback args are the window, the event, the return code and the file path
      * @param {Object} a_ctx the 'this' object for the callback 
      * @param {String} a_defaultExt the default extension filter string for the dialog e.g. *.zip (optional)
@@ -1533,7 +1533,7 @@ BrowserUtils = {
     /**
      * Iterate through the open browser windows, executing a callback
      * in the context of each window. 
-     * @param {Function} a_callback callback function. Should accept the browser
+     * @param a_callback callback function. Should accept the browser
      *                              as a parameter and return a Boolean     *                              
      * @returns the return value for the callback (true if it returned true in any browser, 
      *                                          false only if it returned false in all browsers)

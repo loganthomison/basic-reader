@@ -656,7 +656,7 @@ Alph.Site = {
      * @param {Array} a_words array of words within the document for which to 
      *                        retrieve the interlinear display
      * @param {Document} a_source the document containing the aligned translation
-     * @param {Function} a_end_callback Callback function to execute once request
+     * @param a_end_callback Callback function to execute once request
      *                                  is finished. 
      */
     populateInterlinear: function(a_words,a_source,a_end_callback)
@@ -805,9 +805,9 @@ Alph.Site = {
     /**
      * Load the document contained the aligned text for the supplied source document
      * @param Document a_src_doc the source document
-     * @param Function a_success success callback (gets the parsed alignment document
+     * @param a_success success callback (gets the parsed alignment document
      *                           as the first parameter)
-     * @param Function a_error error callback (gets the error message as the
+     * @param a_error error callback (gets the error message as the
      *                         first parameter
      * @returns the alignment document, parsed as xhtml+xml
      * @type Document
@@ -1098,7 +1098,7 @@ Alph.Site = {
      * or absense on the user's wordlist
      * @param {Alph.LanguageTool} a_langTool the appropriate Alpheios Language Tool
      * @param {Document} a_doc the document to update
-     * @param {Function} a_callback a function to call upon completion
+     * @param a_callback a function to call upon completion
      */
     scanWords: function(a_langTool,a_doc,a_callback)
     {

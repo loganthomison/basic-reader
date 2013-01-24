@@ -166,7 +166,7 @@ DataType.prototype.getDefault = function()
  * Add an observer function on x data sets
  * @param {String} a_name the unique name for the observer
  * @param {int} a_num the number of set accesses after which to execute the callback
- * @param {Function} the a_callback the callback to execute
+ * @param the a_callback the callback to execute
  * @param {Object} a_ctx the 'this' object context for the callback
  */
 DataType.prototype.addSetterObserver = function(a_name,a_num,a_callback,a_ctx)

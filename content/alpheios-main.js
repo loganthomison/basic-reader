@@ -2201,7 +2201,7 @@ Alph.Main =
     {
         Alph.BrowserUtils.openDialog(
                         window,
-                        Alph.BrowserUtils.getContentUrl() + '/dialogs/user-diagram.xul', 
+                        Alph.BrowserUtils.getPref("user.diagram.url"),
                         'alpheios-user-diagram-dialog',
                         null,
                         { e_langTool: Alph.Main.getLanguageTool(),

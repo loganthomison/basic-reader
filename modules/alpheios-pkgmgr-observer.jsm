@@ -174,8 +174,8 @@ PkgMgr =
      * register a package to observe
      * @param {String} a_type the type of observer (one of PkgMgr.TYPE_QUIT or PkgMgr.TYPE_UNINSTALL) 
      * @param {String} a_id the package id
-     * @param {Function} a_callback callback function to execute upon update
-     * @param {Function} a_ctx callback function context
+     * @param  a_callback callback function to execute upon update
+     * @param  a_ctx callback function context
      * @param {Array} a_params callback function parameters 
      */
     registerPkg : function(a_type,a_id,a_callback,a_ctx,a_params) 
